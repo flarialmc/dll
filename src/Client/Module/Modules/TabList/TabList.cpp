@@ -74,9 +74,82 @@ static std::atomic<bool> g_shouldStopLoading{false};
 static std::vector<std::thread> g_loaderThreads;
 static constexpr int NUM_LOADER_THREADS = 3; // Use 3 threads for loading
 
+
+// Dedicated DX12 Uploader Infrastructure
+static winrt::com_ptr<ID3D12CommandQueue> g_uploadQueueDX12;
+static winrt::com_ptr<ID3D12CommandAllocator> g_uploadAllocatorDX12;
+static winrt::com_ptr<ID3D12GraphicsCommandList> g_uploadCmdListDX12;
+static winrt::com_ptr<ID3D12Fence> g_uploadFenceDX12;
+static UINT64 g_uploadFenceValue = 0;
+static HANDLE g_uploadFenceEvent = nullptr;
+
+void InitializeDX12Uploader() {
+    if (g_uploadQueueDX12 || !SwapchainHook::d3d12Device5) {
+        return;
+    }
+
+    D3D12_COMMAND_QUEUE_DESC queueDesc = {};
+    queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+    queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
+    queueDesc.NodeMask = 1;
+    if (FAILED(SwapchainHook::d3d12Device5->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(g_uploadQueueDX12.put())))) {
+        if (logDebug) Logger::debug("Failed to create DX12 upload queue");
+        return;
+    }
+
+    if (FAILED(SwapchainHook::d3d12Device5->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(g_uploadAllocatorDX12.put())))) {
+        if (logDebug) Logger::debug("Failed to create DX12 upload allocator");
+        g_uploadQueueDX12 = nullptr;
+        return;
+    }
+
+    if (FAILED(SwapchainHook::d3d12Device5->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, g_uploadAllocatorDX12.get(), nullptr, IID_PPV_ARGS(g_uploadCmdListDX12.put())))) {
+        if (logDebug) Logger::debug("Failed to create DX12 upload command list");
+        g_uploadAllocatorDX12 = nullptr;
+        g_uploadQueueDX12 = nullptr;
+        return;
+    }
+    g_uploadCmdListDX12->Close();
+
+    if (FAILED(SwapchainHook::d3d12Device5->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(g_uploadFenceDX12.put())))) {
+        if (logDebug) Logger::debug("Failed to create DX12 upload fence");
+        g_uploadCmdListDX12 = nullptr;
+        g_uploadAllocatorDX12 = nullptr;
+        g_uploadQueueDX12 = nullptr;
+        return;
+    }
+    g_uploadFenceValue = 0;
+
+    g_uploadFenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+    if (!g_uploadFenceEvent) {
+        if (logDebug) Logger::debug("Failed to create DX12 upload fence event");
+        g_uploadFenceDX12 = nullptr;
+        g_uploadCmdListDX12 = nullptr;
+        g_uploadAllocatorDX12 = nullptr;
+        g_uploadQueueDX12 = nullptr;
+        return;
+    }
+
+    if (logDebug) Logger::debug("Initialized DX12 Uploader");
+}
+
+void CleanupDX12Uploader() {
+    if (g_uploadFenceEvent) {
+        CloseHandle(g_uploadFenceEvent);
+        g_uploadFenceEvent = nullptr;
+    }
+    g_uploadFenceDX12 = nullptr;
+    g_uploadCmdListDX12 = nullptr;
+    g_uploadAllocatorDX12 = nullptr;
+    g_uploadQueueDX12 = nullptr;
+    if (logDebug) Logger::debug("Cleaned up DX12 Uploader");
+}
+
+// END Dedicated DX12 Uploader Infrastructure
+
+
 // Forward declarations for sync functions
 PlayerHeadTexture *CreateTextureFromBytesDX12Sync(const std::string &playerName, const unsigned char *data, int width, int height);
-
 ID3D11ShaderResourceView *CreateTextureFromBytesDX11Sync(const std::string &playerName, const unsigned char *data, int width, int height);
 
 // Custom rendering function for crisp pixel art - DX12
@@ -156,6 +229,8 @@ void CleanupPlayerHeadTextures() {
     // Stop async loading first
     StopAsyncLoading();
 
+    CleanupDX12Uploader();
+
     // Clear DX12 textures and free descriptors
     {
         std::lock_guard<std::mutex> lock(g_playerHeadMutex);
@@ -187,6 +262,11 @@ void PlayerHeadLoaderWorker() {
             if (g_shouldStopLoading) break;
 
             if (g_loadQueue.empty()) continue;
+
+            if (!g_loadQueue.front().imageData.size()) {
+                g_loadQueue.pop();
+                continue;
+            }
 
             task = std::move(g_loadQueue.front());
             g_loadQueue.pop();
@@ -225,6 +305,10 @@ void InitializeAsyncLoading() {
 
 // Process ready textures on main thread (called each frame)
 void ProcessReadyPlayerHeadTextures() {
+    if (SwapchainHook::d3d12Device5 && !g_uploadQueueDX12) {
+        InitializeDX12Uploader();
+    }
+
     // Skip processing if we're already running slow (adaptive throttling)
     static auto lastFrameTime = std::chrono::high_resolution_clock::now();
     auto currentTime = std::chrono::high_resolution_clock::now();
@@ -283,6 +367,9 @@ void TabList::onEnable() {
     Listen(this, KeyEvent, &TabList::onKey)
     Listen(this, MouseEvent, &TabList::onMouse)
     InitializeAsyncLoading();
+    // START OF CHANGE: Initialize DX12 Uploader
+    InitializeDX12Uploader();
+    // END OF CHANGE
     Module::onEnable();
 }
 
@@ -523,20 +610,22 @@ ID3D11ShaderResourceView *CreateTextureFromBytesDX11Sync(
     return playerTex.srv.get();
 }
 
-
-// Synchronous DX12 texture creation (called from worker threads)
+// =================================================================================
+// START OF CHANGES: Rewritten DX12 Sync Texture Creation
+// =================================================================================
 PlayerHeadTexture *CreateTextureFromBytesDX12Sync(
     const std::string &playerName,
     const unsigned char *data,
     int width,
     int height) {
-    // Check minimal requirements for DX12
-    if (!SwapchainHook::d3d12Device5 || !SwapchainHook::d3d12DescriptorHeapImGuiRender || !data || width <= 0 || height <= 0) {
+    // Check minimal requirements for DX12 and our uploader
+    if (!SwapchainHook::d3d12Device5 || !SwapchainHook::d3d12DescriptorHeapImGuiRender || !data || width <= 0 || height <= 0 || !g_uploadQueueDX12) {
         if (logDebug)
-            Logger::debug("DX12 minimal requirements not met - device: {}, heap: {}, data: {}, size: {}x{}",
+            Logger::debug("DX12 minimal requirements not met - device: {}, heap: {}, data: {}, size: {}x{}, uploader: {}",
                           SwapchainHook::d3d12Device5 ? "valid" : "null",
                           SwapchainHook::d3d12DescriptorHeapImGuiRender ? "valid" : "null",
-                          data ? "valid" : "null", width, height);
+                          data ? "valid" : "null", width, height,
+                          g_uploadQueueDX12 ? "valid" : "null");
         return nullptr;
     }
 
@@ -638,28 +727,16 @@ PlayerHeadTexture *CreateTextureFromBytesDX12Sync(
     }
     uploadBuffer->Unmap(0, &range);
 
-    // Create a simple command queue and command list for upload
-    winrt::com_ptr<ID3D12CommandQueue> tempQueue;
-    D3D12_COMMAND_QUEUE_DESC queueDesc = {};
-    queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
-    queueDesc.NodeMask = 1;
-    hr = SwapchainHook::d3d12Device5->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(tempQueue.put()));
+    // Use the dedicated uploader to perform the copy
+    hr = g_uploadAllocatorDX12->Reset();
     if (FAILED(hr)) {
-        if (logDebug) Logger::debug("Failed to create temporary command queue: 0x{:x}", hr);
+        if (logDebug) Logger::debug("Failed to reset upload allocator: 0x{:x}", hr);
         return nullptr;
     }
 
-    winrt::com_ptr<ID3D12CommandAllocator> tempAllocator;
-    hr = SwapchainHook::d3d12Device5->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(tempAllocator.put()));
+    hr = g_uploadCmdListDX12->Reset(g_uploadAllocatorDX12.get(), nullptr);
     if (FAILED(hr)) {
-        if (logDebug) Logger::debug("Failed to create command allocator: 0x{:x}", hr);
-        return nullptr;
-    }
-
-    winrt::com_ptr<ID3D12GraphicsCommandList> cmdList;
-    hr = SwapchainHook::d3d12Device5->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, tempAllocator.get(), nullptr, IID_PPV_ARGS(cmdList.put()));
-    if (FAILED(hr)) {
-        if (logDebug) Logger::debug("Failed to create command list: 0x{:x}", hr);
+        if (logDebug) Logger::debug("Failed to reset command list: 0x{:x}", hr);
         return nullptr;
     }
 
@@ -679,7 +756,7 @@ PlayerHeadTexture *CreateTextureFromBytesDX12Sync(
     dstLocation.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
     dstLocation.SubresourceIndex = 0;
 
-    cmdList->CopyTextureRegion(&dstLocation, 0, 0, 0, &srcLocation, nullptr);
+    g_uploadCmdListDX12->CopyTextureRegion(&dstLocation, 0, 0, 0, &srcLocation, nullptr);
 
     // Transition to shader resource
     D3D12_RESOURCE_BARRIER barrier = {};
@@ -690,52 +767,34 @@ PlayerHeadTexture *CreateTextureFromBytesDX12Sync(
     barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
     barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 
-    cmdList->ResourceBarrier(1, &barrier);
-    cmdList->Close();
+    g_uploadCmdListDX12->ResourceBarrier(1, &barrier);
+    g_uploadCmdListDX12->Close();
 
     // Execute and wait for completion
-    ID3D12CommandList *cmdLists[] = {cmdList.get()};
-    tempQueue->ExecuteCommandLists(1, cmdLists);
+    ID3D12CommandList *cmdLists[] = {g_uploadCmdListDX12.get()};
+    g_uploadQueueDX12->ExecuteCommandLists(1, cmdLists);
 
-    // Create fence and wait
-    winrt::com_ptr<ID3D12Fence> fence;
-    hr = SwapchainHook::d3d12Device5->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(fence.put()));
-    if (FAILED(hr)) {
-        if (logDebug) Logger::debug("Failed to create fence: 0x{:x}", hr);
-        return nullptr;
-    }
-
-    HANDLE fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-    if (!fenceEvent) {
-        if (logDebug) Logger::debug("Failed to create fence event");
-        return nullptr;
-    }
-
-    const UINT64 fenceValue = 1;
-    hr = tempQueue->Signal(fence.get(), fenceValue);
+    // Signal and wait using the global fence
+    const UINT64 fenceValue = ++g_uploadFenceValue;
+    hr = g_uploadQueueDX12->Signal(g_uploadFenceDX12.get(), fenceValue);
     if (FAILED(hr)) {
         if (logDebug) Logger::debug("Failed to signal fence: 0x{:x}", hr);
-        CloseHandle(fenceEvent);
         return nullptr;
     }
 
-    // Wait for completion
-    if (fence->GetCompletedValue() < fenceValue) {
-        hr = fence->SetEventOnCompletion(fenceValue, fenceEvent);
+    if (g_uploadFenceDX12->GetCompletedValue() < fenceValue) {
+        hr = g_uploadFenceDX12->SetEventOnCompletion(fenceValue, g_uploadFenceEvent);
         if (FAILED(hr)) {
             if (logDebug) Logger::debug("Failed to set fence event: 0x{:x}", hr);
-            CloseHandle(fenceEvent);
             return nullptr;
         }
-        DWORD waitResult = WaitForSingleObject(fenceEvent, 5000); // 5 second timeout
+        DWORD waitResult = WaitForSingleObject(g_uploadFenceEvent, 5000); // 5 second timeout
         if (waitResult != WAIT_OBJECT_0) {
             if (logDebug) Logger::debug("Fence wait timed out or failed: {}", waitResult);
-            CloseHandle(fenceEvent);
             playerTex.loadState = PlayerHeadLoadState::Failed;
             return nullptr;
         }
     }
-    CloseHandle(fenceEvent);
 
     if (logDebug) Logger::debug("DX12 texture upload completed successfully for {}", playerName);
 
@@ -754,6 +813,9 @@ PlayerHeadTexture *CreateTextureFromBytesDX12Sync(
     if (logDebug) Logger::debug("Successfully created DX12 player head texture for {}", playerName);
     return &playerTex;
 }
+// =================================================================================
+// END OF CHANGES: Rewritten DX12 Sync Texture Creation
+// =================================================================================
 
 // Async DX12 texture creation (queues loading, returns immediately)
 PlayerHeadTexture *CreateTextureFromBytesDX12(
@@ -860,7 +922,7 @@ void TabList::normalRender(int index, std::string &value) {
             bool alphaOrder = getOps<bool>("alphaOrder");
             bool flarialFirst = getOps<bool>("flarialFirst");
 
-            if (SwapchainHook::queue != nullptr) showHeads = false;
+            // if (SwapchainHook::queue != nullptr) showHeads = false;
 
             // Define role logos for reuse in both branches
             std::map<std::string, int> roleLogos = {{"Dev", IDR_CYAN_LOGO_PNG}, {"Staff", IDR_WHITE_LOGO_PNG}, {"Gamer", IDR_GAMER_LOGO_PNG}, {"Booster", IDR_BOOSTER_LOGO_PNG}, {"Supporter", IDR_SUPPORTER_LOGO_PNG}, {"Default", IDR_RED_LOGO_PNG}};
