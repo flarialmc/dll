@@ -65,6 +65,8 @@ jobs:
 
       - name: Set Up MSVC Environment
         uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: amd64_arm64
 
       - name: Configure CMake
         run: |
