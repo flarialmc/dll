@@ -1,13 +1,13 @@
 #include "TextHotkey.hpp"
 
 void TextHotkey::onEnable() {
-	Listen(this, KeyEvent, &TextHotkey::onKey)
-		Module::onEnable();
+	Listen(this, KeyEvent, &TextHotkey::onKey);
+	Module::onEnable();
 }
 
 void TextHotkey::onDisable() {
-	Deafen(this, KeyEvent, &TextHotkey::onKey)
-		Module::onDisable();
+	Deafen(this, KeyEvent, &TextHotkey::onKey);
+	Module::onDisable();
 }
 
 void TextHotkey::defaultConfig() {
