@@ -1,5 +1,6 @@
 #include "TextHotkey.hpp"
 
+
 void TextHotkey::onEnable() {
 	Listen(this, KeyEvent, &TextHotkey::onKey);
 	Module::onEnable();
