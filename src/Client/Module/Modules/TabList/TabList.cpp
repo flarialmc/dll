@@ -424,7 +424,7 @@ void TabList::settingsRender(float settingsOffset) {
 
     addHeader("Misc");
     addToggle("Togglable", "", "togglable");
-    addToggle("Show Heads", "Requires BetterFrames to be enabled!", "showHeads");
+    addToggle("Show Player Heads", "", "showHeads");
     addToggle("Player Count", "", "playerCount");
     addSlider("Max Players Column", "", "maxColumn", 30.f, 1.f);
     addToggle("Server IP", "", "serverIP");
