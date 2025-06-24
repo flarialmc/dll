@@ -81,6 +81,11 @@ jobs:
         with:
            name: Flarial_DLL
            path: C:\a\dll\dll\build\Flarial.dll
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v4.6.1
+        with:
+          name: Flarial_DLL
+          path: D:\a\dll\dll\build\Flarial.dll
 
   upload-to-cdn:
     runs-on: ubuntu-latest
