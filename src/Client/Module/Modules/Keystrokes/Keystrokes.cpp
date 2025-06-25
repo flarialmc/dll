@@ -70,6 +70,8 @@ void Keystrokes::defaultConfig() {
     setDef("glowEnabledAmount", 50.f);
     setDef("glowSpeed", 1.f);
     setDef("glowEnabled", false);
+    setDef("textXOffset", 0.5f);
+    setDef("textYOffset", 0.5f);
 }
 
 void Keystrokes::settingsRender(float settingsOffset) {
@@ -94,10 +96,8 @@ void Keystrokes::settingsRender(float settingsOffset) {
     addConditionalSlider(getOps<bool>("showBg") && getOps<bool>("rectShadow"), "Shadow Offset", "How far the shadow will be.", "rectShadowOffset", 0.02f, 0.001f);
     addToggle("Border", "", "border");
     addConditionalSlider(getOps<bool>("border"), "Border Thickness", "", "borderWidth", 4.f);
-
     addToggle("Glow (Disabled State)", "", "glow");
     addConditionalSlider(getOps<bool>("glow"), "Glow Amount (Disabled State)", "", "glowAmount", 100.f);
-
     addToggle("Glow (Enabled State)", "", "glowEnabled");
     addConditionalSlider(getOps<bool>("glowEnabled"), "Glow Amount (Enabled State)", "", "glowEnabledAmount", 100.f);
     addConditionalSlider(getOps<bool>("glowEnabled"), "Glow Speed", "", "glowSpeed", 10.f);
@@ -109,6 +109,8 @@ void Keystrokes::settingsRender(float settingsOffset) {
     extraPadding();
 
     addHeader("Text");
+    addSlider("X Offset", "", "textXOffset", 1.f);
+    addSlider("Y Offset", "", "textYOffset", 1.f);
     addToggle("Text Shadow", "Displays a shadow under the text", "textShadow");
     addConditionalSlider(getOps<bool>("textShadow"), "Shadow Offset", "How far the shadow will be.", "textShadowOffset", 0.02f, 0.001f);
     extraPadding();
@@ -282,6 +284,11 @@ void Keystrokes::normalRender(int index, std::string &value) {
                 Vec2<float>(realcenter.x, smb ? (realcenter.y + (keycardSize + spacing) * 3.f - (keycardSize * 0.05f)) : (realcenter.y + (keycardSize + spacing) * 2.f)) // SPACEBAR
             };
 
+            Vec2<float> textOffset = Vec2<float>{
+                Constraints::RelativeConstraint(getOps<float>("textXOffset") - 0.5f) * getOps<float>("uiscale") * 0.05f,
+                Constraints::RelativeConstraint(getOps<float>("textYOffset") - 0.5f) * getOps<float>("uiscale") * 0.05f
+            };
+
             std::vector<std::string> opString = {
                 getOps<std::string>("wText"),
                 getOps<std::string>("aText"),
@@ -372,13 +379,13 @@ void Keystrokes::normalRender(int index, std::string &value) {
                     if (!hideCPS && !lmbrmb && (i == 4 || i == 5)) {
                         if (enableTextShadow)
                             FlarialGUI::FlarialTextWithFont(
-                                positions[i].x + textShadowOffset,
-                                positions[i].y + textShadowOffset,
+                                positions[i].x + textShadowOffset + textOffset.x,
+                                positions[i].y + textShadowOffset + textOffset.y,
                                 FlarialGUI::to_wide(i == 4 ? lmbText : rmbText).c_str(), keycardDims.x, keycardDims.y,
                                 DWRITE_TEXT_ALIGNMENT_CENTER, fontSize, DWRITE_FONT_WEIGHT_NORMAL,
                                 shadowStates[i], true);
 
-                        FlarialGUI::FlarialTextWithFont(positions[i].x, positions[i].y,
+                        FlarialGUI::FlarialTextWithFont(positions[i].x + textOffset.x, positions[i].y + textOffset.y,
                                                         FlarialGUI::to_wide(i == 4 ? lmbText : rmbText).c_str(), keycardDims.x, keycardDims.y,
                                                         DWRITE_TEXT_ALIGNMENT_CENTER, fontSize, DWRITE_FONT_WEIGHT_NORMAL,
                                                         textStates[i], true);
@@ -390,13 +397,13 @@ void Keystrokes::normalRender(int index, std::string &value) {
                         ) {
                             if (enableTextShadow)
                                 FlarialGUI::FlarialTextWithFont(
-                                    positions[i].x + textShadowOffset,
-                                    positions[i].y + textShadowOffset,
+                                    positions[i].x + textShadowOffset + textOffset.x,
+                                    positions[i].y + textShadowOffset + textOffset.y,
                                     FlarialGUI::to_wide(opString[i]).c_str(), keycardDims.x, (i != 4 && i != 5) && !hideCPS ? keycardDims.y : Constraints::SpacingConstraint(hideCPS ? 1.0f : 0.65f, keycardSize - (keycardSize * 0.05f)),
                                     DWRITE_TEXT_ALIGNMENT_CENTER, fontSize, DWRITE_FONT_WEIGHT_NORMAL,
                                     shadowStates[i], true);
 
-                            FlarialGUI::FlarialTextWithFont(positions[i].x, positions[i].y,
+                            FlarialGUI::FlarialTextWithFont(positions[i].x + textOffset.x, positions[i].y + textOffset.y,
                                                             FlarialGUI::to_wide(opString[i]).c_str(), keycardDims.x, (i != 4 && i != 5) && !hideCPS ? keycardDims.y : Constraints::SpacingConstraint(hideCPS ? 1.0f : 0.65f, keycardSize - (keycardSize * 0.05f)),
                                                             DWRITE_TEXT_ALIGNMENT_CENTER, fontSize, DWRITE_FONT_WEIGHT_NORMAL,
                                                             textStates[i], true);
@@ -405,15 +412,15 @@ void Keystrokes::normalRender(int index, std::string &value) {
                         if (!hideCPS && (i == 4 || i == 5)) {
                             if (enableTextShadow)
                                 FlarialGUI::FlarialTextWithFont(
-                                    positions[i].x + textShadowOffset * 0.6f,
-                                    positions[i].y + Constraints::SpacingConstraint(0.55, keycardSize - (keycardSize * 0.05f)) + textShadowOffset * 0.6f,
+                                    positions[i].x + textOffset.x + textShadowOffset * 0.6f,
+                                    positions[i].y + textOffset.y + Constraints::SpacingConstraint(0.55, keycardSize - (keycardSize * 0.05f)) + textShadowOffset * 0.6f,
                                     FlarialGUI::to_wide(i == 4 ? lmbText : rmbText).c_str(), keycardSize + (keycardSize / 2.0f) + spacing / 2.0f,
                                     Constraints::SpacingConstraint(0.35, keycardSize - (keycardSize * 0.05f)),
                                     DWRITE_TEXT_ALIGNMENT_CENTER, fontSize2,
                                     DWRITE_FONT_WEIGHT_NORMAL, shadowStates[i], true);
 
-                            FlarialGUI::FlarialTextWithFont(positions[i].x, positions[i].y +
-                                                                            Constraints::SpacingConstraint(0.55, keycardSize - (keycardSize * 0.05f)),
+                            FlarialGUI::FlarialTextWithFont(positions[i].x + textOffset.x, positions[i].y + textOffset.y +
+                                                                                           Constraints::SpacingConstraint(0.55, keycardSize - (keycardSize * 0.05f)),
                                                             FlarialGUI::to_wide(i == 4 ? lmbText : rmbText).c_str(), keycardSize + (keycardSize / 2.0f) + spacing / 2.0f,
                                                             Constraints::SpacingConstraint(0.35, keycardSize - (keycardSize * 0.05f)),
                                                             DWRITE_TEXT_ALIGNMENT_CENTER, fontSize2,
