@@ -21,6 +21,8 @@ void OffsetInit::init2190() {
     ADD_OFFSET("Attribute::Health", 7);
     ADD_OFFSET("ClientInstance::getBlockSource", 30);
     ADD_OFFSET("Level::worldFolderName", 0x250);
+    ADD_OFFSET("Level::LevelData", 0x90);
+    ADD_OFFSET("LevelData::worldName", 0x298);
 }
 
 void OffsetInit::init2180() {
