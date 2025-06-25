@@ -62,8 +62,6 @@ void ResizeHook::cleanShit(bool isResize) {
     Memory::SafeRelease(SwapchainHook::stageTex);
     Memory::SafeRelease(SwapchainHook::SavedD3D11BackBuffer);
     Memory::SafeRelease(SwapchainHook::ExtraSavedD3D11BackBuffer);
-    Memory::SafeRelease(SwapchainHook::UUI_SavedD3D11BackBuffer);
-    Memory::SafeRelease(SwapchainHook::UUI_ExtraSavedD3D11BackBuffer);
     Memory::SafeRelease(Blur::pConstantBuffer);
     Memory::SafeRelease(Blur::pSampler);
     Memory::SafeRelease(Blur::pGaussianBlurHorizontalShader);

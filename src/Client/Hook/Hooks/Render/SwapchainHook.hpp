@@ -65,8 +65,6 @@ public:
     static bool currentVsyncState;
     static inline ID3D11Texture2D* SavedD3D11BackBuffer;
     static inline ID3D11Texture2D* ExtraSavedD3D11BackBuffer;
-    static inline ID3D11Texture2D* UUI_SavedD3D11BackBuffer;
-    static inline ID3D11Texture2D* UUI_ExtraSavedD3D11BackBuffer;
     static inline UINT lastBackbufferWidth = 0;
     static inline UINT lastBackbufferHeight = 0;
 
