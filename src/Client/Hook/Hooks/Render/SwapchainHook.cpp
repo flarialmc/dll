@@ -862,44 +862,49 @@ ID3D11Texture2D *SwapchainHook::GetBackbuffer() {
 }
 
 void SwapchainHook::SaveBackbuffer(bool underui) {
+    // Select the correct pair of backbuffer pointers based on the 'underui' flag.
+    // This avoids code duplication and keeps the logic clean.
+    ID3D11Texture2D** pSavedBackBuffer = underui ? &UUI_SavedD3D11BackBuffer : &SavedD3D11BackBuffer;
+    ID3D11Texture2D** pExtraBackBuffer = underui ? &UUI_ExtraSavedD3D11BackBuffer : &ExtraSavedD3D11BackBuffer;
 
-    Memory::SafeRelease(SavedD3D11BackBuffer);
-    Memory::SafeRelease(ExtraSavedD3D11BackBuffer);
-    if (!SwapchainHook::queue) {
+    // Release the previously saved buffers for the current context (UI or non-UI).
+    Memory::SafeRelease(*pSavedBackBuffer);
+    Memory::SafeRelease(*pExtraBackBuffer);
 
-        SwapchainHook::swapchain->GetBuffer(0, IID_PPV_ARGS(&SavedD3D11BackBuffer));
+    if (!queue) { // DX11 Path
+        // Get the current backbuffer from the swapchain.
+        swapchain->GetBuffer(0, IID_PPV_ARGS(pSavedBackBuffer));
 
-        if (FlarialGUI::needsBackBuffer) {
+        // If a copy of the backbuffer is needed (e.g., for blur effects) and we successfully got the main one.
+        if (FlarialGUI::needsBackBuffer && *pSavedBackBuffer) {
 
-            if (!ExtraSavedD3D11BackBuffer) {
+            // Create the texture for the copy if it doesn't exist yet.
+            if (!(*pExtraBackBuffer)) {
                 D3D11_TEXTURE2D_DESC textureDesc = {};
-                SavedD3D11BackBuffer->GetDesc(&textureDesc);
+                (*pSavedBackBuffer)->GetDesc(&textureDesc);
                 textureDesc.Usage = D3D11_USAGE_DEFAULT;
                 textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
                 textureDesc.CPUAccessFlags = 0;
 
-                SwapchainHook::d3d11Device->CreateTexture2D(&textureDesc, nullptr, &ExtraSavedD3D11BackBuffer);
+                d3d11Device->CreateTexture2D(&textureDesc, nullptr, pExtraBackBuffer);
             }
 
-            if (underui) {
-
-                if (UnderUIHooks::bgfxCtx->m_msaart) {
-                    context->ResolveSubresource(ExtraSavedD3D11BackBuffer, 0, UnderUIHooks::bgfxCtx->m_msaart, 0, DXGI_FORMAT_R8G8B8A8_UNORM);
+            if (*pExtraBackBuffer) {
+                // When rendering under the UI, we might need to resolve from an MSAA surface.
+                if (underui && UnderUIHooks::bgfxCtx && UnderUIHooks::bgfxCtx->m_msaart) {
+                    context->ResolveSubresource(*pExtraBackBuffer, 0, UnderUIHooks::bgfxCtx->m_msaart, 0, DXGI_FORMAT_R8G8B8A8_UNORM);
                 } else {
-                    context->CopyResource(ExtraSavedD3D11BackBuffer, SavedD3D11BackBuffer);
+                    // Otherwise, a direct copy is sufficient.
+                    context->CopyResource(*pExtraBackBuffer, *pSavedBackBuffer);
                 }
-
-            } else {
-                context->CopyResource(ExtraSavedD3D11BackBuffer, SavedD3D11BackBuffer);
             }
         }
-
-
     }
-    else {
+    else { // DX12 Path
+        // The DX12 path is only triggered for the non-UI case (underui=false).
+        // Therefore, pSavedBackBuffer points to SavedD3D11BackBuffer.
         HRESULT hr;
-
-        hr = D3D11Resources[currentBitmap]->QueryInterface(IID_PPV_ARGS(&SavedD3D11BackBuffer));
+        hr = D3D11Resources[currentBitmap]->QueryInterface(IID_PPV_ARGS(pSavedBackBuffer));
         if (FAILED(hr)) std::cout << "Failed to query interface: " << std::hex << hr << std::endl;
     }
 }
