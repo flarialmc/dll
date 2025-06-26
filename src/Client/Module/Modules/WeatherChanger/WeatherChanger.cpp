@@ -23,7 +23,7 @@ void WeatherChanger::defaultConfig()
 {
     Module::defaultConfig("core");
     setDef("rain", 1.00f);
-    setDef("lighting", 0.00f);
+    setDef("lightning", 0.00f);
     setDef("snow", false);
     
 }
@@ -41,8 +41,9 @@ void WeatherChanger::settingsRender(float settingsOffset)
                               Constraints::RelativeConstraint(0.88f, "height"));
 
     addHeader("Misc");
-    addSlider("Rain Intensity", "", "rain");
-    addSlider("Snow Intensity", "", "snow");
+    addSlider("Rain Intensity", "", "rain", 1.f);
+    addSlider("Lightning Intensity", "", "lightning", 1.f);
+    addToggle("Snow", "", "snow");
 
     FlarialGUI::UnsetScrollView();
 
@@ -60,17 +61,20 @@ void WeatherChanger::onTick(TickEvent& event)
             SDK::clientInstance->getBlockSource()->getDimension()->weather->rainLevel = this->settings.getSettingByName<float>(
                 "rain")->value;
         else SDK::clientInstance->getBlockSource()->getDimension()->weather->rainLevel = 0.0f;
-        if (getOps<float>("lighting") < 0.02f)
-            SDK::clientInstance->getBlockSource()->getDimension()->weather->lightingLevel = this->settings.getSettingByName<float>(
-                "lighting")->value;
-        else SDK::clientInstance->getBlockSource()->getDimension()->weather->lightingLevel = 0.0f;
-
-        // TODO: When you set snow, it will stay even if on until game reload
+        if (getOps<float>("lightning") < 0.02f)
+            SDK::clientInstance->getBlockSource()->getDimension()->weather->lightningLevel = this->settings.getSettingByName<float>(
+                "lightning")->value;
+        else SDK::clientInstance->getBlockSource()->getDimension()->weather->lightningLevel = 0.0f;
+        //
+        // // TODO: When you set snow, it will stay even if on until game reload
         if (getOps<bool>("snow")) {
             Vec3<float>* pos = event.getActor()->getPosition();
             Vec3<int> e((int)pos->x, (int)pos->y, (int)pos->z);
 
-            SDK::clientInstance->getBlockSource()->getBiome(e)->temparature = 0.0f;
+            // SDK::clientInstance->getBlockSource()->getBiome(e);
+
+
+            SDK::clientInstance->getBlockSource()->getBiome(e)->temperature = 0.0f;
         }
     }
 }

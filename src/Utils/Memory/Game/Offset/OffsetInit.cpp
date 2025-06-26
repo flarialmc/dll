@@ -24,8 +24,10 @@ void OffsetInit::init2190() {
     ADD_OFFSET("Level::LevelData", 0x90);
     ADD_OFFSET("LevelData::worldName", 0x298);
 
-    ADD_OFFSET("Biome::temparature", 0x30);
+    ADD_OFFSET("Biome::temperature", 0x30);
     ADD_OFFSET("Biome::name", 0x198);
+
+    ADD_OFFSET("Dimension::weather", 0x1C8);
 }
 
 void OffsetInit::init2180() {
@@ -251,7 +253,7 @@ void OffsetInit::init2100() {
     ADD_OFFSET("Player::playerName", 0x1D30);
     ADD_OFFSET("Player::gamemode", 0xEC8);
 
-    ADD_OFFSET("Weather::lightingLevel", 0x48);
+    ADD_OFFSET("Weather::lightningLevel", 0x48);
 
     ADD_OFFSET("Level::hitResult", 0xB38);
     ADD_OFFSET("Level::getPlayerMap", 0x1BC8); // getRuntimeActorList offset + B8 || Level::getPlayerList
@@ -273,7 +275,7 @@ void OffsetInit::init2080() {
     ADD_OFFSET("Player::playerName", 0x1D18);
     ADD_OFFSET("Player::gamemode", 0xEB0);
 
-    ADD_OFFSET("Biome::temparature", 0x38);
+    ADD_OFFSET("Biome::temperature", 0x38);
 
     ADD_OFFSET("Weather::rainLevel", 0x3C);
 
@@ -356,7 +358,7 @@ void OffsetInit::init2050() {
 
     ADD_OFFSET("ItemStack::count", 0x22);
 
-    ADD_OFFSET("Weather::lightingLevel", 0x44);
+    ADD_OFFSET("Weather::lightningLevel", 0x44);
     ADD_OFFSET("Weather::rainLevel", 0x38);
 
     ADD_OFFSET("NetworkSystem::remoteConnectorComposite", 0x80);
@@ -385,7 +387,7 @@ void OffsetInit::init2040() {
     ADD_OFFSET("MinecraftGame::mouseGrabbed", 0x190);
     ADD_OFFSET("MinecraftGame::textureGroup", 0x818);
 
-    ADD_OFFSET("Weather::lightingLevel",  0x48);
+    ADD_OFFSET("Weather::lightningLevel",  0x48);
     ADD_OFFSET("Weather::rainLevel", 0x3C);
 
     ADD_OFFSET("Level::hitResult", 0xA68);
@@ -467,12 +469,12 @@ void OffsetInit::init2030() {
     ADD_OFFSET("ItemStack::tag", 0x10);
     ADD_OFFSET("ItemStack::count", 0x20);
 
-    ADD_OFFSET("Biome::temparature", 0x40);
+    ADD_OFFSET("Biome::temperature", 0x40);
 
     ADD_OFFSET("Dimension::name", 0x20);
     ADD_OFFSET("Dimension::weather", 0x1A8);
 
-    ADD_OFFSET("Weather::lightingLevel", 0x44);
+    ADD_OFFSET("Weather::lightningLevel", 0x44);
     ADD_OFFSET("Weather::rainLevel", 0x38);
 
     ADD_OFFSET("LevelRender::getLevelRendererPlayer", 0x308);
