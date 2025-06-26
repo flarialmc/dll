@@ -165,3 +165,8 @@ IDR_LEWIS_PNG             PNG "Data\\lewis.png"
 IDR_LEWIS_MP3             MP3 "Data\\Audio\\Lewis.mp3"
 IDR_DELETE_PNG            PNG "Data\\delete.png"
 
+IDR_PING_AMAZING          PNG "Data\\ping_amazing.png"
+IDR_PING_GOOD             PNG "Data\\ping_good.png"
+IDR_PING_OKAY             PNG "Data\\ping_okay.png"
+IDR_PING_BAD              PNG "Data\\ping_bad.png"
+IDR_PING_QUIT             PNG "Data\\ping_quit.png"
