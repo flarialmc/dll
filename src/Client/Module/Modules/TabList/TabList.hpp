@@ -32,6 +32,8 @@ public:
     // Updated function to handle Flarial First in alphabetical order
     static std::vector<const std::pair<const mcUUID, PlayerListEntry> *> copyMapInAlphabeticalOrder(const std::unordered_map<mcUUID, PlayerListEntry>& sourceMap, bool flarialFirst);
 
+    int getPingImage(int ping);
+
     void normalRender(int index, std::string& value) override;
 
     void onRender(RenderEvent& event);
