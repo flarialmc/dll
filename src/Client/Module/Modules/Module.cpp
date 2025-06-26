@@ -10,12 +10,6 @@
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 
-std::map<std::string, DWRITE_TEXT_ALIGNMENT> alignments = {
-		{"Left", DWRITE_TEXT_ALIGNMENT_LEADING},
-		{"Center", DWRITE_TEXT_ALIGNMENT_CENTER},
-		{"Right", DWRITE_TEXT_ALIGNMENT_TRAILING}
-};
-
 static std::string Lname = "";
 
 D2D_COLOR_F Module::getColor(std::string text) {

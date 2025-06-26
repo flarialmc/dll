@@ -28,6 +28,8 @@ void OffsetInit::init2190() {
     ADD_OFFSET("Biome::name", 0x198);
 
     ADD_OFFSET("Dimension::weather", 0x1C8);
+
+    ADD_OFFSET("GuiData::GuiMessages", 0x150);
 }
 
 void OffsetInit::init2180() {

@@ -2,11 +2,9 @@
 
 #include "../Module.hpp"
 #include "../../../GUI/Engine/Engine.hpp"
-#include "../../Manager.hpp"
-#include "../../../Client.hpp"
-#include "../Nick/NickModule.hpp"
 #include <vector>
 #include <algorithm>
+#include "Events/EventManager.hpp"
 
 class TabList : public Module {
 

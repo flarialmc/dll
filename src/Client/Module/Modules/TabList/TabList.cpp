@@ -14,6 +14,7 @@
 
 #include "Command/Commands/SkinStealCommand.hpp"
 #include "Modules/ClickGUI/ClickGUI.hpp"
+#include "Modules/Nick/NickModule.hpp"
 
 bool logDebug = false;
 

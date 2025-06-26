@@ -35,6 +35,12 @@ public:
 	int totalmaps = 0;
 	std::filesystem::path legacySettingsPath;
 
+	std::map<std::string, DWRITE_TEXT_ALIGNMENT> alignments = {
+		{"Left", DWRITE_TEXT_ALIGNMENT_LEADING},
+		{"Center", DWRITE_TEXT_ALIGNMENT_CENTER},
+		{"Right", DWRITE_TEXT_ALIGNMENT_TRAILING}
+	};
+
 	Module(const std::string& ename, const std::string& edescription, int eicon, const std::string& ekey, bool isScripting = false) {
 		name = ename;
 		description = edescription;
