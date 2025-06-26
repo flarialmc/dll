@@ -386,7 +386,7 @@ void TabList::defaultConfig() {
     setDef("enabled", true);
     setDef("uiscale", 0.65f);
     setDef("playerCount", true);
-    setDef("serverIP", true);
+    setDef("worldName", true);
     setDef("maxColumn", 10.f);
     setDef("togglable", false);
     setDef("maxColumn", 10.f);
@@ -427,7 +427,7 @@ void TabList::settingsRender(float settingsOffset) {
     addToggle("Show Player Heads", "", "showHeads");
     addToggle("Player Count", "", "playerCount");
     addSlider("Max Players Column", "", "maxColumn", 30.f, 1.f);
-    addToggle("Server IP", "", "serverIP");
+    addToggle("World Name", "", "worldName");
     addToggle("Alphabetical Order", "", "alphaOrder");
     addToggle("Flarial First", "Prioritize Flarial users (Dev > Gamer > Booster > Supporter > Default) at the top", "flarialFirst");
     addKeybind("Keybind", "Hold for 2 seconds!", "keybind", true);
@@ -984,8 +984,8 @@ void TabList::normalRender(int index, std::string &value) {
             std::string countTxt;
             ImVec2 curPlayerMetrics;
 
-            if (getOps<bool>("serverIP")) {
-                ImVec2 serverIpMetrics = FlarialGUI::getFlarialTextSize(FlarialGUI::to_wide(SDK::getServerIP()).c_str(), keycardSize * 5, keycardSize, DWRITE_TEXT_ALIGNMENT_LEADING, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, true);
+            if (getOps<bool>("worldName")) {
+                ImVec2 serverIpMetrics = FlarialGUI::getFlarialTextSize(FlarialGUI::to_wide(SDK::clientInstance->getLocalPlayer()->getLevel()->getLevelData()->getLevelName()).c_str(), keycardSize * 5, keycardSize, DWRITE_TEXT_ALIGNMENT_LEADING, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, true);
                 if (totalWidth < serverIpMetrics.x + keycardSize) totalWidth = serverIpMetrics.x + keycardSize;
 
                 totalHeight += keycardSize * 1.25f;
@@ -1026,17 +1026,19 @@ void TabList::normalRender(int index, std::string &value) {
                 FlarialGUI::RoundedRect(fakex, realcenter.y, disabledColor, totalWidth, totalHeight, rounde.x, rounde.x);
             }
 
-            if (getOps<bool>("serverIP")) {
+            if (getOps<bool>("worldName")) {
                 float textX = MC::windowSize.x / 2.f;
                 float textY = realcenter.y;
+
+                SDK::clientInstance->getLocalPlayer()->getLevel();
 
                 if (getOps<bool>("textShadow"))
                     FlarialGUI::FlarialTextWithFont(
                         textX + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * getOps<float>("uiscale"),
                         textY + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * getOps<float>("uiscale"),
-                        FlarialGUI::to_wide(SDK::getServerIP()).c_str(), 0, keycardSize * 0.5f + Constraints::SpacingConstraint(0.70, keycardSize), DWRITE_TEXT_ALIGNMENT_CENTER, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, getColor("textShadow"), true);
+                        FlarialGUI::to_wide(SDK::clientInstance->getLocalPlayer()->getLevel()->getLevelData()->getLevelName()).c_str(), 0, keycardSize * 0.5f + Constraints::SpacingConstraint(0.70, keycardSize), DWRITE_TEXT_ALIGNMENT_CENTER, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, getColor("textShadow"), true);
 
-                FlarialGUI::FlarialTextWithFont(textX, textY, FlarialGUI::to_wide(SDK::getServerIP()).c_str(), 0, keycardSize * 0.5f + Constraints::SpacingConstraint(0.70, keycardSize), DWRITE_TEXT_ALIGNMENT_CENTER, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
+                FlarialGUI::FlarialTextWithFont(textX, textY, FlarialGUI::to_wide(SDK::clientInstance->getLocalPlayer()->getLevel()->getLevelData()->getLevelName()).c_str(), 0, keycardSize * 0.5f + Constraints::SpacingConstraint(0.70, keycardSize), DWRITE_TEXT_ALIGNMENT_CENTER, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
 
                 realcenter.y += keycardSize * 1.25f;
             }
