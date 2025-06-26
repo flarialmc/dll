@@ -24,7 +24,7 @@ void OffsetInit::init2190() {
     ADD_OFFSET("Level::LevelData", 0x90);
     ADD_OFFSET("LevelData::worldName", 0x298);
 
-    ADD_OFFSET("Biome::temperature", 0x30);
+    ADD_OFFSET("Biome::temperature", 0x08);
     ADD_OFFSET("Biome::name", 0x198);
 
     ADD_OFFSET("Dimension::weather", 0x1C8);
