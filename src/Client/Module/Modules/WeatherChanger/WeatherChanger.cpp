@@ -2,34 +2,27 @@
 #include "Client.hpp"
 #include "Events/EventManager.hpp"
 
-WeatherChanger::WeatherChanger(): Module("Weather Changer", "Changes the weather ingame.", IDR_CLOUDY_PNG, "")
-{
-    
+WeatherChanger::WeatherChanger(): Module("Weather Changer", "Changes the weather ingame.", IDR_CLOUDY_PNG, "") {
 }
 
-void WeatherChanger::onEnable()
-{
+void WeatherChanger::onEnable() {
     Listen(this, TickEvent, &WeatherChanger::onTick)
     Module::onEnable();
 }
 
-void WeatherChanger::onDisable()
-{
+void WeatherChanger::onDisable() {
     Deafen(this, TickEvent, &WeatherChanger::onTick)
     Module::onDisable();
 }
 
-void WeatherChanger::defaultConfig()
-{
+void WeatherChanger::defaultConfig() {
     Module::defaultConfig("core");
     setDef("rain", 1.00f);
     setDef("lightning", 0.00f);
     setDef("snow", false);
-    
 }
 
-void WeatherChanger::settingsRender(float settingsOffset)
-{
+void WeatherChanger::settingsRender(float settingsOffset) {
     float x = Constraints::PercentageConstraint(0.019, "left");
     float y = Constraints::PercentageConstraint(0.10, "top");
 
@@ -50,29 +43,21 @@ void WeatherChanger::settingsRender(float settingsOffset)
     resetPadding();
 }
 
-void WeatherChanger::onTick(TickEvent& event)
-{
-    if (!this->isEnabled()) return;
-    if (!SDK::clientInstance->getBlockSource())
-        return;
+void WeatherChanger::onTick(TickEvent &event) {
+    if (!this->isEnabled() || !SDK::clientInstance->getBlockSource() || !SDK::clientInstance->getBlockSource()->getDimension()->weather) return;
 
-    if (this->isEnabled()) {
-        if (getOps<float>("rain") > 0.02f)
-            SDK::clientInstance->getBlockSource()->getDimension()->weather->rainLevel = this->settings.getSettingByName<float>(
-                "rain")->value;
-        else SDK::clientInstance->getBlockSource()->getDimension()->weather->rainLevel = 0.0f;
-        if (getOps<float>("lightning") < 0.02f)
-            SDK::clientInstance->getBlockSource()->getDimension()->weather->lightningLevel = this->settings.getSettingByName<float>(
-                "lightning")->value;
-        else SDK::clientInstance->getBlockSource()->getDimension()->weather->lightningLevel = 0.0f;
+    if (getOps<float>("rain") > 0.02f) SDK::clientInstance->getBlockSource()->getDimension()->weather->rainLevel = this->settings.getSettingByName<float>("rain")->value;
+    else SDK::clientInstance->getBlockSource()->getDimension()->weather->rainLevel = 0.0f;
 
-        // TODO: When you set snow, it will stay even if on until game reload
+    if (getOps<float>("lightning") < 0.02f) SDK::clientInstance->getBlockSource()->getDimension()->weather->lightningLevel = this->settings.getSettingByName<float>("lightning")->value;
+    else SDK::clientInstance->getBlockSource()->getDimension()->weather->lightningLevel = 0.0f;
 
-        if (getOps<bool>("snow")) {
-            Vec3<float>* pos = event.getActor()->getPosition();
-            BlockPos e((int)pos->x, (int)pos->y, (int)pos->z);
+    // TODO: When you set snow, it will stay even if on until game reload
 
-            if (SDK::clientInstance->getBlockSource()->getBiome(e)->temperature != 0) SDK::clientInstance->getBlockSource()->getBiome(e)->temperature = 0.0f;
-        }
+    if (getOps<bool>("snow")) {
+        Vec3<float> *pos = event.getActor()->getPosition();
+        BlockPos e((int) pos->x, (int) pos->y, (int) pos->z);
+
+        if (SDK::clientInstance->getBlockSource()->getBiome(e)->temperature != 0) SDK::clientInstance->getBlockSource()->getBiome(e)->temperature = 0.0f;
     }
 }
