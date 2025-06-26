@@ -65,13 +65,14 @@ void WeatherChanger::onTick(TickEvent& event)
             SDK::clientInstance->getBlockSource()->getDimension()->weather->lightningLevel = this->settings.getSettingByName<float>(
                 "lightning")->value;
         else SDK::clientInstance->getBlockSource()->getDimension()->weather->lightningLevel = 0.0f;
-        //
-        // // TODO: When you set snow, it will stay even if on until game reload
+
+        // TODO: When you set snow, it will stay even if on until game reload
+
         if (getOps<bool>("snow")) {
             Vec3<float>* pos = event.getActor()->getPosition();
-            Vec3<int> e((int)pos->x, (int)pos->y, (int)pos->z);
+            BlockPos e((int)pos->x, (int)pos->y, (int)pos->z);
 
-            SDK::clientInstance->getBlockSource()->getBiome(e)->temperature = 0.0f;
+            if (SDK::clientInstance->getBlockSource()->getBiome(e)->temperature != 0) SDK::clientInstance->getBlockSource()->getBiome(e)->temperature = 0.0f;
         }
     }
 }

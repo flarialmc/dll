@@ -384,7 +384,7 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
         }
 
         if (isOn("showBiome")) {
-            Vec3<int> lol {
+            BlockPos lol {
                 static_cast<int>(SDK::clientInstance->getLocalPlayer()->getPosition()->x),
                 static_cast<int>(SDK::clientInstance->getLocalPlayer()->getPosition()->y),
                 static_cast<int>(SDK::clientInstance->getLocalPlayer()->getPosition()->z),
