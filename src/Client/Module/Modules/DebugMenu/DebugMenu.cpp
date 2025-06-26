@@ -57,6 +57,7 @@ void JavaDebugMenu::defaultConfig() {
     setDef("showFPS", true);
     setDef("showOnePercLows", true);
     setDef("showDim", true);
+    setDef("showBiome", true);
     setDef("showCoords", true);
     setDef("showSpeed", true);
     setDef("showVelocity", true);
@@ -67,6 +68,7 @@ void JavaDebugMenu::defaultConfig() {
     setDef("showCpuGpu", true);
     setDef("showTime", true);
     setDef("showInGameTime", true);
+    setDef("showWorldName", true);
     setDef("showUptime", true);
     setDef("showTargetedBlock", true);
     setDef("showTargetedBlockTags", true);
@@ -132,6 +134,7 @@ void JavaDebugMenu::settingsRender(float settingsOffset) {
     customToggle("Show FPS and Frametime", "", "showFPS");
     customToggle("Show 1% Low FPS", "", "showOnePercLows");
     customToggle("Show Entity Counter and Dimension", "", "showDim");
+    customToggle("Show Biome", "", "showBiome");
     customToggle("Show Coordinates Section", "", "showCoords");
     customToggle("Show Speed", "", "showSpeed");
     customToggle("Show Velocity", "", "showVelocity");
@@ -142,6 +145,7 @@ void JavaDebugMenu::settingsRender(float settingsOffset) {
     customToggle("Show CPU, GPU and Renderer", "", "showCpuGpu");
     customToggle("Show Local Time", "", "showTime");
     customToggle("Show Ingame Time", "", "showInGameTime");
+    customToggle("Show World Name", "", "showWorldName");
     customToggle("Show Uptime", "", "showUptime");
     customToggle("Show Targeted Block", "", "showTargetedBlock");
     customConditionalToggle(getOps<bool>("showTargetedBlock"), "Show Targeted Block Tags", "", "showTargetedBlockTags");
@@ -209,19 +213,6 @@ std::string JavaDebugMenu::getDimensionName() {
     if (!blocksrc) return "Unknown dimension";
 
     std::string dim = blocksrc->getDimension()->getName();
-
-    Vec3<int> lol{
-        static_cast<int>(SDK::clientInstance->getLocalPlayer()->getPosition()->x),
-        static_cast<int>(SDK::clientInstance->getLocalPlayer()->getPosition()->y),
-        static_cast<int>(SDK::clientInstance->getLocalPlayer()->getPosition()->z),
-    };
-
-    // SDK::clientInstance->getLocalPlayer()->getPosition();
-
-    std::cout << blocksrc->getBiome(lol)->getName() << " " << blocksrc->getBiome(lol)->temperature << std::endl;
-
-    // std::cout << blocksrc->getBiome(lol).getBiomeType() << std::endl;
-    // std::cout << blocksrc->getBlock(static_cast<Vec3<int>>(SDK::clientInstance->getLocalPlayer()->getPosition())) << std::endl;
 
     if (dim == "Overworld") return "minecraft:overworld";
     else if (dim == "Nether") return "minecraft:nether";
@@ -363,10 +354,9 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
         std::vector<std::string> left;
         std::vector<std::string> right;
 
-        if (versionName.empty()) {
-            versionName = std::format("Flarial V2 Open Beta, Minecraft {}", VersionUtils::getFormattedVersion());
-        }
+        if (versionName.empty()) versionName = std::format("Flarial V2 Open Beta, Minecraft {}", VersionUtils::getFormattedVersion());
         left.emplace_back(versionName);
+
         if (isOn("showFPS")) {
             if (getOps<bool>("imPoorButIWannaLookRich")) {
                 left.emplace_back(std::format("{} FPS", static_cast<int>(MC::fps * 222.2)));
@@ -393,6 +383,16 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
             left.emplace_back("");
         }
 
+        if (isOn("showBiome")) {
+            Vec3<int> lol {
+                static_cast<int>(SDK::clientInstance->getLocalPlayer()->getPosition()->x),
+                static_cast<int>(SDK::clientInstance->getLocalPlayer()->getPosition()->y),
+                static_cast<int>(SDK::clientInstance->getLocalPlayer()->getPosition()->z),
+            };
+            left.emplace_back(std::format("Biome: {}", SDK::clientInstance->getBlockSource()->getBiome(lol)->getName()));
+            left.emplace_back("");
+        }
+
         if (isOn("showCoords")) {
             Vec3<float> pos = *player->getPosition();
             left.emplace_back(std::format("XYZ: {:.1f} / {:.1f} / {:.1f}", pos.x, pos.y, pos.z));
@@ -416,10 +416,11 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
 
         if (isOn("showCoords") || isOn("showSpeed") || isOn("showVelocity") || renderBreakProg) left.emplace_back("");
 
-        if (isOn("showInGameTime")) {
-            left.emplace_back(std::format("World Time: {}", Time::formatMCTime(Time::curTime, false)));
-            left.emplace_back("");
-        }
+        if (isOn("showInGameTime")) left.emplace_back(std::format("World Time: {}", Time::formatMCTime(Time::curTime, false)));
+
+        if (isOn("showWorldName")) left.emplace_back(std::format("World Name: {}", SDK::clientInstance->getLocalPlayer()->getLevel()->getLevelData()->getLevelName()));
+
+        if (isOn("showInGameTime") || isOn("showWorldName")) left.emplace_back("");
 
         if (isOn("showServer")) {
             left.emplace_back("Server:");
