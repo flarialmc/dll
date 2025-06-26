@@ -343,7 +343,7 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
 
         if (SDK::clientInstance == nullptr) return;
         LocalPlayer *player = SDK::clientInstance->getLocalPlayer();
-        if (player == nullptr) return;
+        if (!player) return;
         ActorRotationComponent *rotComponent = player->getActorRotationComponent();
 
         if (rotComponent) {
@@ -385,10 +385,11 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
 
         if (isOn("showBiome")) {
             std::string curBiome = "unknown";
+            Vec3<float> pos = *player->getPosition();
             BlockPos bp {
-                static_cast<int>(SDK::clientInstance->getLocalPlayer()->getPosition()->x),
-                static_cast<int>(SDK::clientInstance->getLocalPlayer()->getPosition()->y),
-                static_cast<int>(SDK::clientInstance->getLocalPlayer()->getPosition()->z),
+                static_cast<int>(pos.x),
+                static_cast<int>(pos.y),
+                static_cast<int>(pos.z),
             };
             if (SDK::clientInstance->getBlockSource() && SDK::clientInstance->getBlockSource()->getBiome(bp)) {
                 curBiome = SDK::clientInstance->getBlockSource()->getBiome(bp)->getName();
