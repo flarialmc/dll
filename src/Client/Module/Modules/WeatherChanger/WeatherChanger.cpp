@@ -71,9 +71,6 @@ void WeatherChanger::onTick(TickEvent& event)
             Vec3<float>* pos = event.getActor()->getPosition();
             Vec3<int> e((int)pos->x, (int)pos->y, (int)pos->z);
 
-            // SDK::clientInstance->getBlockSource()->getBiome(e);
-
-
             SDK::clientInstance->getBlockSource()->getBiome(e)->temperature = 0.0f;
         }
     }

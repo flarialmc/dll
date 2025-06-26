@@ -218,7 +218,7 @@ std::string JavaDebugMenu::getDimensionName() {
 
     // SDK::clientInstance->getLocalPlayer()->getPosition();
 
-    std::cout << blocksrc->getBiome(lol)->getName() << " " << blocksrc->getBiome(lol)->temparature << std::endl;
+    std::cout << blocksrc->getBiome(lol)->getName() << " " << blocksrc->getBiome(lol)->temperature << std::endl;
 
     // std::cout << blocksrc->getBiome(lol).getBiomeType() << std::endl;
     // std::cout << blocksrc->getBlock(static_cast<Vec3<int>>(SDK::clientInstance->getLocalPlayer()->getPosition())) << std::endl;
