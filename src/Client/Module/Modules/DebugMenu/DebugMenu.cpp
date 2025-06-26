@@ -384,12 +384,17 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
         }
 
         if (isOn("showBiome")) {
-            BlockPos lol {
+            std::string curBiome = "unknown";
+            BlockPos bp {
                 static_cast<int>(SDK::clientInstance->getLocalPlayer()->getPosition()->x),
                 static_cast<int>(SDK::clientInstance->getLocalPlayer()->getPosition()->y),
                 static_cast<int>(SDK::clientInstance->getLocalPlayer()->getPosition()->z),
             };
-            left.emplace_back(std::format("Biome: {}", SDK::clientInstance->getBlockSource()->getBiome(lol)->getName()));
+            if (SDK::clientInstance->getBlockSource() && SDK::clientInstance->getBlockSource()->getBiome(bp)) {
+                curBiome = SDK::clientInstance->getBlockSource()->getBiome(bp)->getName();
+            }
+
+            left.emplace_back(std::format("Biome: {}", curBiome));
             left.emplace_back("");
         }
 
