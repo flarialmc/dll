@@ -76,6 +76,9 @@ void OffsetInit::init2170() {
     ADD_OFFSET("Level::getPlayerMap", 0xB98);
 
     ADD_OFFSET("LevelRendererPlayer::cameraPos", 0x65C);
+
+    ADD_OFFSET("Level::LevelData", 0x100);
+    ADD_OFFSET("LevelData::worldName", 0x298);
 }
 
 void OffsetInit::init2160() {
@@ -170,6 +173,9 @@ void OffsetInit::init2140() {
     ADD_OFFSET("RemoteConnectorComposite::rakNetConnector", 0x70);
 
     ADD_OFFSET("ScreenContext::tessellator", 0xC8);
+
+    ADD_OFFSET("Level::LevelData", 0x110);
+    ADD_OFFSET("LevelData::worldName", 0x390);
 }
 
 void OffsetInit::init2130() {
