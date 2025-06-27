@@ -229,7 +229,7 @@ jobs:
         run: |
           git config user.name "GitHub Actions Bot"
           git config user.email "actions@example.com"
-          curl https://api.github.com/repos/TTF-fog/newcdn/tags > cache.txt
+          curl https://api.github.com/repos/flarialmc/newcdn/tags > cache.txt
   
           git add cache.txt
           git commit -m "Add Cache for Tags (API)"
