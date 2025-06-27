@@ -57,7 +57,8 @@ void JavaDebugMenu::defaultConfig() {
     setDef("showFPS", true);
     setDef("showOnePercLows", true);
     setDef("showDim", true);
-    setDef("showBiome", true);
+    // setDef("showBiome", true);
+    setDef("showWeather", true);
     setDef("showCoords", true);
     setDef("showSpeed", true);
     setDef("showVelocity", true);
@@ -134,7 +135,8 @@ void JavaDebugMenu::settingsRender(float settingsOffset) {
     customToggle("Show FPS and Frametime", "", "showFPS");
     customToggle("Show 1% Low FPS", "", "showOnePercLows");
     customToggle("Show Entity Counter and Dimension", "", "showDim");
-    customToggle("Show Biome", "", "showBiome");
+    // customToggle("Show Biome", "", "showBiome");
+    customToggle("Show Weather", "", "showWeather");
     customToggle("Show Coordinates Section", "", "showCoords");
     customToggle("Show Speed", "", "showSpeed");
     customToggle("Show Velocity", "", "showVelocity");
@@ -212,12 +214,28 @@ std::string JavaDebugMenu::getDimensionName() {
     BlockSource *blocksrc = SDK::clientInstance->getBlockSource();
     if (!blocksrc) return "Unknown dimension";
 
-    std::string dim = blocksrc->getDimension()->getName();
+    Dimension* dimension = blocksrc->getDimension();
+    if (!dimension) return "Unknown dimension";
+
+    std::string dim = dimension->getName();
 
     if (dim == "Overworld") return "minecraft:overworld";
     else if (dim == "Nether") return "minecraft:nether";
     else if (dim == "TheEnd") return "minecraft:the_end";
     else return "Unknown dimension";
+}
+
+std::vector<float> JavaDebugMenu::getWeatherInfo() {
+    BlockSource *blocksrc = SDK::clientInstance->getBlockSource();
+    if (!blocksrc) return std::vector<float>{};
+
+    Dimension* dimension = blocksrc->getDimension();
+    if (!dimension) return std::vector<float>{};
+
+    Weather* weather = dimension->getweather();
+    if (!weather) return std::vector<float>{};
+
+    return std::vector<float>{weather->getrainLevel(), weather->getlightningLevel()};
 }
 
 std::string JavaDebugMenu::getTime() {
@@ -383,6 +401,7 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
             left.emplace_back("");
         }
 
+        /* Crashes when changing weather (rain), needs to be fixed
         if (isOn("showBiome")) {
             std::string curBiome = "unknown";
             Vec3<float> pos = *player->getPosition();
@@ -396,6 +415,20 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
             }
 
             left.emplace_back(std::format("Biome: {}", curBiome));
+            left.emplace_back("");
+        }
+        */
+
+        if (isOn("showWeather")) { // Lightning always shows 100% for some reason
+            std::vector<float> weatherInfo = getWeatherInfo();
+            if (weatherInfo.empty()) {
+                left.emplace_back("Rain Level: Unknown");
+                // left.emplace_back("Lightning Level: Unknown");
+            }
+            else {
+                left.emplace_back(std::format("Rain Level: {:.2f}%", weatherInfo[0] * 100));
+                // left.emplace_back(std::format("Lightning Level: {:.2f}%", weatherInfo[1] * 100));
+            }
             left.emplace_back("");
         }
 
@@ -430,9 +463,17 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
 
         if (isOn("showServer")) {
             left.emplace_back("Server:");
-            left.emplace_back(std::format("IP: {}", SDK::getServerIP()));
-            left.emplace_back(std::format("Port: {}", SDK::getServerPort()));
-            left.emplace_back(std::format("Ping: {} ms", SDK::getServerPing()));
+            std::string serverIp = SDK::getServerIP();
+            if (serverIp == "world") {
+                left.emplace_back("IP: local");
+                left.emplace_back("Port: 0");
+                left.emplace_back("Ping: -1 ms");
+            }
+            else {
+                left.emplace_back(std::format("IP: {}", SDK::getServerIP()));
+                left.emplace_back(std::format("Port: {}", SDK::getServerPort()));
+                left.emplace_back(std::format("Ping: {} ms", SDK::getServerPing()));
+            }
             updateTimedVector(tickList, 1.0f);
             left.emplace_back(std::format("TPS: {}", std::to_string(tickList.size())));
         }

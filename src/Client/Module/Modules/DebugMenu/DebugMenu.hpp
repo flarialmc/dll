@@ -81,6 +81,8 @@ public:
 
 	std::string getDimensionName();
 
+	std::vector<float> getWeatherInfo();
+
 	std::string getTime();
 
 	std::string getFormattedTime(long long seconds);
