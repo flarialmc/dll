@@ -32,6 +32,7 @@ void JavaDebugMenu::onDisable() {
 }
 
 void JavaDebugMenu::defaultConfig() {
+    settings.changeType<float, int>("noOfTags");
     settings.renameSetting("textColor", "textCol");
     setDef("keybind", (std::string) "F3");
     getKeybind();
@@ -78,7 +79,7 @@ void JavaDebugMenu::defaultConfig() {
     setDef("showTargetedBlock", true);
     setDef("showTargetedBlockTags", true);
     setDef("showMaxTags", true);
-    setDef("noOfTags", 10.0f);
+    setDef("noOfTags", 10);
 }
 
 void JavaDebugMenu::customToggle(std::string text, std::string subtext, std::string settingName) {
@@ -91,6 +92,10 @@ void JavaDebugMenu::customConditionalToggle(bool condition, std::string text, st
 
 void JavaDebugMenu::customConditionalSlider(bool condition, std::string text, std::string subtext, std::string settingName, float maxVal, float minVal, bool zerosafe) {
     addConditionalSlider(!getOps<bool>("enableEverything") && condition, text, subtext, settingName, maxVal, minVal, zerosafe);
+}
+
+void JavaDebugMenu::customConditionalSliderInt(bool condition, std::string text, std::string subtext, std::string settingName, int maxVal, int minVal) {
+    addConditionalSliderInt(!getOps<bool>("enableEverything") && condition, text, subtext, settingName, maxVal, minVal);
 }
 
 void JavaDebugMenu::settingsRender(float settingsOffset) {
@@ -159,7 +164,7 @@ void JavaDebugMenu::settingsRender(float settingsOffset) {
     customToggle("Show Targeted Block", "", "showTargetedBlock");
     customConditionalToggle(getOps<bool>("showTargetedBlock"), "Show Targeted Block Tags", "", "showTargetedBlockTags");
     customConditionalToggle(getOps<bool>("showTargetedBlock") && getOps<bool>("showTargetedBlockTags"), "Show Maximum Number Of Block Tags", "", "showMaxTags");
-    customConditionalSlider(getOps<bool>("showTargetedBlock") && getOps<bool>("showTargetedBlockTags") && !getOps<bool>("showMaxTags"), "Number Of Tags To Be Show", "", "noOfTags", 20.0f, 1.0f, true);
+    customConditionalSliderInt(getOps<bool>("showTargetedBlock") && getOps<bool>("showTargetedBlockTags") && !getOps<bool>("showMaxTags"), "Number Of Tags To Be Show", "", "noOfTags", 20, 1);
 
     FlarialGUI::UnsetScrollView();
     resetPadding();
@@ -542,7 +547,7 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
 
             if (isOn("showTargetedBlockTags")) {
                 bool showMax = getOps<bool>("showMaxTags");
-                int maxAllowedTags = static_cast<int>(getOps<float>("noOfTags"));
+                int maxAllowedTags = getOps<int>("noOfTags");
                 int maxFittableTags = static_cast<int>(MC::windowSize.y / (textHeight / 3.0f + yPadding * 2)) - right.size();
 
                 if (lookingAtTags.size() >= maxFittableTags && (showMax || maxAllowedTags >= maxFittableTags)) {
