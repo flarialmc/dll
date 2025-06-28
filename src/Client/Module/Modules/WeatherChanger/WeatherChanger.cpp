@@ -7,6 +7,7 @@ WeatherChanger::WeatherChanger(): Module("Weather Changer", "Changes the weather
 
 void WeatherChanger::onEnable() {
     Listen(this, TickEvent, &WeatherChanger::onTick)
+    Listen(this, RenderEvent, &WeatherChanger::onRender)
     Module::onEnable();
 }
 
@@ -17,13 +18,20 @@ void WeatherChanger::onDisable() {
     }
 
     Deafen(this, TickEvent, &WeatherChanger::onTick)
+    Deafen(this, RenderEvent, &WeatherChanger::onRender)
     Module::onDisable();
+}
+
+void WeatherChanger::onRender(RenderEvent& event) {
+    if (SDK::getServerIP() == "none") oldBiome = nullptr;
 }
 
 void WeatherChanger::defaultConfig() {
     Module::defaultConfig("core");
     setDef("rain", 1.00f);
     setDef("lightning", 0.00f);
+    setDef("customTemp", false);
+    setDef("temperature", 0.5f);
     setDef("snow", false);
 }
 
@@ -41,7 +49,9 @@ void WeatherChanger::settingsRender(float settingsOffset) {
     addHeader("Misc");
     addSlider("Rain Intensity", "", "rain", 1.f);
     addSlider("Lightning Intensity", "", "lightning", 1.f);
-    addToggle("Snow", "", "snow");
+    addToggle("Custom Temperature", "", "customTemp");
+    addConditionalSlider(getOps<bool>("customTemp"), "Temperature", "", "temperature", 1.f, 0.f, true);
+    addConditionalToggle(!getOps<bool>("customTemp"), "Snow", "", "snow");
 
     FlarialGUI::UnsetScrollView();
 
@@ -57,7 +67,7 @@ void WeatherChanger::onTick(TickEvent &event) {
     if (getOps<float>("lightning") < 0.02f) SDK::clientInstance->getBlockSource()->getDimension()->weather->lightningLevel = this->settings.getSettingByName<float>("lightning")->value;
     else SDK::clientInstance->getBlockSource()->getDimension()->weather->lightningLevel = 0.0f;
 
-    if (getOps<bool>("snow")) {
+    if (getOps<bool>("snow") || getOps<bool>("customTemp")) {
         const Vec3<float> *pos = event.getActor()->getPosition();
         const BlockPos bp(static_cast<int>(pos->x), static_cast<int>(pos->y), static_cast<int>(pos->z));
 
@@ -65,7 +75,7 @@ void WeatherChanger::onTick(TickEvent &event) {
             if (oldBiome) oldBiome->temperature = oldTemp;
             oldBiome = curBiome;
             oldTemp = curBiome->temperature;
-            curBiome->temperature = 0.0f;
+            curBiome->temperature = getOps<bool>("snow") ? 0.0f : getOps<float>("temperature");
         }
     } else if (oldBiome) {
         oldBiome->temperature = oldTemp;

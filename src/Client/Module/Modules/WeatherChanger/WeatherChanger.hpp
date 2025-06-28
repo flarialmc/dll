@@ -6,7 +6,7 @@
 class WeatherChanger : public Module {
 public:
 	float oldTemp;
-	Biome* oldBiome;
+	Biome* oldBiome = nullptr;
 
 	WeatherChanger();
 
@@ -19,4 +19,6 @@ public:
 	void settingsRender(float settingsOffset) override;
 
 	void onTick(TickEvent& event);
+
+	void onRender(RenderEvent& event);
 };
