@@ -43,6 +43,12 @@ void WeatherChanger::settingsRender(float settingsOffset) {
     resetPadding();
 }
 
+bool equalBlockPos(const BlockPos one, const BlockPos two) {
+    return one.x == two.x &&
+           one.y == two.y &&
+           one.z == two.z;
+}
+
 void WeatherChanger::onTick(TickEvent &event) {
     if (!this->isEnabled() || !SDK::clientInstance->getBlockSource() || !SDK::clientInstance->getBlockSource()->getDimension()->weather) return;
 
@@ -52,12 +58,27 @@ void WeatherChanger::onTick(TickEvent &event) {
     if (getOps<float>("lightning") < 0.02f) SDK::clientInstance->getBlockSource()->getDimension()->weather->lightningLevel = this->settings.getSettingByName<float>("lightning")->value;
     else SDK::clientInstance->getBlockSource()->getDimension()->weather->lightningLevel = 0.0f;
 
-    // TODO: When you set snow, it will stay even if on until game reload
-
     if (getOps<bool>("snow")) {
-        Vec3<float> *pos = event.getActor()->getPosition();
-        BlockPos e((int) pos->x, (int) pos->y, (int) pos->z);
+        const Vec3<float> *pos = event.getActor()->getPosition();
+        BlockPos bp(static_cast<int>(pos->x), static_cast<int>(pos->y), static_cast<int>(pos->z));
 
-        if (SDK::clientInstance->getBlockSource()->getBiome(e)->temperature != 0) SDK::clientInstance->getBlockSource()->getBiome(e)->temperature = 0.0f;
+        if (Biome *curBiome = SDK::clientInstance->getBlockSource()->getBiome(bp); curBiome && curBiome->temperature != 0) {
+            modifiedQueue.push_front(std::make_pair(bp, curBiome->temperature));
+            curBiome->temperature = 0.0f;
+        }
+    }
+
+    if (!getOps<bool>("snow")) while (getOps<bool>("snow") && modifiedQueue.size() > 1) {
+        const Vec3<float> *pos = event.getActor()->getPosition();
+        if (const BlockPos bp(static_cast<int>(pos->x), static_cast<int>(pos->y), static_cast<int>(pos->z)); equalBlockPos(bp, modifiedQueue.back().first)) continue;
+        if (Biome *theBiome = SDK::clientInstance->getBlockSource()->getBiome(modifiedQueue.back().first)) theBiome->temperature = modifiedQueue.back().second;
+        modifiedQueue.pop_back();
+    }
+
+    if (!getOps<bool>("snow") && modifiedQueue.size() > 0) {
+        while (modifiedQueue.size() > 0) {
+            if (Biome *theBiome = SDK::clientInstance->getBlockSource()->getBiome(modifiedQueue.back().first)) theBiome->temperature = modifiedQueue.back().second;
+            modifiedQueue.pop_back();
+        }
     }
 }

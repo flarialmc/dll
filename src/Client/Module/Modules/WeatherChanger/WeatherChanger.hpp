@@ -6,7 +6,9 @@
 
 class WeatherChanger : public Module {
 public:
-	WeatherChanger();;
+	std::deque<std::pair<BlockPos, float>> modifiedQueue;
+
+	WeatherChanger();
 
 	void onEnable() override;
 
@@ -18,4 +20,3 @@ public:
 
 	void onTick(TickEvent& event);
 };
-
