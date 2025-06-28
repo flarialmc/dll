@@ -310,6 +310,10 @@ public:
                 curr = "modules";
             } else {
                 SDK::clientInstance->grabMouse(10);
+# if defined(__DEBUG__)
+                SDK::clientInstance->releaseMouse(); 
+# endif
+
                 FlarialGUI::ResetShit();
                 Client::SaveSettings();
                 Client::SavePrivate();
@@ -328,6 +332,9 @@ public:
                         SDK::getCurrentScreen() == "zoom_screen"
                     )
                         SDK::clientInstance->grabMouse(10); // let mouse control the view
+# if defined(__DEBUG__)
+					SDK::clientInstance->releaseMouse(); 
+# endif
 
                     MC::lastMouseScroll = MouseAction::Release;
                     this->active = false;
