@@ -434,8 +434,6 @@ public:
                 MC::lastMouseScroll = MouseAction::Release;
             }
 
-            Logger::info("scroll action: {},\naccpos: {}", static_cast<int>(event.getAction()), accumilatedPos);
-
             int scrollActionValue = static_cast<int>(event.getAction());
 
             if (scrollActionValue == static_cast<int>(MouseAction::ScrollUp)) {
