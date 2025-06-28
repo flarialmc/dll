@@ -25,31 +25,6 @@ D2D_COLOR_F Module::getColor(std::string text, std::string mod) {
 	return col;
 };
 
-template <typename T>
-void Module::setDef(std::string setting, T value) {
-	this->settings.getOrAddSettingByName<T>(setting, value);
-}
-
-void Module::setDef(std::string setting, std::string col, float opac, bool rgb) {
-	this->settings.getOrAddSettingByName<std::string>(setting + "Col", col);
-	this->settings.getOrAddSettingByName<float>(setting + "Opacity", opac);
-	this->settings.getOrAddSettingByName<bool>(setting + "RGB", rgb);
-}
-
-void Module::forceDef(std::string setting, std::string col, float opac, bool rgb) {
-	if (this->settings.getSettingByName<std::string>(setting + "Col") != nullptr) this->settings.getSettingByName<std::string>(setting + "Col")->value = col;
-	else this->settings.addSetting(setting + "Col", col);
-	if (this->settings.getSettingByName<float>(setting + "Opacity") != nullptr)this->settings.getSettingByName<float>(setting + "Opacity")->value = opac;
-	else this->settings.addSetting(setting + "Opacity", opac);
-	if (this->settings.getSettingByName<bool>(setting + "RGB") != nullptr)this->settings.getSettingByName<bool>(setting + "RGB")->value = rgb;
-	else this->settings.addSetting(setting + "RGB", rgb);
-}
-
-template <typename T>
-T& Module::getOps(std::string setting) {
-	return this->settings.getSettingByName<T>(setting)->value;
-}
-
 void Module::normalRenderCore(int index, std::string& text) {
 	if (!this->isEnabled()) return;
 	float rotation = getOps<float>("rotation");
@@ -576,12 +551,47 @@ void Module::addConditionalSlider(bool condition, std::string text, std::string 
 	FlarialGUI::ResetOverrideAlphaValues();
 }
 
+void Module::addConditionalSliderInt(bool condition, std::string text, std::string subtext, std::string settingName, int maxVal, int minVal) {
+	FlarialGUI::OverrideAlphaValues((Constraints::RelativeConstraint(0.05f, "height", true) - conditionalSliderAnims[sliderIndex]) / Constraints::RelativeConstraint(0.05f, "height", true));
+
+	if (condition) {
+		padding -= conditionalSliderAnims[sliderIndex];
+		FlarialGUI::lerp(conditionalSliderAnims[sliderIndex], 0.0f, 0.25f * FlarialGUI::frameFactor);
+		Module::addSliderInt(text, subtext, settingName, maxVal, minVal);
+	}
+	else {
+		FlarialGUI::lerp(conditionalSliderAnims[sliderIndex], Constraints::RelativeConstraint(0.05f, "height", true), 0.25f * FlarialGUI::frameFactor);
+		if (conditionalSliderAnims[sliderIndex] < Constraints::RelativeConstraint(0.0499f, "height", true)) {
+			padding -= conditionalSliderAnims[sliderIndex];
+			Module::addSliderInt(text, subtext, settingName, maxVal, minVal);
+		}
+		else sliderIndex++;
+	}
+
+	FlarialGUI::ResetOverrideAlphaValues();
+}
+
+void Module::addSliderInt(std::string text, std::string subtext, std::string settingName, int maxVal, int minVal) {
+	float elementX = Constraints::PercentageConstraint(0.33f, "right");
+	float y = Constraints::PercentageConstraint(0.10, "top") + padding;
+
+	int& value = settings.getSettingByName<int>(settingName)->value;
+
+	value = std::clamp(value, minVal, maxVal);
+
+	FlarialGUI::SliderInt(sliderIndex, elementX, y, value, maxVal, minVal, this->name, settingName);
+
+	Module::addElementText(text, subtext);
+
+	padding += Constraints::RelativeConstraint(0.05f, "height", true);
+	sliderIndex++;
+}
+
 void Module::addSlider(std::string text, std::string subtext, float& value, float maxVal, float minVal, bool zerosafe) {
 	float elementX = Constraints::PercentageConstraint(0.33f, "right");
 	float y = Constraints::PercentageConstraint(0.10, "top") + padding;
 
-	if (value > maxVal) value = maxVal;
-	else if (value < minVal) value = minVal;
+	value = std::clamp(value, minVal, maxVal);
 
 	FlarialGUI::Slider(sliderIndex, elementX, y, value, maxVal, minVal, zerosafe);
 
@@ -597,8 +607,7 @@ void Module::addSlider(std::string text, std::string subtext, std::string settin
 
 	float& value = settings.getSettingByName<float>(settingName)->value;
 
-	if (value > maxVal) value = maxVal;
-	else if (value < minVal) value = minVal;
+	value = std::clamp(value, minVal, maxVal);
 
 	FlarialGUI::Slider(sliderIndex, elementX, y, value, maxVal, minVal, zerosafe, this->name, settingName);
 

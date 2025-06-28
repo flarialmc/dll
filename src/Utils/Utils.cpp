@@ -553,12 +553,12 @@ std::string String::removeNonAlphanumeric(const std::string &input) {
     return nickname;
 }
 
-std::string String::removeNonNumeric(const std::string &string) {
+std::string String::removeNonNumeric(const std::string &string, bool integer) {
     std::string result;
     result.reserve(string.size());
 
     for (char c: string) {
-        if ((c >= '0' && c <= '9') || c == '.') {
+        if ((c >= '0' && c <= '9') || (!integer && c == '.')) {
             result += c;
         }
     }

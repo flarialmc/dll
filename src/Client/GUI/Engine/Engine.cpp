@@ -65,6 +65,7 @@ LRUCache<uint64_t, winrt::com_ptr<ID2D1LinearGradientBrush>> FlarialGUI::gradien
 
 std::unordered_map<int, WindowRect> FlarialGUI::WindowRects;
 std::unordered_map<int, SliderRect> FlarialGUI::SliderRects;
+std::unordered_map<int, SliderIntRect> FlarialGUI::SliderIntRects;
 std::unordered_map<int, TextBoxStruct> FlarialGUI::TextBoxes;
 std::unordered_map<int, ColorPicker> FlarialGUI::ColorPickers;
 std::unordered_map<int, DropdownStruct> FlarialGUI::DropDownMenus;

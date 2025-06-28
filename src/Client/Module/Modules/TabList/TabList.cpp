@@ -384,14 +384,14 @@ void TabList::onDisable() {
 }
 
 void TabList::defaultConfig() {
+    this->settings.changeType<float, int>("maxColumn");
     setDef("enabled", true);
     setDef("uiscale", 0.65f);
     setDef("playerCount", true);
     setDef("serverPing", true);
     setDef("worldName", true);
-    setDef("maxColumn", 10.f);
+    setDef("maxColumn", 10);
     setDef("togglable", false);
-    setDef("maxColumn", 10.f);
     setDef("showHeads", true);
     setDef("textalignment", (std::string) "Left");
     setDef("textShadow", false);
@@ -428,7 +428,7 @@ void TabList::settingsRender(float settingsOffset) {
     addToggle("Togglable", "", "togglable");
     addToggle("Show Player Heads", "", "showHeads");
     addToggle("Player Count", "", "playerCount");
-    addSlider("Max Players Column", "", "maxColumn", 30.f, 1.f);
+    addSliderInt("Max Players per Column", "", "maxColumn", 30, 1);
     addToggle("World Name", "", "worldName");
     addToggle("Server Ping", "", "serverPing");
     addToggle("Alphabetical Order", "", "alphaOrder");
@@ -953,7 +953,7 @@ void TabList::normalRender(int index, std::string &value) {
 
             float totalWidth = keycardSize * (showHeads ? 1 : 0.4);
             float totalHeight = keycardSize * 0.5f;
-            int maxColumn = floor(getOps<float>("maxColumn"));
+            int maxColumn = floor(getOps<int>("maxColumn"));
 
             float fontSize = Constraints::SpacingConstraint(3, keycardSize);
             std::vector<float> columnx = {};

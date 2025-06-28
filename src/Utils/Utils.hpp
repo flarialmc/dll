@@ -323,7 +323,7 @@ public:
 
 	static std::string removeNonAlphanumeric(const std::string& string);
 
-	static std::string removeNonNumeric(const std::string& string);
+	static std::string removeNonNumeric(const std::string& string, bool integer = false);
 
 	static std::vector<std::string> split(std::string_view str, char delimiter);
 

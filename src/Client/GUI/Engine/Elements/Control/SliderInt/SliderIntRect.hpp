@@ -1,6 +1,6 @@
 #pragma once
 
-struct SliderRect {
+struct SliderIntRect {
     bool isMovingElement = false;
     bool hasBeenMoved = false;
     float movedX = 0;
@@ -8,5 +8,5 @@ struct SliderRect {
     float hoveredAnim = 0;
     bool firstHover = false;
     bool isValid = true;
-    float validFloat = -1.f;
+    int validInt = -1.f;
 };

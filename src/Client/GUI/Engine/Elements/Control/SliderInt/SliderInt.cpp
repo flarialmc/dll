@@ -5,7 +5,7 @@
 #define clickgui ModuleManager::getModule("ClickGUI")
 
 using namespace winrt::Windows::UI::Core;
-float FlarialGUI::Slider(int index, float x, float y, float& startingPoint, const float maxValue, const float minValue, const bool zerosafe, std::string moduleName, std::string settingName) {
+int FlarialGUI::SliderInt(int index, float x, float y, int& startingPoint, const int maxValue, const int minValue, std::string moduleName, std::string settingName) {
 	D2D1_COLOR_F color = ClickGUI::getColor("primary1");
 	D2D1_COLOR_F disabledColor = ClickGUI::getColor("primary3");
 	D2D1_COLOR_F circleColor = ClickGUI::getColor("primary2");
@@ -45,14 +45,7 @@ float FlarialGUI::Slider(int index, float x, float y, float& startingPoint, cons
 	if (isAdditionalY) UnSetIsInAdditionalYMode();
 
 	if (!TextBoxes[30 + index].isActive) {
-		std::stringstream stream;
-
-		if (startingPoint < 10.0f) stream << std::fixed << std::setprecision(3) << startingPoint;
-		else if (startingPoint < 100.0f) stream << std::fixed << std::setprecision(2) << startingPoint;
-		else if (startingPoint < 1000.0f) stream << std::fixed << std::setprecision(1) << startingPoint;
-		else stream << std::fixed << std::setprecision(0) << startingPoint;
-
-		text = stream.str();
+		text = FlarialGUI::cached_to_string(startingPoint);
 	}
 
 	float oriX = x;
@@ -77,18 +70,18 @@ float FlarialGUI::Slider(int index, float x, float y, float& startingPoint, cons
 
 	RoundedRect(x, y, TextBoxes[30 + index].curBgCol, percWidth, percHeight, round.x, round.x);
 
-	int limit = 5;
+	int limit = 3;
 
-	startingPoint = std::clamp(startingPoint, zerosafe && minValue == 0.f ? 0.001f : minValue, maxValue);
-	if (SliderRects[index].validFloat == -1.f) SliderRects[index].validFloat = std::clamp(startingPoint, zerosafe && minValue == 0.f ? 0.001f : minValue, maxValue);
+	startingPoint = std::clamp(startingPoint, minValue, maxValue);
+	if (SliderIntRects[index].validInt == -1) SliderIntRects[index].validInt = std::clamp(startingPoint, minValue, maxValue);
 
 	text = TextBox(30 + index, text, limit, x, y, percWidth, percHeight, 2, moduleName, settingName);
-	text = String::removeNonNumeric(text);
+	text = String::removeNonNumeric(text, true);
 
-	if (text.empty() || text == ".") SliderRects[index].isValid = false;
+	if (text.empty()) SliderIntRects[index].isValid = false;
 	else {
-		SliderRects[index].isValid = true;
-		SliderRects[index].validFloat = std::clamp(std::stof(text), zerosafe && minValue == 0.f ? 0.001f : minValue, maxValue);
+		SliderIntRects[index].isValid = true;
+		SliderIntRects[index].validInt = std::clamp(std::stoi(text), minValue, maxValue);
 	}
 
 	if (TextBoxes[30 + index].isActive) {
@@ -96,7 +89,6 @@ float FlarialGUI::Slider(int index, float x, float y, float& startingPoint, cons
 		else lerp(TextBoxes[30 + index].cursorOpac, 2.0f, 0.05f * frameFactor);
 	}
 	else TextBoxes[30 + index].cursorOpac = 0;
-
 
 	if (TextBoxes[30 + index].cursorOpac > 1) TextBoxes[30 + index].isAt1 = true;
 	if (TextBoxes[30 + index].cursorOpac < 0) TextBoxes[30 + index].isAt1 = false;
@@ -146,18 +138,15 @@ float FlarialGUI::Slider(int index, float x, float y, float& startingPoint, cons
 
 	if (activeColorPickerWindows) activeSliders = 1;
 
-	if (SliderRects[index].hasBeenMoved) {
+	if (SliderIntRects[index].hasBeenMoved) {
 
 		if (!TextBoxes[30 + index].isActive)
-			circleX = (SliderRects[index].percentageX - minValue) * (rectangleWidth / (maxValue - minValue)) +
-			rectangleLeft;
-		else circleX = (SliderRects[index].validFloat - minValue) * (rectangleWidth / (maxValue - minValue)) + rectangleLeft;
+			circleX = (SliderIntRects[index].validInt - minValue) * (rectangleWidth / (maxValue - minValue)) + rectangleLeft;
+		else circleX = (SliderIntRects[index].validInt - minValue) * (rectangleWidth / (maxValue - minValue)) + rectangleLeft;
 
 	}
-	else if (SliderRects[index].validFloat != 50.0f && !SliderRects[index].hasBeenMoved)
-		circleX = (SliderRects[index].validFloat - minValue) * (rectangleWidth / (maxValue - minValue)) + rectangleLeft;
-
-
+	else if (SliderIntRects[index].validInt != 50.0f && !SliderIntRects[index].hasBeenMoved)
+		circleX = (SliderIntRects[index].validInt - minValue) * (rectangleWidth / (maxValue - minValue)) + rectangleLeft;
 
 	// Calculate the position and width of the enabled portion rect
 	const float enabledWidth = circleX - farLeftX;
@@ -170,100 +159,95 @@ float FlarialGUI::Slider(int index, float x, float y, float& startingPoint, cons
 	// Draw the enabled portion rect
 	RoundedRect(farLeftX, y, color, enabledWidth, height, round.x, round.x);
 
-	if (SliderRects[index].isMovingElement || Utils::CursorInEllipse(circleX, circleY, Constraints::SpacingConstraint(circleRadius, 1.5f), Constraints::SpacingConstraint(circleRadius, 1.5f))) {
-		lerp(SliderRects[index].hoveredAnim, 1.f, 0.25f * frameFactor);
-		if (!SliderRects[index].firstHover) {
+	if (SliderIntRects[index].isMovingElement || Utils::CursorInEllipse(circleX, circleY, Constraints::SpacingConstraint(circleRadius, 1.5f), Constraints::SpacingConstraint(circleRadius, 1.5f))) {
+		lerp(SliderIntRects[index].hoveredAnim, 1.f, 0.25f * frameFactor);
+		if (!SliderIntRects[index].firstHover) {
 
 			WinrtUtils::setCursorTypeThreaded(CoreCursorType::SizeWestEast);
 
-			SliderRects[index].firstHover = true;
+			SliderIntRects[index].firstHover = true;
 		}
 	}
 	else {
-		if (SliderRects[index].firstHover) {
+		if (SliderIntRects[index].firstHover) {
 			WinrtUtils::setCursorTypeThreaded(CoreCursorType::Arrow);
-			SliderRects[index].firstHover = false;
+			SliderIntRects[index].firstHover = false;
 		}
-		lerp(SliderRects[index].hoveredAnim, 0.f, 0.25f * frameFactor);
+		lerp(SliderIntRects[index].hoveredAnim, 0.f, 0.25f * frameFactor);
 	}
 
 	// Draw the circle in the middle
-	Circle(circleX, circleY, color, Constraints::SpacingConstraint(circleRadius, 1.1f + (1.1f * 0.35f * SliderRects[index].hoveredAnim)));
-	Circle(circleX, circleY, circleColor, Constraints::SpacingConstraint(circleRadius, 0.55f + (0.55f * 0.35f * SliderRects[index].hoveredAnim)));
+	Circle(circleX, circleY, color, Constraints::SpacingConstraint(circleRadius, 1.1f + (1.1f * 0.35f * SliderIntRects[index].hoveredAnim)));
+	Circle(circleX, circleY, circleColor, Constraints::SpacingConstraint(circleRadius, 0.55f + (0.55f * 0.35f * SliderIntRects[index].hoveredAnim)));
 
 	// Calculate the percentage
 	float percentage = ((circleX - rectangleLeft) / rectangleWidth) * (maxValue - minValue) + minValue;
 
-	if (!clickgui->active || MC::mouseButton == MouseButton::Right) return SliderRects[index].percentageX;
+	if (!clickgui->active || MC::mouseButton == MouseButton::Right) return SliderIntRects[index].percentageX;
 
-	SliderRects[index].percentageX = percentage;
+	SliderIntRects[index].percentageX = percentage;
 
 	if (isInScrollView) y += scrollpos;
 
 	if (CursorInRect(farLeftX, y - (height * 3) / 2, totalWidth, height * 3) &&
 		MC::held &&
-		(SliderRects[index].isMovingElement || activeSliders == 0) &&
+		(SliderIntRects[index].isMovingElement || activeSliders == 0) &&
 		clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value > 0.95f) {
 
-		SliderRects[index].movedX = MC::mousePos.x;
-		SliderRects[index].hasBeenMoved = true;
-		SliderRects[index].isMovingElement = true;
+		SliderIntRects[index].movedX = MC::mousePos.x;
+		SliderIntRects[index].hasBeenMoved = true;
+		SliderIntRects[index].isMovingElement = true;
 
 		activeSliders = 1;
 
-		percentage = ((SliderRects[index].movedX - rectangleLeft) / rectangleWidth) * (maxValue - minValue) + minValue;
-		SliderRects[index].percentageX = percentage;
-
+		percentage = ((SliderIntRects[index].movedX - rectangleLeft) / rectangleWidth) * (maxValue - minValue) + minValue;
+		SliderIntRects[index].percentageX = percentage;
 	}
 
 	if (Utils::CursorInEllipse(circleX, circleY, Constraints::SpacingConstraint(circleRadius, 1.5f), Constraints::SpacingConstraint(circleRadius, 1.5f)) && MC::held &&
-		(activeSliders == 0 || SliderRects[index].isMovingElement) && clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value > 0.95f) {
+		(activeSliders == 0 || SliderIntRects[index].isMovingElement) && clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value > 0.95f) {
 
 		if (MC::mousePos.x > farLeftX && MC::mousePos.x < farRightX) {
 
-			SliderRects[index].movedX = MC::mousePos.x;
-			SliderRects[index].hasBeenMoved = true;
-			SliderRects[index].isMovingElement = true;
+			SliderIntRects[index].movedX = MC::mousePos.x;
+			SliderIntRects[index].hasBeenMoved = true;
+			SliderIntRects[index].isMovingElement = true;
 
 			activeSliders = 1;
 		}
 
-		if (MC::mousePos.x < farLeftX) SliderRects[index].movedX = farLeftX;
-		else if (MC::mousePos.x > farRightX) SliderRects[index].movedX = farRightX;
+		if (MC::mousePos.x < farLeftX) SliderIntRects[index].movedX = farLeftX;
+		else if (MC::mousePos.x > farRightX) SliderIntRects[index].movedX = farRightX;
 
-		percentage = ((SliderRects[index].movedX - rectangleLeft) / rectangleWidth) * (maxValue - minValue) + minValue;
-		SliderRects[index].percentageX = percentage;
+		percentage = ((SliderIntRects[index].movedX - rectangleLeft) / rectangleWidth) * (maxValue - minValue) + minValue;
+		SliderIntRects[index].percentageX = percentage;
 	}
-	else if (MC::held && SliderRects[index].isMovingElement && clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value > 0.95f) {
+	else if (MC::held && SliderIntRects[index].isMovingElement && clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value > 0.95f) {
 
 		if (MC::mousePos.x > farLeftX && MC::mousePos.x < farRightX) {
 
-			SliderRects[index].movedX = MC::mousePos.x;
-			SliderRects[index].hasBeenMoved = true;
-			SliderRects[index].isMovingElement = true;
+			SliderIntRects[index].movedX = MC::mousePos.x;
+			SliderIntRects[index].hasBeenMoved = true;
+			SliderIntRects[index].isMovingElement = true;
 
 		}
 
-		if (MC::mousePos.x < farLeftX) SliderRects[index].movedX = farLeftX;
-		else if (MC::mousePos.x > farRightX) SliderRects[index].movedX = farRightX;
+		if (MC::mousePos.x < farLeftX) SliderIntRects[index].movedX = farLeftX;
+		else if (MC::mousePos.x > farRightX) SliderIntRects[index].movedX = farRightX;
 
-		percentage = ((SliderRects[index].movedX - rectangleLeft) / rectangleWidth) * (maxValue - minValue) + minValue;
-		SliderRects[index].percentageX = percentage;
+		percentage = ((SliderIntRects[index].movedX - rectangleLeft) / rectangleWidth) * (maxValue - minValue) + minValue;
+		SliderIntRects[index].percentageX = percentage;
 	}
 
 	if (MC::mouseButton == MouseButton::None && !MC::held || MC::mouseButton == MouseButton::Left && !MC::held) {
-		SliderRects[index].isMovingElement = false;
+		SliderIntRects[index].isMovingElement = false;
 		activeSliders = 0;
-		percentage = SliderRects[index].percentageX;
+		percentage = SliderIntRects[index].percentageX;
 	}
-
-	if (percentage < 0.002f && zerosafe) percentage = 0.001f;
 
 	if (isAdditionalY) SetIsInAdditionalYMode();
 
-	if (SliderRects[index].isValid) startingPoint = percentage;
-
-	if (settingName == "uiscale") ModuleManager::getModule(moduleName)->prevAlignments = std::vector<DWRITE_TEXT_ALIGNMENT>(100, DWRITE_TEXT_ALIGNMENT_JUSTIFIED);
+	if (SliderIntRects[index].isValid) startingPoint = static_cast<int>(percentage);
 
 	return percentage;
 }
