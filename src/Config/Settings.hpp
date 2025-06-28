@@ -86,7 +86,7 @@ public:
         auto it = settings.find(name);
         if (it == settings.end()) return;
 
-        auto *originalSetting = static_cast<SettingType<FromType> *>(it->second.get());
+        auto *originalSetting = dynamic_cast<SettingType<FromType> *>(it->second.get());
         if (!originalSetting) return;
 
         ToType convertedValue;
