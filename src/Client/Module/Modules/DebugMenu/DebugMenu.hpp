@@ -66,6 +66,8 @@ public:
 
 	void customConditionalSlider(bool condition, std::string text, std::string subtext, std::string settingName, float maxVal = 100.0f, float minVal = 0.0f, bool zerosafe = true);
 
+	void customConditionalSliderInt(bool condition, std::string text, std::string subtext, std::string settingName, int maxVal = 100, int minVal = 0);
+
 	void settingsRender(float settingsOffset) override;
 
 	bool isOn(std::string settingName);

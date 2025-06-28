@@ -14,6 +14,7 @@ void DirectionHUD::onDisable() {
 }
 
 void DirectionHUD::defaultConfig() {
+    settings.changeType<float, int>("degreesDecimalCount");
     getKeybind();
     Module::defaultConfig("core");
     Module::defaultConfig("pos");
@@ -49,7 +50,7 @@ void DirectionHUD::defaultConfig() {
     setDef("ordinalScaleShadow", (std::string)"000000", 1.f, false);
     setDef("showWaypoints", true);
     setDef("showDegrees", true);
-    setDef("degreesDecimalCount", 2.f);
+    setDef("degreesDecimalCount", 2);
     setDef("degreesTextSize", 1.2f);
     setDef("degreesTextOffset", 6.1f);
     setDef("degreesText", (std::string)"ffffff", 1.f, false);
@@ -114,7 +115,7 @@ void DirectionHUD::settingsRender(float settingsOffset) {
 
     addHeader("Degrees");
     addToggle("Show Degrees", "Display the exact angle (0-360)", "showDegrees");
-    addConditionalSlider(getOps<bool>("showDegrees"), "Degrees Decimal Count", "", "degreesDecimalCount", 5.0f, 0.0f, false);
+    addConditionalSliderInt(getOps<bool>("showDegrees"), "Degrees Decimal Count", "", "degreesDecimalCount", 5, 0);
     addConditionalSlider(getOps<bool>("showDegrees"), "Degrees Text Size", "", "degreesTextSize", 3.0f, 0.5f);
     addConditionalSlider(getOps<bool>("showDegrees"), "Degrees Text Offset", "", "degreesTextOffset", 10.0f, 0.0f, false);
     addConditionalToggle(getOps<bool>("showDegrees"), "Degrees Text Shadow", "", "degreesTextShadow");
@@ -258,7 +259,7 @@ void DirectionHUD::onRender(RenderEvent &event) {
         if (compassDegrees < 0) compassDegrees += 360.0f;
 
         std::stringstream ss;
-        ss << std::fixed << std::setprecision(floor(getOps<float>("degreesDecimalCount"))) << compassDegrees;
+        ss << std::fixed << std::setprecision(getOps<int>("degreesDecimalCount")) << compassDegrees;
         std::string degreesText = ss.str();
 
         // get text size for positioning

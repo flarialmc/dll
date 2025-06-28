@@ -94,8 +94,8 @@ public:
         auto limiterMod = ModuleManager::getModule("CPS Limiter");
         //if (!limiterMod) return;
 
-        GUIMouseListener::leftLimiter.setRate(limiterMod->getOps<float>("Left"));
-        GUIMouseListener::rightLimiter.setRate(limiterMod->getOps<float>("Right"));
+        GUIMouseListener::leftLimiter.setRate(limiterMod->getOps<int>("Left"));
+        GUIMouseListener::rightLimiter.setRate(limiterMod->getOps<int>("Right"));
 
         using MB = MouseButton;
 

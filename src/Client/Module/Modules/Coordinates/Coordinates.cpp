@@ -13,12 +13,13 @@ void Coordinates::onDisable() {
 }
 
 void Coordinates::defaultConfig() {
+    settings.changeType<float, int>("decimalCount");
     setDef("responsivewidth", true);
     setDef("text", (std::string) "{D} X: {X} Y: {Y} Z: {Z}");
     setDef("textscale", 0.80f);
     Module::defaultConfig("all");
     setDef("showDecimals", false);
-    setDef("decimalCount", 2.f);
+    setDef("decimalCount", 2);
     setDef("verticalMode", false);
     setDef("showVelocity", true);
     setDef("showYvelocity", true);
@@ -50,8 +51,7 @@ void Coordinates::settingsRender(float settingsOffset) {
     addHeader("Text");
     defaultAddSettings("text");
     addToggle("Show Decimals", "", "showDecimals");
-    addConditionalSlider(getOps<bool>("showDecimals"), "Number of Decimals", "", getOps<float>("decimalCount"), 6.f,
-                         1.f);
+    addConditionalSliderInt(getOps<bool>("showDecimals"), "Number of Decimals", "", "decimalCount", 6, 1);
     extraPadding();
 
     addHeader("Module Settings");
@@ -86,7 +86,7 @@ void Coordinates::settingsRender(float settingsOffset) {
 StringMap Coordinates::getCoords(float multiplier) {
     Vec3<float> *pos = SDK::clientInstance->getLocalPlayer()->getPosition();
 
-    int decimalsToShow = getOps<bool>("showDecimals") ? std::floor(getOps<float>("decimalCount")) : -1;
+    int decimalsToShow = getOps<bool>("showDecimals") ? getOps<int>("decimalCount") : -1;
 
     std::string xstr = std::to_string(pos->x * multiplier);
     std::string ystr = std::to_string(pos->y * multiplier);
