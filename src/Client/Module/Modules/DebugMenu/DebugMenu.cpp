@@ -40,8 +40,11 @@ void JavaDebugMenu::defaultConfig() {
     setDef("hideModules", true);
     setDef("rounding", 0.0f);
     setDef("showBg", true);
+    setDef("textShadow", true);
     setDef("text", (std::string) "ffffff", 1.f, false);
+    setDef("textShadow", (std::string)"00000", 0.55f, false);
     setDef("bg", (std::string) "000000", 0.5f, false);
+    setDef("textShadowOffset", 0.003f);
 
     setDef("imPoorButIWannaLookRich", false);
     setDef("f5crosshair", false);
@@ -106,11 +109,14 @@ void JavaDebugMenu::settingsRender(float settingsOffset) {
     addToggle("Hide Modules", "", "hideModules");
     addSlider("Rounding", "Rounding of the rectangle", "rounding", 100, 0, false);
     addToggle("Background", "", "showBg");
+    addToggle("Text Shadow", "", "textShadow");
+    addConditionalSlider(getOps<bool>("textShadow"), "Shadow Offset", "How far the shadow will be.", "textShadowOffset", 0.02f, 0.001f);
     extraPadding();
 
     addHeader("Colors");
     addColorPicker("Text Color", "", "text");
-    addColorPicker("Background Color", "", "bg");
+    addConditionalColorPicker(getOps<bool>("textShadow"), "Text Shadow Color", "", "textShadow");
+    addConditionalColorPicker(getOps<bool>("showBg"), "Background Color", "", "bg");
     extraPadding();
 
     addHeader("Module Settings");
@@ -357,7 +363,10 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
         float rounding = getOps<float>("rounding");
 
         D2D1_COLOR_F textColor = getColor("text");
+        D2D1_COLOR_F textShadowColor = getColor("textShadow");
         D2D1_COLOR_F bgColor = getColor("bg");
+
+        float textShadowOffset = Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * getOps<float>("uiscale");
 
         if (SDK::clientInstance == nullptr) return;
         LocalPlayer *player = SDK::clientInstance->getLocalPlayer();
@@ -567,6 +576,18 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
                     rounding, rounding
                 );
             }
+
+            if (getOps<bool>("textShadow")) FlarialGUI::FlarialTextWithFont(
+                textShadowOffset, leftYoffset + textShadowOffset,
+                String::StrToWStr(i).c_str(),
+                30.0f, textHeight / 3.0f,
+                DWRITE_TEXT_ALIGNMENT_LEADING,
+                textSize,
+                DWRITE_FONT_WEIGHT_NORMAL,
+                textShadowColor,
+                true
+            );
+
             FlarialGUI::FlarialTextWithFont(
                 0.0f, leftYoffset,
                 String::StrToWStr(i).c_str(),
@@ -598,6 +619,18 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
                     rounding, rounding
                 );
             }
+
+            if (getOps<bool>("textShadow")) FlarialGUI::FlarialTextWithFont(
+                (MC::windowSize.x - 30.0f) + textShadowOffset, rightYoffset + textShadowOffset,
+                String::StrToWStr(i).c_str(),
+                30.0f, textHeight / 3.0f,
+                DWRITE_TEXT_ALIGNMENT_TRAILING,
+                textSize,
+                DWRITE_FONT_WEIGHT_NORMAL,
+                textShadowColor,
+                true
+            );
+
             FlarialGUI::FlarialTextWithFont(
                 MC::windowSize.x - 30.0f, rightYoffset,
                 String::StrToWStr(i).c_str(),
@@ -666,6 +699,20 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
             float avgFT = std::accumulate(prevFrameTimes.begin(), prevFrameTimes.end(), 0.f) / prevFrameTimes.size();
 
             if (getOps<bool>("showMinMaxFT")) {
+
+                // minimum frame time
+
+                if (getOps<bool>("textShadow")) FlarialGUI::FlarialTextWithFont(
+                    borderSize * 2 + textShadowOffset, (startHeight - textHeight / 3.0f) + textShadowOffset,
+                    String::StrToWStr(std::format("{:.1f} ms min", minFT)).c_str(),
+                    0.f, textHeight / 3.0f,
+                    DWRITE_TEXT_ALIGNMENT_LEADING,
+                    textSize,
+                    DWRITE_FONT_WEIGHT_NORMAL,
+                    textShadowColor,
+                    true
+                );
+
                 FlarialGUI::FlarialTextWithFont(
                     borderSize * 2, startHeight - textHeight / 3.0f,
                     String::StrToWStr(std::format("{:.1f} ms min", minFT)).c_str(),
@@ -677,6 +724,19 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
                     true
                 );
 
+                // average frame time
+
+                if (getOps<bool>("textShadow")) FlarialGUI::FlarialTextWithFont(
+                    (barWidth * graphLen / 2) + textShadowOffset, (startHeight - textHeight / 3.0f) + textShadowOffset,
+                    String::StrToWStr(std::format("{:.1f} ms avg", avgFT)).c_str(),
+                    0.f, textHeight / 3.0f,
+                    DWRITE_TEXT_ALIGNMENT_CENTER,
+                    textSize,
+                    DWRITE_FONT_WEIGHT_NORMAL,
+                    textShadowColor,
+                    true
+                );
+
                 FlarialGUI::FlarialTextWithFont(
                     barWidth * graphLen / 2, startHeight - textHeight / 3.0f,
                     String::StrToWStr(std::format("{:.1f} ms avg", avgFT)).c_str(),
@@ -685,6 +745,19 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
                     textSize,
                     DWRITE_FONT_WEIGHT_NORMAL,
                     textColor,
+                    true
+                );
+
+                // max frame time
+
+                if (getOps<bool>("textShadow")) FlarialGUI::FlarialTextWithFont(
+                    (barWidth * graphLen) + textShadowOffset, (startHeight - textHeight / 3.0f) + textShadowOffset,
+                    String::StrToWStr(std::format("{:.1f} ms max", maxFT)).c_str(),
+                    0.f, textHeight / 3.0f,
+                    DWRITE_TEXT_ALIGNMENT_TRAILING,
+                    textSize,
+                    DWRITE_FONT_WEIGHT_NORMAL,
+                    textShadowColor,
                     true
                 );
 
@@ -708,6 +781,19 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
                     borderSize
                 );
 
+                // 30 fps text
+
+                if (getOps<bool>("textShadow")) FlarialGUI::FlarialTextWithFont(
+                    (borderSize * 2) + textShadowOffset, startHeight + textShadowOffset,
+                    String::StrToWStr(std::format("30 FPS", minFT)).c_str(),
+                    0.f, textHeight / 3.0f,
+                    DWRITE_TEXT_ALIGNMENT_LEADING,
+                    textSize,
+                    DWRITE_FONT_WEIGHT_NORMAL,
+                    textShadowColor,
+                    true
+                );
+
                 FlarialGUI::FlarialTextWithFont(
                     borderSize * 2, startHeight,
                     String::StrToWStr(std::format("30 FPS", minFT)).c_str(),
@@ -716,6 +802,17 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
                     textSize,
                     DWRITE_FONT_WEIGHT_NORMAL,
                     textColor,
+                    true
+                );
+
+                if (getOps<bool>("textShadow")) FlarialGUI::FlarialTextWithFont(
+                    (borderSize * 2) + textShadowOffset, (startHeight + maxRectHeight / 2 + borderSize) + textShadowOffset,
+                    String::StrToWStr(std::format("60 FPS", minFT)).c_str(),
+                    0.f, textHeight / 3.0f,
+                    DWRITE_TEXT_ALIGNMENT_LEADING,
+                    textSize,
+                    DWRITE_FONT_WEIGHT_NORMAL,
+                    textShadowColor,
                     true
                 );
 
