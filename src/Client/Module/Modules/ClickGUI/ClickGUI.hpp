@@ -281,9 +281,10 @@ public:
 
         if (this->isKeybind(event.keys) && this->isKeyPartOfKeybind(event.key) && event.getAction() == ActionType::Pressed) {
 #if !defined(__DEBUG__)
-			if (SDK::getCurrentScreen() != "hud_screen" && SDK::getCurrentScreen() != "pause_screen" && SDK::getCurrentScreen() != "f3_screen") {
+			if (SDK::getCurrentScreen() != "hud_screen" && SDK::getCurrentScreen() != "pause_screen" && SDK::getCurrentScreen() != "f3_screen" && SDK::getCurrentScreen() != "zoom_screen") {
 				WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType::Arrow);
 				this->active = false;
+			    SDK::clientInstance->releaseMouse();
 			}
 			else {
 #endif
@@ -321,7 +322,12 @@ public:
                 if (this->active) {
                     // exit ClickGUI
                     //WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType::Arrow);
-                    SDK::clientInstance->grabMouse(10); // let mouse control the view
+                    if (
+                        SDK::getCurrentScreen() == "hud_screen" ||
+                        SDK::getCurrentScreen() == "f3_screen" ||
+                        SDK::getCurrentScreen() == "zoom_screen"
+                    )
+                        SDK::clientInstance->grabMouse(10); // let mouse control the view
 
                     MC::lastMouseScroll = MouseAction::Release;
                     this->active = false;
