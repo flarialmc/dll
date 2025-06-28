@@ -17,7 +17,11 @@ void OffsetInit::init2190() {
     ADD_OFFSET("ClientInstance::getBlockSource", 30);
 
     ADD_OFFSET("MinecraftGame::textureGroup", 0x6D8);
+
     ADD_OFFSET("RaknetConnector::JoinedIp", 0x3E0);
+    ADD_OFFSET("RaknetConnector::RawIp", 0x3C0);
+    ADD_OFFSET("RaknetConnector::port", 0x424);
+
     ADD_OFFSET("Attribute::Health", 7);
     ADD_OFFSET("ClientInstance::getBlockSource", 30);
     ADD_OFFSET("Level::worldFolderName", 0x250);
@@ -41,8 +45,11 @@ void OffsetInit::init2180() {
     ADD_OFFSET("ClientInstance::guiData", 0x5B8);
     ADD_OFFSET("ClientInstance::getFovX", 0x740);
     ADD_OFFSET("ClientInstance::getFovY", 0x754);
+
     ADD_OFFSET("RaknetConnector::getPeer", 0x48);
     ADD_OFFSET("RaknetConnector::JoinedIp", 0x3E8);
+    ADD_OFFSET("RaknetConnector::RawIp", 0x3C8);
+    ADD_OFFSET("RaknetConnector::port", 0x42C);
 
     ADD_OFFSET("MinecraftGame::textureGroup", 0x6C8); // sig in 1.21.90: 49 8B 87 ? ? ? ? 48 85 C0 74 ? F0 FF 40 ? 4D 8B 87, string around: "world_loading_progress_screen"
 
@@ -176,7 +183,7 @@ void OffsetInit::init2140() {
     ADD_OFFSET("RaknetConnector::getPeer", 0x2A0);
     ADD_OFFSET("RaknetConnector::JoinedIp", 0x398);
     ADD_OFFSET("RaknetConnector::port", 0x3B8);
-
+    ADD_OFFSET("RaknetConnector::rawIp", 0x378);
 
     ADD_OFFSET("LevelRender::getLevelRendererPlayer", 0x318);
     ADD_OFFSET("LevelRendererPlayer::cameraPos", 0x620);
