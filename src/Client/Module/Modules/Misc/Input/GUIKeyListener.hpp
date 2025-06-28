@@ -43,7 +43,45 @@ public:
                     if (box.isActive && event.getAction() == ActionType::Pressed)
 
                         if (event.getKey() != VK_BACK && event.getPressedKeysAsString() != "CTRL+V") {
-                            box.text += event.getKeyAsString(isCapital);
+                            int key = event.getKey();
+                            bool isAllowedChar = false;
+
+                            if ((key >= 48 && key <= 57) || // 0-9
+                                (key >= 65 && key <= 90))   // A-Z (handles both cases as getKeyAsString converts)
+                                {
+                                    isAllowedChar = true;
+                                }
+                            else {
+                                switch (key) {
+                                    case 188: // , or <
+                                    case 190: // . or >
+                                    case 192: // ` or ~
+                                    case 219: // [ or {
+                                    case 221: // ] or }
+                                    case 220: // \ or |
+                                    case 222: // ' or "
+                                    case 191: // / or ?
+                                    case 187: // = or +
+                                    case 189: // - or _
+                                    case 186: // ; or :
+                                        isAllowedChar = true;
+                                        break;
+                                    case 32: // Spacebar
+                                        isAllowedChar = true;
+                                        break;
+                                        // Add other specific allowed symbols here
+                                    default:
+                                        break;
+                                }
+                            }
+
+                            if (isAllowedChar) box.text += event.getKeyAsString(isCapital);
+
+
+
+
+
+                            // box.text += event.getKeyAsString(isCapital);
                         } else if (event.getKey() == VK_BACK) {
 
                             if (event.getAction() == ActionType::Pressed) {

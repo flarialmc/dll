@@ -126,16 +126,16 @@ std::string Utils::getKeyAsString(int key, bool isCapital, bool isKeybind) {
     if (isCapital) {
         switch (key) {
             // A - Z
-            case 48: return "0";
-            case 49: return "1";
-            case 50: return "2";
-            case 51: return "3";
-            case 52: return "4";
-            case 53: return "5";
-            case 54: return "6";
-            case 55: return "7";
-            case 56: return "8";
-            case 57: return "9";
+            case 48: return ")";
+            case 49: return "!";
+            case 50: return "@";
+            case 51: return "#";
+            case 52: return "$";
+            case 53: return "%";
+            case 54: return "^";
+            case 55: return "&";
+            case 56: return "*";
+            case 57: return "(";
             case 65: return "A";
             case 66: return "B";
             case 67: return "C";
@@ -174,8 +174,10 @@ std::string Utils::getKeyAsString(int key, bool isCapital, bool isKeybind) {
             case 191: return "?";
             case 186: return ":";
             case 187: return "+";
+            case 189: return "_";
             case 219: return "{";
             case 221: return "}";
+            case 222: return "\"";
             default: return "";
         }
     } else {
@@ -227,6 +229,7 @@ std::string Utils::getKeyAsString(int key, bool isCapital, bool isKeybind) {
             case 187: return "=";
             case 189: return "-";
             case 186: return (std::string) ";";
+            case 222: return "'";
             default: return "";
         }
     }
