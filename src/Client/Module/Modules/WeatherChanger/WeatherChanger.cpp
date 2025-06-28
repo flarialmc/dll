@@ -11,6 +11,12 @@ void WeatherChanger::onEnable() {
 }
 
 void WeatherChanger::onDisable() {
+    if (modifiedQueue.size() > 0 && SDK::clientInstance->getBlockSource() && SDK::clientInstance->getBlockSource()->getDimension() && SDK::clientInstance->getBlockSource()->getDimension()->weather)
+        while (modifiedQueue.size() > 0) {
+            if (Biome *theBiome = SDK::clientInstance->getBlockSource()->getBiome(modifiedQueue.back().first)) theBiome->temperature = modifiedQueue.back().second;
+            modifiedQueue.pop_back();
+        }
+
     Deafen(this, TickEvent, &WeatherChanger::onTick)
     Module::onDisable();
 }
@@ -50,7 +56,7 @@ bool equalBlockPos(const BlockPos one, const BlockPos two) {
 }
 
 void WeatherChanger::onTick(TickEvent &event) {
-    if (!this->isEnabled() || !SDK::clientInstance->getBlockSource() || !SDK::clientInstance->getBlockSource()->getDimension()->weather) return;
+    if (!this->isEnabled() || !SDK::clientInstance->getBlockSource() || !SDK::clientInstance->getBlockSource()->getDimension() || !SDK::clientInstance->getBlockSource()->getDimension()->weather) return;
 
     if (getOps<float>("rain") > 0.02f) SDK::clientInstance->getBlockSource()->getDimension()->weather->rainLevel = this->settings.getSettingByName<float>("rain")->value;
     else SDK::clientInstance->getBlockSource()->getDimension()->weather->rainLevel = 0.0f;
@@ -68,7 +74,7 @@ void WeatherChanger::onTick(TickEvent &event) {
         }
     }
 
-    if (!getOps<bool>("snow")) while (getOps<bool>("snow") && modifiedQueue.size() > 1) {
+    while (getOps<bool>("snow") && modifiedQueue.size() > 1) {
         const Vec3<float> *pos = event.getActor()->getPosition();
         if (const BlockPos bp(static_cast<int>(pos->x), static_cast<int>(pos->y), static_cast<int>(pos->z)); equalBlockPos(bp, modifiedQueue.back().first)) continue;
         if (Biome *theBiome = SDK::clientInstance->getBlockSource()->getBiome(modifiedQueue.back().first)) theBiome->temperature = modifiedQueue.back().second;
