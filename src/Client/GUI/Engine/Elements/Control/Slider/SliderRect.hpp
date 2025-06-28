@@ -8,4 +8,6 @@ struct SliderRect {
     float percentageX = 0;
     float hoveredAnim = 0;
     bool firstHover = false;
+    bool isValid = true;
+    float validFloat = -1.f;
 };
