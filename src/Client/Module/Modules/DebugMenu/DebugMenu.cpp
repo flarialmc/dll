@@ -7,6 +7,7 @@
 #include "Modules/Time/Time.hpp"
 #include "SDK/Client/Block/BlockLegacy.hpp"
 #include "Modules/CPS/CPSCounter.hpp"
+#include "Utils/WinrtUtils.hpp"
 
 void JavaDebugMenu::onEnable() {
     Listen(this, SetupAndRenderEvent, &JavaDebugMenu::onSetupAndRender)

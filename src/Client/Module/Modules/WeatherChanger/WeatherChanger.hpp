@@ -3,10 +3,10 @@
 #include "../Module.hpp"
 #include "Events/Game/TickEvent.hpp"
 
-
 class WeatherChanger : public Module {
 public:
-	std::deque<std::pair<BlockPos, float>> modifiedQueue;
+	float oldTemp;
+	Biome* oldBiome;
 
 	WeatherChanger();
 
