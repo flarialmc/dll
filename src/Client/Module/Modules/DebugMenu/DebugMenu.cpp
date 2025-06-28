@@ -393,7 +393,7 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
         std::vector<std::string> left;
         std::vector<std::string> right;
 
-        if (versionName.empty()) versionName = std::format("Flarial V2 Open Beta, Minecraft {}", VersionUtils::getFormattedVersion());
+        if (versionName.empty()) versionName = std::format("Flarial V2 Open Beta, Minecraft {}", WinrtUtils::getFormattedVersion());
         left.emplace_back(versionName);
 
         if (isOn("showFPS")) {
