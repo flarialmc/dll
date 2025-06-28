@@ -18,6 +18,7 @@ private:
 	std::string lookingAt = "minecraft:empty";
 	std::string lastLookingAt = "";
 	std::vector<std::string> lookingAtTags = {};
+	std::string curBiome = "unknown";
 
 	Vec3<float> PrevPos{};
 	float xVelo = 0.f;

@@ -60,7 +60,7 @@ void JavaDebugMenu::defaultConfig() {
     setDef("showFPS", true);
     setDef("showOnePercLows", true);
     setDef("showDim", true);
-    // setDef("showBiome", true);
+    setDef("showBiome", true);
     setDef("showWeather", true);
     setDef("showCoords", true);
     setDef("showSpeed", true);
@@ -141,7 +141,7 @@ void JavaDebugMenu::settingsRender(float settingsOffset) {
     customToggle("Show FPS and Frametime", "", "showFPS");
     customToggle("Show 1% Low FPS", "", "showOnePercLows");
     customToggle("Show Entity Counter and Dimension", "", "showDim");
-    // customToggle("Show Biome", "", "showBiome");
+    customToggle("Show Biome", "", "showBiome");
     customToggle("Show Weather", "", "showWeather");
     customToggle("Show Coordinates Section", "", "showCoords");
     customToggle("Show Speed", "", "showSpeed");
@@ -300,6 +300,18 @@ void JavaDebugMenu::onTick(TickEvent &event) {
         tick.timestamp = Microtime();
         tickList.insert(tickList.begin(), tick);
     }
+
+    if (isOn("showBiome")) {
+        Vec3<float> pos = *SDK::clientInstance->getLocalPlayer()->getPosition();
+        BlockPos bp {
+            static_cast<int>(pos.x),
+            static_cast<int>(pos.y),
+            static_cast<int>(pos.z),
+        };
+        if (SDK::clientInstance->getBlockSource() && SDK::clientInstance->getBlockSource()->getBiome(bp)) {
+            curBiome = SDK::clientInstance->getBlockSource()->getBiome(bp)->getName();
+        }
+    }
 }
 
 void JavaDebugMenu::onSetupAndRender(SetupAndRenderEvent &event) {
@@ -410,33 +422,20 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
             left.emplace_back("");
         }
 
-        /* Crashes when changing weather (rain), needs to be fixed
         if (isOn("showBiome")) {
-            std::string curBiome = "unknown";
-            Vec3<float> pos = *player->getPosition();
-            BlockPos bp {
-                static_cast<int>(pos.x),
-                static_cast<int>(pos.y),
-                static_cast<int>(pos.z),
-            };
-            if (SDK::clientInstance->getBlockSource() && SDK::clientInstance->getBlockSource()->getBiome(bp)) {
-                curBiome = SDK::clientInstance->getBlockSource()->getBiome(bp)->getName();
-            }
-
             left.emplace_back(std::format("Biome: {}", curBiome));
             left.emplace_back("");
         }
-        */
 
         if (isOn("showWeather")) { // Lightning always shows 100% for some reason
             std::vector<float> weatherInfo = getWeatherInfo();
             if (weatherInfo.empty()) {
-                left.emplace_back("Rain Level: Unknown");
-                // left.emplace_back("Lightning Level: Unknown");
+                left.emplace_back("Weather: N/A");
+                left.emplace_back("Lightning Level: N/A");
             }
             else {
-                left.emplace_back(std::format("Rain Level: {:.2f}%", weatherInfo[0] * 100));
-                // left.emplace_back(std::format("Lightning Level: {:.2f}%", weatherInfo[1] * 100));
+                left.emplace_back(std::format("Rain Level: {:.0f}%", weatherInfo[0] * 100));
+                left.emplace_back(std::format("Lightning Level: {:.0f}%", weatherInfo[1] * 100));
             }
             left.emplace_back("");
         }
