@@ -428,17 +428,30 @@ public:
                 MC::scrollId = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
                 MC::lastMouseScroll = event.getAction();
-            } else {
+
+            }
+            else {
                 MC::lastMouseScroll = MouseAction::Release;
             }
 
+            Logger::info("scroll action: {},\naccpos: {}", static_cast<int>(event.getAction()), accumilatedPos);
 
-            accumilatedPos += (event.getAction() == MouseAction::ScrollUp)
-                                  ? FlarialGUI::scrollposmodifier
-                                  : -FlarialGUI::scrollposmodifier;
-            accumilatedBarPos += (event.getAction() == MouseAction::ScrollUp)
-                                     ? FlarialGUI::barscrollposmodifier
-                                     : -FlarialGUI::barscrollposmodifier;
+            int scrollActionValue = static_cast<int>(event.getAction());
+
+            if (scrollActionValue == static_cast<int>(MouseAction::ScrollUp)) {
+                accumilatedPos += FlarialGUI::scrollposmodifier;
+                accumilatedBarPos += FlarialGUI::barscrollposmodifier;
+            }
+            else if (scrollActionValue == static_cast<int>(MouseAction::ScrollDown)) {
+                accumilatedPos -= FlarialGUI::scrollposmodifier;
+                accumilatedBarPos -= FlarialGUI::barscrollposmodifier;
+            }
+            else {
+                float sensitivity = 0.5f; // Adjust this value to control scroll speed for trackpad
+
+                accumilatedPos += scrollActionValue * sensitivity;
+                accumilatedBarPos += scrollActionValue * sensitivity * (FlarialGUI::barscrollposmodifier / FlarialGUI::scrollposmodifier);
+            }
         }
 
         if (this->active) event.cancel();
