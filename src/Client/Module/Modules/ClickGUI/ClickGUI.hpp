@@ -310,6 +310,10 @@ public:
                 curr = "modules";
             } else {
                 SDK::clientInstance->grabMouse(10);
+# if defined(__DEBUG__)
+                SDK::clientInstance->releaseMouse(); 
+# endif
+
                 FlarialGUI::ResetShit();
                 Client::SaveSettings();
                 Client::SavePrivate();
@@ -328,6 +332,9 @@ public:
                         SDK::getCurrentScreen() == "zoom_screen"
                     )
                         SDK::clientInstance->grabMouse(10); // let mouse control the view
+# if defined(__DEBUG__)
+					SDK::clientInstance->releaseMouse(); 
+# endif
 
                     MC::lastMouseScroll = MouseAction::Release;
                     this->active = false;
@@ -428,17 +435,28 @@ public:
                 MC::scrollId = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
                 MC::lastMouseScroll = event.getAction();
-            } else {
+
+            }
+            else {
                 MC::lastMouseScroll = MouseAction::Release;
             }
 
+            int scrollActionValue = static_cast<int>(event.getAction());
 
-            accumilatedPos += (event.getAction() == MouseAction::ScrollUp)
-                                  ? FlarialGUI::scrollposmodifier
-                                  : -FlarialGUI::scrollposmodifier;
-            accumilatedBarPos += (event.getAction() == MouseAction::ScrollUp)
-                                     ? FlarialGUI::barscrollposmodifier
-                                     : -FlarialGUI::barscrollposmodifier;
+            if (scrollActionValue == static_cast<int>(MouseAction::ScrollUp)) {
+                accumilatedPos += FlarialGUI::scrollposmodifier;
+                accumilatedBarPos += FlarialGUI::barscrollposmodifier;
+            }
+            else if (scrollActionValue == static_cast<int>(MouseAction::ScrollDown)) {
+                accumilatedPos -= FlarialGUI::scrollposmodifier;
+                accumilatedBarPos -= FlarialGUI::barscrollposmodifier;
+            }
+            else {
+                float sensitivity = 0.5f; // Adjust this value to control scroll speed for trackpad
+
+                accumilatedPos += scrollActionValue * sensitivity;
+                accumilatedBarPos += scrollActionValue * sensitivity * (FlarialGUI::barscrollposmodifier / FlarialGUI::scrollposmodifier);
+            }
         }
 
         if (this->active) event.cancel();
