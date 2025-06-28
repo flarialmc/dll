@@ -110,6 +110,11 @@ void OffsetInit::init2160() {
     ADD_OFFSET("MinecraftGame::textureGroup", 0x6B8);
 
     ADD_OFFSET("AttributeInstance::Value", 0x7C);
+
+    ADD_OFFSET("Level::LevelData", 0x110);
+    ADD_OFFSET("LevelData::worldName", 0x298);
+
+    ADD_OFFSET("Dimension::weather", 0x1C8);
 }
 
 void OffsetInit::init2150() {
@@ -141,6 +146,10 @@ void OffsetInit::init2150() {
 
     ADD_OFFSET("MinecraftGame::textureGroup", 0x760);
     ADD_OFFSET("Attribute::Health", 1);
+
+    ADD_OFFSET("Dimension::weather", 0x1D0);
+    ADD_OFFSET("Weather::rainLevel", 0x38);
+    ADD_OFFSET("Weather::lightningLevel", 0x40);
 }
 
 void OffsetInit::init2140() {
