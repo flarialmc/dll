@@ -1015,6 +1015,10 @@ void TabList::normalRender(int index, std::string &value) {
             if (getOps<bool>("playerCount")) {
                 countTxt = std::to_string(validPlayers) + " player(s) online";
                 curPlayer = module && module->isEnabled() && !NickModule::backupOri.empty() ? module->getOps<std::string>("nick") : SDK::clientInstance->getLocalPlayer()->getPlayerName();
+
+                curPlayer = String::removeColorCodes(curPlayer);
+                if (!curPlayer.empty()) curPlayer = String::removeNonAlphanumeric(curPlayer);
+
                 ImVec2 countTxtMetrics = FlarialGUI::getFlarialTextSize(FlarialGUI::to_wide(countTxt).c_str(), keycardSize * 5, keycardSize, DWRITE_TEXT_ALIGNMENT_LEADING, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, true);
                 curPlayerMetrics = FlarialGUI::getFlarialTextSize(FlarialGUI::to_wide("Player:__" + curPlayer).c_str(), keycardSize * 5, keycardSize, DWRITE_TEXT_ALIGNMENT_LEADING, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, true);
                 curPlayerMetrics.x += Constraints::SpacingConstraint(0.5, keycardSize);
