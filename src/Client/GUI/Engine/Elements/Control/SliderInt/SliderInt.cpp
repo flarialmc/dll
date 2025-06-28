@@ -44,10 +44,6 @@ int FlarialGUI::SliderInt(int index, float x, float y, int& startingPoint, const
 
 	if (isAdditionalY) UnSetIsInAdditionalYMode();
 
-	if (!TextBoxes[30 + index].isActive) {
-		text = FlarialGUI::cached_to_string(startingPoint);
-	}
-
 	float oriX = x;
 
 	if (TextBoxes[30 + index].noCursorBgCol) {
@@ -74,6 +70,10 @@ int FlarialGUI::SliderInt(int index, float x, float y, int& startingPoint, const
 
 	startingPoint = std::clamp(startingPoint, minValue, maxValue);
 	if (SliderIntRects[index].validInt == -1) SliderIntRects[index].validInt = std::clamp(startingPoint, minValue, maxValue);
+
+	if (!TextBoxes[30 + index].isActive) {
+		text = FlarialGUI::cached_to_string(startingPoint);
+	}
 
 	text = TextBox(30 + index, text, limit, x, y, percWidth, percHeight, 2, moduleName, settingName);
 	text = String::removeNonNumeric(text, true);
