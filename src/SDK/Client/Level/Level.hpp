@@ -12,17 +12,37 @@
 
 #include "LevelData.hpp"
 
+enum class BuildPlatform : int {
+    Google                 = 1,
+    IOS                    = 2,
+    Osx                    = 3,
+    Amazon                 = 4,
+    GearVRDeprecated       = 5,
+    Uwp                    = 7,
+    Win32                  = 8,
+    Dedicated              = 9,
+    TvOSDeprecated         = 10,
+    Sony                   = 11,
+    Nx                     = 12,
+    Xbox                   = 13,
+    WindowsPhoneDeprecated = 14,
+    Linux                  = 15,
+    Unknown                = -1,
+};
+
 enum PlayerListPacketType : int8_t {
     AddPlayerEntry = 0x0, // The names are just add and removed but i dont want to cause issues
     RemovePlayerEntry = 0x1,
 };
+
+
 
 class PlayerListEntry {
 public:
     uint64_t id; // This is the ActorUniqueID
     mcUUID UUID;
     std::string name, XUID, platformOnlineId;
-    int buildPlatform;
+    BuildPlatform buildPlatform;
     PlayerSkin playerSkin;
     bool isTeacher, isHost, isSubClient;
 
@@ -36,7 +56,7 @@ public:
     uint64_t id;
     mcUUID UUID;
     std::string name, XUID, platformOnlineId;
-    int buildPlatform;
+    BuildPlatform buildPlatform;
     PlayerSkin_1_21_90 playerSkin;
     bool isTeacher, isHost, isSubClient;
 

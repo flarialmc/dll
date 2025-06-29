@@ -236,23 +236,24 @@ public:
     std::string mResourcePatch; // this+0x60
     std::string mDefaultGeometryName; // this+0x80
     Image mSkinImage; // this+0xA0
-    Image mCapeImage; // this+0xC0
-    alignas(8) std::vector<AnimatedImageData> mSkinAnimatedImages;
-    MinecraftJson::Value mGeometryData;
-    MinEngineVersion mGeometryDataMinEngineVersion;
-    MinecraftJson::Value mGeometryDataMutable;
-    std::string mAnimationData;
-    std::string mCapeId;
-    alignas(8) std::vector<SerializedPersonaPieceHandle> mPersonaPieces;
-    persona::ArmSize::Type mArmSizeType;
-    std::unordered_map<persona::PieceType, TintMapColor> mPieceTintColors;
-    alignas(4) char mSkinColor[16];
-    TrustedSkinFlag mIsTrustedSkin;
-    alignas(1) bool mIsPremium;
-    alignas(1) bool mIsPersona;
-    alignas(1) bool mIsPersonaCapeOnClassicSkin;
-    alignas(1) bool mIsPrimaryUser;
-    alignas(1) bool mOverridesPlayerAppearance;
+    Image mCapeImage; // this+0xD0
+    char idklolwtfisthis[272];
+    // std::vector<AnimatedImageData> mSkinAnimatedImages;
+    // MinecraftJson::Value mGeometryData;
+    // MinEngineVersion mGeometryDataMinEngineVersion;
+    // MinecraftJson::Value mGeometryDataMutable;
+    // std::string mAnimationData;
+    // std::string mCapeId;
+    // std::vector<SerializedPersonaPieceHandle> mPersonaPieces;
+    // persona::ArmSize::Type mArmSizeType;
+    // std::unordered_map<persona::PieceType, TintMapColor> mPieceTintColors;
+    // char mSkinColor[16];
+    // TrustedSkinFlag mIsTrustedSkin;
+    // bool mIsPremium;
+    // bool mIsPersona;
+    // bool mIsPersonaCapeOnClassicSkin;
+    // bool mIsPrimaryUser;
+    // bool mOverridesPlayerAppearance;
 };
 
 class PlayerSkin_1_21_90 {

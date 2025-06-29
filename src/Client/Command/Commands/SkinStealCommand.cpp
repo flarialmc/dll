@@ -20,6 +20,8 @@
 //#include "../json/MinecraftJson.h"
 #include <fstream>
 
+#include "SDK/Client/Network/Packet/PlayerSkinPacket.hpp"
+
 /*! \def SVPNG_PUT
     \brief Write a byte
 */
@@ -192,6 +194,41 @@ void SkinStealCommand::execute(const std::vector<std::string>& args) {
         if (String::toLower(pair.second.name) == playerName) {
             addCommandMessage("§aSuccessfully stole {}'s skin! Saved at Roamingstate/Flarial/Skins.", pair.second.name);
             SaveSkin(pair.second.name, pair.second.playerSkin.mSkinImage, pair.second.playerSkin.mCapeImage);
+            // std::cout << &SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap() << std::endl;
+            // Logger::info("mId: {}", pair.second.playerSkin.mId);
+            // Logger::info("mPlayFabId: {}", pair.second.playerSkin.mPlayFabId);
+            // Logger::info("mFullId: {}", pair.second.playerSkin.mFullId);
+            // Logger::info("mResourcePatch: {}", pair.second.playerSkin.mResourcePatch);
+            // Logger::info("mDefaultGeometryName: {}", pair.second.playerSkin.mDefaultGeometryName);
+            // Logger::info("mSkinImage: {}", pair.second.playerSkin.mSkinImage.mWidth > 0 ? "exists" : "doesn't exist L");
+            // Logger::info("mCapeImage: {}", pair.second.playerSkin.mCapeImage.mWidth > 0 ? "exists" : "doesn't exist L");
+            // Logger::info("mSkinAnimatedImages (size): {}", pair.second.playerSkin.mSkinAnimatedImages.size());
+            // // Logger::info("mGeometryData: {}", pair.second.playerSkin.mGeometryData);
+            // // Logger::info("mGeometryDataMinEngineVersion: {}", pair.second.playerSkin.mGeometryDataMinEngineVersion);
+            // // Logger::info("mGeometryDataMutable: {}", pair.second.playerSkin.mGeometryDataMutable);
+            // Logger::info("mAnimationData: {}", pair.second.playerSkin.mAnimationData);
+            // Logger::info("mCapeId: {}", pair.second.playerSkin.mCapeId);
+            // Logger::info("mPersonaPieces (size): {}", pair.second.playerSkin.mPersonaPieces.size());
+            // Logger::info("mArmSizeType: {}", (int)pair.second.playerSkin.mArmSizeType);
+            // Logger::info("mPieceTintColors (size): {}", pair.second.playerSkin.mPieceTintColors.size());
+            // // Logger::info("mSkinColor: {}", pair.second.playerSkin.mSkinColor ? "exists" : "doesn't exist L");
+            // Logger::info("mIsTrustedSkin: {}", (bool)pair.second.playerSkin.mIsTrustedSkin);
+            // Logger::info("mIsPremium: {}", (bool)pair.second.playerSkin.mIsPremium);
+            // Logger::info("mIsPersona: {}", (bool)pair.second.playerSkin.mIsPersona);
+            // Logger::info("mIsPersonaCapeOnClassicSkin: {}", (bool)pair.second.playerSkin.mIsPersonaCapeOnClassicSkin);
+            // Logger::info("mIsPrimaryUser: {}", (bool)pair.second.playerSkin.mIsPrimaryUser);
+            // Logger::info("mOverridesPlayerAppearance: {}", (bool)pair.second.playerSkin.mOverridesPlayerAppearance);
+
+            // std::shared_ptr<Packet> packet = SDK::createPacket((int)MinecraftPacketIds::PlayerSkin);
+            // auto* pSkinPacket = reinterpret_cast<PlayerSkinPacket*>(packet.get());
+            //
+            // memcpy(&pSkinPacket->mUUID, &pair.second.UUID, sizeof(mcUUID));
+            // pSkinPacket->mLocalizedOldSkinName = (std::string)"idk lol";
+            // memcpy(&pSkinPacket->mLocalizedNewSkinName, &pair.second.name, sizeof(std::string));
+            // memcpy(&pSkinPacket->mSkin, &pair.second.playerSkin, sizeof(PlayerSkin));
+            //
+            // SDK::clientInstance->getPacketSender()->sendToServer(pSkinPacket);
+
             found = true;
             break;
         }
