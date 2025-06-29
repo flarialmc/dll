@@ -38,6 +38,8 @@
 #include "Hooks/game/ReadFileHook.hpp"
 #include "Hooks/Game/ApplyTurnDeltaHook.hpp"
 
+#include "Hooks/Render/BobHurt.hpp"
+
 std::vector<std::shared_ptr<Hook>> HookManager::hooks;
 
 std::string dxVersion[5] = {"Couldn't initialize", "DX9", "DX10", "DX11", "DX12"};
@@ -121,6 +123,8 @@ void HookManager::initialize() {
 
     addHook<RenderOutlineSelectionHook>();
     addHook<getTimeOfDayHook>();
+
+    addHook<BobHurtHook>();
 
 
 

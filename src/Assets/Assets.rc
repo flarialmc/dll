@@ -99,6 +99,7 @@ IDR_GAMER_LOGO_PNG       PNG "Data\\gamer-logo.png"
 IDR_BOOSTER_LOGO_PNG     PNG "Data\\booster-logo.png"
 IDR_ORANGE_LOGO_PNG      PNG "Data\\orange-logo.png"
 IDR_SUPPORTER_LOGO_PNG	 PNG "Data\\supporter-logo.png"
+IDR_CHYVES_FLARIAL_PNG    PNG "Data\\chyves-flarial.png"
 
 IDR_NIKITA_01            PNG "Data\\nikita\\01.png"
 IDR_NIKITA_02            PNG "Data\\nikita\\02.png" 

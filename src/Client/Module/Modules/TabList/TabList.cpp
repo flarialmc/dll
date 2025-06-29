@@ -1277,6 +1277,10 @@ void TabList::normalRender(int index, std::string &value) {
 
                     int imageResource = roleLogos["Default"];
                     for (const auto &[role, resource]: roleLogos) {
+                        if (clearedName == "notchyves") {
+                            imageResource = IDR_CHYVES_FLARIAL_PNG;
+                            break;
+                        }
                         if (APIUtils::hasRole(role, clearedName)) {
                             imageResource = resource;
                             break;
@@ -1336,6 +1340,10 @@ void TabList::normalRender(int index, std::string &value) {
 
                 int imageResource = roleLogos["Default"];
                 for (const auto &[role, resource]: roleLogos) {
+                    if (curPlayer == "notchyves") {
+                        imageResource = IDR_CHYVES_FLARIAL_PNG;
+                        break;
+                    }
                     if (APIUtils::hasRole(role, curPlayer)) {
                         imageResource = resource;
                         break;

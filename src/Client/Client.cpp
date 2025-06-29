@@ -298,6 +298,7 @@ void Client::initialize() {
 	FlarialGUI::ExtractImageResource(IDR_BOOSTER_LOGO_PNG, "booster-logo.png", "PNG");
 	FlarialGUI::ExtractImageResource(IDR_WHITE_LOGO_PNG, "white-logo.png", "PNG");
 	FlarialGUI::ExtractImageResource(IDR_SUPPORTER_LOGO_PNG, "supporter-logo.png", "PNG");
+	FlarialGUI::ExtractImageResource(IDR_CHYVES_FLARIAL_PNG, "chyves-flarial.png", "PNG");
 
 	FlarialGUI::LoadFont(IDR_FONT_TTF);
 	FlarialGUI::LoadFont(IDR_FONT_BOLD_TTF);

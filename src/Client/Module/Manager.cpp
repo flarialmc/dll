@@ -107,6 +107,7 @@
 #include "Modules/DisableMouseWheel/DisableMouseWheel.hpp"
 #include "Modules/DebugMenu/DebugMenu.hpp"
 #include "Modules/DirectionHUD/DirectionHUD.hpp"
+#include "Modules/JavaViewBobbing/JavaViewBobbing.hpp"
 
 void ModuleManager::getModules() { // TODO: some module is null here for some reason, investigation required
 	for (const auto& pair : moduleMap) {
@@ -254,6 +255,8 @@ void ModuleManager::initialize() {
 	addModule<DisableMouseWheel>();
 	addModule<JavaDebugMenu>();
 	addModule<DirectionHUD>();
+
+	addModule<JavaViewBobbing>();
 
 	addService<GUIKeyListener>();
 	if (!VersionUtils::checkAboveOrEqual(21, 60)) {

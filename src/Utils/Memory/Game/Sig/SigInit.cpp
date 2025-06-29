@@ -6,6 +6,7 @@
 
 void SigInit::init2190() {
     Logger::custom(fg(fmt::color::gold), "Signatures", "Loading sigs for 1.21.9X");
+    ADD_SIG("BobHurt", "48 89 5C 24 ? 57 48 81 EC ? ? ? ? 0F 29 B4 24 ? ? ? ? 48 81 C1");
     ADD_SIG("ThirdPersonNametag", "0F 84 24 05 00 00 49 8B 45 00");
     ADD_SIG("Options::getGamma", "48 83 EC 28 80 B9 48 19 00 00 00 48 8D 54 24 30 48 8B 01 48 8B 40 60 74 38 41 B8 1A");
     ADD_SIG("HurtColor", "E8 ? ? ? ? 0F 28 05 ? ? ? ? 0F 11 85 F8 01 00 00"); // RenderController::getOverlayColor

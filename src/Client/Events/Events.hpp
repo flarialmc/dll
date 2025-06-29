@@ -42,3 +42,4 @@
 #include "Game/RenderItemInHandEvent.hpp"
 #include "Render/RenderOutlineSelectionEvent.hpp"
 #include "Game/ReadFileEvent.hpp"
+#include "Render/BobHurtEvent.hpp"
