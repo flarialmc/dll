@@ -219,7 +219,22 @@ std::string JavaDebugMenu::getCPU() {
     memcpy(cpuBrand + 16, cpuInfo, sizeof(cpuInfo));
     __cpuid(cpuInfo, 0x80000004);
     memcpy(cpuBrand + 32, cpuInfo, sizeof(cpuInfo));
-    return std::string(cpuBrand);
+
+    std::string cpuBrandStr = std::string(cpuBrand);
+
+    // more ai slop
+    int threadCount = 0;
+	__cpuid(cpuInfo, 0);
+	unsigned int maxLeaf = cpuInfo[0];
+
+    if (maxLeaf >= 1) {
+		__cpuid(cpuInfo, 1);
+		threadCount = (cpuInfo[1] >> 16) & 0xFF; 
+    } else {
+        threadCount = 1; // Default to 1 if unable to determine
+	}
+
+    return std::to_string(threadCount) + "x " + cpuBrandStr;
 }
 
 std::string JavaDebugMenu::getDimensionName() {
