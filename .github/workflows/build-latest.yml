@@ -35,15 +35,15 @@ jobs:
                   echo "Unknown tag type, skipping build"
                   echo "should_build=false" >> "$GITHUB_OUTPUT"
               fi
-          elif [[ "${{ github.event.head_commit.message }}" == *"nightly:"* ]]; then
+          elif [[ "${{ github.event.head_commit.message }}" == *"nightly:"* ]] || [[ "${{ github.event.head_commit.message }}" == *"Revert"*"nightly:"* ]]; then
               echo "Build needed for nightly"
               echo "should_build=true" >> "$GITHUB_OUTPUT"
               echo "type=0" >> "$GITHUB_OUTPUT"
-          elif [[ "${{ github.event.head_commit.message }}" == *"release:"* ]]; then
+          elif [[ "${{ github.event.head_commit.message }}" == *"release:"* ]] || [[ "${{ github.event.head_commit.message }}" == *"Revert"*"release:"* ]]; then
               echo "Build needed for release"
               echo "should_build=true" >> "$GITHUB_OUTPUT"
               echo "type=1" >> "$GITHUB_OUTPUT"
-          elif [[ "${{ github.event.head_commit.message }}" == *"beta:"* ]]; then
+          elif [[ "${{ github.event.head_commit.message }}" == *"beta:"* ]] || [[ "${{ github.event.head_commit.message }}" == *"Revert"*"beta:"* ]]; then
               echo "Build needed for beta"
               echo "should_build=true" >> "$GITHUB_OUTPUT"
               echo "type=2" >> "$GITHUB_OUTPUT"
