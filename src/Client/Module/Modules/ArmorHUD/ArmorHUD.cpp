@@ -84,8 +84,7 @@ void ArmorHUD::settingsRender(float settingsOffset) {
 
 	addHeader("Durability");
 	addToggle("Durability Text", "", "showdurability");
-	addSlider("Text Offset X", "", "textOffsetX", 50.f, 0.0f, false);
-	//addConditionalSlider(getOps<bool>("showdurability") && getOps<bool>("vertical"), "Text Offset X", "", "textOffsetX", 50.f, 0.0f, false);
+	addConditionalSlider(getOps<bool>("showdurability") && getOps<bool>("vertical"), "Text Offset X", "", "textOffsetX", 50.f, 0.0f, false);
 	addConditionalSlider(getOps<bool>("showdurability") && !getOps<bool>("vertical"), "Text Offset Y", "", "textOffsetY", 50.f, 0.0f, false);
 	addConditionalSlider(getOps<bool>("showdurability"), "Text Size", "", "textSize", 0.25f, 0.0f, true);
 	addConditionalToggle(getOps<bool>("showdurability"), "Show Durability in %", "", "percent");
