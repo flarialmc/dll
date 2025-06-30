@@ -137,7 +137,7 @@ public:
 			if (!pCls.is_open()) return LOG_ERROR("Could not clear the contents of PRIVATE: {}", GetLastError());
 			pCls.close();
 
-			if (!SetFileAttributesA(privatePath.c_str(), originalAttributes)) LOG_ERROR("Failed to set PRIVATE as a hidden file {}", GetLastError());
+			// if (!SetFileAttributesA(privatePath.c_str(), originalAttributes)) LOG_ERROR("Failed to set PRIVATE as a hidden file {}", GetLastError());
 
 			std::ofstream pFile(privatePath, std::ios::app);
 
@@ -284,8 +284,8 @@ public:
 
 			DWORD attributes = GetFileAttributesA(privatePath.c_str());
 
-			if (SetFileAttributesA(privatePath.c_str(), attributes | FILE_ATTRIBUTE_HIDDEN)) Logger::custom(fg(fmt::color::dark_magenta), "Config", "PRIVATE is now a hidden file");
-			else LOG_ERROR("Failed to set PRIVATE as a hidden file");
+			// if (SetFileAttributesA(privatePath.c_str(), attributes | FILE_ATTRIBUTE_HIDDEN)) Logger::custom(fg(fmt::color::dark_magenta), "Config", "PRIVATE is now a hidden file");
+			// else LOG_ERROR("Failed to set PRIVATE as a hidden file");
 
 			if (!priv) LOG_ERROR("Failed to create PRIVATE: {}", GetLastError());
 			else priv.close();
