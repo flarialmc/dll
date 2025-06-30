@@ -39,10 +39,6 @@ void BaseActorRendererRenderTextHook::drawLogo(ScreenContext* screenContext, con
         }
     }
 
-    if (clearedName == "notchyves") {
-        loc = {Utils::getAssetsPath() + "\\" + "chyves-flarial.png", true};
-    }
-
     if (!SDK::clientInstance->getMinecraftGame()->textureGroup) {
         return;
     }
