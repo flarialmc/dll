@@ -908,7 +908,7 @@ int TabList::getPingImage(int ping) {
     else return IDR_PING_AMAZING;
 }
 
-void TabList::normalRender(int index, std::string &value) {
+void TabList::onRender(RenderEvent &event) {
     if (!this->isEnabled()) return;
     if (SDK::hasInstanced && (active || ClickGUI::editmenu)) {
         // Process ready textures from background threads (adaptive rate based on performance)
@@ -1277,10 +1277,6 @@ void TabList::normalRender(int index, std::string &value) {
 
                     int imageResource = roleLogos["Default"];
                     for (const auto &[role, resource]: roleLogos) {
-                        if (clearedName == "notchyves") {
-                            imageResource = IDR_CHYVES_FLARIAL_PNG;
-                            break;
-                        }
                         if (APIUtils::hasRole(role, clearedName)) {
                             imageResource = resource;
                             break;
@@ -1392,12 +1388,6 @@ void TabList::normalRender(int index, std::string &value) {
             }
         }
     }
-}
-
-void TabList::onRender(RenderEvent &event) {
-    if (!this->isEnabled()) return;
-    std::string text;
-    this->normalRender(20, text);
 }
 
 void TabList::onMouse(const MouseEvent &event) {

@@ -11,7 +11,7 @@ class TabList : public Module {
 public:
 
 
-    TabList();;
+    TabList();
 
     void onEnable() override;
 
@@ -31,8 +31,6 @@ public:
     static std::vector<const std::pair<const mcUUID, PlayerListEntry> *> copyMapInAlphabeticalOrder(const std::unordered_map<mcUUID, PlayerListEntry>& sourceMap, bool flarialFirst);
 
     int getPingImage(int ping);
-
-    void normalRender(int index, std::string& value) override;
 
     void onRender(RenderEvent& event);
 
