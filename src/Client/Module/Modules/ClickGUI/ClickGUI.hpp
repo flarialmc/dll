@@ -276,6 +276,16 @@ public:
 
     void onKey(KeyEvent &event) {
         //TODO: MAKE module->setActive() module->isActive() module->isRestricted()
+        // #if !defined(__DEBUG__)
+        if (SDK::getCurrentScreen() != "zoom_screen" &&
+            SDK::getCurrentScreen() != "f3_screen" &&
+            SDK::getCurrentScreen() != "hud_screen"
+#if defined(__DEBUG__)
+            && SDK::getServerIP() != "none"
+#endif
+        )
+            return;
+
         if (event.getKey() == VK_CONTROL && event.getAction() == ActionType::Pressed) MC::holdingCTRL = true;
         else if (event.getKey() == VK_CONTROL && event.getAction() == ActionType::Released) MC::holdingCTRL = false;
 
@@ -311,7 +321,7 @@ public:
             } else {
                 SDK::clientInstance->grabMouse(10);
 # if defined(__DEBUG__)
-                SDK::clientInstance->releaseMouse(); 
+                SDK::clientInstance->releaseMouse();
 # endif
 
                 FlarialGUI::ResetShit();
@@ -333,7 +343,7 @@ public:
                     )
                         SDK::clientInstance->grabMouse(10); // let mouse control the view
 # if defined(__DEBUG__)
-					SDK::clientInstance->releaseMouse(); 
+                    SDK::clientInstance->releaseMouse();
 # endif
 
                     MC::lastMouseScroll = MouseAction::Release;
@@ -435,9 +445,7 @@ public:
                 MC::scrollId = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
                 MC::lastMouseScroll = event.getAction();
-
-            }
-            else {
+            } else {
                 MC::lastMouseScroll = MouseAction::Release;
             }
 
@@ -446,12 +454,10 @@ public:
             if (scrollActionValue == static_cast<int>(MouseAction::ScrollUp)) {
                 accumilatedPos += FlarialGUI::scrollposmodifier;
                 accumilatedBarPos += FlarialGUI::barscrollposmodifier;
-            }
-            else if (scrollActionValue == static_cast<int>(MouseAction::ScrollDown)) {
+            } else if (scrollActionValue == static_cast<int>(MouseAction::ScrollDown)) {
                 accumilatedPos -= FlarialGUI::scrollposmodifier;
                 accumilatedBarPos -= FlarialGUI::barscrollposmodifier;
-            }
-            else {
+            } else {
                 float sensitivity = 0.5f; // Adjust this value to control scroll speed for trackpad
 
                 accumilatedPos += scrollActionValue * sensitivity;
