@@ -1,3 +1,4 @@
+#pragma once
 #include "../Hook.hpp"
 #include "../../../../SDK/SDK.hpp"
 #include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
