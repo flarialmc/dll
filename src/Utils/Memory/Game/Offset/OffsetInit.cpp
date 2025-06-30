@@ -196,6 +196,8 @@ void OffsetInit::init2140() {
 
     ADD_OFFSET("Level::LevelData", 0x110);
     ADD_OFFSET("LevelData::worldName", 0x390);
+
+    ADD_OFFSET("Biome::name", 0x10);
 }
 
 void OffsetInit::init2130() {
