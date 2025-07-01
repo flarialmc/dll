@@ -29,4 +29,7 @@ public:
 	void settingsRender(float settingsOffset) override;
 
 	void onOutlineSelection(RenderOutlineSelectionEvent& event);
+
+	void drawOverlay(MCDrawUtil3D dc, Vec3<float> bp, D2D_COLOR_F col, auto face, bool full);
+	void drawOutline(MCDrawUtil3D dc, Vec3<float> bp, D2D_COLOR_F col, bool full, float width);
 };
