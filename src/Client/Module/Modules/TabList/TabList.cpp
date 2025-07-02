@@ -1337,10 +1337,6 @@ void TabList::onRender(RenderEvent &event) {
 
                 int imageResource = roleLogos["Default"];
                 for (const auto &[role, resource]: roleLogos) {
-                    if (curPlayer == "notchyves") {
-                        imageResource = IDR_CHYVES_FLARIAL_PNG;
-                        break;
-                    }
                     if (APIUtils::hasRole(role, curPlayer)) {
                         imageResource = resource;
                         break;
