@@ -457,10 +457,11 @@ int TabList::getRolePriority(const std::string &name) {
 
     // Check roles in order of priority using ApiUtils
     if (APIUtils::hasRole("Dev", clearedName)) return 0;
-    if (APIUtils::hasRole("Gamer", clearedName)) return 1;
-    if (APIUtils::hasRole("Booster", clearedName)) return 2;
-    if (APIUtils::hasRole("Supporter", clearedName)) return 3;
-    return 4; // Default Flarial user (in onlineUsers but no specific role)
+    if (APIUtils::hasRole("Staff", clearedName)) return 1;
+    if (APIUtils::hasRole("Gamer", clearedName)) return 2;
+    if (APIUtils::hasRole("Booster", clearedName)) return 3;
+    if (APIUtils::hasRole("Supporter", clearedName)) return 4;
+    return 5; // Default Flarial user (in onlineUsers but no specific role)
 }
 
 std::vector<const std::pair<const mcUUID, PlayerListEntry> *> TabList::sortByFlarialHierarchy(
