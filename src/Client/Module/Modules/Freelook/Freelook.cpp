@@ -125,6 +125,7 @@ void FreeLook::settingsRender(float settingsOffset) {
 
 void FreeLook::onKey(KeyEvent &event) {
     if (!this->isEnabled()) return;
+	if (SDK::getCurrentScreen() != "hud_screen") return; // only allow in game
     if (this->isKeyPartOfKeybind(event.key)) {
         if (this->isKeybind(event.keys)) { // key is defo pressed
             keybindActions[0]({});
