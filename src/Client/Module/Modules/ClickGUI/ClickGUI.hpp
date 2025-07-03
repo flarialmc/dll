@@ -110,7 +110,20 @@ public:
         }
 
         if (name.second < message.size()) {
-            message.insert(name.second, prefix);
+
+            std::string formats;
+            for (size_t i = 0; i + 3 <= name.second; ++i) {
+                if (
+                    (i < name.second) &&
+                    (static_cast<unsigned char>(message[i]) == 0xC2) &&
+                    (static_cast<unsigned char>(message[i + 1]) == 0xA7)
+                ) {
+                    formats += message.substr(i, 3);
+                    i += 2;
+                }
+            }
+
+            message.insert(name.second, prefix + formats);
             pkt->message = message;
         }
     }
