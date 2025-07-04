@@ -699,6 +699,10 @@ void Module::postLoad(bool softLoad) {
 	else this->defaultConfig();
 
 	keybindActions.push_back([this](std::vector<std::any> args)-> std::any {
+		if (SDK::getCurrentScreen() != "hud_screen" &&
+			SDK::getCurrentScreen() != "zoom_screen" &&
+			SDK::getCurrentScreen() != "f3_screen" && this->name != "ClickGUI"
+			) return {};
 		this->active = !this->active;
 		return {};
 		});

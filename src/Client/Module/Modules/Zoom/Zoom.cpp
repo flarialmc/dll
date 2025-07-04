@@ -179,7 +179,7 @@ void Zoom::onKey(KeyEvent &event) {
     if (this->isKeybind(event.keys) &&
         this->isKeyPartOfKeybind(event.key) &&
         (getOps<bool>("toggleZoom") ? event.getAction() == ActionType::Pressed : true)
-        && (SDK::getCurrentScreen() == "hud_screen" || SDK::getCurrentScreen() == "f3_screen")) {
+        && (SDK::getCurrentScreen() == "hud_screen" || SDK::getCurrentScreen() == "f3_screen" || SDK::getCurrentScreen() == "zoom_screen")) {
         keybindActions[0]({});
         if (!getOps<bool>("SaveModifier")) zoomValue = 30.0f;
     } else if (getOps<bool>("toggleZoom") ? (this->isKeybind(event.keys) && this->isKeyPartOfKeybind(event.key)) : !this->isKeybind(event.keys) && (getOps<bool>("toggleZoom") ? event.getAction() == ActionType::Pressed : true)) this->active = false;

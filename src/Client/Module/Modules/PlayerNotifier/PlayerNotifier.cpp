@@ -107,7 +107,7 @@ void PlayerNotifier::settingsRender(float settingsOffset) {
 }
 
 void PlayerNotifier::onKey(KeyEvent& event) {
-	if (this->isKeyPartOfKeybind(event.key)) {
+	if (this->isKeyPartOfKeybind(event.key) && (SDK::getCurrentScreen() == "hud_screen" || SDK::getCurrentScreen() == "f3_screen" || SDK::getCurrentScreen() == "zoom_screen")) {
 		if (this->isKeybind(event.keys)) { // key is defo pressed
 			keybindActions[0]({});
 		}

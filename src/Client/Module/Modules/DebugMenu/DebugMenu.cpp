@@ -942,7 +942,11 @@ void JavaDebugMenu::drawVector(ImDrawList *drawList, ImVec2 center, ImVec2 endPo
 
 void JavaDebugMenu::onHudCursorRendererRender(HudCursorRendererRenderEvent &event) {
     if (!this->isEnabled()) return;
-    if (this->active && SDK::clientInstance && SDK::clientInstance->getScreenName() == "hud_screen" && SDK::clientInstance->getLocalPlayer() != nullptr) {
+    if (this->active && SDK::clientInstance && (
+        SDK::getCurrentScreen() == "hud_screen" ||
+        SDK::getCurrentScreen() == "f3_screen" ||
+        SDK::getCurrentScreen() == "zoom_screen"
+        ) && SDK::clientInstance->getLocalPlayer() != nullptr) {
         event.cancel();
     }
 }

@@ -125,7 +125,7 @@ void FreeLook::settingsRender(float settingsOffset) {
 
 void FreeLook::onKey(KeyEvent &event) {
     if (!this->isEnabled()) return;
-    if (this->isKeyPartOfKeybind(event.key)) {
+    if (this->isKeyPartOfKeybind(event.key) && (SDK::getCurrentScreen() == "hud_screen" || SDK::getCurrentScreen() == "f3_screen" || SDK::getCurrentScreen() == "zoom_screen")) {
         if (this->isKeybind(event.keys)) { // key is defo pressed
             keybindActions[0]({});
         }
