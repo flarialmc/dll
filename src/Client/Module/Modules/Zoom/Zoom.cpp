@@ -176,7 +176,6 @@ void Zoom::onMouse(MouseEvent &event) {
 
 void Zoom::onKey(KeyEvent &event) {
     if (!this->isEnabled()) return;
-    if (SDK::getCurrentScreen() != "hud_screen") return; // only allow in game
     if (this->isKeybind(event.keys) &&
         this->isKeyPartOfKeybind(event.key) &&
         (getOps<bool>("toggleZoom") ? event.getAction() == ActionType::Pressed : true)

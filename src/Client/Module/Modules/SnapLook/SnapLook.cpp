@@ -55,7 +55,6 @@ void SnapLook::settingsRender(float settingsOffset)
 void SnapLook::onKey(KeyEvent& event)
 {
     if (!this->isEnabled()) return;
-    if (SDK::getCurrentScreen() != "hud_screen") return; // only allow in game
     if (this->isKeybind(event.keys) && this->isKeyPartOfKeybind(event.key)) keybindActions[0]({});
 
     if (!getOps<bool>("togglable") && !this->isKeybind(event.keys)) this->active = false;
