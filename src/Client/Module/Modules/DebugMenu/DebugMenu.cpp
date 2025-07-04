@@ -32,6 +32,8 @@ void JavaDebugMenu::onDisable() {
 }
 
 void JavaDebugMenu::defaultConfig() {
+    setDef("enabled", true);
+
     settings.changeType<float, int>("noOfTags");
     settings.renameSetting("textColor", "textCol");
     setDef("keybind", (std::string) "F3");
@@ -45,11 +47,41 @@ void JavaDebugMenu::defaultConfig() {
     setDef("textShadow", true);
     setDef("text", (std::string) "ffffff", 1.f, false);
     setDef("textShadow", (std::string)"00000", 0.55f, false);
-    setDef("bg", (std::string) "000000", 0.5f, false);
+    setDef("bg", (std::string) "000000", 0.4f, false);
     setDef("textShadowOffset", 0.003f);
 
     setDef("imPoorButIWannaLookRich", false);
     setDef("f5crosshair", false);
+
+    setDef("enableEverything", true);
+
+    setDef("showBlock1", true); // FPS, 1% Lows, Frametime
+
+    setDef("showBlock2", true);; // E, T, Dimension, Biome
+
+    setDef("showBlock3", true); // Coords, Chunk, Direction, Weather
+    setDef("showCoords", true);
+    setDef("showWeather", true);
+
+    setDef("showBlock4", true); // Speed, Velocity, Break Progress
+    setDef("alwaysShowBreakProg", true);
+
+    setDef("showBlock5", true); // World Time and Name
+
+    setDef("showBlock6", true); // Server IP, Port, Ping, TPS
+
+    setDef("showBlock7", true); // Memory
+
+    setDef("showBlock8", true); // CPU
+
+    setDef("showBlock9", true); // Res, Renderer, GPU
+
+    setDef("showBlock10", true); // Local Time, CPU Uptime, Minecraft Uptime
+
+    setDef("showBlock11", true); // Looking At
+    setDef("showTargetedBlockTags", true);
+    setDef("showMaxTags", true);
+    setDef("noOfTags", 10);
 
     setDef("showFTgraph", true);
     setDef("showMinMaxFT", true);
@@ -57,45 +89,6 @@ void JavaDebugMenu::defaultConfig() {
     setDef("FTgraphHeight", 25.f);
     setDef("FTgraphWidth", 100.f);
     setDef("FTbarWidth", 6.f);
-
-    setDef("enableEverything", true);
-    setDef("showFPS", true);
-    setDef("showOnePercLows", true);
-    setDef("showDim", true);
-    setDef("showBiome", true);
-    setDef("showWeather", true);
-    setDef("showCoords", true);
-    setDef("showSpeed", true);
-    setDef("showVelocity", true);
-    setDef("showBreakProg", true);
-    setDef("alwaysShowBreakProg", true);
-    setDef("showServer", true);
-    setDef("showMemory", true);
-    setDef("showCpuGpu", true);
-    setDef("showTime", true);
-    setDef("showInGameTime", true);
-    setDef("showWorldName", true);
-    setDef("showUptime", true);
-    setDef("showTargetedBlock", true);
-    setDef("showTargetedBlockTags", true);
-    setDef("showMaxTags", true);
-    setDef("noOfTags", 10);
-}
-
-void JavaDebugMenu::customToggle(std::string text, std::string subtext, std::string settingName) {
-    addConditionalToggle(!getOps<bool>("enableEverything"), text, subtext, settingName);
-}
-
-void JavaDebugMenu::customConditionalToggle(bool condition, std::string text, std::string subtext, std::string settingName) {
-    addConditionalToggle(!getOps<bool>("enableEverything") && condition, text, subtext, settingName);
-}
-
-void JavaDebugMenu::customConditionalSlider(bool condition, std::string text, std::string subtext, std::string settingName, float maxVal, float minVal, bool zerosafe) {
-    addConditionalSlider(!getOps<bool>("enableEverything") && condition, text, subtext, settingName, maxVal, minVal, zerosafe);
-}
-
-void JavaDebugMenu::customConditionalSliderInt(bool condition, std::string text, std::string subtext, std::string settingName, int maxVal, int minVal) {
-    addConditionalSliderInt(!getOps<bool>("enableEverything") && condition, text, subtext, settingName, maxVal, minVal);
 }
 
 void JavaDebugMenu::settingsRender(float settingsOffset) {
@@ -130,48 +123,57 @@ void JavaDebugMenu::settingsRender(float settingsOffset) {
     addToggle("Show Debug Crosshair In F5", "", "f5crosshair");
     extraPadding();
 
+    bool c = getOps<bool>("showFTgraph");
+
     addToggle("Show FrameTime Graph", "nerdy stats!", "showFTgraph");
-    addConditionalToggle(getOps<bool>("showFTgraph"), "Show Min/Max FrameTime", "", "showMinMaxFT");
-    addConditionalToggle(getOps<bool>("showFTgraph"), "Show 30/60FPS Lines And Text", "", "showThreshold");
-    addConditionalSlider(getOps<bool>("showFTgraph"), "Graph Height", "", "FTgraphHeight", 50.f, 10.f);
-    addConditionalSlider(getOps<bool>("showFTgraph"), "Graph Width", "", "FTgraphWidth", 200.f, 40.f);
-    addConditionalSlider(getOps<bool>("showFTgraph"), "Bar Width", "", "FTbarWidth", 15.f, 1.f);
+    addConditionalToggle(c && getOps<bool>("showFTgraph"), "Show Min/Max FrameTime", "", "showMinMaxFT");
+    addConditionalToggle(c && getOps<bool>("showFTgraph"), "Show 30/60FPS Lines And Text", "", "showThreshold");
+    addConditionalSlider(c && getOps<bool>("showFTgraph"), "Graph Height", "", "FTgraphHeight", 50.f, 10.f);
+    addConditionalSlider(c && getOps<bool>("showFTgraph"), "Graph Width", "", "FTgraphWidth", 200.f, 40.f);
+    addConditionalSlider(c && getOps<bool>("showFTgraph"), "Bar Width", "", "FTbarWidth", 15.f, 1.f);
     extraPadding();
 
     addToggle("Enable All Text", "", "enableEverything");
 
-    if (!getOps<bool>("enableEverything")) {
-        extraPadding();
-    }
+    c = !getOps<bool>("enableEverything");
 
-    customToggle("Show FPS and Frametime", "", "showFPS");
-    customToggle("Show 1% Low FPS", "", "showOnePercLows");
-    customToggle("Show Entity Counter and Dimension", "", "showDim");
-    customToggle("Show Biome", "", "showBiome");
-    customToggle("Show Weather", "", "showWeather");
-    customToggle("Show Coordinates Section", "", "showCoords");
-    customToggle("Show Speed", "", "showSpeed");
-    customToggle("Show Velocity", "", "showVelocity");
-    customToggle("Show Break Progress", "", "showBreakProg");
-    customConditionalToggle(getOps<bool>("showBreakProg"), "Always Show Break Progress", "", "alwaysShowBreakProg");
-    customToggle("Show Server Section", "", "showServer");
-    customToggle("Show Memory", "", "showMemory");
-    customToggle("Show CPU, GPU and Renderer", "", "showCpuGpu");
-    customToggle("Show Local Time", "", "showTime");
-    customToggle("Show Ingame Time", "", "showInGameTime");
-    customToggle("Show World Name", "", "showWorldName");
-    customToggle("Show Uptime", "", "showUptime");
-    customToggle("Show Targeted Block", "", "showTargetedBlock");
-    customConditionalToggle(getOps<bool>("showTargetedBlock"), "Show Targeted Block Tags", "", "showTargetedBlockTags");
-    customConditionalToggle(getOps<bool>("showTargetedBlock") && getOps<bool>("showTargetedBlockTags"), "Show Maximum Number Of Block Tags", "", "showMaxTags");
-    customConditionalSliderInt(getOps<bool>("showTargetedBlock") && getOps<bool>("showTargetedBlockTags") && !getOps<bool>("showMaxTags"), "Number Of Tags To Be Show", "", "noOfTags", 20, 1);
+    if (c) extraPadding();
+
+    addConditionalToggle(c, "Block 1", "FPS, 1% Lows, Frametime", "showBlock1");
+    addConditionalToggle(c, "Block 2", "E, T, Dimension, Biome", "showBlock2");
+
+    addConditionalToggle(c, "Block 3", "Coordinates, Weather", "showBlock3");
+    addConditionalToggle(c && getOps<bool>("showBlock3"), "Show Coordinates", "", "showCoords");
+    addConditionalToggle(c && getOps<bool>("showBlock3"), "Show Weather", "", "showWeather");
+    if (c && getOps<bool>("showBlock3")) extraPadding();
+
+    addConditionalToggle(c, "Block 4", "Speed, Velocity, Break Progress", "showBlock4");
+    addConditionalToggle(c && getOps<bool>("showBlock4"), "Always Show Break Progress", "", "alwaysShowBreakProg");
+    if (c && getOps<bool>("showBlock4")) extraPadding();
+
+    addConditionalToggle(c, "Block 5", "World Time and Name", "showBlock5");
+    addConditionalToggle(c, "Block 6", "Server Info", "showBlock6");
+    addConditionalToggle(c, "Block 7", "Memory", "showBlock7");
+    addConditionalToggle(c, "Block 8", "CPU", "showBlock8");
+    addConditionalToggle(c, "Block 9", "Resolution, Renderer, GPU", "showBlock9");
+    addConditionalToggle(c, "Block 10", "Local Time, CPU Uptime, Minecraft Uptime", "showBlock10");
+
+    addConditionalToggle(c, "Block 11", "Looking At", "showBlock11");
+    addConditionalToggle(c && getOps<bool>("showBlock11"), "Show Targeted Block Tags", "", "showTargetedBlockTags");
+    addConditionalToggle(c && getOps<bool>("showBlock11") && getOps<bool>("showTargetedBlockTags"), "Show Max Tags", "", "showMaxTags");
+    addConditionalSliderInt(c && getOps<bool>("showBlock11") && getOps<bool>("showTargetedBlockTags") && !getOps<bool>("showMaxTags"), "Number Of Tags To Be Show", "", "noOfTags", 20, 1);
 
     FlarialGUI::UnsetScrollView();
     resetPadding();
 }
 
-bool JavaDebugMenu::isOn(std::string settingName) {
-    return getOps<bool>("enableEverything") || getOps<bool>(settingName);
+bool JavaDebugMenu::isOnBlock(int block) {
+    return getOps<bool>("enableEverything") || getOps<bool>(std::format("showBlock{}", block));
+}
+
+bool JavaDebugMenu::isOnSetting(std::string settingName, int block = -1) {
+    if (block == -1) return getOps<bool>("enableEverything") || getOps<bool>(settingName);
+    else return getOps<bool>("enableEverything") || (getOps<bool>(std::format("showBlock{}", block)) && getOps<bool>(settingName));
 }
 
 void JavaDebugMenu::updateTimedVector(std::vector<TimedObj> &vec, float diff) {
@@ -184,7 +186,7 @@ void JavaDebugMenu::updateTimedVector(std::vector<TimedObj> &vec, float diff) {
 }
 
 void JavaDebugMenu::getOnePercLows() {
-    if (!prevFrameTimes.size()) {
+    if (prevFrameTimes.empty()) {
         cached1PercLow = 0.f;
         return;
     }
@@ -252,17 +254,32 @@ std::string JavaDebugMenu::getDimensionName() {
     else return "Unknown dimension";
 }
 
-std::vector<float> JavaDebugMenu::getWeatherInfo() {
+std::pair<std::string, std::vector<float>> JavaDebugMenu::getWeatherInfo() {
+    std::string weatherStr;
+    std::vector<float> weatherVals;
+
+    std::pair<std::string, std::vector<float>> res = { weatherStr, weatherVals };
+
     BlockSource *blocksrc = SDK::clientInstance->getBlockSource();
-    if (!blocksrc) return std::vector<float>{};
+    if (!blocksrc) return res;
 
     Dimension* dimension = blocksrc->getDimension();
-    if (!dimension) return std::vector<float>{};
+    if (!dimension) return res;
 
     Weather* weather = dimension->getweather();
-    if (!weather) return std::vector<float>{};
+    if (!weather) return res;
 
-    return std::vector<float>{weather->getrainLevel(), weather->getlightningLevel()};
+    float rain = weather->getrainLevel();
+    float lightning = weather->getlightningLevel();
+
+    if (lightning == 1) weatherStr = "Thunderstorm";
+    else if (lightning > 0) weatherStr = "Light Thunder";
+    else if (rain == 1) weatherStr = "Heavy Rain";
+    else if (rain > 0.5) weatherStr = "Rain";
+    else if (rain > 0) weatherStr = "Light Rain";
+    else weatherStr = "Clear";
+
+    return std::pair<std::string, std::vector<float>>{weatherStr, std::vector<float>{rain, lightning}};
 }
 
 std::string JavaDebugMenu::getTime() {
@@ -306,7 +323,7 @@ void JavaDebugMenu::onTick(TickEvent &event) {
     if (!this->isEnabled()) return;
     if (!SDK::clientInstance->getLocalPlayer()) return;
 
-    if (isOn("showSpeed") || isOn("showVelocity")) {
+    if (isOnBlock(4)) { // Speed and Velocity
         auto stateVectorComponent = SDK::clientInstance->getLocalPlayer()->getStateVectorComponent();
         if (stateVectorComponent != nullptr) {
             xVelo = (stateVectorComponent->Pos.x - PrevPos.x) * 20;
@@ -316,13 +333,13 @@ void JavaDebugMenu::onTick(TickEvent &event) {
         }
     }
 
-    if (isOn("showServer")) {
+    if (isOnBlock(6)) { // TPS
         TimedObj tick{};
         tick.timestamp = Microtime();
         tickList.insert(tickList.begin(), tick);
     }
 
-    if (isOn("showBiome")) {
+    if (isOnBlock(2)) { // Biome
         Vec3<float> pos = *SDK::clientInstance->getLocalPlayer()->getPosition();
         BlockPos bp {
             static_cast<int>(pos.x),
@@ -330,7 +347,7 @@ void JavaDebugMenu::onTick(TickEvent &event) {
             static_cast<int>(pos.z),
         };
         if (SDK::clientInstance->getBlockSource() && SDK::clientInstance->getBlockSource()->getBiome(bp)) {
-            curBiome = SDK::clientInstance->getBlockSource()->getBiome(bp)->getName();
+            curBiome = SDK::clientInstance->getBlockSource()->getBiome(bp);
         }
     }
 }
@@ -341,7 +358,7 @@ void JavaDebugMenu::onSetupAndRender(SetupAndRenderEvent &event) {
     if (!SDK::clientInstance->getLocalPlayer()->getLevel()) return;
     if (!SDK::clientInstance->getBlockSource()) return;
 
-    if (isOn("showTargetedBlock")) {
+    if (isOnBlock(11)) { // Looking At
         HitResult result = SDK::clientInstance->getLocalPlayer()->getLevel()->getHitResult();
         BlockPos pos = {
             result.blockPos.x,
@@ -355,7 +372,7 @@ void JavaDebugMenu::onSetupAndRender(SetupAndRenderEvent &event) {
             try {
                 lookingAt = block->getNamespace() + ":" + block->getName();
 
-                if (isOn("showTargetedBlockTags") && lookingAt != lastLookingAt) {
+                if (isOnSetting("showTargetedBlockTags") && lookingAt != lastLookingAt) {
                     lastLookingAt = lookingAt;
                     std::vector<std::string> tags = {};
                     for (auto i: tagMap) {
@@ -371,7 +388,7 @@ void JavaDebugMenu::onSetupAndRender(SetupAndRenderEvent &event) {
         }
     }
 
-    if (isOn("showBreakProg") && MC::heldLeft) {
+    if (isOnBlock(4) && MC::heldLeft) { // Break Progress
         Gamemode *gm = SDK::clientInstance->getLocalPlayer()->getGamemode();
         float breakProgress = gm->getLastBreakProgress() * 100;
         if (lastBreakProgress != breakProgress) {
@@ -414,127 +431,139 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
         std::vector<std::string> left;
         std::vector<std::string> right;
 
+        bool spoof = getOps<bool>("imPoorButIWannaLookRich");
+
         if (versionName.empty()) versionName = std::format("Flarial V2 Open Beta, Minecraft {}", WinrtUtils::getFormattedVersion());
         left.emplace_back(versionName);
 
-        if (isOn("showFPS")) {
-            if (getOps<bool>("imPoorButIWannaLookRich")) {
+        if (isOnBlock(1)) {
+            if (spoof) {
                 left.emplace_back(std::format("{} FPS", static_cast<int>(MC::fps * 222.2)));
-                if (isOn("showOnePercLows")) left.emplace_back("1% Lows: \u221E FPS");
-            } else {
+                left.emplace_back("1% Lows: \u221E FPS");
+            }
+            else {
                 left.emplace_back(std::format("{} FPS", MC::fps));
-                if (isOn("showOnePercLows")) {
-                    auto now = std::chrono::steady_clock::now();
-                    if (std::chrono::duration_cast<std::chrono::seconds>(now - last1PercLowUpdate).count() >= 1) {
-                        getOnePercLows();
-                        last1PercLowUpdate = now;
-                    }
-                    left.emplace_back(std::format("1% Lows: {:.0f} FPS", cached1PercLow));
+                auto now = std::chrono::steady_clock::now();
+                if (std::chrono::duration_cast<std::chrono::seconds>(now - last1PercLowUpdate).count() >= 1) {
+                    getOnePercLows();
+                    last1PercLowUpdate = now;
                 }
+                left.emplace_back(std::format("1% Lows: {:.0f} FPS", cached1PercLow));
             }
             left.emplace_back(std::format("Frametime: {:.2f}ms", MC::frameTime));
         }
 
         left.emplace_back("");
 
-        if (isOn("showDim")) {
-            left.emplace_back(std::format("E: {}", player->getLevel()->getRuntimeActorList().size()));
+        if (isOnBlock(2)) {
+            std::string temp = "Unknown";
+            if (curBiome != nullptr) temp = std::format("{:.2f}", curBiome->gettemperature());
+            left.emplace_back(std::format("E: {} T: {}", player->getLevel()->getRuntimeActorList().size(), temp));
+
             left.emplace_back(getDimensionName());
+
+            if (curBiome != nullptr) left.emplace_back(std::format("minecraft:{}", curBiome->getName()));
+            else left.emplace_back("Unknown biome");
+
             left.emplace_back("");
         }
 
-        if (isOn("showBiome")) {
-            left.emplace_back(std::format("Biome: {}", curBiome));
-            left.emplace_back("");
-        }
+        if (isOnBlock(3)) {
+            if (isOnSetting("showCoords")) {
+                Vec3<float> pos = *player->getPosition();
+                left.emplace_back(std::format("XYZ: {:.1f} / {:.1f} / {:.1f}", pos.x, pos.y, pos.z));
 
-        if (isOn("showWeather")) { // Lightning always shows 100% for some reason
-            std::vector<float> weatherInfo = getWeatherInfo();
-            if (weatherInfo.empty()) {
-                left.emplace_back("Weather: N/A");
-                left.emplace_back("Lightning Level: N/A");
+                Vec3<int> blockPos(static_cast<int>(pos.x), static_cast<int>(pos.y), static_cast<int>(pos.z));
+                left.emplace_back(std::format("Block: {} {} {}", blockPos.x, blockPos.y, blockPos.z));
+                left.emplace_back(std::format("Chunk: {} {} {}", static_cast<int>(pos.x / 16), static_cast<int>(pos.y / 16), static_cast<int>(pos.z / 16)));
+                left.emplace_back(std::format("Chunk Coordinate: {} {}", static_cast<int>(pos.x) % 16, static_cast<int>(pos.z) % 16));
+
+                left.emplace_back(getFacingDirection(player));
+                HitResult target = player->getLevel()->getHitResult();
+                BlockPos targetPos = {target.blockPos.x, target.blockPos.y, target.blockPos.z};
+                left.emplace_back(std::format("Looking at block: {} {} {}", targetPos.x, targetPos.y, targetPos.z));
             }
-            else {
-                left.emplace_back(std::format("Rain Level: {:.0f}%", weatherInfo[0] * 100));
-                left.emplace_back(std::format("Lightning Level: {:.0f}%", weatherInfo[1] * 100));
+
+            if (isOnSetting("showWeather")) {
+                std::pair<std::string, std::vector<float>> weatherInfo = getWeatherInfo();
+                if (weatherInfo.second.empty()) {
+                    left.emplace_back("Weather: Unknown");
+                }
+                else {
+                    left.emplace_back(std::format("Weather: {}", weatherInfo.first));
+                    left.emplace_back(std::format("Rain / Lightning: {:.0f}% / {:.0f}%", weatherInfo.second[0] * 100, weatherInfo.second[1] * 100));
+                }
             }
+
             left.emplace_back("");
         }
 
-        if (isOn("showCoords")) {
-            Vec3<float> pos = *player->getPosition();
-            left.emplace_back(std::format("XYZ: {:.1f} / {:.1f} / {:.1f}", pos.x, pos.y, pos.z));
-            Vec3<int> blockPos(static_cast<int>(pos.x), static_cast<int>(pos.y), static_cast<int>(pos.z));
-            left.emplace_back(std::format("Block: {} {} {}", blockPos.x, blockPos.y, blockPos.z));
-            left.emplace_back(std::format("Chunk: {} {} {}", static_cast<int>(pos.x / 16), static_cast<int>(pos.y / 16), static_cast<int>(pos.z / 16)));
-            left.emplace_back(std::format("Chunk Coordinate: {} {}", static_cast<int>(pos.x) % 16, static_cast<int>(pos.z) % 16));
-            left.emplace_back(getFacingDirection(player));
+        if (isOnBlock(4)) {
+            left.emplace_back(std::format("Speed: {:.2f} blocks/s", sqrt(std::pow(xVelo, 2) + std::pow(yVelo, 2) + std::pow(zVelo, 2))));
+            left.emplace_back(std::format("Velocity: {:.2f} / {:.2f} / {:.2f} blocks/s", xVelo, yVelo, zVelo));
+
+            if (isOnSetting("alwaysShowBreakProg") || currentBreakProgress != 0.0f) left.emplace_back(std::format("Break Progress: {}%", static_cast<int>(currentBreakProgress)));
+
             left.emplace_back("");
-            HitResult target = player->getLevel()->getHitResult();
-            BlockPos targetPos = {target.blockPos.x, target.blockPos.y, target.blockPos.z};
-            left.emplace_back(std::format("Looking at block: {} {} {}", targetPos.x, targetPos.y, targetPos.z));
         }
 
-        if (isOn("showSpeed")) left.emplace_back(std::format("Speed: {:.2f} blocks/s", sqrt(std::pow(xVelo, 2) + std::pow(yVelo, 2) + std::pow(zVelo, 2))));
+        if (isOnBlock(5)) {
+            left.emplace_back(std::format("World Time: {}", Time::formatMCTime(Time::curTime, false)));
+            left.emplace_back(std::format("World Name: {}", SDK::clientInstance->getLocalPlayer()->getLevel()->getLevelData()->getLevelName()));
 
-        if (isOn("showVelocity")) left.emplace_back(std::format("Velocity: {:.2f} / {:.2f} / {:.2f} blocks/s", xVelo, yVelo, zVelo));
+            left.emplace_back("");
+        }
 
-        bool renderBreakProg = isOn("showBreakProg") && (getOps<bool>("alwaysShowBreakProg") || currentBreakProgress != 0.0f);
-        if (renderBreakProg) left.emplace_back(std::format("Break Progress: {}%", static_cast<int>(currentBreakProgress)));
-
-        if (isOn("showCoords") || isOn("showSpeed") || isOn("showVelocity") || renderBreakProg) left.emplace_back("");
-
-        if (isOn("showInGameTime")) left.emplace_back(std::format("World Time: {}", Time::formatMCTime(Time::curTime, false)));
-
-        if (isOn("showWorldName")) left.emplace_back(std::format("World Name: {}", SDK::clientInstance->getLocalPlayer()->getLevel()->getLevelData()->getLevelName()));
-
-        if (isOn("showInGameTime") || isOn("showWorldName")) left.emplace_back("");
-
-        if (isOn("showServer")) {
+        if (isOnBlock(6)) {
             left.emplace_back("Server:");
             std::string serverIp = SDK::getServerIP();
+
             if (serverIp == "world") {
                 left.emplace_back("IP: local");
-                left.emplace_back("Port: 0");
-                left.emplace_back("Ping: -1 ms");
             }
             else {
                 left.emplace_back(std::format("IP: {}", SDK::getServerIP()));
                 left.emplace_back(std::format("Port: {}", SDK::getServerPort()));
                 left.emplace_back(std::format("Ping: {} ms", SDK::getServerPing()));
             }
+
             updateTimedVector(tickList, 1.0f);
             left.emplace_back(std::format("TPS: {}", std::to_string(tickList.size())));
         }
 
 
         right.emplace_back("64bit");
-        if (isOn("showMemory")) {
+
+        if (isOnBlock(7)) {
             MEMORYSTATUSEX memory_status;
             memory_status.dwLength = sizeof(memory_status);
             GlobalMemoryStatusEx(&memory_status);
             int total_memory = static_cast<int>(memory_status.ullTotalPhys / 1000000);
             int free_memory = static_cast<int>(memory_status.ullAvailPhys / 1000000);
             int used_memory = total_memory - free_memory;
-            if (getOps<bool>("imPoorButIWannaLookRich")) {
+            if (spoof) {
                 int totallyRealTotalMemory = 2097152;
                 right.emplace_back(std::format("Mem: {}% {}/{} MB", static_cast<int>((used_memory * 100) / totallyRealTotalMemory), used_memory, totallyRealTotalMemory));
             } else right.emplace_back(std::format("Mem: {}% {}/{} MB", static_cast<int>((used_memory * 100) / total_memory), used_memory, total_memory));
-            right.emplace_back("");
         }
 
-        if (isOn("showCpuGpu")) {
-            if (getOps<bool>("imPoorButIWannaLookRich")) right.emplace_back("Intel 9 7900X3D ProMax Plus");
+        right.emplace_back("");
+
+        if (isOnBlock(8)) {
+            if (spoof) right.emplace_back("Intel 9 7900X3D ProMax Plus");
             else {
                 if (cpuName.empty()) std::string cpuName = getCPU();
                 right.emplace_back(std::format("CPU: {}", getCPU()));
             }
 
             right.emplace_back("");
+        }
 
+        if (isOnBlock(9)) {
             right.emplace_back(std::format("Display: {}x{}", MC::windowSize.x, MC::windowSize.y));
             right.emplace_back(std::format("Active Renderer: {}", SwapchainHook::queue == nullptr ? "DirectX11" : "DirectX12"));
-            if (getOps<bool>("imPoorButIWannaLookRich")) right.emplace_back("AMD GFX 5090 Ti AI Accelerated DLSS 12.0");
+
+            if (spoof) right.emplace_back("AMD GFX 5090 Ti AI Accelerated DLSS 12.0");
             else {
                 if (!MC::GPU.empty()) right.emplace_back(MC::GPU);
                 else right.emplace_back("Unknown GPU");
@@ -543,24 +572,24 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
             right.emplace_back("");
         }
 
-        if (isOn("showTime")) right.emplace_back(std::format("Local Time: {}", getTime()));
-
-        if (isOn("showUptime")) {
+        if (isOnBlock(10)) {
+            right.emplace_back(std::format("Local Time: {}", getTime()));
             right.emplace_back(std::format("CPU Uptime: {}", getFormattedTime(static_cast<long long>(GetTickCount64() / 1000))));
             right.emplace_back(std::format("Minecraft Uptime: {}", getFormattedTime(
                                                static_cast<long long>(
                                                    std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - startTime).count()
                                                ) / 1000
                                            )));
+
             right.emplace_back("");
         }
 
-        if (isOn("showTargetedBlock")) {
+        if (isOnBlock(11)) {
             right.emplace_back("Targeted Block:");
             right.emplace_back(lookingAt);
             right.emplace_back("");
 
-            if (isOn("showTargetedBlockTags")) {
+            if (isOnSetting("showTargetedBlockTags")) {
                 bool showMax = getOps<bool>("showMaxTags");
                 int maxAllowedTags = getOps<int>("noOfTags");
                 int maxFittableTags = static_cast<int>(MC::windowSize.y / (textHeight / 3.0f + yPadding * 2)) - right.size();
@@ -568,12 +597,18 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
                 if (lookingAtTags.size() >= maxFittableTags && (showMax || maxAllowedTags >= maxFittableTags)) {
                     for (int i = 0; i < maxFittableTags; i++) right.emplace_back('#' + lookingAtTags[i]);
                     right.emplace_back(std::format("{} more tags...", lookingAtTags.size() - maxFittableTags));
-                } else if (showMax) {
+                }
+                else if (showMax) {
                     for (const auto &i: lookingAtTags) right.emplace_back('#' + i);
-                } else {
+                }
+                else if (lookingAtTags.size() > maxAllowedTags) {
                     for (int i = 0; i < maxAllowedTags; i++) right.emplace_back('#' + lookingAtTags[i]);
                     right.emplace_back(std::format("{} more tags...", lookingAtTags.size() - maxAllowedTags));
                 }
+                else {
+                    for (int i = 0; i < lookingAtTags.size(); i++) right.emplace_back('#' + lookingAtTags[i]);
+                }
+
             }
         }
 
@@ -670,12 +705,12 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
 
         // frametime graph start
 
-        if (isOn("showFTgraph") || isOn("showOnePercLows")) {
+        if (isOnSetting("showFTgraph") || isOnBlock(1)) {
             while (prevFrameTimes.size() >= static_cast<int>(Constraints::SpacingConstraint(getOps<float>("FTgraphWidth") * 10, uiscaleConst) / Constraints::SpacingConstraint(getOps<float>("FTbarWidth"), uiscaleConst))) prevFrameTimes.pop_front();
             prevFrameTimes.push_back(MC::frameTime);
         }
 
-        if (getOps<bool>("showFTgraph")) {
+        if (isOnSetting("showFTgraph")) {
             float max = 1000.f / 30;
             float maxRectHeight = Constraints::SpacingConstraint(getOps<float>("FTgraphHeight") * 10, uiscaleConst);
             float maxRectWidth = Constraints::SpacingConstraint(getOps<float>("FTgraphWidth") * 10, uiscaleConst);

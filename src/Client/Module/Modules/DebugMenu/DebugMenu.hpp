@@ -18,7 +18,7 @@ private:
 	std::string lookingAt = "minecraft:empty";
 	std::string lastLookingAt = "";
 	std::vector<std::string> lookingAtTags = {};
-	std::string curBiome = "unknown";
+	Biome* curBiome = nullptr;
 
 	Vec3<float> PrevPos{};
 	float xVelo = 0.f;
@@ -60,17 +60,11 @@ public:
 
 	void defaultConfig() override;
 
-	void customToggle(std::string text, std::string subtext, std::string settingName);
-
-	void customConditionalToggle(bool condition, std::string text, std::string subtext, std::string settingName);
-
-	void customConditionalSlider(bool condition, std::string text, std::string subtext, std::string settingName, float maxVal = 100.0f, float minVal = 0.0f, bool zerosafe = true);
-
-	void customConditionalSliderInt(bool condition, std::string text, std::string subtext, std::string settingName, int maxVal = 100, int minVal = 0);
-
 	void settingsRender(float settingsOffset) override;
 
-	bool isOn(std::string settingName);
+	bool isOnBlock(int block);
+
+	bool isOnSetting(std::string settingName, int block);
 
 	void updateTimedVector(std::vector<TimedObj>& vec, float diff);
 
@@ -84,7 +78,7 @@ public:
 
 	std::string getDimensionName();
 
-	std::vector<float> getWeatherInfo();
+	std::pair<std::string, std::vector<float>> getWeatherInfo();
 
 	std::string getTime();
 
