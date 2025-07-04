@@ -70,12 +70,13 @@ void WeatherChanger::onTick(TickEvent &event) {
     if (getOps<bool>("snow") || getOps<bool>("customTemp")) {
         const Vec3<float> *pos = event.getActor()->getPosition();
         const BlockPos bp(static_cast<int>(pos->x), static_cast<int>(pos->y), static_cast<int>(pos->z));
+        const float toSet = getOps<bool>("snow") ? 0.0f : getOps<float>("temperature");
 
-        if (Biome *curBiome = SDK::clientInstance->getBlockSource()->getBiome(bp); curBiome && curBiome->temperature != 0) {
+        if (Biome *curBiome = SDK::clientInstance->getBlockSource()->getBiome(bp); curBiome && curBiome->temperature != toSet) {
             if (oldBiome) oldBiome->temperature = oldTemp;
             oldBiome = curBiome;
             oldTemp = curBiome->temperature;
-            curBiome->temperature = getOps<bool>("snow") ? 0.0f : getOps<float>("temperature");
+            curBiome->temperature = toSet;
         }
     } else if (oldBiome) {
         oldBiome->temperature = oldTemp;
