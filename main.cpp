@@ -31,7 +31,7 @@ void SavePlayerCache() {
 
     // Check if string size is greater than 15 KB (15,360 bytes)
     if (playersListString.size() > 15360) {
-        playersListString = "[]";
+        playersListString = "{\"players\":[]}";
     }
 
     std::string filePath = Utils::getRoamingPath() + "/Flarial/playerscache.txt";
