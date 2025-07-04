@@ -237,7 +237,7 @@ public:
     std::string mDefaultGeometryName; // this+0x80
     Image mSkinImage; // this+0xA0
     Image mCapeImage; // this+0xD0
-    char idklolwtfisthis[272];
+    // char idklolwtfisthis[272];
     // std::vector<AnimatedImageData> mSkinAnimatedImages;
     // MinecraftJson::Value mGeometryData;
     // MinEngineVersion mGeometryDataMinEngineVersion;
