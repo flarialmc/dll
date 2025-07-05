@@ -114,11 +114,26 @@ public:
 
     [[nodiscard]] constexpr Image() = default;
 
-    //LL_CLANG_CEXPR Image& operator=(Image&&) noexcept = default;
     [[nodiscard]] constexpr Image(Image &&) noexcept = default;
+    [[nodiscard]] constexpr Image(const Image &other) noexcept
+        : imageFormat(other.imageFormat),
+          mWidth(other.mWidth),
+          mHeight(other.mHeight),
+          mDepth(other.mDepth),
+          mUsage(other.mUsage),
+          mImageBytes(other.mImageBytes) {} // Use Blob's copy constructor
 
-    //LL_CLANG_CEXPR Image& operator=(Image const&) noexcept = default;
-    [[nodiscard]] constexpr Image(Image const &) noexcept = default;
+    constexpr Image &operator=(const Image &other) noexcept {
+        if (this != &other) {
+            imageFormat = other.imageFormat;
+            mWidth = other.mWidth;
+            mHeight = other.mHeight;
+            mDepth = other.mDepth;
+            mUsage = other.mUsage;
+            mImageBytes = other.mImageBytes; // Use Blob's assignment operator
+        }
+        return *this;
+    }
 };
 
 enum class AnimatedTextureType : unsigned int {
@@ -238,24 +253,29 @@ public:
     std::string mDefaultGeometryName; // this+0x80
     Image mSkinImage; // this+0xA0
     Image mCapeImage; // this+0xD0
-    // char idklolwtfisthis[272];
 
-    // std::vector<AnimatedImageData> mSkinAnimatedImages;
-    // MinecraftJson::Value mGeometryData;
-    // MinEngineVersion mGeometryDataMinEngineVersion;
-    // MinecraftJson::Value mGeometryDataMutable;
-    // std::string mAnimationData;
-    // std::string mCapeId;
-    // std::vector<SerializedPersonaPieceHandle> mPersonaPieces;
-    // persona::ArmSize::Type mArmSizeType;
-    // std::unordered_map<persona::PieceType, TintMapColor> mPieceTintColors;
-    // char mSkinColor[16];
-    // TrustedSkinFlag mIsTrustedSkin;
-    // bool mIsPremium;
-    // bool mIsPersona;
-    // bool mIsPersonaCapeOnClassicSkin;
-    // bool mIsPrimaryUser;
-    // bool mOverridesPlayerAppearance;
+    std::vector<AnimatedImageData> mSkinAnimatedImages;
+    MinecraftJson::Value mGeometryData;
+    MinEngineVersion mGeometryDataMinEngineVersion;
+    MinecraftJson::Value mGeometryDataMutable;
+    std::string mAnimationData;
+    std::string mCapeId;
+    std::vector<SerializedPersonaPieceHandle> mPersonaPieces;
+    persona::ArmSize::Type mArmSizeType;
+    std::unordered_map<persona::PieceType, TintMapColor> mPieceTintColors;
+    char mSkinColor[16];
+    TrustedSkinFlag mIsTrustedSkin;
+    bool mIsPremium;
+    bool mIsPersona;
+    bool mIsPersonaCapeOnClassicSkin;
+    bool mIsPrimaryUser;
+    bool mOverridesPlayerAppearance;
+
+    [[nodiscard]] PlayerSkin() = default;
+    [[nodiscard]] PlayerSkin(const PlayerSkin &other) = default;
+    PlayerSkin &operator=(const PlayerSkin &other) = default; // Explicitly defaulted
+    [[nodiscard]] PlayerSkin(PlayerSkin &&) noexcept = default;
+    PlayerSkin &operator=(PlayerSkin &&) noexcept = default;
 };
 
 class PlayerSkin_1_21_90 {

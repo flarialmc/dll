@@ -202,16 +202,47 @@ void SkinStealCommand::execute(const std::vector<std::string> &args) {
             addCommandMessage("§aSuccessfully stole {}'s skin! Saved at Roamingstate/Flarial/Skins.", pair.second.name);
             SaveSkin(pair.second.name, pair.second.playerSkin.mSkinImage, pair.second.playerSkin.mCapeImage);
 
-            if (false) {
-                // std::cout << pair.second.id << std::endl;
-                // std::cout << pair.second.isHost << std::endl;
-                // std::cout << pair.second.isSubClient << std::endl;
-                // std::cout << pair.second.isTeacher << std::endl;
-                // std::cout << pair.second.name << std::endl;
-                // std::cout << pair.second.platformOnlineId << std::endl;
-                // std::cout << pair.second.XUID << std::endl;
-                // std::cout << (int) pair.second.buildPlatform << std::endl;
-                // std::cout << "Skin" << std::endl;
+            if (true) {
+                std::cout << pair.second.id << std::endl;
+                std::cout << pair.second.isHost << std::endl;
+                std::cout << pair.second.isSubClient << std::endl;
+                std::cout << pair.second.isTeacher << std::endl;
+                std::cout << pair.second.name << std::endl;
+                std::cout << pair.second.platformOnlineId << std::endl;
+                std::cout << pair.second.XUID << std::endl;
+                std::cout << (int) pair.second.buildPlatform << std::endl;
+                std::cout << "Skin" << std::endl;
+                Logger::info("mId: {}", pair.second.playerSkin.mId);
+                Logger::info("mPlayFabId: {}", pair.second.playerSkin.mPlayFabId);
+                Logger::info("mFullId: {}", pair.second.playerSkin.mFullId);
+                Logger::info("mResourcePatch: {}", pair.second.playerSkin.mResourcePatch);
+                Logger::info("mDefaultGeometryName: {}", pair.second.playerSkin.mDefaultGeometryName);
+                Logger::info("mSkinImage: {}", pair.second.playerSkin.mSkinImage.mWidth > 0 ? "exists" : "doesn't exist L");
+                Logger::info("mCapeImage: {}", pair.second.playerSkin.mCapeImage.mWidth > 0 ? "exists" : "doesn't exist L");
+                Logger::info("mSkinAnimatedImages (size): {}", pair.second.playerSkin.mSkinAnimatedImages.size());
+                // Logger::info("mGeometryData: {}", pair.second.playerSkin.mGeometryData);
+                // Logger::info("mGeometryDataMinEngineVersion: {}", pair.second.playerSkin.mGeometryDataMinEngineVersion);
+                // Logger::info("mGeometryDataMutable: {}", pair.second.playerSkin.mGeometryDataMutable);
+                Logger::info("mAnimationData: {}", pair.second.playerSkin.mAnimationData);
+                Logger::info("mCapeId: {}", pair.second.playerSkin.mCapeId);
+                Logger::info("mPersonaPieces (size): {}", pair.second.playerSkin.mPersonaPieces.size());
+                Logger::info("mArmSizeType: {}", (int) pair.second.playerSkin.mArmSizeType);
+                Logger::info("mPieceTintColors (size): {}", pair.second.playerSkin.mPieceTintColors.size());
+                // Logger::info("mSkinColor R: {}", pair.second.playerSkin.mSKinColor.r);
+                // Logger::info("mSkinColor G: {}", pair.second.playerSkin.mSKinColor.g);
+                // Logger::info("mSkinColor B: {}", pair.second.playerSkin.mSKinColor.b);
+                Logger::info("mIsTrustedSkin: {}", (bool) pair.second.playerSkin.mIsTrustedSkin);
+                Logger::info("mIsPremium: {}", (bool) pair.second.playerSkin.mIsPremium);
+                Logger::info("mIsPersona: {}", (bool) pair.second.playerSkin.mIsPersona);
+                Logger::info("mIsPersonaCapeOnClassicSkin: {}", (bool) pair.second.playerSkin.mIsPersonaCapeOnClassicSkin);
+                Logger::info("mIsPrimaryUser: {}", (bool) pair.second.playerSkin.mIsPrimaryUser);
+                Logger::info("mOverridesPlayerAppearance: {}", (bool) pair.second.playerSkin.mOverridesPlayerAppearance);
+                //
+                // std::cout << pair.second.playerSkin.mId << std::endl;
+                //
+                //
+                std::cout << "-----------------------" << std::endl;
+                // std::cout << &SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap() << std::endl;
                 // Logger::info("mId: {}", pair.second.playerSkin.mId);
                 // Logger::info("mPlayFabId: {}", pair.second.playerSkin.mPlayFabId);
                 // Logger::info("mFullId: {}", pair.second.playerSkin.mFullId);
@@ -226,57 +257,25 @@ void SkinStealCommand::execute(const std::vector<std::string> &args) {
                 // Logger::info("mAnimationData: {}", pair.second.playerSkin.mAnimationData);
                 // Logger::info("mCapeId: {}", pair.second.playerSkin.mCapeId);
                 // Logger::info("mPersonaPieces (size): {}", pair.second.playerSkin.mPersonaPieces.size());
-                // Logger::info("mArmSizeType: {}", (int) pair.second.playerSkin.mArmSizeType);
+                // Logger::info("mArmSizeType: {}", (int)pair.second.playerSkin.mArmSizeType);
                 // Logger::info("mPieceTintColors (size): {}", pair.second.playerSkin.mPieceTintColors.size());
-                // // Logger::info("mSkinColor R: {}", pair.second.playerSkin.mSKinColor.r);
-                // // Logger::info("mSkinColor G: {}", pair.second.playerSkin.mSKinColor.g);
-                // // Logger::info("mSkinColor B: {}", pair.second.playerSkin.mSKinColor.b);
-                // Logger::info("mIsTrustedSkin: {}", (bool) pair.second.playerSkin.mIsTrustedSkin);
-                // Logger::info("mIsPremium: {}", (bool) pair.second.playerSkin.mIsPremium);
-                // Logger::info("mIsPersona: {}", (bool) pair.second.playerSkin.mIsPersona);
-                // Logger::info("mIsPersonaCapeOnClassicSkin: {}", (bool) pair.second.playerSkin.mIsPersonaCapeOnClassicSkin);
-                // Logger::info("mIsPrimaryUser: {}", (bool) pair.second.playerSkin.mIsPrimaryUser);
-                // Logger::info("mOverridesPlayerAppearance: {}", (bool) pair.second.playerSkin.mOverridesPlayerAppearance);
+                // // Logger::info("mSkinColor: {}", pair.second.playerSkin.mSkinColor ? "exists" : "doesn't exist L");
+                // Logger::info("mIsTrustedSkin: {}", (bool)pair.second.playerSkin.mIsTrustedSkin);
+                // Logger::info("mIsPremium: {}", (bool)pair.second.playerSkin.mIsPremium);
+                // Logger::info("mIsPersona: {}", (bool)pair.second.playerSkin.mIsPersona);
+                // Logger::info("mIsPersonaCapeOnClassicSkin: {}", (bool)pair.second.playerSkin.mIsPersonaCapeOnClassicSkin);
+                // Logger::info("mIsPrimaryUser: {}", (bool)pair.second.playerSkin.mIsPrimaryUser);
+                // Logger::info("mOverridesPlayerAppearance: {}", (bool)pair.second.playerSkin.mOverridesPlayerAppearance);
                 //
-                // // std::cout << pair.second.playerSkin.mId << std::endl;
+                std::shared_ptr<Packet> packet = SDK::createPacket((int) MinecraftPacketIds::PlayerSkin);
+                auto *pSkinPacket = reinterpret_cast<PlayerSkinPacket *>(packet.get());
                 //
-                //
-                // std::cout << "-----------------------" << std::endl;
-                // // std::cout << &SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap() << std::endl;
-                // // Logger::info("mId: {}", pair.second.playerSkin.mId);
-                // // Logger::info("mPlayFabId: {}", pair.second.playerSkin.mPlayFabId);
-                // // Logger::info("mFullId: {}", pair.second.playerSkin.mFullId);
-                // // Logger::info("mResourcePatch: {}", pair.second.playerSkin.mResourcePatch);
-                // // Logger::info("mDefaultGeometryName: {}", pair.second.playerSkin.mDefaultGeometryName);
-                // // Logger::info("mSkinImage: {}", pair.second.playerSkin.mSkinImage.mWidth > 0 ? "exists" : "doesn't exist L");
-                // // Logger::info("mCapeImage: {}", pair.second.playerSkin.mCapeImage.mWidth > 0 ? "exists" : "doesn't exist L");
-                // // Logger::info("mSkinAnimatedImages (size): {}", pair.second.playerSkin.mSkinAnimatedImages.size());
-                // // // Logger::info("mGeometryData: {}", pair.second.playerSkin.mGeometryData);
-                // // // Logger::info("mGeometryDataMinEngineVersion: {}", pair.second.playerSkin.mGeometryDataMinEngineVersion);
-                // // // Logger::info("mGeometryDataMutable: {}", pair.second.playerSkin.mGeometryDataMutable);
-                // // Logger::info("mAnimationData: {}", pair.second.playerSkin.mAnimationData);
-                // // Logger::info("mCapeId: {}", pair.second.playerSkin.mCapeId);
-                // // Logger::info("mPersonaPieces (size): {}", pair.second.playerSkin.mPersonaPieces.size());
-                // // Logger::info("mArmSizeType: {}", (int)pair.second.playerSkin.mArmSizeType);
-                // // Logger::info("mPieceTintColors (size): {}", pair.second.playerSkin.mPieceTintColors.size());
-                // // // Logger::info("mSkinColor: {}", pair.second.playerSkin.mSkinColor ? "exists" : "doesn't exist L");
-                // // Logger::info("mIsTrustedSkin: {}", (bool)pair.second.playerSkin.mIsTrustedSkin);
-                // // Logger::info("mIsPremium: {}", (bool)pair.second.playerSkin.mIsPremium);
-                // // Logger::info("mIsPersona: {}", (bool)pair.second.playerSkin.mIsPersona);
-                // // Logger::info("mIsPersonaCapeOnClassicSkin: {}", (bool)pair.second.playerSkin.mIsPersonaCapeOnClassicSkin);
-                // // Logger::info("mIsPrimaryUser: {}", (bool)pair.second.playerSkin.mIsPrimaryUser);
-                // // Logger::info("mOverridesPlayerAppearance: {}", (bool)pair.second.playerSkin.mOverridesPlayerAppearance);
-                //
-                // std::shared_ptr<Packet> packet = SDK::createPacket((int) MinecraftPacketIds::PlayerSkin);
-                // auto *pSkinPacket = reinterpret_cast<PlayerSkinPacket *>(packet.get());
-                //
-                // memcpy(&pSkinPacket->mUUID, &pair.second.UUID, sizeof(mcUUID));
-                // pSkinPacket->mLocalizedOldSkinName = (std::string) "Custom";
-                // pSkinPacket->mLocalizedNewSkinName = (std::string) "Custom";
-                // memcpy(&pSkinPacket->mSkin, &pair.second.playerSkin, sizeof(PlayerSkin));
-                //
-                // SDK::clientInstance->getPacketSender()->sendToServer(pSkinPacket);
-                // Logger::debug("sent skin packet");
+                memcpy(&pSkinPacket->mUUID, &pair.second.UUID, sizeof(mcUUID));
+                pSkinPacket->mLocalizedOldSkinName = (std::string) "Custom";
+                pSkinPacket->mLocalizedNewSkinName = (std::string) "Custom";
+                pSkinPacket->mSkin = pair.second.playerSkin;
+                SDK::clientInstance->getPacketSender()->sendToServer(pSkinPacket);
+                Logger::debug("sent skin packet");
             }
 
             found = true;
