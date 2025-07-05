@@ -134,6 +134,7 @@ enum class AnimationExpression : unsigned int {
 };
 
 class AnimatedImageData {
+public:
     AnimatedTextureType mType;
     AnimationExpression mExpression;
     Image mImage;
@@ -225,7 +226,7 @@ public:
 enum class TrustedSkinFlag : signed char {
     Unset = 0,
     False = 1,
-    True  = 2,
+    True = 2,
 };
 
 class PlayerSkin {
@@ -237,7 +238,7 @@ public:
     std::string mDefaultGeometryName; // this+0x80
     Image mSkinImage; // this+0xA0
     Image mCapeImage; // this+0xD0
-    char idklolwtfisthis[272];
+
     // std::vector<AnimatedImageData> mSkinAnimatedImages;
     // MinecraftJson::Value mGeometryData;
     // MinEngineVersion mGeometryDataMinEngineVersion;

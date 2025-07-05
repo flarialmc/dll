@@ -106,7 +106,7 @@ void SendPacketHook::receiveCallbackPlayerSkin(void *packetHandlerDispatcher, vo
     auto event = nes::make_holder<PacketEvent>(packet.get());
     eventMgr.trigger(event);
     if (!event->isCancelled())
-        receivePacketModalFormRequestOriginal(packetHandlerDispatcher, networkIdentifier, netEventCallback, packet);
+        receivePacketPlayerSkinOriginal(packetHandlerDispatcher, networkIdentifier, netEventCallback, packet);
 }
 
 
