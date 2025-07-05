@@ -43,9 +43,9 @@ void PlayerNotifier::loadSettings(bool softLoad) {
 }
 
 void PlayerNotifier::check() {
-	std::unordered_map<mcUUID, PlayerListEntry>& playerMap = SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap();
+	std::unordered_map<mcUUID, PlayerListEntry> playerMap = SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap();
 
-	for (const auto& [uuid, entry] : playerMap) {
+	for (const auto entry: playerMap | std::views::values) {
 		for (int i = 0; i < totalPlayers; i++) {
 			if (!this->settings.getSettingByName<bool>("player" + FlarialGUI::cached_to_string(i) + "Enabled")) continue;
 			if (this->settings.getSettingByName<bool>("player" + FlarialGUI::cached_to_string(i) + "Enabled")->value) {

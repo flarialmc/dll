@@ -21,4 +21,6 @@ public:
 	void settingsRender(float settingsOffset) override;
 
 	void onKey(KeyEvent& event);
+
+	void onMouse(MouseEvent& event);
 };

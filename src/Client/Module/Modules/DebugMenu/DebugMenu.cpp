@@ -14,6 +14,7 @@ void JavaDebugMenu::onEnable() {
     Listen(this, RenderEvent, &JavaDebugMenu::onRender)
     Listen(this, TickEvent, &JavaDebugMenu::onTick)
     Listen(this, KeyEvent, &JavaDebugMenu::onKey)
+    Listen(this, MouseEvent, &JavaDebugMenu::onMouse)
     Listen(this, HudCursorRendererRenderEvent, &JavaDebugMenu::onHudCursorRendererRender)
     Listen(this, SetTopScreenNameEvent, &JavaDebugMenu::onSetTopScreenName)
     Listen(this, PerspectiveEvent, &JavaDebugMenu::onGetViewPerspective)
@@ -25,6 +26,7 @@ void JavaDebugMenu::onDisable() {
     Deafen(this, RenderEvent, &JavaDebugMenu::onRender)
     Deafen(this, TickEvent, &JavaDebugMenu::onTick)
     Deafen(this, KeyEvent, &JavaDebugMenu::onKey)
+    Deafen(this, MouseEvent, &JavaDebugMenu::onMouse)
     Deafen(this, HudCursorRendererRenderEvent, &JavaDebugMenu::onHudCursorRendererRender)
     Deafen(this, SetTopScreenNameEvent, &JavaDebugMenu::onSetTopScreenName)
     Deafen(this, PerspectiveEvent, &JavaDebugMenu::onGetViewPerspective)
@@ -46,7 +48,7 @@ void JavaDebugMenu::defaultConfig() {
     setDef("showBg", true);
     setDef("textShadow", true);
     setDef("text", (std::string) "ffffff", 1.f, false);
-    setDef("textShadow", (std::string)"00000", 0.55f, false);
+    setDef("textShadow", (std::string) "00000", 0.55f, false);
     setDef("bg", (std::string) "000000", 0.4f, false);
     setDef("textShadowOffset", 0.003f);
 
@@ -226,15 +228,15 @@ std::string JavaDebugMenu::getCPU() {
 
     // more ai slop
     int threadCount = 0;
-	__cpuid(cpuInfo, 0);
-	unsigned int maxLeaf = cpuInfo[0];
+    __cpuid(cpuInfo, 0);
+    unsigned int maxLeaf = cpuInfo[0];
 
     if (maxLeaf >= 1) {
-		__cpuid(cpuInfo, 1);
-		threadCount = (cpuInfo[1] >> 16) & 0xFF; 
+        __cpuid(cpuInfo, 1);
+        threadCount = (cpuInfo[1] >> 16) & 0xFF;
     } else {
         threadCount = 1; // Default to 1 if unable to determine
-	}
+    }
 
     return std::to_string(threadCount) + "x " + cpuBrandStr;
 }
@@ -243,7 +245,7 @@ std::string JavaDebugMenu::getDimensionName() {
     BlockSource *blocksrc = SDK::clientInstance->getBlockSource();
     if (!blocksrc) return "Unknown dimension";
 
-    Dimension* dimension = blocksrc->getDimension();
+    Dimension *dimension = blocksrc->getDimension();
     if (!dimension) return "Unknown dimension";
 
     std::string dim = dimension->getName();
@@ -254,19 +256,19 @@ std::string JavaDebugMenu::getDimensionName() {
     else return "Unknown dimension";
 }
 
-std::pair<std::string, std::vector<float>> JavaDebugMenu::getWeatherInfo() {
+std::pair<std::string, std::vector<float> > JavaDebugMenu::getWeatherInfo() {
     std::string weatherStr;
     std::vector<float> weatherVals;
 
-    std::pair<std::string, std::vector<float>> res = { weatherStr, weatherVals };
+    std::pair<std::string, std::vector<float> > res = {weatherStr, weatherVals};
 
     BlockSource *blocksrc = SDK::clientInstance->getBlockSource();
     if (!blocksrc) return res;
 
-    Dimension* dimension = blocksrc->getDimension();
+    Dimension *dimension = blocksrc->getDimension();
     if (!dimension) return res;
 
-    Weather* weather = dimension->getweather();
+    Weather *weather = dimension->getweather();
     if (!weather) return res;
 
     float rain = weather->getrainLevel();
@@ -279,7 +281,7 @@ std::pair<std::string, std::vector<float>> JavaDebugMenu::getWeatherInfo() {
     else if (rain > 0) weatherStr = "Light Rain";
     else weatherStr = "Clear";
 
-    return std::pair<std::string, std::vector<float>>{weatherStr, std::vector<float>{rain, lightning}};
+    return std::pair<std::string, std::vector<float> >{weatherStr, std::vector<float>{rain, lightning}};
 }
 
 std::string JavaDebugMenu::getTime() {
@@ -323,7 +325,8 @@ void JavaDebugMenu::onTick(TickEvent &event) {
     if (!this->isEnabled()) return;
     if (!SDK::clientInstance->getLocalPlayer()) return;
 
-    if (isOnBlock(4)) { // Speed and Velocity
+    if (isOnBlock(4)) {
+        // Speed and Velocity
         auto stateVectorComponent = SDK::clientInstance->getLocalPlayer()->getStateVectorComponent();
         if (stateVectorComponent != nullptr) {
             xVelo = (stateVectorComponent->Pos.x - PrevPos.x) * 20;
@@ -333,15 +336,17 @@ void JavaDebugMenu::onTick(TickEvent &event) {
         }
     }
 
-    if (isOnBlock(6)) { // TPS
+    if (isOnBlock(6)) {
+        // TPS
         TimedObj tick{};
         tick.timestamp = Microtime();
         tickList.insert(tickList.begin(), tick);
     }
 
-    if (isOnBlock(2)) { // Biome
+    if (isOnBlock(2)) {
+        // Biome
         Vec3<float> pos = *SDK::clientInstance->getLocalPlayer()->getPosition();
-        BlockPos bp {
+        BlockPos bp{
             static_cast<int>(pos.x),
             static_cast<int>(pos.y),
             static_cast<int>(pos.z),
@@ -358,7 +363,8 @@ void JavaDebugMenu::onSetupAndRender(SetupAndRenderEvent &event) {
     if (!SDK::clientInstance->getLocalPlayer()->getLevel()) return;
     if (!SDK::clientInstance->getBlockSource()) return;
 
-    if (isOnBlock(11)) { // Looking At
+    if (isOnBlock(11)) {
+        // Looking At
         HitResult result = SDK::clientInstance->getLocalPlayer()->getLevel()->getHitResult();
         BlockPos pos = {
             result.blockPos.x,
@@ -388,7 +394,8 @@ void JavaDebugMenu::onSetupAndRender(SetupAndRenderEvent &event) {
         }
     }
 
-    if (isOnBlock(4) && MC::heldLeft) { // Break Progress
+    if (isOnBlock(4) && MC::heldLeft) {
+        // Break Progress
         Gamemode *gm = SDK::clientInstance->getLocalPlayer()->getGamemode();
         float breakProgress = gm->getLastBreakProgress() * 100;
         if (lastBreakProgress != breakProgress) {
@@ -440,8 +447,7 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
             if (spoof) {
                 left.emplace_back(std::format("{} FPS", static_cast<int>(MC::fps * 222.2)));
                 left.emplace_back("1% Lows: \u221E FPS");
-            }
-            else {
+            } else {
                 left.emplace_back(std::format("{} FPS", MC::fps));
                 auto now = std::chrono::steady_clock::now();
                 if (std::chrono::duration_cast<std::chrono::seconds>(now - last1PercLowUpdate).count() >= 1) {
@@ -485,11 +491,10 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
             }
 
             if (isOnSetting("showWeather")) {
-                std::pair<std::string, std::vector<float>> weatherInfo = getWeatherInfo();
+                std::pair<std::string, std::vector<float> > weatherInfo = getWeatherInfo();
                 if (weatherInfo.second.empty()) {
                     left.emplace_back("Weather: Unknown");
-                }
-                else {
+                } else {
                     left.emplace_back(std::format("Weather: {}", weatherInfo.first));
                     left.emplace_back(std::format("Rain / Lightning: {:.0f}% / {:.0f}%", weatherInfo.second[0] * 100, weatherInfo.second[1] * 100));
                 }
@@ -520,8 +525,7 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
 
             if (serverIp == "world") {
                 left.emplace_back("IP: local");
-            }
-            else {
+            } else {
                 left.emplace_back(std::format("IP: {}", SDK::getServerIP()));
                 left.emplace_back(std::format("Port: {}", SDK::getServerPort()));
                 left.emplace_back(std::format("Ping: {} ms", SDK::getServerPing()));
@@ -597,18 +601,14 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
                 if (lookingAtTags.size() >= maxFittableTags && (showMax || maxAllowedTags >= maxFittableTags)) {
                     for (int i = 0; i < maxFittableTags; i++) right.emplace_back('#' + lookingAtTags[i]);
                     right.emplace_back(std::format("{} more tags...", lookingAtTags.size() - maxFittableTags));
-                }
-                else if (showMax) {
+                } else if (showMax) {
                     for (const auto &i: lookingAtTags) right.emplace_back('#' + i);
-                }
-                else if (lookingAtTags.size() > maxAllowedTags) {
+                } else if (lookingAtTags.size() > maxAllowedTags) {
                     for (int i = 0; i < maxAllowedTags; i++) right.emplace_back('#' + lookingAtTags[i]);
                     right.emplace_back(std::format("{} more tags...", lookingAtTags.size() - maxAllowedTags));
-                }
-                else {
+                } else {
                     for (int i = 0; i < lookingAtTags.size(); i++) right.emplace_back('#' + lookingAtTags[i]);
                 }
-
             }
         }
 
@@ -632,16 +632,17 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
                 );
             }
 
-            if (getOps<bool>("textShadow")) FlarialGUI::FlarialTextWithFont(
-                textShadowOffset, leftYoffset + textShadowOffset,
-                String::StrToWStr(i).c_str(),
-                30.0f, textHeight / 3.0f,
-                DWRITE_TEXT_ALIGNMENT_LEADING,
-                textSize,
-                DWRITE_FONT_WEIGHT_NORMAL,
-                textShadowColor,
-                true
-            );
+            if (getOps<bool>("textShadow"))
+                FlarialGUI::FlarialTextWithFont(
+                    textShadowOffset, leftYoffset + textShadowOffset,
+                    String::StrToWStr(i).c_str(),
+                    30.0f, textHeight / 3.0f,
+                    DWRITE_TEXT_ALIGNMENT_LEADING,
+                    textSize,
+                    DWRITE_FONT_WEIGHT_NORMAL,
+                    textShadowColor,
+                    true
+                );
 
             FlarialGUI::FlarialTextWithFont(
                 0.0f, leftYoffset,
@@ -675,16 +676,17 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
                 );
             }
 
-            if (getOps<bool>("textShadow")) FlarialGUI::FlarialTextWithFont(
-                (MC::windowSize.x - 30.0f) + textShadowOffset, rightYoffset + textShadowOffset,
-                String::StrToWStr(i).c_str(),
-                30.0f, textHeight / 3.0f,
-                DWRITE_TEXT_ALIGNMENT_TRAILING,
-                textSize,
-                DWRITE_FONT_WEIGHT_NORMAL,
-                textShadowColor,
-                true
-            );
+            if (getOps<bool>("textShadow"))
+                FlarialGUI::FlarialTextWithFont(
+                    (MC::windowSize.x - 30.0f) + textShadowOffset, rightYoffset + textShadowOffset,
+                    String::StrToWStr(i).c_str(),
+                    30.0f, textHeight / 3.0f,
+                    DWRITE_TEXT_ALIGNMENT_TRAILING,
+                    textSize,
+                    DWRITE_FONT_WEIGHT_NORMAL,
+                    textShadowColor,
+                    true
+                );
 
             FlarialGUI::FlarialTextWithFont(
                 MC::windowSize.x - 30.0f, rightYoffset,
@@ -754,19 +756,19 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
             float avgFT = std::accumulate(prevFrameTimes.begin(), prevFrameTimes.end(), 0.f) / prevFrameTimes.size();
 
             if (getOps<bool>("showMinMaxFT")) {
-
                 // minimum frame time
 
-                if (getOps<bool>("textShadow")) FlarialGUI::FlarialTextWithFont(
-                    borderSize * 2 + textShadowOffset, (startHeight - textHeight / 3.0f) + textShadowOffset,
-                    String::StrToWStr(std::format("{:.1f} ms min", minFT)).c_str(),
-                    0.f, textHeight / 3.0f,
-                    DWRITE_TEXT_ALIGNMENT_LEADING,
-                    textSize,
-                    DWRITE_FONT_WEIGHT_NORMAL,
-                    textShadowColor,
-                    true
-                );
+                if (getOps<bool>("textShadow"))
+                    FlarialGUI::FlarialTextWithFont(
+                        borderSize * 2 + textShadowOffset, (startHeight - textHeight / 3.0f) + textShadowOffset,
+                        String::StrToWStr(std::format("{:.1f} ms min", minFT)).c_str(),
+                        0.f, textHeight / 3.0f,
+                        DWRITE_TEXT_ALIGNMENT_LEADING,
+                        textSize,
+                        DWRITE_FONT_WEIGHT_NORMAL,
+                        textShadowColor,
+                        true
+                    );
 
                 FlarialGUI::FlarialTextWithFont(
                     borderSize * 2, startHeight - textHeight / 3.0f,
@@ -781,16 +783,17 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
 
                 // average frame time
 
-                if (getOps<bool>("textShadow")) FlarialGUI::FlarialTextWithFont(
-                    (barWidth * graphLen / 2) + textShadowOffset, (startHeight - textHeight / 3.0f) + textShadowOffset,
-                    String::StrToWStr(std::format("{:.1f} ms avg", avgFT)).c_str(),
-                    0.f, textHeight / 3.0f,
-                    DWRITE_TEXT_ALIGNMENT_CENTER,
-                    textSize,
-                    DWRITE_FONT_WEIGHT_NORMAL,
-                    textShadowColor,
-                    true
-                );
+                if (getOps<bool>("textShadow"))
+                    FlarialGUI::FlarialTextWithFont(
+                        (barWidth * graphLen / 2) + textShadowOffset, (startHeight - textHeight / 3.0f) + textShadowOffset,
+                        String::StrToWStr(std::format("{:.1f} ms avg", avgFT)).c_str(),
+                        0.f, textHeight / 3.0f,
+                        DWRITE_TEXT_ALIGNMENT_CENTER,
+                        textSize,
+                        DWRITE_FONT_WEIGHT_NORMAL,
+                        textShadowColor,
+                        true
+                    );
 
                 FlarialGUI::FlarialTextWithFont(
                     barWidth * graphLen / 2, startHeight - textHeight / 3.0f,
@@ -805,16 +808,17 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
 
                 // max frame time
 
-                if (getOps<bool>("textShadow")) FlarialGUI::FlarialTextWithFont(
-                    (barWidth * graphLen) + textShadowOffset, (startHeight - textHeight / 3.0f) + textShadowOffset,
-                    String::StrToWStr(std::format("{:.1f} ms max", maxFT)).c_str(),
-                    0.f, textHeight / 3.0f,
-                    DWRITE_TEXT_ALIGNMENT_TRAILING,
-                    textSize,
-                    DWRITE_FONT_WEIGHT_NORMAL,
-                    textShadowColor,
-                    true
-                );
+                if (getOps<bool>("textShadow"))
+                    FlarialGUI::FlarialTextWithFont(
+                        (barWidth * graphLen) + textShadowOffset, (startHeight - textHeight / 3.0f) + textShadowOffset,
+                        String::StrToWStr(std::format("{:.1f} ms max", maxFT)).c_str(),
+                        0.f, textHeight / 3.0f,
+                        DWRITE_TEXT_ALIGNMENT_TRAILING,
+                        textSize,
+                        DWRITE_FONT_WEIGHT_NORMAL,
+                        textShadowColor,
+                        true
+                    );
 
                 FlarialGUI::FlarialTextWithFont(
                     barWidth * graphLen, startHeight - textHeight / 3.0f,
@@ -838,16 +842,17 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
 
                 // 30 fps text
 
-                if (getOps<bool>("textShadow")) FlarialGUI::FlarialTextWithFont(
-                    (borderSize * 2) + textShadowOffset, startHeight + textShadowOffset,
-                    String::StrToWStr(std::format("30 FPS", minFT)).c_str(),
-                    0.f, textHeight / 3.0f,
-                    DWRITE_TEXT_ALIGNMENT_LEADING,
-                    textSize,
-                    DWRITE_FONT_WEIGHT_NORMAL,
-                    textShadowColor,
-                    true
-                );
+                if (getOps<bool>("textShadow"))
+                    FlarialGUI::FlarialTextWithFont(
+                        (borderSize * 2) + textShadowOffset, startHeight + textShadowOffset,
+                        String::StrToWStr(std::format("30 FPS", minFT)).c_str(),
+                        0.f, textHeight / 3.0f,
+                        DWRITE_TEXT_ALIGNMENT_LEADING,
+                        textSize,
+                        DWRITE_FONT_WEIGHT_NORMAL,
+                        textShadowColor,
+                        true
+                    );
 
                 FlarialGUI::FlarialTextWithFont(
                     borderSize * 2, startHeight,
@@ -860,16 +865,17 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
                     true
                 );
 
-                if (getOps<bool>("textShadow")) FlarialGUI::FlarialTextWithFont(
-                    (borderSize * 2) + textShadowOffset, (startHeight + maxRectHeight / 2 + borderSize) + textShadowOffset,
-                    String::StrToWStr(std::format("60 FPS", minFT)).c_str(),
-                    0.f, textHeight / 3.0f,
-                    DWRITE_TEXT_ALIGNMENT_LEADING,
-                    textSize,
-                    DWRITE_FONT_WEIGHT_NORMAL,
-                    textShadowColor,
-                    true
-                );
+                if (getOps<bool>("textShadow"))
+                    FlarialGUI::FlarialTextWithFont(
+                        (borderSize * 2) + textShadowOffset, (startHeight + maxRectHeight / 2 + borderSize) + textShadowOffset,
+                        String::StrToWStr(std::format("60 FPS", minFT)).c_str(),
+                        0.f, textHeight / 3.0f,
+                        DWRITE_TEXT_ALIGNMENT_LEADING,
+                        textSize,
+                        DWRITE_FONT_WEIGHT_NORMAL,
+                        textShadowColor,
+                        true
+                    );
 
                 FlarialGUI::FlarialTextWithFont(
                     borderSize * 2, startHeight + maxRectHeight / 2 + borderSize,
@@ -943,9 +949,9 @@ void JavaDebugMenu::drawVector(ImDrawList *drawList, ImVec2 center, ImVec2 endPo
 void JavaDebugMenu::onHudCursorRendererRender(HudCursorRendererRenderEvent &event) {
     if (!this->isEnabled()) return;
     if (this->active && SDK::clientInstance && (
-        SDK::getCurrentScreen() == "hud_screen" ||
-        SDK::getCurrentScreen() == "f3_screen" ||
-        SDK::getCurrentScreen() == "zoom_screen"
+            SDK::getCurrentScreen() == "hud_screen" ||
+            SDK::getCurrentScreen() == "f3_screen" ||
+            SDK::getCurrentScreen() == "zoom_screen"
         ) && SDK::clientInstance->getLocalPlayer() != nullptr) {
         event.cancel();
     }
@@ -957,6 +963,13 @@ void JavaDebugMenu::onKey(KeyEvent &event) {
         if (this->isKeybind(event.keys)) {
             keybindActions[0]({});
         }
+    }
+}
+
+void JavaDebugMenu::onMouse(MouseEvent &event) {
+    if (!this->isEnabled()) return;
+    if (Utils::getMouseAsString(event.getButton()) == getOps<std::string>("keybind") && event.getAction() == MouseAction::Press) {
+        keybindActions[0]({});
     }
 }
 

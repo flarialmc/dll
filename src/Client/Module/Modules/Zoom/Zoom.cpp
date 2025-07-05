@@ -55,7 +55,7 @@ void Zoom::settingsRender(float settingsOffset) {
                               Constraints::RelativeConstraint(1.0, "width"),
                               Constraints::RelativeConstraint(0.88f, "height"));
 
-    addHeader("Main");
+    addHeader("Zoom");
     addKeybind("Keybind", "Hold for 2 seconds!", "keybind", true);
     addToggle("Use Scroll", "Allows to adjust zoom with scroll wheel.", "UseScroll");
     addToggle("Toggle Zoom", "No need to hold the keybind to zoom.", "toggleZoom");

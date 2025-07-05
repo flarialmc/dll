@@ -108,6 +108,7 @@
 #include "Modules/DebugMenu/DebugMenu.hpp"
 #include "Modules/DirectionHUD/DirectionHUD.hpp"
 #include "Modules/JavaViewBobbing/JavaViewBobbing.hpp"
+#include "Modules/Clone/Clone.hpp"
 
 void ModuleManager::getModules() { // TODO: some module is null here for some reason, investigation required
 	for (const auto& pair : moduleMap) {
@@ -235,6 +236,7 @@ void ModuleManager::initialize() {
 	addModule<ModernKeybindHandling>();
 	addModule<CustomCrosshair>();
 	addModule<Waila>();
+	if (VersionUtils::checkBelowOrEqual(21, 80)) addModule<Clone>();
 
 	addModule<RawInputBuffer>();
 	if (VersionUtils::checkAboveOrEqual(21, 00)) { // Due to entt
