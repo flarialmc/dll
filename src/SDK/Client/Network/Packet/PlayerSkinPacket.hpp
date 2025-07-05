@@ -8,4 +8,5 @@ public:
     PlayerSkin      mSkin;
     std::string     mLocalizedNewSkinName;
     std::string     mLocalizedOldSkinName;
+    // bool            mTrusted;
 };

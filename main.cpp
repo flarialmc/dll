@@ -31,7 +31,7 @@ void SavePlayerCache() {
 
     // Check if string size is greater than 15 KB (15,360 bytes)
     if (playersListString.size() > 15360) {
-        playersListString = "[]";
+        playersListString = "{\"players\":[]}";
     }
 
     std::string filePath = Utils::getRoamingPath() + "/Flarial/playerscache.txt";
@@ -41,7 +41,7 @@ void SavePlayerCache() {
         cacheFile.close();
         Logger::success("Cached player list.");
     } else {
-        Logger::error("Could not open file for writing: " + filePath);
+        LOG_ERROR("Could not open file for writing: " + filePath);
     }
 }
 
@@ -108,7 +108,7 @@ DWORD WINAPI init() {
                 SavePlayerCache();
                 lastOnlineUsersFetchTime = now;
             } catch (const std::exception &ex) {
-                Logger::error("An error occurred while parsing online users: {}", ex.what());
+                LOG_ERROR("An error occurred while parsing online users: {}", ex.what());
             }
         }
 
@@ -132,7 +132,7 @@ DWORD WINAPI init() {
                 }
                 lastVipFetchTime = now;
             } catch (const std::exception& e) {
-                Logger::error("An error occurred while parsing VIP users: {}", e.what());
+                LOG_ERROR("An error occurred while parsing VIP users: {}", e.what());
             }
         }
 
@@ -153,14 +153,17 @@ DWORD WINAPI init() {
     while (!Client::disable) {
         ModuleManager::syncState();
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
     }
 
-    Client::SaveSettings();
-
-    Client::UnregisterActivationHandler();
-    ScriptManager::shutdown();
     ModuleManager::terminate();
     Logger::custom(fmt::fg(fmt::color::pink), "ModuleManager", "Shut down");
+
+    Client::UnregisterActivationHandler();
+    Logger::custom(fmt::fg(fmt::color::pink), "UnregisterActivationHandler", "Shut down");
+    ScriptManager::shutdown();
+    Logger::custom(fmt::fg(fmt::color::pink), "ScriptManager", "Shut down");
+
     HookManager::terminate();
     Logger::custom(fmt::fg(fmt::color::pink), "HookManager", "Shut down");
     CommandManager::terminate();
@@ -188,7 +191,6 @@ DWORD WINAPI init() {
     WinrtUtils::setWindowTitle("");
 
     Logger::shutdown();
-
     CloseHandle(mutex);
     FreeLibraryAndExitThread(Client::currentModule, 0);
 }

@@ -12,22 +12,14 @@
 class RenderOutlineSelectionHook : public Hook {
 private:
 
-    static void OutlineSelectioCallback(LevelRendererPlayer* obj, ScreenContext* scn, void* block, void* region, Vec3<int> pos) {
-        Vec3<float> woah = Vec3<float>(pos.x, pos.y, pos.z);
-        auto event = nes::make_holder<RenderOutlineSelectionEvent>(woah, scn);
-        eventMgr.trigger(event);
-
-        if (!event->isCancelled()) funcOriginal(obj, scn, block, region, pos);
-    }
+    static void OutlineSelectioCallback(LevelRendererPlayer* obj, ScreenContext* scn, void* block, void* region, Vec3<int> pos);
 
 public:
     typedef void(__thiscall* getFovOriginal)(LevelRendererPlayer* obj, ScreenContext* scn, void* block, void* region, Vec3<int> pos);
 
     static inline getFovOriginal funcOriginal = nullptr;
 
-    RenderOutlineSelectionHook() : Hook("RenderOutlineSelectionHook", Memory::offsetFromSig(GET_SIG_ADDRESS("LevelRendererPlayer::renderOutlineSelection"), 1)) {}
+    RenderOutlineSelectionHook();
 
-    void enableHook() override {
-        this->autoHook((void*)OutlineSelectioCallback, (void**)&funcOriginal);
-    }
+    void enableHook() override;
 };

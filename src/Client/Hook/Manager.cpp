@@ -34,6 +34,11 @@
 #include "Hooks/Game/ItemInHandRendererRenderItem.hpp"
 #include "Hooks/Visual/RenderOutlineSelectionHook.hpp"
 #include "Hooks/Game/displayClientMessage.hpp"
+#include "Hooks/Game/getTimeOfDayHook.hpp"
+#include "Hooks/game/ReadFileHook.hpp"
+#include "Hooks/Game/ApplyTurnDeltaHook.hpp"
+
+#include "Hooks/Render/BobHurt.hpp"
 
 std::vector<std::shared_ptr<Hook>> HookManager::hooks;
 
@@ -83,7 +88,8 @@ void HookManager::initialize() {
     addHook<OverworldFogColorHook>();
     addHook<TimeChangerHook>();
     addHook<SendPacketHook>();
-    addHook<getSensHook>();
+    addHook<ApplyTurnDeltaHook>();
+    //addHook<getSensHook>();
     addHook<HudMobEffectsRendererHook>();
     if(VersionUtils::checkAboveOrEqual(20, 60)) { // due to texture group offset
         addHook<HudCursorRendererHook>();
@@ -98,22 +104,37 @@ void HookManager::initialize() {
         addHook<ContainerScreenControllerHook>();
     }
 
-    addHook<isPreGameHook>();
-    addHook<_composeFullStackHook>();
+    if(!VersionUtils::checkAboveOrEqual(21, 80)) { //needed for MaterialBinLoader/shader loader
+        addHook<_composeFullStackHook>();
+    }
 
-    addHook<RenderOrderExecuteHook>();
-    addHook<RenderChunkCoordinatorHandleVisibilityUpdatesHook>();
+    // likely packchanger hooks, im not sure!
+    if(!VersionUtils::checkAboveOrEqual(21, 60))
+    {
+        addHook<isPreGameHook>();
 
-    addHook<SettingsScreenOnExitHook>();
+        addHook<RenderOrderExecuteHook>();
+        addHook<RenderChunkCoordinatorHandleVisibilityUpdatesHook>();
+//
+        addHook<SettingsScreenOnExitHook>();
+    }
 
     addHook<ItemInHandRendererRenderItem>();
 
     addHook<RenderOutlineSelectionHook>();
+    addHook<getTimeOfDayHook>();
+
+    addHook<BobHurtHook>();
+
+
 
     if(VersionUtils::checkAboveOrEqual(21, 40)) {
         addHook<UpdatePlayerHook>();
     }
 
+    if(VersionUtils::checkAboveOrEqual(21, 50)) {
+        addHook<ReadFileHook>();
+    }
     for (const auto& hook: hooks) {
         hook->enableHook();
     }

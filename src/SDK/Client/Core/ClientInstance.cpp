@@ -20,16 +20,30 @@ BlockSource *ClientInstance::getBlockSource() {
     return Memory::CallVFuncI<BlockSource *>(off, this);
 }
 
-void ClientInstance::grabMouse() {
+void ClientInstance::grabMouse(int delay) {
+    if (delay > 0 ) {
+        std::thread troll([this, delay]() {
+            std::this_thread::sleep_for(std::chrono::milliseconds(delay));
+            static uintptr_t indexRef;
 
-    static uintptr_t indexRef;
+            if (indexRef == 0) {
+                indexRef = GET_SIG_ADDRESS("ClientInstance::grabMouse");
+            }
 
-    if (indexRef == 0) {
-        indexRef = GET_SIG_ADDRESS("ClientInstance::grabMouse");
+            int index = *reinterpret_cast<int*>(indexRef + 3) / 8;
+            return Memory::CallVFuncI<void>(index, this);
+        });
+        troll.detach();
+    } else {
+        static uintptr_t indexRef;
+
+        if (indexRef == 0) {
+            indexRef = GET_SIG_ADDRESS("ClientInstance::grabMouse");
+        }
+
+        int index = *reinterpret_cast<int*>(indexRef + 3) / 8;
+        return Memory::CallVFuncI<void>(index, this);
     }
-
-    int index = *reinterpret_cast<int *>(indexRef + 3) / 8;
-    return Memory::CallVFuncI<void>(index, this);
 }
 
 void ClientInstance::releaseMouse() {
@@ -51,12 +65,13 @@ std::string ClientInstance::getTopScreenName() {
 }
 
 std::string ClientInstance::getScreenName() {
-    std::string screen = "no_screen";
+    return SDK::currentScreen;
+    // std::string screen = "no_screen";
 
-    static auto sig = GET_SIG_ADDRESS("ClientInstance::getScreenName");
+    /*static auto sig = GET_SIG_ADDRESS("ClientInstance::getScreenName");
     auto fn = reinterpret_cast<std::string& (__thiscall *)(ClientInstance*, std::string&)>(sig);
     screen = fn(this, screen);
-    return screen;
+    return screen;*/
 }
 
 

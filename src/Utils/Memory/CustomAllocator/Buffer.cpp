@@ -28,6 +28,7 @@
  */
 
 #include <windows.h>
+#include <unknwn.h>
 #include "Buffer.hpp"
 
 // Size of each memory block. (= page size of VirtualAlloc)

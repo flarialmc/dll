@@ -8,72 +8,18 @@ private:
 	Vec3<float> PrevPos{};
 	std::string speed;
 public:
-	SpeedDisplay() : Module("Speed Display", "Displays your current travel speed in blocks/second.",
-		IDR_SPEED_PNG, "") {
-		Module::setup();
-	};
+	SpeedDisplay();;
 
-	void onEnable() override {
-		Listen(this, RenderEvent, &SpeedDisplay::onRender)
-			Listen(this, TickEvent, &SpeedDisplay::onTick)
-			Module::onEnable();
-	}
+	void onEnable() override;
 
-	void onDisable() override {
-		Deafen(this, RenderEvent, &SpeedDisplay::onRender)
-			Deafen(this, TickEvent, &SpeedDisplay::onTick)
-			Module::onDisable();
-	}
+	void onDisable() override;
 
-	void defaultConfig() override {
-		Module::defaultConfig();
-		if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"{value} m/s");
-		if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 1.00f);
-	}
+	void defaultConfig() override;
 
-	void settingsRender(float settingsOffset) override {
-		float x = Constraints::PercentageConstraint(0.019, "left");
-		float y = Constraints::PercentageConstraint(0.10, "top");
+	void settingsRender(float settingsOffset) override;
 
-		const float scrollviewWidth = Constraints::RelativeConstraint(0.5, "height", true);
+	void onRender(RenderEvent& event);
 
-
-		FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
-		FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
-			Constraints::RelativeConstraint(1.0, "width"),
-			Constraints::RelativeConstraint(0.88f, "height"));
-
-		this->addHeader("Main");
-		this->defaultAddSettings("main");
-		this->extraPadding();
-
-		this->addHeader("Text");
-		this->defaultAddSettings("text");
-		this->extraPadding();
-
-		this->addHeader("Colors");
-		this->defaultAddSettings("colors");
-		this->extraPadding();
-
-		this->addHeader("Misc");
-		this->defaultAddSettings("misc");
-
-		FlarialGUI::UnsetScrollView();
-		this->resetPadding();
-	}
-
-	void onRender(RenderEvent& event) {
-		this->normalRender(15, speed);
-	}
-
-	void onTick(TickEvent& event) {
-		if (!SDK::clientInstance->getLocalPlayer())
-			return;
-		auto stateVectorComponent = SDK::clientInstance->getLocalPlayer()->getStateVectorComponent();
-		if (stateVectorComponent != nullptr) {
-			speed = std::format("{:.2f}", stateVectorComponent->Pos.dist(PrevPos) * 20);
-			PrevPos = stateVectorComponent->Pos;
-		}
-	}
+	void onTick(TickEvent& event);
 };
 
