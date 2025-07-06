@@ -105,7 +105,7 @@ void Clone::onTick(TickEvent &event) {
     for (const auto val: SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap() | std::views::values) {
         Logger::debug("{}", val.name);
         if (
-            String::toLower(val.name) != targetName ||
+            String::removeNonAlphanumeric(String::removeColorCodes(String::toLower(val.name))) != targetName ||
             !isValidUtf8(val.playerSkin.mId)
         )
             continue;
