@@ -3,13 +3,10 @@
 #include "Modules/ClickGUI/ClickGUI.hpp"
 #include "Utils/Render/PositionUtils.hpp"
 
-MovableCoordinates::MovableCoordinates(): Module("Movable " + mname, "Makes the Minecraft " + mname + " movable.", IDR_MOVABLE_PNG, "")
-{
-    
+MovableCoordinates::MovableCoordinates(): Module("Movable " + mname, "Makes the Minecraft " + mname + " movable.", IDR_MOVABLE_PNG, "") {
 }
 
-void MovableCoordinates::onEnable()
-{
+void MovableCoordinates::onEnable() {
     restored = false;
     Listen(this, SetupAndRenderEvent, &MovableCoordinates::onSetupAndRender)
     Listen(this, RenderEvent, &MovableCoordinates::onRender)
@@ -17,14 +14,14 @@ void MovableCoordinates::onEnable()
 
     if (FlarialGUI::inMenu) {
         FlarialGUI::Notify("To change the position of the " + mname + ", Please click " +
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
-                "editmenubind")->value + " in the settings tab.");
+                           ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
+                               "editmenubind")->value + " in the settings tab.");
     }
     Module::onEnable();
 }
 
-void MovableCoordinates::onDisable()
-{
+void MovableCoordinates::onDisable() {
+    Module::onDisable();
     if (!restored) {
         delayDisable = true;
         return;
@@ -32,27 +29,21 @@ void MovableCoordinates::onDisable()
     Deafen(this, SetupAndRenderEvent, &MovableCoordinates::onSetupAndRender)
     Deafen(this, RenderEvent, &MovableCoordinates::onRender)
     Deafen(this, UIControlGetPositionEvent, &MovableCoordinates::onUIControlGetPosition)
-
-    Module::onDisable();
 }
 
-void MovableCoordinates::defaultConfig()
-{
+void MovableCoordinates::defaultConfig() {
     Module::defaultConfig("core");
     Module::defaultConfig("pos");
-    
 }
 
-void MovableCoordinates::settingsRender(float settingsOffset)
-{}
+void MovableCoordinates::settingsRender(float settingsOffset) {
+}
 
-void MovableCoordinates::onRender(RenderEvent& event)
-{
-    if (!this->isEnabled()) return;
+void MovableCoordinates::onRender(RenderEvent &event) {
+    if (!this->isEnabled() && !delayDisable) return;
     auto name = SDK::getCurrentScreen();
 
     if (name == "hud_screen" || name == "pause_screen") {
-
         float width = currentSize.x;
         float height = currentSize.y;
 
@@ -61,12 +52,11 @@ void MovableCoordinates::onRender(RenderEvent& event)
                                               getOps<float>("percentageY"));
 
         if (settingperc.x != 0) currentPos = Vec2<float>(settingperc.x * (MC::windowSize.x - width), settingperc.y * (MC::windowSize.y - height));
-        else if (settingperc.x == 0 and originalPos.x != 0.0f) currentPos = Vec2<float>{ originalPos.x, originalPos.y };
+        else if (settingperc.x == 0 and originalPos.x != 0.0f) currentPos = Vec2<float>{originalPos.x, originalPos.y};
 
         if (ClickGUI::editmenu) FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, width, height, 27, this->name);
 
-        if (currentPos.x != -120.0f)
-        {
+        if (currentPos.x != -120.0f) {
             Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(currentPos.x, currentPos.y, 27, width, height);
 
 
@@ -85,9 +75,9 @@ void MovableCoordinates::onRender(RenderEvent& event)
     }
 }
 
-void MovableCoordinates::onUIControlGetPosition(UIControlGetPositionEvent& event)
-{ // happens when game updates control position
-    if (!this->isEnabled()) return;
+void MovableCoordinates::onUIControlGetPosition(UIControlGetPositionEvent &event) {
+    // happens when game updates control position
+    if (!this->isEnabled() && !delayDisable) return;
     auto control = event.getControl();
     if (control->getLayerName() == layerName) {
         if (!enabledState) return;
@@ -96,9 +86,10 @@ void MovableCoordinates::onUIControlGetPosition(UIControlGetPositionEvent& event
             return;
         }
         Vec2<float> scaledPos = PositionUtils::getScaledPos(currentPos);
-        if (event.getPosition() == nullptr) { // 1.21.30 and below
+        if (event.getPosition() == nullptr) {
+            // 1.21.30 and below
             control->parentRelativePosition = scaledPos;
-            control->forEachChild([](std::shared_ptr<UIControl>& child) {
+            control->forEachChild([](std::shared_ptr<UIControl> &child) {
                 child->updatePosition();
             });
             return;
@@ -109,26 +100,23 @@ void MovableCoordinates::onUIControlGetPosition(UIControlGetPositionEvent& event
     }
 }
 
-void MovableCoordinates::onSetupAndRender(SetupAndRenderEvent& event)
-{
-    if (!this->isEnabled()) return;
+void MovableCoordinates::onSetupAndRender(SetupAndRenderEvent &event) {
+    if (!this->isEnabled() && !delayDisable) return;
     update();
 }
 
-void MovableCoordinates::update()
-{
+void MovableCoordinates::update() {
     if (restored) return;
     if (!delayDisable) {
         if (ClickGUI::editmenu) {
             if (!enabledState) return;
-        }
-        else {
+        } else {
             if (lastAppliedPos == (enabledState ? currentPos : originalPos)) return;
         }
         if (SDK::getCurrentScreen() != "hud_screen") return;
     }
     if (SDK::getCurrentScreen() != "hud_screen") return;
-    SDK::screenView->VisualTree->root->forEachChild([this](std::shared_ptr<UIControl>& control) {
+    SDK::screenView->VisualTree->root->forEachChild([this](std::shared_ptr<UIControl> &control) {
         if (control->getLayerName() == layerName) {
             updatePosition(control.get());
             return true; // dont go through other controls
@@ -142,8 +130,7 @@ void MovableCoordinates::update()
     }
 }
 
-void MovableCoordinates::updatePosition(UIControl* control)
-{
+void MovableCoordinates::updatePosition(UIControl *control) {
     if (!(SDK::clientInstance && SDK::clientInstance->getLocalPlayer())) return;
 
     auto pos = control->parentRelativePosition;
@@ -161,7 +148,7 @@ void MovableCoordinates::updatePosition(UIControl* control)
     if (VersionUtils::checkAboveOrEqual(21, 40)) {
         control->updatePosition(true);
     }
-    control->forEachChild([](std::shared_ptr<UIControl>& child) {
+    control->forEachChild([](std::shared_ptr<UIControl> &child) {
         child->updatePosition();
     });
 
@@ -176,11 +163,9 @@ void MovableCoordinates::updatePosition(UIControl* control)
 
     auto _scaledSize = PositionUtils::getScreenScaledPos(size);
 
-    if (_scaledSize.x < 10)
-        _scaledSize.x = 10;
+    if (_scaledSize.x < 10) _scaledSize.x = 10;
 
-    if (_scaledSize.y < 10)
-        _scaledSize.y = 10;
+    if (_scaledSize.y < 10) _scaledSize.y = 10;
 
     currentSize = _scaledSize;
 

@@ -10,13 +10,12 @@ void GuiScale::onEnable() {
 
 void GuiScale::onDisable() {
     Logger::debug("{}", restored);
+    Module::onDisable();
     if (!restored) {
         delayDisable = true;
         return;
     }
     Deafen(this, SetupAndRenderEvent, &GuiScale::onSetupAndRender)
-
-    Module::onDisable();
 }
 
 void GuiScale::defaultConfig() {
@@ -46,7 +45,7 @@ void GuiScale::settingsRender(float settingsOffset) {
 }
 
 void GuiScale::onSetupAndRender(SetupAndRenderEvent &event) {
-    if (!this->isEnabled()) return;
+    if (!this->isEnabled() && !delayDisable) return;
     update();
 }
 
