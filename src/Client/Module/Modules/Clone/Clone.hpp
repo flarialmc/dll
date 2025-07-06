@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "../../../../SDK/Client/Network/Packet/CommandRequestPacket.hpp"
+#include "Events/Events.hpp"
 
 class Clone : public Module {
 private:

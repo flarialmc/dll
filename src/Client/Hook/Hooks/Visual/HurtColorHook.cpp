@@ -2,7 +2,6 @@
 
 MCCColor* HurtColorHook::HurtColorCallback(void* a1, MCCColor* color, void* a3)
 {
-
     auto event = nes::make_holder<HurtColorEvent>(funcOriginal(a1, color, a3));
 
     if(VersionUtils::checkAboveOrEqual(21,40)) {
