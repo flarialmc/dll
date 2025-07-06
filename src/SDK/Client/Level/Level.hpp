@@ -117,24 +117,17 @@ public:
                     entry.playerSkin.mCapeImage.mImageBytes = Blob(sourceSkin.mCapeImage.mImageBytes);
 
                     entry.playerSkin.mSkinAnimatedImages = sourceSkin.mSkinAnimatedImages;
-                    entry.playerSkin.mGeometryData = sourceSkin.mGeometryData; // Assuming MinecraftJson::Value has a copy constructor or assignment operator
+                    entry.playerSkin.mGeometryData = sourceSkin.mGeometryData;
                     entry.playerSkin.mGeometryDataMinEngineVersion = sourceSkin.mGeometryDataMinEngineVersion;
-                    entry.playerSkin.mGeometryDataMutable = sourceSkin.mGeometryDataMutable; // Assuming MinecraftJson::Value has a copy constructor or assignment operator
+                    entry.playerSkin.mGeometryDataMutable = sourceSkin.mGeometryDataMutable;
                     entry.playerSkin.mAnimationData = sourceSkin.mAnimationData;
                     entry.playerSkin.mCapeId = sourceSkin.mCapeId;
                     entry.playerSkin.mPersonaPieces = sourceSkin.mPersonaPieces;
                     entry.playerSkin.mArmSizeType = sourceSkin.mArmSizeType;
-                    entry.playerSkin.mPieceTintColors = sourceSkin.mPieceTintColors; // std::unordered_map has copy constructor/assignment operator
+                    entry.playerSkin.mPieceTintColors = sourceSkin.mPieceTintColors;
 
-                    // For char mSkinColor[16], you MUST copy its contents.
-                    // Using strcpy_s for safer string copying (if it's a null-terminated string)
-                    // If not a null-terminated string, use memcpy.
-                    // Assuming mSkinColor is a C-style string:
                     strncpy_s(entry.playerSkin.mSkinColor, sizeof(entry.playerSkin.mSkinColor), sourceSkin.mSkinColor, sizeof(entry.playerSkin.mSkinColor) - 1);
-                    entry.playerSkin.mSkinColor[sizeof(entry.playerSkin.mSkinColor) - 1] = '\0'; // Ensure null-termination
-
-                    // If mSkinColor is just raw bytes (not necessarily a string):
-                    // memcpy(entry.playerSkin.mSkinColor, sourceSkin.mSkinColor, sizeof(entry.playerSkin.mSkinColor));
+                    entry.playerSkin.mSkinColor[sizeof(entry.playerSkin.mSkinColor) - 1] = '\0';
 
                     entry.playerSkin.mIsTrustedSkin = sourceSkin.mIsTrustedSkin;
                     entry.playerSkin.mIsPremium = sourceSkin.mIsPremium;

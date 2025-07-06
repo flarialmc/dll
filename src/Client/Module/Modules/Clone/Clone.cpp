@@ -102,14 +102,12 @@ void Clone::onTick(TickEvent &event) {
         std::shared_ptr<Packet> packet = SDK::createPacket((int) MinecraftPacketIds::PlayerSkin);
         auto *pSkinPacket = reinterpret_cast<PlayerSkinPacket *>(packet.get());
 
-        // memcpy(&pSkinPacket->mUUID, &val.UUID, sizeof(mcUUID));
         pSkinPacket->mUUID = val.UUID;
-        pSkinPacket->mLocalizedOldSkinName = (std::string) "";
-        pSkinPacket->mLocalizedNewSkinName = (std::string) "";
+        pSkinPacket->mLocalizedOldSkinName = std::string("");
+        pSkinPacket->mLocalizedNewSkinName = std::string("");
         pSkinPacket->mSkin = val.playerSkin;
         pSkinPacket->mTrusted = (bool)val.playerSkin.mIsTrustedSkin;
-        // memcpy(&pSkinPacket->mSkin, &val.playerSkin, sizeof(PlayerSkin));
-        // pSkinPacket->mSkin = target.playerSkin;
+
         SDK::clientInstance->getPacketSender()->sendToServer(pSkinPacket);
         Logger::debug("sent skin packet");
         break;
