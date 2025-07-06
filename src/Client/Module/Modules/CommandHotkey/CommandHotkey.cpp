@@ -1,5 +1,8 @@
 #include "CommandHotkey.hpp"
 
+#include "Client.hpp"
+#include "Events/EventManager.hpp"
+
 void CommandHotkey::onSetup() {
 
 	for (int i = 0; i < totalKeybinds; ++i) {

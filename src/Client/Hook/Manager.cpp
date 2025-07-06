@@ -39,6 +39,8 @@
 #include "Hooks/Game/ApplyTurnDeltaHook.hpp"
 
 #include "Hooks/Render/BobHurt.hpp"
+#include "Hooks/Visual/ActorShaderParams.hpp"
+#include "Hooks/Visual/TintColorHook.hpp"
 
 std::vector<std::shared_ptr<Hook>> HookManager::hooks;
 
@@ -125,6 +127,8 @@ void HookManager::initialize() {
     addHook<getTimeOfDayHook>();
 
     addHook<BobHurtHook>();
+    addHook<TintColorHook>();
+    addHook<ActorShaderParamsHook>();
 
 
 
