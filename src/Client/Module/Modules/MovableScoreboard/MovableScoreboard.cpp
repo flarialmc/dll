@@ -30,7 +30,8 @@ void MovableScoreboard::onDisable() {
 
 void MovableScoreboard::defaultConfig() {
     Module::defaultConfig("core");
-    Module::defaultConfig("pos");
+    setDef("percentageX", 1.0f);
+    setDef("percentageY", 0.5f);
 }
 
 void MovableScoreboard::settingsRender(float settingsOffset) {
@@ -51,8 +52,10 @@ void MovableScoreboard::onRender(RenderEvent &event) {
         if (settingperc.x != 0) currentPos = Vec2<float>(settingperc.x * (MC::windowSize.x - width), settingperc.y * (MC::windowSize.y - height));
         else if (settingperc.x == 0 and originalPos.x != 0.0f) currentPos = Vec2<float>{originalPos.x, originalPos.y};
 
-        if (ClickGUI::editmenu) FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, width, height, 29, this->name);
-
+        if (ClickGUI::editmenu) {
+            FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, width, height, 29, this->name);
+            checkForRightClickAndOpenSettings(currentPos.x, currentPos.y, width, height);
+        }
 
         if (currentPos.x != -120.0f) {
             Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(currentPos.x, currentPos.y, 29, width, height);
@@ -125,9 +128,7 @@ void MovableScoreboard::update() {
 void MovableScoreboard::updatePosition(UIControl *control) {
     if (!(SDK::clientInstance && SDK::clientInstance->getLocalPlayer())) return;
 
-    auto pos = control->parentRelativePosition;
-
-    if (enabledState && originalPos == Vec2<float>{0, 0}) {
+    if ((enabledState && originalPos == Vec2<float>{0, 0}) || delayDisable) {
         auto guiData = SDK::clientInstance->getGuiData();
         auto scaledSize = guiData->ScreenSizeScaled;
         auto centerScaled = Vec2{scaledSize.x / 2, scaledSize.y / 2};
@@ -164,6 +165,4 @@ void MovableScoreboard::updatePosition(UIControl *control) {
     if (_scaledSize.y < 10) _scaledSize.y = 10;
 
     currentSize = _scaledSize;
-
-    return;
 }

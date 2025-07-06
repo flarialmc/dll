@@ -4,7 +4,7 @@
 #include "Events/EventManager.hpp"
 
 class MovableCoordinates : public Module {
-private:
+public:
 	static inline std::string layerName = "player_position";
 	Vec2<float> currentPos{ -120.0f, -120.0f };;
 	bool enabled = false;
@@ -12,10 +12,10 @@ private:
 	Vec2<float> currentSize = Vec2<float>{ 0.0f, 0.0f };
 	Vec2<float> lastAppliedPos = Vec2<float>{ 0.0f, 0.0f };
 	bool restored = false;
-public:
+
 	static inline std::string mname = "Coordinates"; // dont use "name" var pls cuz it will override this->name so Module("name here") would be useless
 
-	MovableCoordinates();;
+	MovableCoordinates();
 
 	void onEnable() override;
 

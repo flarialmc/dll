@@ -30,7 +30,8 @@ void MovableHotbar::onDisable() {
 
 void MovableHotbar::defaultConfig() {
     Module::defaultConfig("core");
-    Module::defaultConfig("pos");
+    setDef("percentageX", 0.5f);
+    setDef("percentageY", 1.f);
 }
 
 void MovableHotbar::settingsRender(float settingsOffset) {
@@ -51,7 +52,10 @@ void MovableHotbar::onRender(RenderEvent &event) {
         if (settingperc.x != 0) currentPos = Vec2<float>(settingperc.x * (MC::windowSize.x - width), settingperc.y * (MC::windowSize.y - height));
         else if (settingperc.x == 0 and originalPos.x != 0.0f) currentPos = Vec2<float>{originalPos.x, originalPos.y};
 
-        if (ClickGUI::editmenu) FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, width, height, 28, this->name);
+        if (ClickGUI::editmenu) {
+            FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, width, height, 28, this->name);
+            checkForRightClickAndOpenSettings(currentPos.x, currentPos.y, width, height);
+        }
 
         Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(currentPos.x, currentPos.y, 28, width, height);
 
@@ -122,9 +126,11 @@ void MovableHotbar::update() {
 void MovableHotbar::updatePosition(UIControl *control) {
     if (!(SDK::clientInstance && SDK::clientInstance->getLocalPlayer())) return;
 
+    std::cout << "man" << std::endl;
+
     auto pos = control->parentRelativePosition;
 
-    if (enabledState && originalPos == Vec2<float>{0, 0}) {
+    if ((enabledState && originalPos == Vec2<float>{0, 0}) || delayDisable) {
         auto guiData = SDK::clientInstance->getGuiData();
         auto scaledSize = guiData->ScreenSizeScaled;
         auto centerScaled = Vec2{scaledSize.x / 2, scaledSize.y / 2};
@@ -162,6 +168,4 @@ void MovableHotbar::updatePosition(UIControl *control) {
     if (_scaledSize.y < 10) _scaledSize.y = 10;
 
     currentSize = _scaledSize;
-
-    return;
 }

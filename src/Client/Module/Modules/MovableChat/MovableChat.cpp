@@ -36,7 +36,8 @@ void MovableChat::onDisable() {
 
 void MovableChat::defaultConfig() {
     Module::defaultConfig("core");
-    Module::defaultConfig("pos");
+    setDef("percentageX", 0.f);
+    setDef("percentageY", 0.12658389f);
     setDef("here", true);
     setDef("pingsound", true);
     setDef("mode", (std::string) "Xp Orb");
@@ -95,11 +96,14 @@ void MovableChat::onRender(RenderEvent &event) {
         if (settingperc.x != 0) currentPos = Vec2<float>(settingperc.x * (MC::windowSize.x - width), settingperc.y * (MC::windowSize.y - height));
         else if (settingperc.x == 0 and originalPos.x != 0.0f) currentPos = Vec2<float>{originalPos.x, originalPos.y};
 
-        if (ClickGUI::editmenu) FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, width, height, 26, this->name);
-
-        Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(currentPos.x, currentPos.y, 26, width, height);
+        if (ClickGUI::editmenu) {
+            FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, width, height, 26, this->name);
+            checkForRightClickAndOpenSettings(currentPos.x, currentPos.y, width, height);
+        }
 
         if (currentPos.x != -120.0f) {
+            Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(currentPos.x, currentPos.y, 26, width, height);
+
             currentPos.x = vec2.x;
             currentPos.y = vec2.y;
 
@@ -117,14 +121,10 @@ void MovableChat::onRender(RenderEvent &event) {
 
 void MovableChat::onUIControlGetPosition(UIControlGetPositionEvent &event) {
     // happens when game updates control position
-    if (!this->isEnabled() && !delayDisable) return;
+
+    if (!enabledState && !delayDisable) return;
     auto control = event.getControl();
     if (control->getLayerName() == layerName) {
-        if (!enabledState) return;
-        if (originalPos == Vec2<float>{0, 0}) {
-            originalPos = PositionUtils::getScreenScaledPos(control->parentRelativePosition);
-            return;
-        }
         Vec2<float> scaledPos = PositionUtils::getScaledPos(currentPos);
         if (event.getPosition() == nullptr) {
             // 1.21.30 and below
@@ -155,7 +155,6 @@ void MovableChat::update() {
         }
         if (SDK::getCurrentScreen() != "hud_screen") return;
     }
-    if (SDK::getCurrentScreen() != "hud_screen") return;
     SDK::screenView->VisualTree->root->forEachChild([this](std::shared_ptr<UIControl> &control) {
         if (control->getLayerName() == layerName) {
             updatePosition(control.get());
@@ -173,10 +172,11 @@ void MovableChat::update() {
 void MovableChat::updatePosition(UIControl *control) {
     if (!(SDK::clientInstance && SDK::clientInstance->getLocalPlayer())) return;
 
-    auto pos = control->parentRelativePosition;
-
-    if (enabledState && originalPos == Vec2<float>{0, 0}) {
-        originalPos = PositionUtils::getScreenScaledPos(pos);
+    if ((enabledState && originalPos == Vec2<float>{0, 0}) || delayDisable) {
+        auto guiData = SDK::clientInstance->getGuiData();
+        auto scaledSize = guiData->ScreenSizeScaled;
+        auto recalculatedPos = Vec2<float>{0, 62 + 12};
+        originalPos = PositionUtils::getScreenScaledPos(recalculatedPos);
         currentPos = originalPos;
     }
 

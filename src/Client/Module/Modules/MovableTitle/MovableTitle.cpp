@@ -47,7 +47,10 @@ void MovableTitle::onRender(RenderEvent &event) {
         if (settingperc.x != 0) currentPos = Vec2<float>(settingperc.x * (MC::windowSize.x - width), settingperc.y * (MC::windowSize.y - height));
         else if (settingperc.x == 0 and originalPos.x != 0.0f) currentPos = Vec2<float>{originalPos.x, originalPos.y};
 
-        if (ClickGUI::editmenu) FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, width, height, 30, this->name);
+        if (ClickGUI::editmenu) {
+            FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, width, height, 30, this->name);
+            checkForRightClickAndOpenSettings(currentPos.x, currentPos.y, width, height);
+        }
 
         if (currentPos.x != -120.0f) {
             Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(currentPos.x, currentPos.y, 30, width, height);
@@ -73,8 +76,8 @@ void MovableTitle::onUIControlGetPosition(UIControlGetPositionEvent &event) {
     if (!this->isEnabled() && !delayDisable) return;
     auto control = event.getControl();
     if (control->getLayerName() == layerName) {
-        if (!isEnabled()) return;
-        if (originalPos == Vec2<float>{0, 0}) {
+        if (!isEnabled() && !delayDisable) return;
+        if ((originalPos == Vec2<float>{0, 0}) || delayDisable) {
             originalPos = PositionUtils::getScreenScaledPos(control->parentRelativePosition);
             return;
         }
@@ -119,7 +122,7 @@ void MovableTitle::updatePosition(UIControl *control) {
 
     auto pos = control->parentRelativePosition;
 
-    if (isEnabled() && originalPos == Vec2<float>{0, 0}) {
+    if ((isEnabled() && originalPos == Vec2<float>{0, 0}) || delayDisable) {
         originalPos = PositionUtils::getScreenScaledPos(pos);
     }
 
