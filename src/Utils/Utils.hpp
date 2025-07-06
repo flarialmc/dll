@@ -14,7 +14,7 @@ struct MCCColor {
 		};
 		float arr[4]{};
 	};
-	bool shouldDelete = true;
+	// bool shouldDelete = true;
 
 	MCCColor() {
 		this->r = 1.0f;
@@ -28,7 +28,7 @@ struct MCCColor {
 		this->g = other.g;
 		this->b = other.b;
 		this->a = other.a;
-		this->shouldDelete = other.shouldDelete;
+		// this->shouldDelete = other.shouldDelete;
 	}
 
 	explicit MCCColor(const float* arr) {
@@ -57,7 +57,7 @@ struct MCCColor {
 		this->g = g;
 		this->b = b;
 		this->a = a;
-		this->shouldDelete = shouldDelete;
+		// this->shouldDelete = shouldDelete;
 	};
 
 	[[nodiscard]] MCCColor lerp(const MCCColor& o, float t) const;

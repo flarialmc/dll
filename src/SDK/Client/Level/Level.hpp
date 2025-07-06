@@ -42,7 +42,7 @@ public:
     std::string name, XUID, platformOnlineId;
     BuildPlatform buildPlatform;
     PlayerSkin playerSkin;
-    alignas(4) char color[16];
+    MCCColor color;
     bool isTeacher, isHost, isSubClient;
 
     PlayerListEntry &operator=(const PlayerListEntry &other) {
@@ -57,7 +57,7 @@ public:
     std::string name, XUID, platformOnlineId;
     BuildPlatform buildPlatform;
     PlayerSkin_1_21_90 playerSkin;
-    alignas(4) char color[16];
+    MCCColor color;
     bool isTeacher, isHost, isSubClient;
 
     PlayerListEntry_1_21_90 &operator=(const PlayerListEntry_1_21_90 &other) {
@@ -85,9 +85,10 @@ public:
                 entry.XUID = entry_1_21_90.XUID;
                 entry.platformOnlineId = entry_1_21_90.platformOnlineId;
                 entry.buildPlatform = entry_1_21_90.buildPlatform;
+                entry.color = entry_1_21_90.color;
 
-                strncpy_s(entry.color, sizeof(entry.color), entry_1_21_90.color, sizeof(entry.color) - 1);
-                entry.color[sizeof(entry.color) - 1] = '\0';
+                // strncpy_s(entry.color, sizeof(entry.color), entry_1_21_90.color, sizeof(entry.color) - 1);
+                // entry.color[sizeof(entry.color) - 1] = '\0';
 
                 entry.isTeacher = entry_1_21_90.isTeacher;
                 entry.isHost = entry_1_21_90.isHost;
@@ -126,8 +127,10 @@ public:
                     entry.playerSkin.mArmSizeType = sourceSkin.mArmSizeType;
                     entry.playerSkin.mPieceTintColors = sourceSkin.mPieceTintColors;
 
-                    strncpy_s(entry.playerSkin.mSkinColor, sizeof(entry.playerSkin.mSkinColor), sourceSkin.mSkinColor, sizeof(entry.playerSkin.mSkinColor) - 1);
-                    entry.playerSkin.mSkinColor[sizeof(entry.playerSkin.mSkinColor) - 1] = '\0';
+                    entry.playerSkin.mSkinColor = sourceSkin.mSkinColor;
+
+                    // strncpy_s(entry.playerSkin.mSkinColor, sizeof(entry.playerSkin.mSkinColor), sourceSkin.mSkinColor, sizeof(entry.playerSkin.mSkinColor) - 1);
+                    // entry.playerSkin.mSkinColor[sizeof(entry.playerSkin.mSkinColor) - 1] = '\0';
 
                     entry.playerSkin.mIsTrustedSkin = sourceSkin.mIsTrustedSkin;
                     entry.playerSkin.mIsPremium = sourceSkin.mIsPremium;

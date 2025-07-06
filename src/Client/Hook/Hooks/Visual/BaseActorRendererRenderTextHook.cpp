@@ -97,7 +97,7 @@ void BaseActorRendererRenderTextHook::drawLogo(ScreenContext* screenContext, con
     shaderColor->g = 1.f;
     shaderColor->b = 1.f;
     shaderColor->a = 1.f;
-    shaderColor->shouldDelete = true;
+    // shaderColor->shouldDelete = true;
 
     const auto tess = screenContext->getTessellator();
 

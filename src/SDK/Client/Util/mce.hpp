@@ -263,7 +263,7 @@ public:
     std::vector<SerializedPersonaPieceHandle> mPersonaPieces;
     persona::ArmSize::Type mArmSizeType;
     std::unordered_map<persona::PieceType, TintMapColor> mPieceTintColors;
-    char mSkinColor[16];
+    MCCColor mSkinColor;
     TrustedSkinFlag mIsTrustedSkin;
     bool mIsPremium;
     bool mIsPersona;
