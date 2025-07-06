@@ -22,6 +22,7 @@
 #include "UnderUIHooks.hpp"
 #include "CreateSwapchainForCoreWindowHook.hpp"
 #include "ResizeHook.hpp"
+#include <stb_image_write.h>
 using ::IUnknown;
 
 #include "../../../Module/Modules/MotionBlur/MotionBlur.hpp"
@@ -423,9 +424,6 @@ void SwapchainHook::DX11Render(bool underui) {
     UINT numRenderTargets = D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT;
     ID3D11DepthStencilView* originalDepthStencilView = nullptr;
     context->OMGetRenderTargets(numRenderTargets, originalRenderTargetViews, &originalDepthStencilView);
-
-
-
 
     if (context) {
 

@@ -108,6 +108,7 @@
 #include "Modules/DebugMenu/DebugMenu.hpp"
 #include "Modules/DirectionHUD/DirectionHUD.hpp"
 #include "Modules/JavaViewBobbing/JavaViewBobbing.hpp"
+#include "Modules/DepthOfField/DepthOfField.hpp"
 
 void ModuleManager::getModules() { // TODO: some module is null here for some reason, investigation required
 	for (const auto& pair : moduleMap) {
@@ -257,6 +258,8 @@ void ModuleManager::initialize() {
 	addModule<DirectionHUD>();
 
 	addModule<JavaViewBobbing>();
+
+	addModule<DepthOfField>();
 
 	addService<GUIKeyListener>();
 	if (!VersionUtils::checkAboveOrEqual(21, 60)) {
