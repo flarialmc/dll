@@ -61,6 +61,7 @@ bool FlarialGUI::RoundedRadioButton(int index, float x, float y, const D2D_COLOR
 
     if (CursorInRect(x, y, width, height) && MC::mouseButton == MouseButton::Left && !MC::held) {
         MC::mouseButton = MouseButton::None;
+        once2 = false;
         return true;
     }
 
