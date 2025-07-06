@@ -973,10 +973,9 @@ void ClickGUI::onRender(RenderEvent &event) {
                     L"RESET POS", buttonWidth, buttonHeight, round.x, round.x)) {
                     auto currentModule = ModuleManager::getModule(page.module);
                     if (currentModule != nullptr) {
-                        if (currentModule->settings.getSettingByName<float>("percentageX") != nullptr)
-                            currentModule->settings.getSettingByName<float>("percentageX")->value = 0.0f;
-                        if (currentModule->settings.getSettingByName<float>("percentageY") != nullptr)
-                            currentModule->settings.getSettingByName<float>("percentageY")->value = 0.0f;
+                        currentModule->settings.deleteSetting("percentageX");
+                        currentModule->settings.deleteSetting("percentageY");
+                        currentModule->defaultConfig();
                         FlarialGUI::ResetShit();
                     }
                 }
