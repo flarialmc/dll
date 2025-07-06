@@ -42,6 +42,7 @@ public:
     std::string name, XUID, platformOnlineId;
     BuildPlatform buildPlatform;
     PlayerSkin playerSkin;
+    alignas(4) char color[16];
     bool isTeacher, isHost, isSubClient;
 
     PlayerListEntry &operator=(const PlayerListEntry &other) {

@@ -151,6 +151,7 @@ void CleanupDX12Uploader() {
 
 // Forward declarations for sync functions
 PlayerHeadTexture *CreateTextureFromBytesDX12Sync(const std::string &playerName, const unsigned char *data, int width, int height);
+
 ID3D11ShaderResourceView *CreateTextureFromBytesDX11Sync(const std::string &playerName, const unsigned char *data, int width, int height);
 
 // Custom rendering function for crisp pixel art - DX12
@@ -464,23 +465,32 @@ int TabList::getRolePriority(const std::string &name) {
     return 5; // Default Flarial user (in onlineUsers but no specific role)
 }
 
-std::vector<const std::pair<const mcUUID, PlayerListEntry> *> TabList::sortByFlarialHierarchy(
+std::vector<PlayerListEntry> TabList::sortByFlarialHierarchy(
     const std::unordered_map<mcUUID, PlayerListEntry> &sourceMap) {
-    std::vector<const std::pair<const mcUUID, PlayerListEntry> *> players;
+    // 1. Create a vector of PlayerListEntry objects, not pointers.
+    std::vector<PlayerListEntry> players;
     players.reserve(sourceMap.size());
 
+    // 2. Populate the vector by copying the PlayerListEntry from the map.
     for (const auto &pair: sourceMap) {
-        players.push_back(&pair);
+        players.push_back(pair.second); // We copy the value (PlayerListEntry)
     }
 
-    std::sort(players.begin(), players.end(), [](const auto *a, const auto *b) {
-        int priorityA = getRolePriority(a->second.name);
-        int priorityB = getRolePriority(b->second.name);
-        if (priorityA != priorityB) return priorityA < priorityB;
+    // 3. Sort the vector of objects directly.
+    std::sort(players.begin(), players.end(), [](const PlayerListEntry &a, const PlayerListEntry &b) {
+        // The lambda now compares PlayerListEntry objects by const reference.
+        // We access members directly (e.g., a.name) instead of through a pointer (e.g., a->second.name).
 
+        int priorityA = getRolePriority(a.name);
+        int priorityB = getRolePriority(b.name);
+        if (priorityA != priorityB) {
+            return priorityA < priorityB;
+        }
+
+        // The comparison logic remains the same, just with direct member access.
         return std::lexicographical_compare(
-            a->second.name.begin(), a->second.name.end(),
-            b->second.name.begin(), b->second.name.end(),
+            a.name.begin(), a.name.end(),
+            b.name.begin(), b.name.end(),
             [](char c1, char c2) {
                 return std::tolower(static_cast<unsigned char>(c1)) < std::tolower(static_cast<unsigned char>(c2));
             });
@@ -489,57 +499,74 @@ std::vector<const std::pair<const mcUUID, PlayerListEntry> *> TabList::sortByFla
     return players;
 }
 
-std::vector<const std::pair<const mcUUID, PlayerListEntry> *> TabList::copyMapInAlphabeticalOrder(
+std::vector<PlayerListEntry> TabList::copyMapInAlphabeticalOrder(
     const std::unordered_map<mcUUID, PlayerListEntry> &sourceMap, bool flarialFirst) {
-    std::vector<const std::pair<const mcUUID, PlayerListEntry> *> flarialEntries;
-    std::vector<const std::pair<const mcUUID, PlayerListEntry> *> nonFlarialEntries;
+    // 1. Create vectors of PlayerListEntry objects, not pointers.
+    std::vector<PlayerListEntry> flarialEntries;
+    std::vector<PlayerListEntry> nonFlarialEntries;
 
+    // 2. Populate the vectors by copying the PlayerListEntry from the map.
     for (const auto &pair: sourceMap) {
-        const std::string &name = pair.second.name;
-        if (name.empty()) continue;
+        const PlayerListEntry &entry = pair.second;
+        if (entry.name.empty()) {
+            continue;
+        }
 
-        std::string clearedName = String::removeNonAlphanumeric(String::removeColorCodes(name));
-        if (clearedName.empty()) clearedName = name;
+        std::string clearedName = String::removeNonAlphanumeric(String::removeColorCodes(entry.name));
+        if (clearedName.empty()) {
+            clearedName = entry.name;
+        }
 
         auto it = std::ranges::find(APIUtils::onlineUsers, clearedName);
+
+        // 'flarialFirst' controls whether we split the list or treat everyone the same.
         if (flarialFirst && it != APIUtils::onlineUsers.end()) {
-            flarialEntries.push_back(&pair);
+            flarialEntries.push_back(entry); // Copy the object
         } else {
-            nonFlarialEntries.push_back(&pair);
+            nonFlarialEntries.push_back(entry); // Copy the object
         }
     }
 
-    auto sortByRoleAndName = [](const auto *a, const auto *b) {
-        int priorityA = getRolePriority(a->second.name);
-        int priorityB = getRolePriority(b->second.name);
-        if (priorityA != priorityB) return priorityA < priorityB;
+    // 3. Update sorting lambdas to accept objects by const reference.
+    auto sortByRoleAndName = [](const PlayerListEntry &a, const PlayerListEntry &b) {
+        int priorityA = getRolePriority(a.name);
+        int priorityB = getRolePriority(b.name);
+        if (priorityA != priorityB) {
+            return priorityA < priorityB;
+        }
         return std::lexicographical_compare(
-            a->second.name.begin(), a->second.name.end(),
-            b->second.name.begin(), b->second.name.end(),
+            a.name.begin(), a.name.end(),
+            b.name.begin(), b.name.end(),
             [](char c1, char c2) {
                 return std::tolower(static_cast<unsigned char>(c1)) < std::tolower(static_cast<unsigned char>(c2));
             });
     };
 
-    auto sortByName = [](const auto *a, const auto *b) {
+    auto sortByName = [](const PlayerListEntry &a, const PlayerListEntry &b) {
         return std::lexicographical_compare(
-            a->second.name.begin(), a->second.name.end(),
-            b->second.name.begin(), b->second.name.end(),
+            a.name.begin(), a.name.end(),
+            b.name.begin(), b.name.end(),
             [](char c1, char c2) {
                 return std::tolower(static_cast<unsigned char>(c1)) < std::tolower(static_cast<unsigned char>(c2));
             });
     };
 
-    std::vector<const std::pair<const mcUUID, PlayerListEntry> *> result;
+    // 4. Build the final result vector (which also contains objects).
+    std::vector<PlayerListEntry> result;
+    result.reserve(sourceMap.size()); // Pre-allocate memory for efficiency
 
     if (flarialFirst) {
+        // Sort the two lists separately with their respective rules.
         std::sort(flarialEntries.begin(), flarialEntries.end(), sortByRoleAndName);
         std::sort(nonFlarialEntries.begin(), nonFlarialEntries.end(), sortByName);
+
+        // Combine the sorted lists.
         result.insert(result.end(), flarialEntries.begin(), flarialEntries.end());
         result.insert(result.end(), nonFlarialEntries.begin(), nonFlarialEntries.end());
     } else {
-        result = flarialEntries;
-        result.insert(result.end(), nonFlarialEntries.begin(), nonFlarialEntries.end());
+        // If not 'flarialFirst', all players are in 'nonFlarialEntries'.
+        // We just need to sort this combined list by name.
+        result = std::move(nonFlarialEntries); // Efficiently move the data
         std::sort(result.begin(), result.end(), sortByName);
     }
 
@@ -817,6 +844,7 @@ PlayerHeadTexture *CreateTextureFromBytesDX12Sync(
     if (logDebug) Logger::debug("Successfully created DX12 player head texture for {}", playerName);
     return &playerTex;
 }
+
 // =================================================================================
 // END OF CHANGES: Rewritten DX12 Sync Texture Creation
 // =================================================================================
@@ -940,17 +968,17 @@ void TabList::onRender(RenderEvent &event) {
             std::map<std::string, int> roleLogos = {{"Dev", IDR_CYAN_LOGO_PNG}, {"Staff", IDR_WHITE_LOGO_PNG}, {"Gamer", IDR_GAMER_LOGO_PNG}, {"Booster", IDR_BOOSTER_LOGO_PNG}, {"Supporter", IDR_SUPPORTER_LOGO_PNG}, {"Default", IDR_RED_LOGO_PNG}};
             auto module = ModuleManager::getModule("Nick");
 
-            std::vector<const std::pair<const mcUUID, PlayerListEntry> *> vecmap = alphaOrder
-                                                                                       ? copyMapInAlphabeticalOrder(SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap(), flarialFirst)
-                                                                                       : (flarialFirst
-                                                                                              ? sortByFlarialHierarchy(SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap())
-                                                                                              : [] {
-                                                                                                  const auto &map = SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap();
-                                                                                                  std::vector<const std::pair<const mcUUID, PlayerListEntry> *> v;
-                                                                                                  v.reserve(map.size());
-                                                                                                  for (const auto &pair: map) v.push_back(&pair);
-                                                                                                  return v;
-                                                                                              }());
+            std::vector<PlayerListEntry> vecmap = alphaOrder
+                                                      ? copyMapInAlphabeticalOrder(SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap(), flarialFirst)
+                                                      : (flarialFirst
+                                                             ? sortByFlarialHierarchy(SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap())
+                                                             : [] {
+                                                                 const auto &map = SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap();
+                                                                 std::vector<PlayerListEntry> v;
+                                                                 v.reserve(map.size());
+                                                                 for (const auto &pair: map) v.push_back(pair.second);
+                                                                 return v;
+                                                             }());
 
             float totalWidth = keycardSize * (showHeads ? 1 : 0.4);
             float totalHeight = keycardSize * 0.5f;
@@ -962,9 +990,9 @@ void TabList::onRender(RenderEvent &event) {
             size_t validPlayers = 0;
 
             for (size_t i = 0; i < vecmap.size(); i++) {
-                if (vecmap[i]->second.name.empty()) continue;
+                if (vecmap[i].name.empty()) continue;
 
-                std::string name = String::removeColorCodes(vecmap[i]->second.name);
+                std::string name = String::removeColorCodes(vecmap[i].name);
                 if (name.empty()) continue;
 
                 std::string clearedName = String::removeNonAlphanumeric(name);
@@ -1104,9 +1132,9 @@ void TabList::onRender(RenderEvent &event) {
             realcenter.y += keycardSize * 1.25f;
 
             for (size_t i = 0; i < vecmap.size(); i++) {
-                if (vecmap[i] == nullptr || !vecmap[i]->second.name.size() || vecmap[i]->second.name.empty()) continue;
+                if (!vecmap[i].name.size() || vecmap[i].name.empty()) continue;
 
-                std::string name = String::removeColorCodes(vecmap[i]->second.name);
+                std::string name = String::removeColorCodes(vecmap[i].name);
                 if (name.empty()) continue;
 
                 std::string clearedName = String::removeNonAlphanumeric(name);
@@ -1121,11 +1149,11 @@ void TabList::onRender(RenderEvent &event) {
 
                 if (showHeads) {
                     // PLAYER HEAD START
-                    const auto &skinImage = vecmap[i]->second.playerSkin.mSkinImage;
+                    const auto &skinImage = vecmap[i].playerSkin.mSkinImage;
 
                     if (logDebug)
                         Logger::debug("Player {} skin: format={}, size={}x{}, data_size={}",
-                                      vecmap[i]->second.name,
+                                      vecmap[i].name,
                                       static_cast<int>(skinImage.imageFormat),
                                       skinImage.mWidth, skinImage.mHeight,
                                       skinImage.mImageBytes.size());
@@ -1142,11 +1170,11 @@ void TabList::onRender(RenderEvent &event) {
                         std::vector<unsigned char> head2 = SkinStealCommand::cropHead(skinImage, skinFormat, true);
 
                         if (head.empty() && head2.empty()) {
-                            if (logDebug) Logger::debug("Empty head data for player {}", vecmap[i]->second.name);
+                            if (logDebug) Logger::debug("Empty head data for player {}", vecmap[i].name);
                             continue;
                         }
 
-                        std::string uniqueTextureKey = vecmap[i]->second.playerSkin.mId;
+                        std::string uniqueTextureKey = vecmap[i].playerSkin.mId;
 
                         bool alrExists = false;
 
@@ -1182,7 +1210,7 @@ void TabList::onRender(RenderEvent &event) {
                             }
                         }
 
-                        std::string playerName = String::removeNonAlphanumeric(String::removeColorCodes(vecmap[i]->second.name));
+                        std::string playerName = String::removeNonAlphanumeric(String::removeColorCodes(vecmap[i].name));
                         if (logDebug) {
                             // Debug: Check if the scaled head has any non-transparent pixels
                             bool hasVisiblePixels = false;
@@ -1309,7 +1337,6 @@ void TabList::onRender(RenderEvent &event) {
                             String::StrToWStr(name).c_str(), columnx[i / maxColumn] - (0.825 * keycardSize), keycardSize, alignments[getOps<std::string>("textalignment")], floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, getColor("textShadow"), true);
 
                     FlarialGUI::FlarialTextWithFont(textX, textY, String::StrToWStr(name).c_str(), columnx[i / maxColumn] - (0.825 * keycardSize), keycardSize, alignments[getOps<std::string>("textalignment")], floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
-
                 } else {
                     if (getOps<bool>("textShadow"))
                         FlarialGUI::FlarialTextWithFont(
@@ -1381,7 +1408,6 @@ void TabList::onRender(RenderEvent &event) {
                         FlarialGUI::to_wide(countTxt).c_str(), 0, keycardSize * 0.5f + Constraints::SpacingConstraint(0.70, keycardSize), DWRITE_TEXT_ALIGNMENT_CENTER, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, getColor("textShadow"), true);
 
                 FlarialGUI::FlarialTextWithFont(textX3, curY, FlarialGUI::to_wide(countTxt).c_str(), 0, keycardSize * 0.5f + Constraints::SpacingConstraint(0.70, keycardSize), DWRITE_TEXT_ALIGNMENT_CENTER, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
-
             }
         }
     }
@@ -1389,10 +1415,8 @@ void TabList::onRender(RenderEvent &event) {
 
 void TabList::onMouse(const MouseEvent &event) {
     if (!this->isEnabled()) return;
-    if (Utils::getMouseAsString(event.getButton()) == getOps<std::string>("keybind") && event.getAction() == MouseAction::Press)
-        keybindActions[0]({});
-    if (!getOps<bool>("togglable") && Utils::getMouseAsString(event.getButton()) == getOps<std::string>("keybind") && event.getAction() == MouseAction::Release)
-        this->active = false;
+    if (Utils::getMouseAsString(event.getButton()) == getOps<std::string>("keybind") && event.getAction() == MouseAction::Press) keybindActions[0]({});
+    if (!getOps<bool>("togglable") && Utils::getMouseAsString(event.getButton()) == getOps<std::string>("keybind") && event.getAction() == MouseAction::Release) this->active = false;
 }
 
 void TabList::onKey(const KeyEvent &event) {

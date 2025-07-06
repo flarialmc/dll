@@ -8,12 +8,14 @@
 void Clone::onEnable() {
     Listen(this, KeyEvent, &Clone::onKey)
     Listen(this, MouseEvent, &Clone::onMouse)
+    Listen(this, TickEvent, &Clone::onTick)
     Module::onEnable();
 }
 
 void Clone::onDisable() {
     Deafen(this, KeyEvent, &Clone::onKey)
     Deafen(this, MouseEvent, &Clone::onMouse)
+    Deafen(this, TickEvent, &Clone::onTick)
     Module::onDisable();
 }
 
@@ -41,28 +43,37 @@ void Clone::settingsRender(float settingsOffset) {
     this->resetPadding();
 }
 
-bool isValidUtf8(const std::string& s) {
+bool isValidUtf8(const std::string &s) {
     int bytes_expected = 0; // Number of continuation bytes expected
 
     for (size_t i = 0; i < s.length(); ++i) {
         unsigned char byte = static_cast<unsigned char>(s[i]);
 
-        if (bytes_expected == 0) { // Leading byte
-            if (byte <= 0x7F) { // ASCII (0xxxxxxx)
+        if (bytes_expected == 0) {
+            // Leading byte
+            if (byte <= 0x7F) {
+                // ASCII (0xxxxxxx)
                 // Nothing to do, it's valid
-            } else if ((byte & 0xE0) == 0xC0) { // 2-byte sequence (110xxxxx)
+            } else if ((byte & 0xE0) == 0xC0) {
+                // 2-byte sequence (110xxxxx)
                 bytes_expected = 1;
-            } else if ((byte & 0xF0) == 0xE0) { // 3-byte sequence (1110xxxx)
+            } else if ((byte & 0xF0) == 0xE0) {
+                // 3-byte sequence (1110xxxx)
                 bytes_expected = 2;
-            } else if ((byte & 0xF8) == 0xF0) { // 4-byte sequence (11110xxx)
+            } else if ((byte & 0xF8) == 0xF0) {
+                // 4-byte sequence (11110xxx)
                 bytes_expected = 3;
-            } else { // Invalid leading byte
+            } else {
+                // Invalid leading byte
                 return false;
             }
-        } else { // Continuation byte (10xxxxxx)
-            if ((byte & 0xC0) == 0x80) { // Is a valid continuation byte
+        } else {
+            // Continuation byte (10xxxxxx)
+            if ((byte & 0xC0) == 0x80) {
+                // Is a valid continuation byte
                 bytes_expected--;
-            } else { // Not a continuation byte
+            } else {
+                // Not a continuation byte
                 return false;
             }
         }
@@ -72,7 +83,8 @@ bool isValidUtf8(const std::string& s) {
     return bytes_expected == 0;
 }
 
-void Clone::clone() {
+void Clone::onTick(TickEvent &event) {
+    if (!clone) return;
     if (!SDK::clientInstance->getLocalPlayer() || SDK::clientInstance->getLocalPlayer()->getLevel()->getHitResult().type != HitResultType::Entity) return;
     std::string targetName = String::removeNonAlphanumeric(String::removeColorCodes(String::toLower(*SDK::clientInstance->getLocalPlayer()->getLevel()->getHitResult().getEntity()->getNametag())));
     std::string curName = String::removeNonAlphanumeric(String::removeColorCodes(String::toLower(*SDK::clientInstance->getLocalPlayer()->getNametag())));
@@ -88,11 +100,15 @@ void Clone::clone() {
     //     }
     // }
 
+    Logger::debug("{} {}", curName, targetName);
+
     for (const auto val: SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap() | std::views::values) {
+        Logger::debug("{}", val.name);
         if (
             String::toLower(val.name) != targetName ||
             !isValidUtf8(val.playerSkin.mId)
-            ) continue;
+        )
+            continue;
         if (myCurSkinId == val.playerSkin.mId) break;
 
         std::shared_ptr<Packet> packet = SDK::createPacket((int) MinecraftPacketIds::PlayerSkin);
@@ -100,8 +116,8 @@ void Clone::clone() {
 
         // memcpy(&pSkinPacket->mUUID, &val.UUID, sizeof(mcUUID));
         pSkinPacket->mUUID = val.UUID;
-        pSkinPacket->mLocalizedOldSkinName = (std::string) "Custom";
-        pSkinPacket->mLocalizedNewSkinName = (std::string) "Custom";
+        pSkinPacket->mLocalizedOldSkinName = (std::string) "";
+        pSkinPacket->mLocalizedNewSkinName = (std::string) "";
         pSkinPacket->mSkin = val.playerSkin;
         // memcpy(&pSkinPacket->mSkin, &val.playerSkin, sizeof(PlayerSkin));
         // pSkinPacket->mSkin = target.playerSkin;
@@ -204,6 +220,8 @@ void Clone::clone() {
                 }*/
     }
 
+    clone = false;
+
     // Logger::debug("{} {}", targetName, curName);
     // Logger::debug("{} {}", ftarget, fme);
     // Logger::debug("{} {}", me.playerSkin.mId, target.playerSkin.mId);
@@ -229,7 +247,8 @@ void Clone::onKey(KeyEvent &event) {
             SDK::getCurrentScreen() == "zoom_screen" ||
             SDK::getCurrentScreen() == "f3_screen"
         )) {
-        clone();
+        clone = true;
+        // clone();
     }
 }
 
@@ -240,6 +259,7 @@ void Clone::onMouse(MouseEvent &event) {
             SDK::getCurrentScreen() == "zoom_screen" ||
             SDK::getCurrentScreen() == "f3_screen"
         )) {
-        clone();
+        clone = true;
+        // clone();
     }
 }
