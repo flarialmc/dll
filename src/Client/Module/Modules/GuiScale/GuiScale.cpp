@@ -9,7 +9,6 @@ void GuiScale::onEnable() {
 }
 
 void GuiScale::onDisable() {
-    Logger::debug("{}", restored);
     Module::onDisable();
     if (!restored) {
         delayDisable = true;
