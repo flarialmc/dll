@@ -133,8 +133,12 @@ void Zoom::onMouse(MouseEvent &event) {
     if (!this->isEnabled()) return;
     if (Utils::getMouseAsString(event.getButton()) == getOps<std::string>("keybind") && event.getAction() == MouseAction::Press && getOps<bool>("toggleZoom")) {
         keybindActions[0]({});
+        if (!getOps<bool>("SaveModifier")) zoomValue = 30.0f;
     } else if (!getOps<bool>("toggleZoom")) {
-        if (Utils::getMouseAsString(event.getButton()) == getOps<std::string>("keybind") && event.getAction() == MouseAction::Press) this->active = true;
+        if (Utils::getMouseAsString(event.getButton()) == getOps<std::string>("keybind") && event.getAction() == MouseAction::Press) {
+            if (!getOps<bool>("SaveModifier") && !this->active) zoomValue = 30.0f;
+            this->active = true;
+        }
         else if (Utils::getMouseAsString(event.getButton()) == getOps<std::string>("keybind") && event.getAction() == MouseAction::Release) this->active = false;
     }
 
