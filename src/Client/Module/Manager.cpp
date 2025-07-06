@@ -109,6 +109,7 @@
 #include "Modules/DirectionHUD/DirectionHUD.hpp"
 #include "Modules/JavaViewBobbing/JavaViewBobbing.hpp"
 #include "Modules/Clone/Clone.hpp"
+#include "Modules/MovableDayCounter/MovableDayCounter.hpp"
 
 void ModuleManager::getModules() { // TODO: some module is null here for some reason, investigation required
 	for (const auto& pair : moduleMap) {
@@ -218,6 +219,7 @@ void ModuleManager::initialize() {
 	addModule<MovableChat>();
 	addModule<MovableCoordinates>();
 	addModule<MovableHotbar>();
+	addModule<MovableDayCounter>();
 	// addModule<CompactChat>();
 	addModule<ItemPhysics>();
 
