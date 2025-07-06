@@ -236,7 +236,7 @@ void ModuleManager::initialize() {
 	addModule<ModernKeybindHandling>();
 	addModule<CustomCrosshair>();
 	addModule<Waila>();
-	if (VersionUtils::checkBelowOrEqual(21, 80)) addModule<Clone>();
+	addModule<Clone>();
 
 	addModule<RawInputBuffer>();
 	if (VersionUtils::checkAboveOrEqual(21, 00)) { // Due to entt

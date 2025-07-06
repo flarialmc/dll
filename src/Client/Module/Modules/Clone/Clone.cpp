@@ -89,17 +89,6 @@ void Clone::onTick(TickEvent &event) {
     std::string targetName = String::removeNonAlphanumeric(String::removeColorCodes(String::toLower(*SDK::clientInstance->getLocalPlayer()->getLevel()->getHitResult().getEntity()->getNametag())));
     std::string curName = String::removeNonAlphanumeric(String::removeColorCodes(String::toLower(*SDK::clientInstance->getLocalPlayer()->getNametag())));
 
-    std::string myCurSkinId;
-    bool fme = false;
-    bool ftarget = false;
-
-    // for (const auto val: SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap() | std::views::values) {
-    //     if (String::toLower(val.name) == curName) {
-    //         myCurSkinId = val.playerSkin.mId;
-    //         break;
-    //     }
-    // }
-
     Logger::debug("{} {}", curName, targetName);
 
     for (const auto val: SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap() | std::views::values) {
@@ -109,7 +98,6 @@ void Clone::onTick(TickEvent &event) {
             !isValidUtf8(val.playerSkin.mId)
         )
             continue;
-        if (myCurSkinId == val.playerSkin.mId) break;
 
         std::shared_ptr<Packet> packet = SDK::createPacket((int) MinecraftPacketIds::PlayerSkin);
         auto *pSkinPacket = reinterpret_cast<PlayerSkinPacket *>(packet.get());
@@ -119,6 +107,7 @@ void Clone::onTick(TickEvent &event) {
         pSkinPacket->mLocalizedOldSkinName = (std::string) "";
         pSkinPacket->mLocalizedNewSkinName = (std::string) "";
         pSkinPacket->mSkin = val.playerSkin;
+        pSkinPacket->mTrusted = (bool)val.playerSkin.mIsTrustedSkin;
         // memcpy(&pSkinPacket->mSkin, &val.playerSkin, sizeof(PlayerSkin));
         // pSkinPacket->mSkin = target.playerSkin;
         SDK::clientInstance->getPacketSender()->sendToServer(pSkinPacket);

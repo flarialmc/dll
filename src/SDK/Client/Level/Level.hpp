@@ -57,6 +57,7 @@ public:
     std::string name, XUID, platformOnlineId;
     BuildPlatform buildPlatform;
     PlayerSkin_1_21_90 playerSkin;
+    alignas(4) char color[16];
     bool isTeacher, isHost, isSubClient;
 
     PlayerListEntry_1_21_90 &operator=(const PlayerListEntry_1_21_90 &other) {
@@ -84,6 +85,10 @@ public:
                 entry.XUID = entry_1_21_90.XUID;
                 entry.platformOnlineId = entry_1_21_90.platformOnlineId;
                 entry.buildPlatform = entry_1_21_90.buildPlatform;
+
+                strncpy_s(entry.color, sizeof(entry.color), entry_1_21_90.color, sizeof(entry.color) - 1);
+                entry.color[sizeof(entry.color) - 1] = '\0';
+
                 entry.isTeacher = entry_1_21_90.isTeacher;
                 entry.isHost = entry_1_21_90.isHost;
                 entry.isSubClient = entry_1_21_90.isSubClient;
@@ -110,6 +115,33 @@ public:
                     entry.playerSkin.mCapeImage.mDepth = sourceSkin.mCapeImage.mDepth;
                     entry.playerSkin.mCapeImage.mUsage = sourceSkin.mCapeImage.mUsage;
                     entry.playerSkin.mCapeImage.mImageBytes = Blob(sourceSkin.mCapeImage.mImageBytes);
+
+                    entry.playerSkin.mSkinAnimatedImages = sourceSkin.mSkinAnimatedImages;
+                    entry.playerSkin.mGeometryData = sourceSkin.mGeometryData; // Assuming MinecraftJson::Value has a copy constructor or assignment operator
+                    entry.playerSkin.mGeometryDataMinEngineVersion = sourceSkin.mGeometryDataMinEngineVersion;
+                    entry.playerSkin.mGeometryDataMutable = sourceSkin.mGeometryDataMutable; // Assuming MinecraftJson::Value has a copy constructor or assignment operator
+                    entry.playerSkin.mAnimationData = sourceSkin.mAnimationData;
+                    entry.playerSkin.mCapeId = sourceSkin.mCapeId;
+                    entry.playerSkin.mPersonaPieces = sourceSkin.mPersonaPieces;
+                    entry.playerSkin.mArmSizeType = sourceSkin.mArmSizeType;
+                    entry.playerSkin.mPieceTintColors = sourceSkin.mPieceTintColors; // std::unordered_map has copy constructor/assignment operator
+
+                    // For char mSkinColor[16], you MUST copy its contents.
+                    // Using strcpy_s for safer string copying (if it's a null-terminated string)
+                    // If not a null-terminated string, use memcpy.
+                    // Assuming mSkinColor is a C-style string:
+                    strncpy_s(entry.playerSkin.mSkinColor, sizeof(entry.playerSkin.mSkinColor), sourceSkin.mSkinColor, sizeof(entry.playerSkin.mSkinColor) - 1);
+                    entry.playerSkin.mSkinColor[sizeof(entry.playerSkin.mSkinColor) - 1] = '\0'; // Ensure null-termination
+
+                    // If mSkinColor is just raw bytes (not necessarily a string):
+                    // memcpy(entry.playerSkin.mSkinColor, sourceSkin.mSkinColor, sizeof(entry.playerSkin.mSkinColor));
+
+                    entry.playerSkin.mIsTrustedSkin = sourceSkin.mIsTrustedSkin;
+                    entry.playerSkin.mIsPremium = sourceSkin.mIsPremium;
+                    entry.playerSkin.mIsPersona = sourceSkin.mIsPersona;
+                    entry.playerSkin.mIsPersonaCapeOnClassicSkin = sourceSkin.mIsPersonaCapeOnClassicSkin;
+                    entry.playerSkin.mIsPrimaryUser = sourceSkin.mIsPrimaryUser;
+                    entry.playerSkin.mOverridesPlayerAppearance = sourceSkin.mOverridesPlayerAppearance;
                 }
 
                 tempMap.emplace(uuid, std::move(entry));
