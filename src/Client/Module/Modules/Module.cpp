@@ -173,7 +173,18 @@ void Module::normalRenderCore(int index, std::string& text) {
 		true
 	);
 
-	FlarialGUI::FlarialTextWithFont(
+	if (false) {
+		SDK::pushDrawTextQueueEntry(DrawTextQueueEntry(
+			this->name,
+			text,
+			RectangleArea(topleft.x + Constraints::SpacingConstraint(paddingX, textWidth), 100, topleft.y + Constraints::SpacingConstraint(paddingY, textWidth), 100),
+			MCCColor(255, 255, 255, 255),
+			(ui::TextAlignment)0,
+			TextMeasureData(getOps<float>("textscale") * 2.f, getOps<bool>("textShadow"), false),
+			CaretMeasureData{-1, 0}
+			));
+	} else {
+		FlarialGUI::FlarialTextWithFont(
 		topleft.x + Constraints::SpacingConstraint(paddingX, textWidth),
 		topleft.y + Constraints::SpacingConstraint(paddingY, textWidth),
 		FlarialGUI::to_wide(text).c_str(),
@@ -184,6 +195,8 @@ void Module::normalRenderCore(int index, std::string& text) {
 		getColor("text"),
 		true
 	);
+	}
+
 
 	if (getOps<bool>("border")) FlarialGUI::RoundedHollowRect(
 		topleft.x,

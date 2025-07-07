@@ -111,7 +111,7 @@
 #include "Modules/Clone/Clone.hpp"
 #include "Modules/MovableDayCounter/MovableDayCounter.hpp"
 
-void ModuleManager::getModules() { // TODO: some module is null here for some reason, investigation required
+void ModuleManager::getModules() {
 	for (const auto& pair : moduleMap) {
 		if (pair.second == nullptr) continue;
 		modulesVector.push_back(pair.second);

@@ -446,7 +446,6 @@ void SwapchainHook::DX11Render(bool underui) {
                     auto event = nes::make_holder<RenderEvent>();
                     event->RTV = mainRenderTargetView;
                     eventMgr.trigger(event);
-
                 } else {
 
                     auto event = nes::make_holder<RenderUnderUIEvent>();

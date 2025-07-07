@@ -13,10 +13,10 @@ MCCColor *TintColorHook::TintColorCallback(void *a1, MCCColor *color, void *a3) 
     // }
     //
     // return event->getHurtColor();
-    auto actor = hat::member_at<Actor *>(a3, 0x38);
-    if (actor && actor->getHurtTime() > 0) {
-        Logger::debug("{} {} {} {}", color->r, color->g, color->b, color->a);
-    }
+    // auto actor = hat::member_at<Actor *>(a3, 0x38);
+    // if (actor && actor->getHurtTime() > 0) {
+    //     Logger::debug("{} {} {} {}", color->r, color->g, color->b, color->a);
+    // }
 
     return funcOriginal(a1, color, a3);
 }

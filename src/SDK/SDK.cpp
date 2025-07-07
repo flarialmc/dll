@@ -6,13 +6,24 @@
 
 ClientInstance *SDK::clientInstance = nullptr;
 ScreenView *SDK::screenView = nullptr;
+std::vector<DrawTextQueueEntry> SDK::drawTextQueue;
 
 std::string SDK::currentScreen;
 
 bool SDK::hasInstanced = false;
 uint64_t SDK::serverPing = 0;
 
-bool SDK::containsIgnoreCase(const std::string& mainString, const std::string& searchString) {
+void SDK::pushDrawTextQueueEntry(DrawTextQueueEntry entry) {
+    auto it = std::find_if(drawTextQueue.begin(), drawTextQueue.end(), [&entry](const DrawTextQueueEntry &ent) {
+        return entry.id == ent.id;
+    });
+    if (it != drawTextQueue.end() && std::find(drawTextQueue.begin(), drawTextQueue.end(), entry) != drawTextQueue.end()) return;
+    if (it != drawTextQueue.end()) drawTextQueue.erase(it);
+
+    drawTextQueue.push_back(std::move(entry));
+}
+
+bool SDK::containsIgnoreCase(const std::string &mainString, const std::string &searchString) {
     auto it = std::search(
         mainString.begin(), mainString.end(),
         searchString.begin(), searchString.end(),
@@ -20,12 +31,13 @@ bool SDK::containsIgnoreCase(const std::string& mainString, const std::string& s
     );
     return it != mainString.end();
 }
+
 bool SDK::isHovered(Vec4<float> box, Vec2<float> mouse) {
     if (mouse.x >= box.x && mouse.y >= box.y && mouse.x <= box.z && mouse.y <= box.w) return true;
     return false;
 }
-std::shared_ptr<Packet> SDK::createPacket(int id) {
 
+std::shared_ptr<Packet> SDK::createPacket(int id) {
     static uintptr_t Address;
 
     if (Address == NULL) {
@@ -37,7 +49,7 @@ std::shared_ptr<Packet> SDK::createPacket(int id) {
 }
 
 // TODO: use CI::GetScreenName
-void SDK::setCurrentScreen(const std::string& layer) {
+void SDK::setCurrentScreen(const std::string &layer) {
     SDK::currentScreen = layer;
 }
 
