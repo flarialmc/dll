@@ -27,9 +27,6 @@ private:
 
         if (!renderedText) {
             renderedText = true;
-            SDK::drawTextFps++;
-
-
             for (DrawTextQueueEntry &entry: SDK::drawTextQueue2) {
                 funcOriginalText(ctx, font, &entry.rect, &entry.text, &entry.color, entry.color.a, entry.alignment, &entry.textMeasureData, &entry.caretMeasureData);
             }
