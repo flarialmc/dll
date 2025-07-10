@@ -175,14 +175,6 @@ void Module::normalRenderCore(int index, std::string &text) {
         );
 
     if (false) {
-        SDK::imGuiFps++;
-        if (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - SDK::lastFpsUpd).count() >= 1) {
-            Logger::debug("FPS\t{}\t{}", SDK::drawTextFps, SDK::imGuiFps);
-            SDK::imGuiFps = 0;
-            SDK::drawTextFps = 0;
-            SDK::lastFpsUpd = std::chrono::steady_clock::now();
-        }
-
         auto txtCol = getColor("text");
         float guiScale = SDK::clientInstance->getGuiData()->getGuiScale();
 
