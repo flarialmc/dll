@@ -468,6 +468,8 @@ void SwapchainHook::DX11Render(bool underui) {
 
                 ImGui::End();
                 ImGui::EndFrame();
+                SDK::drawTextQueue2 = SDK::drawTextQueue;
+                SDK::drawTextQueue.clear();
                 ImGui::Render();
 
                 context->OMSetRenderTargets(1, &mainRenderTargetView, originalDepthStencilView);
@@ -685,6 +687,8 @@ void SwapchainHook::DX12Render(bool underui) {
 
                 ImGui::End();
                 ImGui::EndFrame();
+                SDK::drawTextQueue2 = SDK::drawTextQueue;
+                SDK::drawTextQueue.clear();
                 ImGui::Render();
 
                 ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), d3d12CommandList);

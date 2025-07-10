@@ -7,19 +7,19 @@
 ClientInstance *SDK::clientInstance = nullptr;
 ScreenView *SDK::screenView = nullptr;
 std::vector<DrawTextQueueEntry> SDK::drawTextQueue;
-
+std::vector<DrawTextQueueEntry> SDK::drawTextQueue2;
 std::string SDK::currentScreen;
 
 bool SDK::hasInstanced = false;
 uint64_t SDK::serverPing = 0;
 
 void SDK::pushDrawTextQueueEntry(DrawTextQueueEntry entry) {
-    auto it = std::find_if(drawTextQueue.begin(), drawTextQueue.end(), [&entry](const DrawTextQueueEntry &ent) {
-        return entry.id == ent.id;
-    });
-    if (it != drawTextQueue.end() && std::find(drawTextQueue.begin(), drawTextQueue.end(), entry) != drawTextQueue.end()) return;
-    if (it != drawTextQueue.end()) drawTextQueue.erase(it);
-
+    // auto it = std::find_if(drawTextQueue.begin(), drawTextQueue.end(), [&entry](const DrawTextQueueEntry &ent) {
+    //     return entry.id == ent.id;
+    // });
+    // if (it != drawTextQueue.end() && std::find(drawTextQueue.begin(), drawTextQueue.end(), entry) != drawTextQueue.end()) return;
+    // if (it != drawTextQueue.end()) drawTextQueue.erase(it);
+    //
     drawTextQueue.push_back(std::move(entry));
 }
 

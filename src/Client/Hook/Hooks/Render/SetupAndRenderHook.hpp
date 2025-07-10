@@ -26,12 +26,13 @@ private:
         funcOriginalText(ctx, font, pos, text, color, alpha, textAlignment, textMeasureData, caretMeasureData);
 
         if (!renderedText) {
-            for (DrawTextQueueEntry &entry: SDK::drawTextQueue) {
-                funcOriginalText(ctx, font, &entry.rect, &entry.text, &entry.color, 1.f, entry.alignment, &entry.textMeasureData, &entry.caretMeasureData);
-
-                Logger::debug("rendered text {}", entry.text);
-            }
             renderedText = true;
+            SDK::drawTextFps++;
+
+
+            for (DrawTextQueueEntry &entry: SDK::drawTextQueue2) {
+                funcOriginalText(ctx, font, &entry.rect, &entry.text, &entry.color, entry.color.a, entry.alignment, &entry.textMeasureData, &entry.caretMeasureData);
+            }
         }
     }
 
