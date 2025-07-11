@@ -1,17 +1,17 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "../../../GUI/Engine/Engine.hpp"
-#include "../../Manager.hpp"
-#include "../../../Client.hpp"
-#include "../Nick/NickModule.hpp"
-#include <vector>
-#include <algorithm>
+#include "Events/Events.hpp"
 
 class SkinStealer : public Module {
-
+private:
+    static std::vector<std::shared_ptr<Packet>> inFlightPackets;
 public:
-    SkinStealer();;
+    bool clone = false;
+
+    SkinStealer() : Module("Skin Stealer", "Equip someone else's skin",
+        IDR_SKINSTEALER_PNG, "MB_MIDDLE") {
+    };
 
     void onEnable() override;
 
@@ -21,5 +21,11 @@ public:
 
     void settingsRender(float settingsOffset) override;
 
-    void onKey(const KeyEvent& event);
+    static void cloneSkin(std::string targetName);
+
+    void onTick(TickEvent& event);
+
+    void onKey(KeyEvent& event);
+
+    void onMouse(MouseEvent& event);
 };

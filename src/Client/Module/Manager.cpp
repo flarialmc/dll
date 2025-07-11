@@ -108,8 +108,8 @@
 #include "Modules/DebugMenu/DebugMenu.hpp"
 #include "Modules/DirectionHUD/DirectionHUD.hpp"
 #include "Modules/JavaViewBobbing/JavaViewBobbing.hpp"
-#include "Modules/Clone/Clone.hpp"
 #include "Modules/MovableDayCounter/MovableDayCounter.hpp"
+#include "Modules/SkinStealer/SkinStealer.hpp"
 
 void ModuleManager::getModules() {
 	for (const auto& pair : moduleMap) {
@@ -238,7 +238,7 @@ void ModuleManager::initialize() {
 	addModule<ModernKeybindHandling>();
 	addModule<CustomCrosshair>();
 	addModule<Waila>();
-	addModule<Clone>();
+	addModule<SkinStealer>();
 
 	addModule<RawInputBuffer>();
 	if (VersionUtils::checkAboveOrEqual(21, 00)) { // Due to entt

@@ -154,6 +154,7 @@
 #define IDR_F3_PNG              255
 #define IDR_DELETE_PNG          256
 #define IDR_RENDER_DRAGON_PNG   257
+#define IDR_SKINSTEALER_PNG     263
 // MAKE SURE YOU ALWAYS UPDATE THIS!
 
 #define MAX_IMAGE_ID 262
