@@ -6,6 +6,7 @@
 class Clone : public Module {
 private:
     bool clone = false;
+    static std::vector<std::shared_ptr<Packet>> inFlightPackets;
 public:
     Clone() : Module("Skin Cloner", "Equip someone else's skin",
         IDR_TEXT_BOX_PNG, "MB_MIDDLE") {
