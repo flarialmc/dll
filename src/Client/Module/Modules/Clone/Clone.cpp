@@ -5,7 +5,7 @@
 #include "Events/EventManager.hpp"
 #include "SDK/Client/Network/Packet/PlayerSkinPacket.hpp"
 
-std::vector<std::shared_ptr<Packet>> Clone::inFlightPackets;
+std::vector<std::shared_ptr<Packet> > Clone::inFlightPackets;
 
 void Clone::onEnable() {
     Listen(this, KeyEvent, &Clone::onKey)
@@ -99,13 +99,65 @@ void Clone::onTick(TickEvent &event) {
         };
 
         std::shared_ptr<Packet> packet = SDK::createPacket((int) MinecraftPacketIds::PlayerSkin);
-        auto pSkinPacket = std::static_pointer_cast<PlayerSkinPacket>(packet);
 
-        pSkinPacket->mUUID = val.UUID;
-        pSkinPacket->mSkin = val.playerSkin;
+        if (VersionUtils::checkAboveOrEqual(21, 90)) {
+            auto pSkinPacket = std::static_pointer_cast<PlayerSkinPacket_1_21_90>(packet);
 
-        SDK::clientInstance->getPacketSender()->sendToServer(pSkinPacket.get());
-        inFlightPackets.push_back(pSkinPacket);
+            pSkinPacket->mUUID = val.UUID;
+            // pSkinPacket->mSkin = val.playerSkin;
+            const auto &sourceSkin = val.playerSkin;
+
+            pSkinPacket->mSkin.impl->mObject.mId = sourceSkin.mId;
+            pSkinPacket->mSkin.impl->mObject.mId = sourceSkin.mId;
+            pSkinPacket->mSkin.impl->mObject.mPlayFabId = sourceSkin.mPlayFabId;
+            pSkinPacket->mSkin.impl->mObject.mFullId = sourceSkin.mFullId;
+            pSkinPacket->mSkin.impl->mObject.mResourcePatch = sourceSkin.mResourcePatch;
+            pSkinPacket->mSkin.impl->mObject.mDefaultGeometryName = sourceSkin.mDefaultGeometryName;
+
+            // Copy Image data manually to avoid assignment issues
+            pSkinPacket->mSkin.impl->mObject.mSkinImage.imageFormat = sourceSkin.mSkinImage.imageFormat;
+            pSkinPacket->mSkin.impl->mObject.mSkinImage.mWidth = sourceSkin.mSkinImage.mWidth;
+            pSkinPacket->mSkin.impl->mObject.mSkinImage.mHeight = sourceSkin.mSkinImage.mHeight;
+            pSkinPacket->mSkin.impl->mObject.mSkinImage.mDepth = sourceSkin.mSkinImage.mDepth;
+            pSkinPacket->mSkin.impl->mObject.mSkinImage.mUsage = sourceSkin.mSkinImage.mUsage;
+            pSkinPacket->mSkin.impl->mObject.mSkinImage.mImageBytes = Blob(sourceSkin.mSkinImage.mImageBytes);
+
+            pSkinPacket->mSkin.impl->mObject.mCapeImage.imageFormat = sourceSkin.mCapeImage.imageFormat;
+            pSkinPacket->mSkin.impl->mObject.mCapeImage.mWidth = sourceSkin.mCapeImage.mWidth;
+            pSkinPacket->mSkin.impl->mObject.mCapeImage.mHeight = sourceSkin.mCapeImage.mHeight;
+            pSkinPacket->mSkin.impl->mObject.mCapeImage.mDepth = sourceSkin.mCapeImage.mDepth;
+            pSkinPacket->mSkin.impl->mObject.mCapeImage.mUsage = sourceSkin.mCapeImage.mUsage;
+            pSkinPacket->mSkin.impl->mObject.mCapeImage.mImageBytes = Blob(sourceSkin.mCapeImage.mImageBytes);
+
+            pSkinPacket->mSkin.impl->mObject.mSkinAnimatedImages = sourceSkin.mSkinAnimatedImages;
+            pSkinPacket->mSkin.impl->mObject.mGeometryData = sourceSkin.mGeometryData;
+            pSkinPacket->mSkin.impl->mObject.mGeometryDataMinEngineVersion = sourceSkin.mGeometryDataMinEngineVersion;
+            pSkinPacket->mSkin.impl->mObject.mGeometryDataMutable = sourceSkin.mGeometryDataMutable;
+            pSkinPacket->mSkin.impl->mObject.mAnimationData = sourceSkin.mAnimationData;
+            pSkinPacket->mSkin.impl->mObject.mCapeId = sourceSkin.mCapeId;
+            pSkinPacket->mSkin.impl->mObject.mPersonaPieces = sourceSkin.mPersonaPieces;
+            pSkinPacket->mSkin.impl->mObject.mArmSizeType = sourceSkin.mArmSizeType;
+            pSkinPacket->mSkin.impl->mObject.mPieceTintColors = sourceSkin.mPieceTintColors;
+            pSkinPacket->mSkin.impl->mObject.mSkinColor = sourceSkin.mSkinColor;
+            pSkinPacket->mSkin.impl->mObject.mIsTrustedSkin = sourceSkin.mIsTrustedSkin;
+            pSkinPacket->mSkin.impl->mObject.mIsPremium = sourceSkin.mIsPremium;
+            pSkinPacket->mSkin.impl->mObject.mIsPersona = sourceSkin.mIsPersona;
+            pSkinPacket->mSkin.impl->mObject.mIsPersonaCapeOnClassicSkin = sourceSkin.mIsPersonaCapeOnClassicSkin;
+            pSkinPacket->mSkin.impl->mObject.mIsPrimaryUser = sourceSkin.mIsPrimaryUser;
+            pSkinPacket->mSkin.impl->mObject.mOverridesPlayerAppearance = sourceSkin.mOverridesPlayerAppearance;
+
+            SDK::clientInstance->getPacketSender()->sendToServer(pSkinPacket.get());
+            inFlightPackets.push_back(pSkinPacket);
+        } else {
+            auto pSkinPacket = std::static_pointer_cast<PlayerSkinPacket>(packet);
+
+            pSkinPacket->mUUID = val.UUID;
+            pSkinPacket->mSkin = val.playerSkin;
+
+            SDK::clientInstance->getPacketSender()->sendToServer(pSkinPacket.get());
+            inFlightPackets.push_back(pSkinPacket);
+        }
+
         // don't remove anything from inFlightPackets vec because it will mess up stuff
         SDK::clientInstance->getGuiData()->displayClientMessage("§aSkin cloned");
         break;

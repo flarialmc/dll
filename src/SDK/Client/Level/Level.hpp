@@ -126,12 +126,7 @@ public:
                     entry.playerSkin.mPersonaPieces = sourceSkin.mPersonaPieces;
                     entry.playerSkin.mArmSizeType = sourceSkin.mArmSizeType;
                     entry.playerSkin.mPieceTintColors = sourceSkin.mPieceTintColors;
-
                     entry.playerSkin.mSkinColor = sourceSkin.mSkinColor;
-
-                    // strncpy_s(entry.playerSkin.mSkinColor, sizeof(entry.playerSkin.mSkinColor), sourceSkin.mSkinColor, sizeof(entry.playerSkin.mSkinColor) - 1);
-                    // entry.playerSkin.mSkinColor[sizeof(entry.playerSkin.mSkinColor) - 1] = '\0';
-
                     entry.playerSkin.mIsTrustedSkin = sourceSkin.mIsTrustedSkin;
                     entry.playerSkin.mIsPremium = sourceSkin.mIsPremium;
                     entry.playerSkin.mIsPersona = sourceSkin.mIsPersona;
