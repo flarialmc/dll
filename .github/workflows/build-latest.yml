@@ -149,7 +149,7 @@ jobs:
         run: |
           git config user.name "GitHub Actions Bot"
           git config user.email "actions@example.com"
-          mv -f Flarial_DLL/Flarial.dll "./dll/latest.dll"
+          cp -f Flarial_DLL/Flarial.dll "./dll/latest.dll"
           git add ./dll/latest.dll
           git commit -m "Add Release for Release Commit: '${{ github.event.head_commit.message }}'"
           git push origin main
@@ -189,7 +189,7 @@ jobs:
         run: |
           git config user.name "GitHub Actions Bot"
           git config user.email "actions@example.com"
-          mv -f Flarial_DLL/Flarial.dll "./dll/beta.dll"
+          cp -f Flarial_DLL/Flarial.dll "./dll/beta.dll"
           git add ./dll/beta.dll
           git commit -m "Add Beta for Beta Commit: '${{ github.event.head_commit.message }}'"
           git push origin main
