@@ -33,6 +33,8 @@ void OffsetInit::init2190() {
     ADD_OFFSET("GuiData::GuiMessages", 0x150);
 
     ADD_OFFSET("MinecraftGame::mouseGrabbed", 0x1B8);
+
+    ADD_OFFSET("GuiData::GuiMessages", 0x150);
 }
 
 void OffsetInit::init2180() {
