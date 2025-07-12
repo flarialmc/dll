@@ -30,11 +30,8 @@ void OffsetInit::init2190() {
     ADD_OFFSET("Biome::temperature", 0x08);
     ADD_OFFSET("Biome::name", 0x198);
 
-    ADD_OFFSET("GuiData::GuiMessages", 0x150);
-
     ADD_OFFSET("MinecraftGame::mouseGrabbed", 0x1B8);
 
-    ADD_OFFSET("GuiData::GuiMessages", 0x150);
 }
 
 void OffsetInit::init2180() {
@@ -89,6 +86,8 @@ void OffsetInit::init2170() {
     ADD_OFFSET("LevelData::worldName", 0x298);
 
     ADD_OFFSET("MinecraftGame::mouseGrabbed", 0x1B0);
+
+    ADD_OFFSET("GuiData::GuiMessages", 0x150);
 }
 
 void OffsetInit::init2160() {
