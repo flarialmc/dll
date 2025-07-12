@@ -64,9 +64,9 @@ void ResizeHook::cleanShit(bool isResize) {
     Memory::SafeRelease(SwapchainHook::ExtraSavedD3D11BackBuffer);
     Memory::SafeRelease(Blur::pConstantBuffer);
     Memory::SafeRelease(Blur::pSampler);
-    Memory::SafeRelease(Blur::pDownsampleShader);
+    Memory::SafeRelease(Blur::pGaussianBlurHorizontalShader);
     Memory::SafeRelease(Blur::pInputLayout);
-    Memory::SafeRelease(Blur::pUpsampleShader);
+    Memory::SafeRelease(Blur::pGaussianBlurVerticalShader);
     Memory::SafeRelease(Blur::pVertexBuffer);
     Memory::SafeRelease(Blur::pVertexShader);
     Memory::SafeRelease(SwapchainHook::d3d11Device);
@@ -86,10 +86,6 @@ void ResizeHook::cleanShit(bool isResize) {
     Memory::SafeRelease(RealMotionBlurHelper::m_vertexBuffer);
     MotionBlur::initted = false;
 
-
-    Blur::hasDoneFrames = false;
-    for (ID3D11Texture2D* tex : Blur::framebuffers) { Memory::SafeRelease(tex); Blur::framebuffers.clear(); }
-
     for (auto& i : ClickGUIElements::images) {
         Memory::SafeRelease(i.second);
     }
@@ -103,13 +99,17 @@ void ResizeHook::cleanShit(bool isResize) {
 
     ClickGUIElements::images.clear();
 
-    if (!isResize) {
-        for (auto& i : ImagesClass::ImguiDX11Images) {
-            Memory::SafeRelease(i.second);
-        }
-        ImagesClass::ImguiDX11Images.clear();
+    // Always clean D3D11 images during shutdown
+    for (auto& i : ImagesClass::ImguiDX11Images) {
+        Memory::SafeRelease(i.second);
     }
+    ImagesClass::ImguiDX11Images.clear();
 
+    // Properly clean D3D12 texture resources
+    for (auto& i : ImagesClass::ImguiDX12Textures) {
+        Memory::SafeRelease(i.second);
+    }
+    ImagesClass::ImguiDX12Textures.clear();
     ImagesClass::ImguiDX12Images.clear();
 
     for (auto i : ImagesClass::eimages) {
@@ -206,10 +206,12 @@ void ResizeHook::cleanShit(bool isResize) {
 
 
     if (!isResize) {
-
+        // Clean up static image upload resources
+        FlarialGUI::CleanupImageResources();
 
         Memory::SafeRelease(SwapchainHook::D3D12DescriptorHeap);         Memory::SafeRelease(SwapchainHook::d3d12DescriptorHeapBackBuffers);
-        Memory::SafeRelease(SwapchainHook::d3d12DescriptorHeapImGuiRender); Memory::SafeRelease(SwapchainHook::d3d12DescriptorHeapImGuiIMAGE);
+        Memory::SafeRelease(SwapchainHook::d3d12DescriptorHeapImGuiRender); // Consolidated heap contains both ImGui and images
+        SwapchainHook::ResetDescriptorAllocation(); // Reset consolidated descriptor allocation state
 
 
         if (ImGui::GetCurrentContext()) {

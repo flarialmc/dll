@@ -5,124 +5,196 @@
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 
-#define colors_text HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_text")->value)
-#define o_colors_text clickgui->settings.getSettingByName<float>("o_colors_text")->value
-#define colors_text_rgb clickgui->settings.getSettingByName<bool>("colors_text_rgb")->value
-
-#define colors_primary1 HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_primary1")->value)
-#define o_colors_primary1 clickgui->settings.getSettingByName<float>("o_colors_primary1")->value
-#define colors_primary1_rgb clickgui->settings.getSettingByName<bool>("colors_primary1_rgb")->value
-
-#define colors_primary2 HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_primary2")->value)
-#define o_colors_primary2 clickgui->settings.getSettingByName<float>("o_colors_primary2")->value
-#define colors_primary2_rgb clickgui->settings.getSettingByName<bool>("colors_primary2_rgb")->value
-
-#define colors_primary3 HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_primary3")->value)
-#define o_colors_primary3 clickgui->settings.getSettingByName<float>("o_colors_primary3")->value
-#define colors_primary3_rgb clickgui->settings.getSettingByName<bool>("colors_primary3_rgb")->value
-
-#define colors_primary4 HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_primary4")->value)
-#define o_colors_primary4 clickgui->settings.getSettingByName<float>("o_colors_primary4")->value
-#define colors_primary4_rgb clickgui->settings.getSettingByName<bool>("colors_primary4_rgb")->value
-
-#define colors_secondary1 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary1")->value)
-#define o_colors_secondary1 clickgui->settings.getSettingByName<float>("o_colors_secondary1")->value
-#define colors_secondary1_rgb clickgui->settings.getSettingByName<bool>("colors_secondary1_rgb")->value
-
-#define colors_secondary2 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary2")->value)
-#define o_colors_secondary2 clickgui->settings.getSettingByName<float>("o_colors_secondary2")->value
-#define colors_secondary2_rgb clickgui->settings.getSettingByName<bool>("colors_secondary2_rgb")->value
-
-#define colors_secondary7 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary7")->value)
-#define o_colors_secondary7 clickgui->settings.getSettingByName<float>("o_colors_secondary7")->value
-#define colors_secondary7_rgb clickgui->settings.getSettingByName<bool>("colors_secondary7_rgb")->value
-
-bool FlarialGUI::Toggle(int index, float x, float y, bool isEnabled) {
-    return FlarialGUI::Toggle(index, x, y, isEnabled, false);
+void FlarialGUI::Toggle(int index, float x, float y, bool isEnabled) {
+	FlarialGUI::Toggle(index, x, y, isEnabled, false);
 }
 
-bool FlarialGUI::Toggle(int index, float x, float y, bool isEnabled, bool rgb, std::string moduleName, std::string settingName) {
-    D2D1_COLOR_F disabledColor = colors_primary3;
-    D2D1_COLOR_F enabledColor = colors_primary1;
-    D2D1_COLOR_F circleColor = colors_primary2;
+void FlarialGUI::Toggle(int index, float x, float y, bool isEnabled, bool rgb, std::string moduleName, std::string settingName) {
+	auto mod = ModuleManager::getModule(moduleName);
 
-    enabledColor.a = o_colors_primary1;
-    disabledColor.a = o_colors_primary3;
-    circleColor.a = o_colors_primary2;
+	D2D1_COLOR_F disabledColor = ClickGUI::getColor("primary3");
+	D2D1_COLOR_F enabledColor = ClickGUI::getColor("primary1");
+	D2D1_COLOR_F circleColor = ClickGUI::getColor("primary2");
 
-    if (ClickGUI::settingsOpacity != 1) {
-        disabledColor.a = ClickGUI::settingsOpacity;
-        enabledColor.a = ClickGUI::settingsOpacity;
-        circleColor.a = ClickGUI::settingsOpacity;
-        toggleColors[index].a = ClickGUI::settingsOpacity;
-    }
+	enabledColor.a *= clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value;
+	disabledColor.a *= clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value;
+	circleColor.a *= clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value;
 
-    if (shouldAdditionalY) {
-        for (int i = 0; i < highestAddIndexes + 1; i++) {
-            if (i <= additionalIndex && additionalY[i] > 0.0f) {
-                y += additionalY[i];
-            }
-        }
-    }
+	if (ClickGUI::settingsOpacity != 1) {
+		disabledColor.a = ClickGUI::settingsOpacity;
+		enabledColor.a = ClickGUI::settingsOpacity;
+		circleColor.a = ClickGUI::settingsOpacity;
+		toggleColors[index].a = ClickGUI::settingsOpacity;
+	}
 
-    const bool isAdditionalY = shouldAdditionalY;
-    float rectWidth = Constraints::RelativeConstraint(0.058, "height", true);
-    float rectHeight = Constraints::RelativeConstraint(0.027, "height", true);
-
-    y -= rectHeight / 2.0f;
-
-    Vec2<float> round = Constraints::RoundingConstraint(30, 30);
-
-    if (isAdditionalY) UnSetIsInAdditionalYMode();
-
-    if (isEnabled) toggleColors[index] = FlarialGUI::LerpColor(toggleColors[index], enabledColor, 0.10f * FlarialGUI::frameFactor);
-    else toggleColors[index] = FlarialGUI::LerpColor(toggleColors[index], disabledColor, 0.10f * FlarialGUI::frameFactor);
-
-    FlarialGUI::RoundedRect(x, y, rgb ? rgbColor : toggleColors[index], rectWidth, rectHeight, round.x, round.x);
-
-    // the circle (I KNOW IM USING A RECT LOL)
-
-    float circleWidth = Constraints::SpacingConstraint(0.7, rectHeight);
-    float circleHeight = Constraints::SpacingConstraint(0.7, rectHeight);
-
-    float ySpacing = Constraints::SpacingConstraint(0.2f, circleHeight);
-    float xSpacing = Constraints::SpacingConstraint(0.134f, circleWidth);
-    round = Constraints::RoundingConstraint(23, 23);
-
-    float enabledSpacing;
-
-    if (isEnabled) {
-        FlarialGUI::lerp(FlarialGUI::toggleSpacings[index], Constraints::SpacingConstraint(1.6, circleWidth), 0.25f * FlarialGUI::frameFactor);
-        //FadeEffect::ApplyFadeInEffect(2.4f * FlarialGUI::frameFactor, Constraints::SpacingConstraint(1.6, circleWidth),FlarialGUI::toggleSpacings[index]);
-        enabledSpacing = FlarialGUI::toggleSpacings[index];
-        if (enabledSpacing > Constraints::SpacingConstraint(1.6, circleWidth)) enabledSpacing = Constraints::SpacingConstraint(1.6, circleWidth);
-    } else {
-        FlarialGUI::lerp(FlarialGUI::toggleSpacings[index], Constraints::SpacingConstraint(0.1, circleWidth), 0.25f * FlarialGUI::frameFactor);
-        //FadeEffect::ApplyFadeOutEffect(2.4f * FlarialGUI::frameFactor, FlarialGUI::toggleSpacings[index]);
-        enabledSpacing = FlarialGUI::toggleSpacings[index];
-    }
-
-    FlarialGUI::RoundedRect(x + xSpacing + enabledSpacing, y + ySpacing, circleColor, circleWidth, circleHeight, round.x, round.x);
-
-    if (isAdditionalY) SetIsInAdditionalYMode();
-
-    if (isInScrollView) y += FlarialGUI::scrollpos;
-
-    if (CursorInRect(x, y, rectWidth, rectHeight) && clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value > 0.95f) {
-        if (MC::mouseButton == MouseButton::Left && !MC::held && (!activeColorPickerWindows || index == 123)) {
-            MC::mouseButton = MouseButton::None;
-            return true;
-        }
-        else if (MC::mouseButton == MouseButton::Right && !MC::held && (!activeColorPickerWindows || index == 123) && clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value > 0.95f) {
-			bool resettableSettingsEnabled = Client::settings.getSettingByName<bool>("resettableSettings")->value;
-			if (resettableSettingsEnabled && moduleName != "" && settingName != "") {
-                auto mod = ModuleManager::getModule(moduleName);
-                mod->settings.deleteSetting(settingName);
-				mod->defaultConfig();
-				return mod->settings.getSettingByName<bool>(settingName)->value;
+	if (shouldAdditionalY) {
+		for (int i = 0; i < highestAddIndexes + 1; i++) {
+			if (i <= additionalIndex && additionalY[i] > 0.0f) {
+				y += additionalY[i];
 			}
-        }
-    }
+		}
+	}
 
-    return false;
+	const bool isAdditionalY = shouldAdditionalY;
+	float rectWidth = Constraints::RelativeConstraint(0.058, "height", true);
+	float rectHeight = Constraints::RelativeConstraint(0.027, "height", true);
+
+	y -= rectHeight / 2.0f;
+
+	Vec2<float> round = Constraints::RoundingConstraint(30, 30);
+
+	if (isAdditionalY) UnSetIsInAdditionalYMode();
+
+	if (settingName != "" ? mod->getOps<bool>(settingName) : isEnabled) toggleColors[index] = FlarialGUI::LerpColor(toggleColors[index], CursorInRect(x, y + (isInScrollView ? scrollpos : 0), rectWidth, rectHeight) ? D2D1::ColorF(enabledColor.r * 0.8, enabledColor.g * 0.8, enabledColor.b * 0.8, enabledColor.a) : enabledColor, 0.10f * FlarialGUI::frameFactor);
+	else toggleColors[index] = FlarialGUI::LerpColor(toggleColors[index], CursorInRect(x, y + (isInScrollView ? scrollpos : 0), rectWidth, rectHeight) ? D2D1::ColorF(disabledColor.r * 0.8, disabledColor.g * 0.8, disabledColor.b * 0.8, disabledColor.a) : disabledColor, 0.10f * FlarialGUI::frameFactor);
+
+	if (CursorInRect(x, y + (isInScrollView ? scrollpos : 0), rectWidth, rectHeight) && !ToggleIsHovering[index]) {
+		ToggleIsHovering[index] = true;
+		WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType::Hand);
+	}
+	else if (!CursorInRect(x, y + (isInScrollView ? scrollpos : 0), rectWidth, rectHeight) && ToggleIsHovering[index]) {
+		ToggleIsHovering[index] = false;
+		WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType::Arrow);
+	}
+
+	FlarialGUI::RoundedRect(x, y, rgb ? rgbColor : toggleColors[index], rectWidth, rectHeight, round.x, round.x);
+
+	// the circle (I KNOW IM USING A RECT LOL)
+
+	float circleWidth = Constraints::SpacingConstraint(0.7, rectHeight);
+	float circleHeight = Constraints::SpacingConstraint(0.7, rectHeight);
+
+	float ySpacing = Constraints::SpacingConstraint(0.2f, circleHeight);
+	float xSpacing = Constraints::SpacingConstraint(0.134f, circleWidth);
+	round = Constraints::RoundingConstraint(23, 23);
+
+	float enabledSpacing;
+
+	if (settingName != "" ? mod->getOps<bool>(settingName) : isEnabled) {
+		FlarialGUI::lerp(FlarialGUI::toggleSpacings[index], Constraints::SpacingConstraint(1.6, circleWidth), 0.25f * FlarialGUI::frameFactor);
+		//FadeEffect::ApplyFadeInEffect(2.4f * FlarialGUI::frameFactor, Constraints::SpacingConstraint(1.6, circleWidth),FlarialGUI::toggleSpacings[index]);
+		enabledSpacing = FlarialGUI::toggleSpacings[index];
+		if (enabledSpacing > Constraints::SpacingConstraint(1.6, circleWidth)) enabledSpacing = Constraints::SpacingConstraint(1.6, circleWidth);
+	}
+	else {
+		FlarialGUI::lerp(FlarialGUI::toggleSpacings[index], Constraints::SpacingConstraint(0.1, circleWidth), 0.25f * FlarialGUI::frameFactor);
+		//FadeEffect::ApplyFadeOutEffect(2.4f * FlarialGUI::frameFactor, FlarialGUI::toggleSpacings[index]);
+		enabledSpacing = FlarialGUI::toggleSpacings[index];
+	}
+
+	FlarialGUI::RoundedRect(x + xSpacing + enabledSpacing, y + ySpacing, circleColor, circleWidth, circleHeight, round.x, round.x);
+
+	if (isAdditionalY) SetIsInAdditionalYMode();
+
+	if (!clickgui->active) return;
+
+	if (isInScrollView) y += FlarialGUI::scrollpos;
+
+	if (CursorInRect(x, y, rectWidth, rectHeight) && clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value > 0.95f) {
+		if (MC::mouseButton == MouseButton::Left && !MC::held && (!activeColorPickerWindows || index == 123)) {
+			MC::mouseButton = MouseButton::None;
+			if (settingName != "") mod->getOps<bool>(settingName) = !mod->getOps<bool>(settingName);
+		}
+		else if (MC::mouseButton == MouseButton::Right && !MC::held && (!activeColorPickerWindows || index == 123)) {
+			if (Client::settings.getSettingByName<bool>("resettableSettings")->value && moduleName != "" && settingName != "") {
+				auto mod = ModuleManager::getModule(moduleName);
+				mod->settings.deleteSetting(settingName);
+				mod->defaultConfig();
+				mod->settings.getSettingByName<bool>(settingName)->value;
+			}
+		}
+		if (ToggleIsHovering[index]) WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType::Hand);
+	}
+
+	//if (settingName != "") mod->getOps<bool>(settingName) = false;
+	//return false;
+}
+
+
+
+bool FlarialGUI::Toggle(int index, float x, float y, bool isEnabled, bool rgb) {
+	D2D1_COLOR_F disabledColor = ClickGUI::getColor("primary3");
+	D2D1_COLOR_F enabledColor = ClickGUI::getColor("primary1");
+	D2D1_COLOR_F circleColor = ClickGUI::getColor("primary2");
+
+	enabledColor.a *= clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value;
+	disabledColor.a *= clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value;
+	circleColor.a *= clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value;
+
+	if (ClickGUI::settingsOpacity != 1) {
+		disabledColor.a = ClickGUI::settingsOpacity;
+		enabledColor.a = ClickGUI::settingsOpacity;
+		circleColor.a = ClickGUI::settingsOpacity;
+		toggleColors[index].a = ClickGUI::settingsOpacity;
+	}
+
+	if (shouldAdditionalY) {
+		for (int i = 0; i < highestAddIndexes + 1; i++) {
+			if (i <= additionalIndex && additionalY[i] > 0.0f) {
+				y += additionalY[i];
+			}
+		}
+	}
+
+	const bool isAdditionalY = shouldAdditionalY;
+	float rectWidth = Constraints::RelativeConstraint(0.058, "height", true);
+	float rectHeight = Constraints::RelativeConstraint(0.027, "height", true);
+
+	y -= rectHeight / 2.0f;
+
+	Vec2<float> round = Constraints::RoundingConstraint(30, 30);
+
+	if (isAdditionalY) UnSetIsInAdditionalYMode();
+
+	if (isEnabled) toggleColors[index] = FlarialGUI::LerpColor(toggleColors[index], CursorInRect(x, y + (isInScrollView ? scrollpos : 0), rectWidth, rectHeight) ? D2D1::ColorF(enabledColor.r * 0.8, enabledColor.g * 0.8, enabledColor.b * 0.8, enabledColor.a) : enabledColor, 0.10f * FlarialGUI::frameFactor);
+	else toggleColors[index] = FlarialGUI::LerpColor(toggleColors[index], CursorInRect(x, y + (isInScrollView ? scrollpos : 0), rectWidth, rectHeight) ? D2D1::ColorF(disabledColor.r * 0.8, disabledColor.g * 0.8, disabledColor.b * 0.8, disabledColor.a) : disabledColor, 0.10f * FlarialGUI::frameFactor);
+
+	if (CursorInRect(x, y + (isInScrollView ? scrollpos : 0), rectWidth, rectHeight) && !ToggleIsHovering[index]) {
+		ToggleIsHovering[index] = true;
+		WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType::Hand);
+	}
+	else if (!CursorInRect(x, y + (isInScrollView ? scrollpos : 0), rectWidth, rectHeight) && ToggleIsHovering[index]) {
+		ToggleIsHovering[index] = false;
+		WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType::Arrow);
+	}
+
+	FlarialGUI::RoundedRect(x, y, rgb ? rgbColor : toggleColors[index], rectWidth, rectHeight, round.x, round.x);
+
+	// the circle (I KNOW IM USING A RECT LOL)
+
+	float circleWidth = Constraints::SpacingConstraint(0.7, rectHeight);
+	float circleHeight = Constraints::SpacingConstraint(0.7, rectHeight);
+
+	float ySpacing = Constraints::SpacingConstraint(0.2f, circleHeight);
+	float xSpacing = Constraints::SpacingConstraint(0.134f, circleWidth);
+	round = Constraints::RoundingConstraint(23, 23);
+
+	float enabledSpacing;
+
+	if (isEnabled) {
+		FlarialGUI::lerp(FlarialGUI::toggleSpacings[index], Constraints::SpacingConstraint(1.6, circleWidth), 0.25f * FlarialGUI::frameFactor);
+		//FadeEffect::ApplyFadeInEffect(2.4f * FlarialGUI::frameFactor, Constraints::SpacingConstraint(1.6, circleWidth),FlarialGUI::toggleSpacings[index]);
+		enabledSpacing = FlarialGUI::toggleSpacings[index];
+		if (enabledSpacing > Constraints::SpacingConstraint(1.6, circleWidth)) enabledSpacing = Constraints::SpacingConstraint(1.6, circleWidth);
+	}
+	else {
+		FlarialGUI::lerp(FlarialGUI::toggleSpacings[index], Constraints::SpacingConstraint(0.1, circleWidth), 0.25f * FlarialGUI::frameFactor);
+		//FadeEffect::ApplyFadeOutEffect(2.4f * FlarialGUI::frameFactor, FlarialGUI::toggleSpacings[index]);
+		enabledSpacing = FlarialGUI::toggleSpacings[index];
+	}
+
+	FlarialGUI::RoundedRect(x + xSpacing + enabledSpacing, y + ySpacing, circleColor, circleWidth, circleHeight, round.x, round.x);
+
+	if (isAdditionalY) SetIsInAdditionalYMode();
+
+	if (isInScrollView) y += FlarialGUI::scrollpos;
+
+	if (CursorInRect(x, y, rectWidth, rectHeight) && clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value > 0.95f) {
+		if (MC::mouseButton == MouseButton::Left && !MC::held && (!activeColorPickerWindows || index == 123)) {
+			MC::mouseButton = MouseButton::None;
+			return true;
+		}
+	}
+
+	return false;
 }
