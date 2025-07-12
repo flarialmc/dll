@@ -1,6 +1,7 @@
 #include "Sprint.hpp"
 
 #include "Events/EventManager.hpp"
+#include "Modules/Sneak/Sneak.hpp"
 
 Sprint::Sprint(): Module("Toggle Sprint", "Automatically sprints for you!!!", IDR_AUTO_SPRINT_PNG, "CTRL")
 {
@@ -29,7 +30,8 @@ void Sprint::defaultConfig()
 {
     getKeybind();
     Module::defaultConfig("all");
-    setDef("status", false);
+    setDef("status", true);
+    setDef("toggleStatus", true);
     setDef("textscale", 0.80f);
     setDef("always", false);
     
@@ -53,6 +55,7 @@ void Sprint::settingsRender(float settingsOffset)
     addKeybind("Keybind", "Hold for 2 seconds!", "keybind", true);
     addToggle("Always Sprint", "Also known as auto sprint", "always");
     addToggle("Show Status", "", "status");
+    addConditionalToggle(getOps<bool>("status"), "Show Toggle Status", "", "toggleStatus");
     extraPadding();
 
     addHeader("Main");
@@ -107,35 +110,36 @@ void Sprint::onRender(RenderEvent& event)
 
     if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
 
+        std::shared_ptr<Sneak> toggleSneak = std::dynamic_pointer_cast<Sneak>(ModuleManager::getModule("Toggle Sneak"));
+
         if (SDK::clientInstance->getLocalPlayer() != nullptr) {
             std::string text = "Standing";
+            bool showStatus = true;
+            bool status = toggleSprinting;
+
             if (SDK::clientInstance->getLocalPlayer()->getActorFlag(ActorFlags::FLAG_SNEAKING)) {
                 text = "Sneaking";
-                this->normalRender(5, text);
+
+                if (toggleSneak != nullptr && toggleSneak->getOps<bool>("enabled")) status = toggleSneak->toggled;
+                else showStatus = false;
             }
-            else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(ActorFlags::FLAG_SWIMMING)) {
-                text = "Swimming";
-                this->normalRender(5, text);
-            }
+            else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(ActorFlags::FLAG_SWIMMING)) text = "Swimming";
             else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(ActorFlags::FLAG_GLIDING)) {
                 text = "Gliding";
-                this->normalRender(5, text);
+                showStatus = false;
             }
             else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(ActorFlags::FLAG_SLEEPING)) {
                 text = "Sleeping";
-                this->normalRender(5, text);
+                showStatus = false;
             }
-            else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(ActorFlags::FLAG_SPRINTING)) {
-                text = "Sprinting";
-                this->normalRender(5, text);
+            else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(ActorFlags::FLAG_SPRINTING)) text = "Sprinting";
+            else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(FLAG_MOVING)) text = "Walking";
+
+            if (getOps<bool>("toggleStatus") && showStatus) {
+                std::string text2 = std::format("{} ({})", text, status ? "Toggled": "Vanilla");
+                this->normalRender(5, text2);
             }
-            else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(FLAG_MOVING)) {
-                text = "Walking";
-                this->normalRender(5, text);
-            }
-            else {
-                this->normalRender(5, text);
-            }
+            else this->normalRender(5, text);
 
         }
     }
