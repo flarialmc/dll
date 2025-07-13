@@ -128,6 +128,20 @@ public:
     auto operator-(const Vec2<T> Vec) {
         return Vec2(this->x - Vec.x, this->y - Vec.y);
     }
+
+    auto operator/(const Vec2<T> Vec) {
+        return Vec2(this->x / Vec.x, this->y / Vec.y);
+    }
+
+    auto operator*(T scalar) const -> Vec2<T> {
+        return Vec2<T>(this->x * scalar, this->y * scalar);
+    }
+
+    auto operator+=(const Vec2<T> &other) -> Vec2<T> & {
+        this->x += other.x;
+        this->y += other.y;
+        return *this;
+    }
 };
 
 template<typename T>

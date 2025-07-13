@@ -5,16 +5,16 @@
 
 class ApplyTurnDeltaHook : public Hook {
 private:
-    static void ApplyTurnDelta(void* a1, Vec2<float>& a2) {
+    static void ApplyTurnDelta(void* a1, Vec2<float>& delta) {
 
-        auto event = nes::make_holder<TurnDeltaEvent>(a1, a2);
+        auto event = nes::make_holder<TurnDeltaEvent>(a1, delta);
         eventMgr.trigger(event);
 
-        funcOriginal(a1, a2);
+        funcOriginal(a1, delta);
     }
 
 public:
-    typedef void(__thiscall* original)(void* a1, Vec2<float>& a2);
+    typedef void(__thiscall* original)(void* a1, Vec2<float>& delta);
 
     static inline original funcOriginal = nullptr;
 

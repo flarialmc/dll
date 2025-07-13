@@ -95,6 +95,7 @@
 #include "Scripting/ScriptManager.hpp"
 #include "Modules/AutoPerspective/AutoPerspective.hpp"
 #include "Modules/BlockHit/BlockHit.hpp"
+#include "Modules/CinematicCamera/CinematicCamera.hpp"
 #include "Modules/LowHealthIndicator/LowHealthIndicator.hpp"
 #include "Modules/PlayerNotifier/PlayerNotifier.hpp"
 #include "Modules/ZeqaUtils/ZeqaUtils.hpp"
@@ -266,6 +267,7 @@ void ModuleManager::initialize() {
 
 	addModule<DeathLogger>();
 	addModule<Twerk>();
+	addModule<CinematicCamera>();
 
 	addService<GUIKeyListener>();
 	if (!VersionUtils::checkAboveOrEqual(21, 60)) {
