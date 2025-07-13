@@ -108,6 +108,7 @@
 #include "Modules/DebugMenu/DebugMenu.hpp"
 #include "Modules/DirectionHUD/DirectionHUD.hpp"
 #include "Modules/JavaViewBobbing/JavaViewBobbing.hpp"
+#include "Modules/DeathLogger/DeathLogger.hpp"
 #include "Modules/MovableDayCounter/MovableDayCounter.hpp"
 #include "Modules/SkinStealer/SkinStealer.hpp"
 
@@ -261,6 +262,8 @@ void ModuleManager::initialize() {
 	addModule<DirectionHUD>();
 
 	addModule<JavaViewBobbing>();
+
+	addModule<DeathLogger>();
 
 	addService<GUIKeyListener>();
 	if (!VersionUtils::checkAboveOrEqual(21, 60)) {
