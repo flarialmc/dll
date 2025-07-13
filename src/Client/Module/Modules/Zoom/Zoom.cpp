@@ -41,6 +41,14 @@ void Zoom::defaultConfig() {
     setDef("modifier", 10.0f);
     setDef("anim", 0.20f);
     setDef("disableanim", false);
+    setDef("cinematicMode", false);
+
+    // cinematic camera options
+    setDef("smoothing", true);
+    setDef("smoothness", 8.f);
+    setDef("cinebars", false);
+    setDef("cinebar", "000000", 1.f, false);
+    setDef("cinebarHeight", 0.2f);
 }
 
 void Zoom::settingsRender(float settingsOffset) {
@@ -66,8 +74,21 @@ void Zoom::settingsRender(float settingsOffset) {
     addToggle("Hide Hand", "Hide hand when zooming.", "hidehand");
     addToggle("Hide Modules", "Hides other modules when zooming.", "hidemodules");
     addToggle("Always Animate", "Smooth zoom animation while sprinting.", "alwaysanim");
-    addToggle("Low Sensitivity", "Lower sensitivity when in zoom.", "lowsens");
-    addConditionalSlider(getOps<bool>("lowsens"), "Low Sensitivity Strength", "", "lowsensStrength", 1.f, 0.f, false);
+    addToggle("Enable Cinematic Camera", "Whether to use cinematic camera on zoom or not", "cinematicMode");
+
+    if (getOps<bool>("cinematicMode")) {
+        addHeader("Cinematic Camera");
+        // direct copy paste from cinematic camera module
+        addToggle("Enable Smoothing", "", "smoothing");
+        addConditionalSlider(getOps<bool>("smoothing"), "Smoothing", "", "smoothness", 10.f);
+        addToggle("Cinematic Bars", "", "cinebars");
+        addConditionalSlider(getOps<bool>("cinebars"), "Cinematic Bar Height", "", "cinebarHeight", 0.8f);
+        addConditionalColorPicker(getOps<bool>("cinebars"), "Cinematic Bar Color", "", "cinebar");
+    } else {
+        addHeader("Low Sensitivity");
+        addToggle("Low Sensitivity", "Lower sensitivity when in zoom.", "lowsens");
+        addConditionalSlider(getOps<bool>("lowsens"), "Low Sensitivity Strength", "", "lowsensStrength", 1.f, 0.f, false);
+    }
 
     FlarialGUI::UnsetScrollView();
     resetPadding();
@@ -75,6 +96,13 @@ void Zoom::settingsRender(float settingsOffset) {
 
 void Zoom::onRender(RenderEvent &event) {
     if (!this->isEnabled()) return;
+
+    if (this->active && getOps<bool>("cinematicMode") && getOps<bool>("cinebars") && (SDK::getCurrentScreen() == "hud_screen" || SDK::getCurrentScreen() == "zoom_screen" || SDK::getCurrentScreen() == "f3_screen")) {
+        float barHeight = MC::windowSize.y * getOps<float>("cinebarHeight") / 2.f;
+
+        FlarialGUI::RoundedRect(0, 0, getColor("cinebar"), MC::windowSize.x, barHeight, 0, 0);
+        FlarialGUI::RoundedRect(0, MC::windowSize.y - barHeight, getColor("cinebar"), MC::windowSize.x, barHeight, 0, 0);
+    }
 
     auto player = SDK::clientInstance->getLocalPlayer();
     if (!player) return;
@@ -224,10 +252,30 @@ void Zoom::onSetTopScreenName(SetTopScreenNameEvent &event) {
 }
 
 void Zoom::onTurnDeltaEvent(TurnDeltaEvent &event) {
-    if (!this->isEnabled() || !this->active) return;
-    float oSens = 1.f;
-    if (getOps<bool>("lowsens")) oSens = std::min(oSens, oSens * (1.0f + (((zoomValue / 2) / realFov) - 1.0f) * getOps<float>("lowsensStrength")));
+    if (!this->isEnabled() || !this->active) {
+        smoothDelta = Vec2<float>{0.f, 0.f};
+        return;
+    }
+    if (getOps<bool>("cinematicMode")) {
+        if (!getOps<bool>("smoothing")) {
+            smoothDelta = Vec2<float>{0.f, 0.f};
+            return;
+        };
 
-    event.delta.x *= oSens;
-    event.delta.y *= oSens;
+        auto now = std::chrono::steady_clock::now();
+        float deltaTime = std::chrono::duration<float>(now - lastTime).count();
+        lastTime = now;
+
+        float alpha = 1.0f - std::exp(-deltaTime * (10.01f - getOps<float>("smoothness")));
+
+        smoothDelta += (event.delta - smoothDelta) * alpha;
+
+        event.delta = smoothDelta;
+    } else {
+        float oSens = 1.f;
+        if (getOps<bool>("lowsens")) oSens = std::min(oSens, oSens * (1.0f + (((zoomValue / 2) / realFov) - 1.0f) * getOps<float>("lowsensStrength")));
+
+        event.delta.x *= oSens;
+        event.delta.y *= oSens;
+    }
 }

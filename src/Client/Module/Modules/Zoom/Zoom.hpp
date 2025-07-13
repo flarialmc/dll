@@ -17,6 +17,9 @@ private:
 
 	static inline bool fisrtTime = true;
 
+	Vec2<float> smoothDelta{0, 0};
+	std::chrono::time_point<std::chrono::steady_clock> lastTime = std::chrono::steady_clock::now();
+
 public:
 	static inline bool animationFinished = true;
 	static inline bool jdfAnimationFinished = true;
