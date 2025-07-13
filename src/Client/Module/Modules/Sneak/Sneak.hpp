@@ -8,7 +8,9 @@ class Sneak : public Module {
 public:
 
 
-	Sneak();;
+	Sneak(): Module("Toggle Sneak", "No need to hold down your sneak key.",
+		IDR_SLOWLY_PNG, "SHIFT") {
+	}
 
 	void onEnable() override;
 

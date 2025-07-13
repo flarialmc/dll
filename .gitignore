@@ -34,3 +34,5 @@ _deps/
 Makefile
 cmake-build-debug/
 Testing/
+auto-inject.bat
+Minecraft.Loader.exe
