@@ -85,6 +85,7 @@ IDR_F3_PNG               PNG "Data\\f3.png"
 IDR_RENDER_DRAGON_PNG    PNG "Data\\renderdragon.png"
 IDR_SKINSTEALER_PNG      PNG "Data\\SkinStealer.png"
 IDR_CINEMATICCAMERA_PNG  PNG "Data\\cinematiccamera.png"
+IDR_DEATHLOGGER_PNG      PNG "Data\\deathlogger.png"
 
 IDR_SETTINGS_PNG         PNG "Data\\settings.png"
 IDR_SETTINGS_WHITE_PNG   PNG "Data\\settingswhite.png"

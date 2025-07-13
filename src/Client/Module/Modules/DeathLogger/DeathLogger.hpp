@@ -13,7 +13,7 @@ private:
 public:
 
     DeathLogger() : Module("Death Logger", "Logs your coordinates in chat on death.",
-        IDR_SKULL_PNG, "") {
+        IDR_DEATHLOGGER_PNG, "") {
 
     };
 
