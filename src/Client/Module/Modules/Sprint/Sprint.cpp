@@ -3,13 +3,7 @@
 #include "Events/EventManager.hpp"
 #include "Modules/Sneak/Sneak.hpp"
 
-Sprint::Sprint(): Module("Toggle Sprint", "Automatically sprints for you!!!", IDR_AUTO_SPRINT_PNG, "CTRL")
-{
-    
-}
-
-void Sprint::onEnable()
-{
+void Sprint::onEnable() {
     Listen(this, KeyEvent, &Sprint::onKey)
     Listen(this, MouseEvent, &Sprint::onMouse)
     Listen(this, RenderEvent, &Sprint::onRender)
@@ -17,8 +11,7 @@ void Sprint::onEnable()
     Module::onEnable();
 }
 
-void Sprint::onDisable()
-{
+void Sprint::onDisable() {
     Deafen(this, KeyEvent, &Sprint::onKey)
     Deafen(this, MouseEvent, &Sprint::onMouse)
     Deafen(this, RenderEvent, &Sprint::onRender)
@@ -26,8 +19,7 @@ void Sprint::onDisable()
     Module::onDisable();
 }
 
-void Sprint::defaultConfig()
-{
+void Sprint::defaultConfig() {
     getKeybind();
     Module::defaultConfig("all");
     setDef("status", true);
@@ -37,8 +29,7 @@ void Sprint::defaultConfig()
     
 }
 
-void Sprint::settingsRender(float settingsOffset)
-{
+void Sprint::settingsRender(float settingsOffset) {
     float x = Constraints::PercentageConstraint(0.019, "left");
     float y = Constraints::PercentageConstraint(0.10, "top");
 
@@ -77,8 +68,7 @@ void Sprint::settingsRender(float settingsOffset)
     resetPadding();
 }
 
-void Sprint::onSetup()
-{
+void Sprint::onSetup() {
     keybindActions.clear();
     keybindActions.push_back([this](std::vector<std::any> args) -> std::any {
         toggleSprinting = !toggleSprinting;
@@ -86,8 +76,7 @@ void Sprint::onSetup()
     });
 }
 
-void Sprint::onKey(KeyEvent& event)
-{
+void Sprint::onKey(KeyEvent& event) {
     if (!this->isEnabled()) return;
     if (this->isKeybind(event.keys) && this->isKeyPartOfKeybind(event.key)) {
         keybindActions[0]({});
@@ -101,8 +90,7 @@ void Sprint::onMouse(MouseEvent &event) {
     }
 }
 
-void Sprint::onRender(RenderEvent& event)
-{
+void Sprint::onRender(RenderEvent& event) {
     if (!this->isEnabled()) return;
     if (!this->isEnabled() || SDK::getCurrentScreen() != "hud_screen") return;
 
@@ -145,8 +133,7 @@ void Sprint::onRender(RenderEvent& event)
     }
 }
 
-void Sprint::onTick(TickEvent& event)
-{
+void Sprint::onTick(TickEvent& event) {
     if (!this->isEnabled()) return;
     if (SDK::clientInstance != nullptr) {
         if (SDK::clientInstance->getLocalPlayer() != nullptr) {

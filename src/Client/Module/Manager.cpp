@@ -109,6 +109,7 @@
 #include "Modules/DirectionHUD/DirectionHUD.hpp"
 #include "Modules/JavaViewBobbing/JavaViewBobbing.hpp"
 #include "Modules/DeathLogger/DeathLogger.hpp"
+#include "Modules/Twerk/Twerk.hpp"
 #include "Modules/MovableDayCounter/MovableDayCounter.hpp"
 #include "Modules/SkinStealer/SkinStealer.hpp"
 
@@ -264,6 +265,7 @@ void ModuleManager::initialize() {
 	addModule<JavaViewBobbing>();
 
 	addModule<DeathLogger>();
+	addModule<Twerk>();
 
 	addService<GUIKeyListener>();
 	if (!VersionUtils::checkAboveOrEqual(21, 60)) {

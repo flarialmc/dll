@@ -2,31 +2,21 @@
 
 #include "Events/EventManager.hpp"
 
-Sneak::Sneak(): Module("Toggle Sneak", "No need to hold down your sneak key.", IDR_SLOWLY_PNG, "SHIFT")
-{
-
-    
-
-}
-
-void Sneak::onEnable()
-{
+void Sneak::onEnable() {
     Listen(this, KeyEvent, &Sneak::onKey)
     Listen(this, MouseEvent, &Sneak::onMouse)
     Listen(this, TickEvent, &Sneak::onTick)
     Module::onEnable();
 }
 
-void Sneak::onDisable()
-{
+void Sneak::onDisable() {
     Deafen(this, KeyEvent, &Sneak::onKey)
     Deafen(this, MouseEvent, &Sneak::onMouse)
     Deafen(this, TickEvent, &Sneak::onTick)
     Module::onDisable();
 }
 
-void Sneak::defaultConfig()
-{
+void Sneak::defaultConfig() {
     getKeybind();
     Module::defaultConfig("core");
     setDef("status", false);
@@ -35,8 +25,7 @@ void Sneak::defaultConfig()
     
 }
 
-void Sneak::settingsRender(float settingsOffset)
-{
+void Sneak::settingsRender(float settingsOffset) {
     float x = Constraints::PercentageConstraint(0.019, "left");
     float y = Constraints::PercentageConstraint(0.10, "top");
 
@@ -54,8 +43,8 @@ void Sneak::settingsRender(float settingsOffset)
     resetPadding();
 }
 
-void Sneak::onKey(KeyEvent& event)
-{ // TODO: it lets sneak key up through (flickers sneak once)
+void Sneak::onKey(KeyEvent& event) {
+    // TODO: it lets sneak key up through (flickers sneak once)
     if (!this->isEnabled()) return;
     if (this->isKeybind(event.keys) && this->isKeyPartOfKeybind(event.key)) {
         toggleSneaking = !toggleSneaking;
@@ -69,8 +58,7 @@ void Sneak::onMouse(MouseEvent &event) {
     }
 }
 
-void Sneak::onTick(TickEvent& event)
-{
+void Sneak::onTick(TickEvent& event) {
     if (!this->isEnabled()) return;
     if (SDK::clientInstance != nullptr) {
         if (SDK::clientInstance->getLocalPlayer() != nullptr) {

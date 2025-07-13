@@ -51,7 +51,6 @@ public:
 
 	JavaDebugMenu() : Module("Java Debug Menu", "Displays Java-style debug information.\nSimilar to F3 menu in Minecraft Java Edition.",
 		IDR_F3_PNG, "F3") {
-			
 	}
 
 	void onEnable() override;
