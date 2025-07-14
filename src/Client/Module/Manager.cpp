@@ -31,7 +31,6 @@
 #include "Modules/ArmorHUD/ArmorHUD.hpp"
 #include "Modules/PaperDoll/PaperDoll.hpp"
 #include "Modules/PatarHD/PatarHD.hpp"
-#include "Modules/HurtColor/HurtColor.hpp"
 #include "Modules/FogColor/FogColor.hpp"
 #include "Modules/TimeChanger/TimeChanger.hpp"
 #include "Modules/RenderOptions/RenderOptions.hpp"
@@ -109,9 +108,11 @@
 #include "Modules/DirectionHUD/DirectionHUD.hpp"
 #include "Modules/JavaViewBobbing/JavaViewBobbing.hpp"
 #include "Modules/DeathLogger/DeathLogger.hpp"
+#include "Modules/HurtColor/HurtColor.hpp"
 #include "Modules/Twerk/Twerk.hpp"
 #include "Modules/MovableDayCounter/MovableDayCounter.hpp"
 #include "Modules/SkinStealer/SkinStealer.hpp"
+#include "Modules/GlintColor/GlintColor.hpp"
 
 void ModuleManager::getModules() {
 	for (const auto& pair : moduleMap) {
@@ -177,6 +178,7 @@ void ModuleManager::initialize() {
 	addModule<Sneak>();
 	addModule<Sprint>();
 	addModule<Hitbox>();
+	addModule<GlintColor>();
 	addModule<HurtColor>();
 	addModule<ThirdPerson>();
 	addModule<JavaDynamicFOV>();

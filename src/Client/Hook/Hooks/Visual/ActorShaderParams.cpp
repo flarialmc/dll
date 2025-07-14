@@ -1,4 +1,5 @@
 #include "ActorShaderParams.hpp"
+#include "Events/Render/ActorShaderParamsEvent.hpp"
 
 ActorShaderParamsHook::ActorShaderParamsHook(): Hook("Actor Shader Params Hook", GET_SIG_ADDRESS("ActorShaderManager::setupShaderParameter")) {
 }
@@ -24,20 +25,11 @@ void ActorShaderParamsHook::ActorShaderParamsCallback(
     float br,
     unsigned char *lightEmission
 ) {
-    // if (entity->getHurtTime() > 0) {
-    //     // overlay->r = 0.f;
-    //     // overlay->g = 0.f;
-    //     // overlay->b = 1.f;
-    //     // overlay->a = 0.7f;
-    //     Logger::debug("{} {} {}", overlay->r, overlay->g, overlay->b);
-    // }
-    // Logger::debug("{} {} {}", changeColor2->r, changeColor2->g, changeColor2->b);
-    // Vec2<float> lol = Vec2<float>{1.f, 1.f};
-    // glintUVScale = &lol;
-    // overlay->r = 0.f;
-    // overlay->g = 0.f;
-    // overlay->b = 1.f;
-    // overlay->a = 0.7f;
-
+    auto event = nes::make_holder<ActorShaderParamsEvent>(entity, overlay, changeColor, glintColor, lightEmission);
+    eventMgr.trigger(event);
+    overlay = event->getOverlay();
+    changeColor = event->getChangeColor();
+    glintColor = event->getGlintColor();
+    lightEmission = event->getLightEmission();
     return funcOriginal(screenContext, entityContext, entity, overlay, changeColor, changeColor2, glintColor, uvOffset1, uvOffset2, uvRot1, uvRot2, glintUVScale, uvAnim, br, lightEmission);
 }
