@@ -968,96 +968,113 @@ void TabList::onRender(RenderEvent &event) {
             std::map<std::string, int> roleLogos = {{"Dev", IDR_CYAN_LOGO_PNG}, {"Staff", IDR_WHITE_LOGO_PNG}, {"Gamer", IDR_GAMER_LOGO_PNG}, {"Booster", IDR_BOOSTER_LOGO_PNG}, {"Supporter", IDR_SUPPORTER_LOGO_PNG}, {"Default", IDR_RED_LOGO_PNG}};
             auto module = ModuleManager::getModule("Nick");
 
-            std::vector<PlayerListEntry> vecmap = alphaOrder
-                                                      ? copyMapInAlphabeticalOrder(SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap(), flarialFirst)
-                                                      : (flarialFirst
-                                                             ? sortByFlarialHierarchy(SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap())
-                                                             : [] {
-                                                                 const auto &map = SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap();
-                                                                 std::vector<PlayerListEntry> v;
-                                                                 v.reserve(map.size());
-                                                                 for (const auto &pair: map) v.push_back(pair.second);
-                                                                 return v;
-                                                             }());
-
-            float totalWidth = keycardSize * (showHeads ? 1 : 0.4);
-            float totalHeight = keycardSize * 0.5f;
             int maxColumn = floor(getOps<int>("maxColumn"));
 
             float fontSize = Constraints::SpacingConstraint(3, keycardSize);
-            std::vector<float> columnx = {};
-            float curMax = 0;
-            size_t validPlayers = 0;
 
-            for (size_t i = 0; i < vecmap.size(); i++) {
-                if (vecmap[i].name.empty()) continue;
+            float totalHeight = keycardSize * 0.5f;
 
-                std::string name = String::removeColorCodes(vecmap[i].name);
-                if (name.empty()) continue;
+            // do some caching bullshit
+            if (vecmap.size() != SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap().size()) {
+                totalHeight = 0;
+                columnx.clear();
+                refreshCache = true;
+                vecmap = alphaOrder
+                             ? copyMapInAlphabeticalOrder(SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap(), flarialFirst)
+                             : (flarialFirst
+                                    ? sortByFlarialHierarchy(SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap())
+                                    : [] {
+                                        const auto &map = SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap();
+                                        std::vector<PlayerListEntry> v;
+                                        v.reserve(map.size());
+                                        for (const auto &pair: map) v.push_back(pair.second);
+                                        return v;
+                                    }());
 
-                std::string clearedName = String::removeNonAlphanumeric(name);
-                if (clearedName.empty()) clearedName = name;
+                totalWidth = keycardSize * (showHeads ? 1 : 0.4);
 
-                if (module && module->isEnabled() && !NickModule::backupOri.empty() && clearedName == String::removeNonAlphanumeric(String::removeColorCodes(NickModule::backupOri))) {
-                    name = module->getOps<std::string>("nick");
-                    if (name.empty()) name = clearedName;
+                float curMax = 0;
+
+                validPlayers = 0;
+
+                for (size_t i = 0; i < vecmap.size(); i++) {
+                    if (vecmap[i].name.empty()) continue;
+
+                    std::string name = String::removeColorCodes(vecmap[i].name);
+                    if (name.empty()) continue;
+
+                    std::string clearedName = String::removeNonAlphanumeric(name);
+                    if (clearedName.empty()) clearedName = name;
+
+                    if (module && module->isEnabled() && !NickModule::backupOri.empty() && clearedName == String::removeNonAlphanumeric(String::removeColorCodes(NickModule::backupOri))) {
+                        name = module->getOps<std::string>("nick");
+                        if (name.empty()) name = clearedName;
+                    }
+
+                    auto textMetric = FlarialGUI::getFlarialTextSize(String::StrToWStr(name).c_str(), keycardSize * 5, keycardSize, DWRITE_TEXT_ALIGNMENT_LEADING, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, true);
+
+                    auto it = std::ranges::find(APIUtils::onlineUsers, clearedName);
+                    if (it != APIUtils::onlineUsers.end()) textMetric.x += Constraints::SpacingConstraint(0.6, keycardSize);
+
+                    if (textMetric.x > curMax) curMax = textMetric.x;
+                    if (i < maxColumn) totalHeight += keycardSize * 0.7f;
+
+                    validPlayers++;
+
+                    if ((i + 1) % maxColumn == 0 || i == vecmap.size() - 1) {
+                        totalWidth += curMax + keycardSize * (showHeads ? 1 : 0.4);
+                        columnx.push_back(curMax + keycardSize * (showHeads ? 1 : 0.4f));
+                        curMax = 0;
+                    }
                 }
 
-                auto textMetric = FlarialGUI::getFlarialTextSize(String::StrToWStr(name).c_str(), keycardSize * 5, keycardSize, DWRITE_TEXT_ALIGNMENT_LEADING, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, true);
-
-                auto it = std::ranges::find(APIUtils::onlineUsers, clearedName);
-                if (it != APIUtils::onlineUsers.end()) textMetric.x += Constraints::SpacingConstraint(0.6, keycardSize);
-
-                if (textMetric.x > curMax) curMax = textMetric.x;
-                if (i < maxColumn) totalHeight += keycardSize * 0.7f;
-
-                validPlayers++;
-
-                if ((i + 1) % maxColumn == 0 || i == vecmap.size() - 1) {
-                    totalWidth += curMax + keycardSize * (showHeads ? 1 : 0.4);
-                    columnx.push_back(curMax + keycardSize * (showHeads ? 1 : 0.4f));
-                    curMax = 0;
-                }
+                baseTotalHeight = totalHeight;
+            } else {
+                totalHeight += baseTotalHeight;
             }
 
-            std::string curPlayer;
-            std::string countTxt;
-            ImVec2 curPlayerMetrics;
-            ImVec2 curPingMetrics;
-
             if (getOps<bool>("worldName")) {
-                ImVec2 serverIpMetrics = FlarialGUI::getFlarialTextSize(FlarialGUI::to_wide(SDK::clientInstance->getLocalPlayer()->getLevel()->getLevelData()->getLevelName()).c_str(), keycardSize * 5, keycardSize, DWRITE_TEXT_ALIGNMENT_LEADING, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, true);
-                if (totalWidth < serverIpMetrics.x + keycardSize) totalWidth = serverIpMetrics.x + keycardSize;
+                std::string worldName = SDK::clientInstance->getLocalPlayer()->getLevel()->getLevelData()->getLevelName();
+                if (worldName != cache_worldName) {
+                    worldNameMetrics = FlarialGUI::getFlarialTextSize(FlarialGUI::to_wide(worldName).c_str(), keycardSize * 5, keycardSize, DWRITE_TEXT_ALIGNMENT_LEADING, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, true);
+                    cache_worldName = worldName;
+                }
+                if (totalWidth < worldNameMetrics.x + keycardSize) totalWidth = worldNameMetrics.x + keycardSize;
 
                 totalHeight += keycardSize * 1.25f;
             }
 
             if (getOps<bool>("serverPing")) {
-                curPingMetrics = FlarialGUI::getFlarialTextSize(FlarialGUI::to_wide("Ping:__" + std::format("{}ms", SDK::getServerPing())).c_str(), keycardSize * 5, keycardSize, DWRITE_TEXT_ALIGNMENT_LEADING, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, true);
-                curPingMetrics.x += Constraints::SpacingConstraint(0.5, keycardSize);
-
+                std::string serverPing = "Ping:__" + std::format("{}ms", SDK::getServerPing());
+                if (serverPing != cache_serverPing) {
+                    curPingMetrics = FlarialGUI::getFlarialTextSize(FlarialGUI::to_wide(serverPing).c_str(), keycardSize * 5, keycardSize, DWRITE_TEXT_ALIGNMENT_LEADING, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, true);
+                    curPingMetrics.x += Constraints::SpacingConstraint(0.5, keycardSize);
+                    cache_serverPing = serverPing;
+                }
                 if (totalWidth < curPingMetrics.x + keycardSize) totalWidth = curPingMetrics.x + keycardSize;
 
                 totalHeight += keycardSize * 0.75f;
             }
 
             if (getOps<bool>("playerCount")) {
-                countTxt = std::to_string(validPlayers) + " player(s) online";
-                curPlayer = module && module->isEnabled() && !NickModule::backupOri.empty() ? module->getOps<std::string>("nick") : SDK::clientInstance->getLocalPlayer()->getPlayerName();
+                std::string playerCount = std::to_string(validPlayers) + " player(s) online";
+                if (playerCount != cache_playerCount) {
+                    playerCountMetrics = FlarialGUI::getFlarialTextSize(FlarialGUI::to_wide(playerCount).c_str(), keycardSize * 5, keycardSize, DWRITE_TEXT_ALIGNMENT_LEADING, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, true);
+                    cache_playerCount = playerCount;
+                }
 
-                curPlayer = String::removeColorCodes(curPlayer);
-                if (!curPlayer.empty()) curPlayer = String::removeNonAlphanumeric(curPlayer);
+                std::string curPlayer = "Player:__" + String::removeNonAlphanumeric(String::removeColorCodes(module && module->isEnabled() && !NickModule::backupOri.empty() ? module->getOps<std::string>("nick") : SDK::clientInstance->getLocalPlayer()->getPlayerName()));
+                if (curPlayer != cache_curPlayer) {
+                    curPlayerMetrics = FlarialGUI::getFlarialTextSize(FlarialGUI::to_wide(curPlayer).c_str(), keycardSize * 5, keycardSize, DWRITE_TEXT_ALIGNMENT_LEADING, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, true);
+                    curPlayerMetrics.x += Constraints::SpacingConstraint(0.5, keycardSize);
+                    cache_curPlayer = curPlayer;
+                }
 
-                ImVec2 countTxtMetrics = FlarialGUI::getFlarialTextSize(FlarialGUI::to_wide(countTxt).c_str(), keycardSize * 5, keycardSize, DWRITE_TEXT_ALIGNMENT_LEADING, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, true);
-                curPlayerMetrics = FlarialGUI::getFlarialTextSize(FlarialGUI::to_wide("Player:__" + curPlayer).c_str(), keycardSize * 5, keycardSize, DWRITE_TEXT_ALIGNMENT_LEADING, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, true);
-                curPlayerMetrics.x += Constraints::SpacingConstraint(0.5, keycardSize);
-
-                if (totalWidth < countTxtMetrics.x + keycardSize) totalWidth = countTxtMetrics.x + keycardSize;
+                if (totalWidth < playerCountMetrics.x + keycardSize) totalWidth = playerCountMetrics.x + keycardSize;
                 if (totalWidth < curPlayerMetrics.x + keycardSize) totalWidth = curPlayerMetrics.x + keycardSize;
 
                 totalHeight += keycardSize * 2.f;
             }
-
 
             Vec2<float> realcenter;
             if (settingperc.x != 0 || settingperc.y != 0) realcenter = Vec2<float>(settingperc.x * MC::windowSize.x, settingperc.y * MC::windowSize.y);
@@ -1090,7 +1107,7 @@ void TabList::onRender(RenderEvent &event) {
                         textY + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * getOps<float>("uiscale"),
                         FlarialGUI::to_wide(SDK::clientInstance->getLocalPlayer()->getLevel()->getLevelData()->getLevelName()).c_str(), 0, keycardSize * 0.5f + Constraints::SpacingConstraint(0.70, keycardSize), DWRITE_TEXT_ALIGNMENT_CENTER, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, getColor("textShadow"), true);
 
-                FlarialGUI::FlarialTextWithFont(textX, textY, FlarialGUI::to_wide(SDK::clientInstance->getLocalPlayer()->getLevel()->getLevelData()->getLevelName()).c_str(), 0, keycardSize * 0.5f + Constraints::SpacingConstraint(0.70, keycardSize), DWRITE_TEXT_ALIGNMENT_CENTER, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
+                FlarialGUI::FlarialTextWithFont(textX, textY, FlarialGUI::to_wide(cache_worldName).c_str(), 0, keycardSize * 0.5f + Constraints::SpacingConstraint(0.70, keycardSize), DWRITE_TEXT_ALIGNMENT_CENTER, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
             }
 
             if (getOps<bool>("serverPing")) {

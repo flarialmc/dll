@@ -15,14 +15,14 @@ private:
         MCCColor *changeColor,
         MCCColor *changeColor2,
         MCCColor *glintColor,
-        unsigned int uvOffset1,
-        unsigned int uvOffset2,
-        float uvRot1,
-        float uvRot2,
-        BaseActorRenderContext **glintUVScale,
-        MCCColor *uvAnim,
-        float br,
-        unsigned __int8 *lightEmission
+        void *uvOffset1,
+        void *uvOffset2,
+        void *uvRot1,
+        void *uvRot2,
+        void **glintUVScale,
+        void *uvAnim,
+        float brightness,
+        void *lightEmission
     );
 
 public:
@@ -34,14 +34,14 @@ public:
         MCCColor *changeColor,
         MCCColor *changeColor2,
         MCCColor *glintColor,
-        unsigned int uvOffset1,
-        unsigned int uvOffset2,
-        float uvRot1,
-        float uvRot2,
-        BaseActorRenderContext **glintUVScale,
-        MCCColor *uvAnim,
-        float br,
-        unsigned __int8 *lightEmission
+        void *uvOffset1,
+        void *uvOffset2,
+        void *uvRot1,
+        void *uvRot2,
+        void **glintUVScale,
+        void *uvAnim,
+        float brightness,
+        void *lightEmission
     );
 
     static inline ActorShaderParamsOriginal funcOriginal = nullptr;

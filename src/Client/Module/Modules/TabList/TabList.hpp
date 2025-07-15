@@ -7,7 +7,27 @@
 #include "Events/EventManager.hpp"
 
 class TabList : public Module {
+private:
+    bool refreshCache = true;
 
+    std::vector<float> columnx;
+    std::vector<PlayerListEntry> vecmap;
+    float totalWidth;
+    float baseTotalHeight;
+    size_t validPlayers;
+
+    std::string cache_worldName;
+    std::string cache_serverPing;
+    std::string cache_playerCount;
+    std::string cache_curPlayer;
+
+    ImVec2 worldNameMetrics;
+    ImVec2 curPingMetrics;
+    ImVec2 playerCountMetrics;
+    ImVec2 curPlayerMetrics;
+
+    std::string curPlayer;
+    std::string countTxt;
 public:
 
 

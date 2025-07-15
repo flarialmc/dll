@@ -16,20 +16,17 @@ void ActorShaderParamsHook::ActorShaderParamsCallback(
     MCCColor *changeColor,
     MCCColor *changeColor2,
     MCCColor *glintColor,
-    unsigned int uvOffset1,
-    unsigned int uvOffset2,
-    float uvRot1,
-    float uvRot2,
-    BaseActorRenderContext **glintUVScale,
-    MCCColor *uvAnim,
-    float br,
-    unsigned char *lightEmission
+    void *uvOffset1,
+    void *uvOffset2,
+    void *uvRot1,
+    void *uvRot2,
+    void **glintUVScale,
+    void *uvAnim,
+    float brightness,
+    void *lightEmission
 ) {
-    auto event = nes::make_holder<ActorShaderParamsEvent>(entity, overlay, changeColor, glintColor, lightEmission);
+    auto event = nes::make_holder<ActorShaderParamsEvent>(overlay, changeColor, glintColor);
     eventMgr.trigger(event);
-    overlay = event->getOverlay();
-    changeColor = event->getChangeColor();
-    glintColor = event->getGlintColor();
-    lightEmission = event->getLightEmission();
-    return funcOriginal(screenContext, entityContext, entity, overlay, changeColor, changeColor2, glintColor, uvOffset1, uvOffset2, uvRot1, uvRot2, glintUVScale, uvAnim, br, lightEmission);
+
+    return funcOriginal(screenContext, entityContext, entity, event->getOverlay(), event->getChangeColor(), changeColor2, event->getGlintColor(), uvOffset1, uvOffset2, uvRot1, uvRot2, glintUVScale, uvAnim, brightness, lightEmission);
 }
