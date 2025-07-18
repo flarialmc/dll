@@ -73,7 +73,11 @@ public:
 
 	std::string getFacingDirection(LocalPlayer* player);
 
-	std::string getCPU();
+	std::wstring GetCpuName();
+
+	DWORD GetCpuCoreCount();
+
+	DWORD GetCpuThreadCount();
 
 	std::string getDimensionName();
 
@@ -100,4 +104,5 @@ public:
 	void onGetViewPerspective(PerspectiveEvent& event);
 
 	void drawVector(ImDrawList* drawList, ImVec2 center, ImVec2 endPos, ImU32 col, float lineWidth, float lineLength, float guiscale);
+
 };
