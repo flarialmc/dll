@@ -179,7 +179,7 @@ void ModuleManager::initialize() {
 	addModule<Sneak>();
 	addModule<Sprint>();
 	addModule<Hitbox>();
-	addModule<GlintColor>();
+	if (VersionUtils::checkAboveOrEqual(21, 80)) addModule<GlintColor>();
 	addModule<HurtColor>();
 	addModule<ThirdPerson>();
 	addModule<JavaDynamicFOV>();
