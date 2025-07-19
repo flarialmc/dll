@@ -576,7 +576,7 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
         right.emplace_back("");
 
         if (isOnBlock(8)) {
-            if (spoof) right.emplace_back("69x Intel 9 7900X3D ProMax Plus (420 Cores)");
+            if (spoof) right.emplace_back("CPU: 69x Intel 9 7900X3D ProMax Plus (420 Cores)");
             else {
                 if (cpuName.empty()) {
                     std::wstring temp(std::format(L"CPU: {}x {} ({} Cores)", GetCpuThreadCount(), GetCpuName(), GetCpuCoreCount()));
