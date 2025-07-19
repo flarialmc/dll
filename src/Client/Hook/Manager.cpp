@@ -41,6 +41,7 @@
 #include "Hooks/Render/BobHurt.hpp"
 #include "Hooks/Visual/ActorShaderParams.hpp"
 #include "Hooks/Visual/TintColorHook.hpp"
+#include "Hooks/Render/RenderLevelHook.hpp"
 
 std::vector<std::shared_ptr<Hook>> HookManager::hooks;
 
@@ -129,7 +130,7 @@ void HookManager::initialize() {
     addHook<BobHurtHook>();
     addHook<TintColorHook>();
     addHook<ActorShaderParamsHook>();
-
+    addHook<RenderLevelHook>();
 
     if(VersionUtils::checkAboveOrEqual(21, 40)) {
         addHook<UpdatePlayerHook>();
