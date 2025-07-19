@@ -935,16 +935,6 @@ void TabList::onRender(RenderEvent &event) {
                 columnx.clear();
                 refreshCache = true;
                 vecmap = sortVecmap(pmap_cache, flarialFirst, alphaOrder);
-                // vecmap = alphaOrder
-                //              ? copyMapInAlphabeticalOrder(pmap_cache, flarialFirst)
-                //              : (flarialFirst
-                //                     ? sortByFlarialHierarchy(pmap_cache)
-                //                     : [] {
-                //                         std::vector<PlayerListEntry> v;
-                //                         v.reserve(pmap_cache.size());
-                //                         for (const auto &pair: pmap_cache) v.push_back(pair.second);
-                //                         return v;
-                //                     }());
 
                 totalWidth = keycardSize * (showHeads ? 1 : 0.4);
 
