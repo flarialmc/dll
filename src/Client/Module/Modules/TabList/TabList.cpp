@@ -405,6 +405,21 @@ void TabList::defaultConfig() {
     setDef("flarialFirst", true);
 }
 
+void TabList::onSetup() {
+    keybindActions.clear();
+
+    keybindActions.push_back([this](std::vector<std::any> args)-> std::any {
+        if (SDK::getCurrentScreen() != "hud_screen" &&
+            SDK::getCurrentScreen() != "zoom_screen" &&
+            SDK::getCurrentScreen() != "f3_screen" && this->name != "ClickGUI"
+        )
+            return {};
+        this->active = !this->active;
+        refreshCache = true;
+        return {};
+    });
+}
+
 void TabList::settingsRender(float settingsOffset) {
     float x = Constraints::PercentageConstraint(0.019, "left");
     float y = Constraints::PercentageConstraint(0.10, "top");
@@ -930,7 +945,7 @@ void TabList::onRender(RenderEvent &event) {
                 lastPlayerMapUpdate = now;
             }
 
-            if (vecmap.size() != pmap_cache.size()) {
+            if (vecmap.size() != pmap_cache.size() || refreshCache) {
                 totalHeight = 0;
                 columnx.clear();
                 refreshCache = true;
@@ -980,7 +995,7 @@ void TabList::onRender(RenderEvent &event) {
 
             if (getOps<bool>("worldName")) {
                 std::string worldName = SDK::clientInstance->getLocalPlayer()->getLevel()->getLevelData()->getLevelName();
-                if (worldName != cache_worldName) {
+                if (worldName != cache_worldName || refreshCache) {
                     worldNameMetrics = FlarialGUI::getFlarialTextSize(FlarialGUI::to_wide(worldName).c_str(), keycardSize * 5, keycardSize, DWRITE_TEXT_ALIGNMENT_LEADING, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, true);
                     cache_worldName = worldName;
                 }
@@ -991,7 +1006,7 @@ void TabList::onRender(RenderEvent &event) {
 
             if (getOps<bool>("serverPing")) {
                 std::string serverPing = "Ping:__" + std::format("{}ms", SDK::getServerPing());
-                if (serverPing != cache_serverPing) {
+                if (serverPing != cache_serverPing || refreshCache) {
                     curPingMetrics = FlarialGUI::getFlarialTextSize(FlarialGUI::to_wide(serverPing).c_str(), keycardSize * 5, keycardSize, DWRITE_TEXT_ALIGNMENT_LEADING, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, true);
                     curPingMetrics.x += Constraints::SpacingConstraint(0.5, keycardSize);
                     cache_serverPing = serverPing;
@@ -1003,14 +1018,14 @@ void TabList::onRender(RenderEvent &event) {
 
             if (getOps<bool>("playerCount")) {
                 std::string playerCount = std::to_string(validPlayers) + " player(s) online";
-                if (playerCount != cache_playerCount) {
+                if (playerCount != cache_playerCount || refreshCache) {
                     playerCountMetrics = FlarialGUI::getFlarialTextSize(FlarialGUI::to_wide(playerCount).c_str(), keycardSize * 5, keycardSize, DWRITE_TEXT_ALIGNMENT_LEADING, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, true);
                     cache_playerCount = playerCount;
                 }
 
                 std::string _curPlayer = String::removeNonAlphanumeric(String::removeColorCodes(module && module->isEnabled() && !NickModule::backupOri.empty() ? module->getOps<std::string>("nick") : SDK::clientInstance->getLocalPlayer()->getPlayerName()));
                 std::string curPlayer = "Player:__" + _curPlayer;
-                if (_curPlayer != cache_curPlayer) {
+                if (_curPlayer != cache_curPlayer || refreshCache) {
                     curPlayerMetrics = FlarialGUI::getFlarialTextSize(FlarialGUI::to_wide(curPlayer).c_str(), keycardSize * 5, keycardSize, DWRITE_TEXT_ALIGNMENT_LEADING, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, true);
                     curPlayerMetrics.x += Constraints::SpacingConstraint(0.5, keycardSize);
                     cache_curPlayer = _curPlayer;

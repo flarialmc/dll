@@ -80,6 +80,8 @@ public:
 
     void defaultConfig() override;
 
+    void onSetup() override;
+
     void settingsRender(float settingsOffset) override;
 
     static int getRolePriority(const std::string &name);
