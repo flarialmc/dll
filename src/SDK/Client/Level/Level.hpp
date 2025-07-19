@@ -44,10 +44,6 @@ public:
     PlayerSkin playerSkin;
     MCCColor color;
     bool isTeacher, isHost, isSubClient;
-
-    PlayerListEntry &operator=(const PlayerListEntry &other) {
-        return *this;
-    }
 };
 
 class PlayerListEntry_1_21_90 {
@@ -59,10 +55,6 @@ public:
     PlayerSkin_1_21_90 playerSkin;
     MCCColor color;
     bool isTeacher, isHost, isSubClient;
-
-    PlayerListEntry_1_21_90 &operator=(const PlayerListEntry_1_21_90 &other) {
-        return *this;
-    }
 };
 
 

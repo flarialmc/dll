@@ -3,7 +3,6 @@
 #include <wrl/client.h>
 #include <unordered_map>
 #include <mutex>
-#include <set>
 #include <chrono>
 #include <atomic>
 #include <thread>
@@ -465,116 +464,74 @@ int TabList::getRolePriority(const std::string &name) {
     return 5; // Default Flarial user (in onlineUsers but no specific role)
 }
 
-std::vector<PlayerListEntry> TabList::sortByFlarialHierarchy(
-    const std::unordered_map<mcUUID, PlayerListEntry> &sourceMap) {
-    // 1. Create a vector of PlayerListEntry objects, not pointers.
-    std::vector<PlayerListEntry> players;
-    players.reserve(sourceMap.size());
-
-    // 2. Populate the vector by copying the PlayerListEntry from the map.
-    for (const auto &pair: sourceMap) {
-        players.push_back(pair.second); // We copy the value (PlayerListEntry)
-    }
-
-    // 3. Sort the vector of objects directly.
-    std::sort(players.begin(), players.end(), [](const PlayerListEntry &a, const PlayerListEntry &b) {
-        // The lambda now compares PlayerListEntry objects by const reference.
-        // We access members directly (e.g., a.name) instead of through a pointer (e.g., a->second.name).
-
-        int priorityA = getRolePriority(a.name);
-        int priorityB = getRolePriority(b.name);
-        if (priorityA != priorityB) {
-            return priorityA < priorityB;
-        }
-
-        // The comparison logic remains the same, just with direct member access.
-        return std::lexicographical_compare(
-            a.name.begin(), a.name.end(),
-            b.name.begin(), b.name.end(),
-            [](char c1, char c2) {
-                return std::tolower(static_cast<unsigned char>(c1)) < std::tolower(static_cast<unsigned char>(c2));
-            });
-    });
-
-    return players;
-}
-
-std::vector<PlayerListEntry> TabList::copyMapInAlphabeticalOrder(
-    const std::unordered_map<mcUUID, PlayerListEntry> &sourceMap, bool flarialFirst) {
-    // 1. Create vectors of PlayerListEntry objects, not pointers.
-    std::vector<PlayerListEntry> flarialEntries;
-    std::vector<PlayerListEntry> nonFlarialEntries;
-
-    // 2. Populate the vectors by copying the PlayerListEntry from the map.
-    for (const auto &pair: sourceMap) {
-        const PlayerListEntry &entry = pair.second;
-        if (entry.name.empty()) {
-            continue;
-        }
-
-        std::string clearedName = String::removeNonAlphanumeric(String::removeColorCodes(entry.name));
-        if (clearedName.empty()) {
-            clearedName = entry.name;
-        }
-
-        auto it = std::ranges::find(APIUtils::onlineUsers, clearedName);
-
-        // 'flarialFirst' controls whether we split the list or treat everyone the same.
-        if (flarialFirst && it != APIUtils::onlineUsers.end()) {
-            flarialEntries.push_back(entry); // Copy the object
-        } else {
-            nonFlarialEntries.push_back(entry); // Copy the object
-        }
-    }
-
-    // 3. Update sorting lambdas to accept objects by const reference.
-    auto sortByRoleAndName = [](const PlayerListEntry &a, const PlayerListEntry &b) {
-        int priorityA = getRolePriority(a.name);
-        int priorityB = getRolePriority(b.name);
-        if (priorityA != priorityB) {
-            return priorityA < priorityB;
-        }
-        return std::lexicographical_compare(
-            a.name.begin(), a.name.end(),
-            b.name.begin(), b.name.end(),
-            [](char c1, char c2) {
-                return std::tolower(static_cast<unsigned char>(c1)) < std::tolower(static_cast<unsigned char>(c2));
-            });
-    };
-
-    auto sortByName = [](const PlayerListEntry &a, const PlayerListEntry &b) {
-        return std::lexicographical_compare(
-            a.name.begin(), a.name.end(),
-            b.name.begin(), b.name.end(),
-            [](char c1, char c2) {
-                return std::tolower(static_cast<unsigned char>(c1)) < std::tolower(static_cast<unsigned char>(c2));
-            });
-    };
-
-    // 4. Build the final result vector (which also contains objects).
-    std::vector<PlayerListEntry> result;
-    result.reserve(sourceMap.size()); // Pre-allocate memory for efficiency
-
+std::vector<PlayerListEntry> TabList::sortVecmap(
+    const std::unordered_map<mcUUID, PlayerListEntry> &sourceMap, bool flarialFirst, bool sort) {
     if (flarialFirst) {
-        // Sort the two lists separately with their respective rules.
-        std::sort(flarialEntries.begin(), flarialEntries.end(), sortByRoleAndName);
-        std::sort(nonFlarialEntries.begin(), nonFlarialEntries.end(), sortByName);
+        std::vector<PlayerListEntry> flarialEntries;
+        std::vector<PlayerListEntry> nonFlarialEntries;
 
-        // Combine the sorted lists.
+        for (const auto &pair: sourceMap) {
+            const PlayerListEntry &entry = pair.second;
+            if (entry.name.empty()) continue;
+
+            std::string clearedName = String::removeNonAlphanumeric(String::removeColorCodes(entry.name));
+            if (clearedName.empty()) clearedName = entry.name;
+
+            auto it = std::ranges::find(APIUtils::onlineUsers, clearedName);
+            if (it != APIUtils::onlineUsers.end()) {
+                flarialEntries.push_back(entry);
+            } else {
+                nonFlarialEntries.push_back(entry);
+            }
+        }
+
+        if (sort) {
+            auto sortByName = [](const PlayerListEntry &a, const PlayerListEntry &b) {
+                std::string clean_a = String::removeColorCodes(a.name);
+                std::string clean_b = String::removeColorCodes(b.name);
+                return std::lexicographical_compare(clean_a.begin(), clean_a.end(), clean_b.begin(), clean_b.end(),
+                                                    [](char c1, char c2) { return std::tolower(static_cast<unsigned char>(c1)) < std::tolower(static_cast<unsigned char>(c2)); });
+            };
+
+            auto sortByRoleAndName = [&sortByName](const PlayerListEntry &a, const PlayerListEntry &b) {
+                int priorityA = getRolePriority(a.name);
+                int priorityB = getRolePriority(b.name);
+                if (priorityA != priorityB) return priorityA < priorityB;
+                return sortByName(a, b);
+            };
+
+            std::sort(flarialEntries.begin(), flarialEntries.end(), sortByRoleAndName);
+            std::sort(nonFlarialEntries.begin(), nonFlarialEntries.end(), sortByName);
+        }
+
+        std::vector<PlayerListEntry> result;
+        result.reserve(sourceMap.size());
         result.insert(result.end(), flarialEntries.begin(), flarialEntries.end());
         result.insert(result.end(), nonFlarialEntries.begin(), nonFlarialEntries.end());
+        return result;
     } else {
-        // If not 'flarialFirst', all players are in 'nonFlarialEntries'.
-        // We just need to sort this combined list by name.
-        result = std::move(nonFlarialEntries); // Efficiently move the data
-        std::sort(result.begin(), result.end(), sortByName);
+        std::vector<PlayerListEntry> result;
+        result.reserve(sourceMap.size());
+        for (const auto &pair: sourceMap) {
+            if (!pair.second.name.empty()) {
+                result.push_back(pair.second);
+            }
+        }
+
+        // Conditionally sort the single list.
+        if (sort) {
+            auto sortByName = [](const PlayerListEntry &a, const PlayerListEntry &b) {
+                std::string clean_a = String::removeColorCodes(a.name);
+                std::string clean_b = String::removeColorCodes(b.name);
+                return std::lexicographical_compare(clean_a.begin(), clean_a.end(), clean_b.begin(), clean_b.end(),
+                                                    [](char c1, char c2) { return std::tolower(static_cast<unsigned char>(c1)) < std::tolower(static_cast<unsigned char>(c2)); });
+            };
+            std::sort(result.begin(), result.end(), sortByName);
+        }
+
+        return result;
     }
-
-    return result;
 }
-
-// DX11 player head texture storage
-
 
 // DX11 texture creation from raw bytes
 // Synchronous DX11 texture creation (called from worker threads)
@@ -641,9 +598,6 @@ ID3D11ShaderResourceView *CreateTextureFromBytesDX11Sync(
     return playerTex.srv.get();
 }
 
-// =================================================================================
-// START OF CHANGES: Rewritten DX12 Sync Texture Creation
-// =================================================================================
 PlayerHeadTexture *CreateTextureFromBytesDX12Sync(
     const std::string &playerName,
     const unsigned char *data,
@@ -845,10 +799,6 @@ PlayerHeadTexture *CreateTextureFromBytesDX12Sync(
     return &playerTex;
 }
 
-// =================================================================================
-// END OF CHANGES: Rewritten DX12 Sync Texture Creation
-// =================================================================================
-
 // Async DX12 texture creation (queues loading, returns immediately)
 PlayerHeadTexture *CreateTextureFromBytesDX12(
     const std::string &playerName,
@@ -963,33 +913,38 @@ void TabList::onRender(RenderEvent &event) {
             bool flarialFirst = getOps<bool>("flarialFirst");
 
             // if (SwapchainHook::queue != nullptr) showHeads = false;
-
-            // Define role logos for reuse in both branches
-            std::map<std::string, int> roleLogos = {{"Dev", IDR_CYAN_LOGO_PNG}, {"Staff", IDR_WHITE_LOGO_PNG}, {"Gamer", IDR_GAMER_LOGO_PNG}, {"Booster", IDR_BOOSTER_LOGO_PNG}, {"Supporter", IDR_SUPPORTER_LOGO_PNG}, {"Default", IDR_RED_LOGO_PNG}};
             auto module = ModuleManager::getModule("Nick");
 
             int maxColumn = floor(getOps<int>("maxColumn"));
 
             float fontSize = Constraints::SpacingConstraint(3, keycardSize);
 
-            float totalHeight = keycardSize * 0.5f;
+            float totalHeight = 0;
 
             // do some caching bullshit
-            if (vecmap.size() != SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap().size()) {
+            // getPlayerMap() is expensive to run so we only check for updates every second
+
+            auto now = std::chrono::steady_clock::now();
+            if (std::chrono::duration_cast<std::chrono::seconds>(now - lastPlayerMapUpdate).count() >= 1) {
+                pmap_cache = SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap();
+                lastPlayerMapUpdate = now;
+            }
+
+            if (vecmap.size() != pmap_cache.size()) {
                 totalHeight = 0;
                 columnx.clear();
                 refreshCache = true;
-                vecmap = alphaOrder
-                             ? copyMapInAlphabeticalOrder(SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap(), flarialFirst)
-                             : (flarialFirst
-                                    ? sortByFlarialHierarchy(SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap())
-                                    : [] {
-                                        const auto &map = SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap();
-                                        std::vector<PlayerListEntry> v;
-                                        v.reserve(map.size());
-                                        for (const auto &pair: map) v.push_back(pair.second);
-                                        return v;
-                                    }());
+                vecmap = sortVecmap(pmap_cache, flarialFirst, alphaOrder);
+                // vecmap = alphaOrder
+                //              ? copyMapInAlphabeticalOrder(pmap_cache, flarialFirst)
+                //              : (flarialFirst
+                //                     ? sortByFlarialHierarchy(pmap_cache)
+                //                     : [] {
+                //                         std::vector<PlayerListEntry> v;
+                //                         v.reserve(pmap_cache.size());
+                //                         for (const auto &pair: pmap_cache) v.push_back(pair.second);
+                //                         return v;
+                //                     }());
 
                 totalWidth = keycardSize * (showHeads ? 1 : 0.4);
 
@@ -1030,7 +985,7 @@ void TabList::onRender(RenderEvent &event) {
 
                 baseTotalHeight = totalHeight;
             } else {
-                totalHeight += baseTotalHeight;
+                totalHeight = baseTotalHeight;
             }
 
             if (getOps<bool>("worldName")) {
@@ -1063,11 +1018,12 @@ void TabList::onRender(RenderEvent &event) {
                     cache_playerCount = playerCount;
                 }
 
-                std::string curPlayer = "Player:__" + String::removeNonAlphanumeric(String::removeColorCodes(module && module->isEnabled() && !NickModule::backupOri.empty() ? module->getOps<std::string>("nick") : SDK::clientInstance->getLocalPlayer()->getPlayerName()));
-                if (curPlayer != cache_curPlayer) {
+                std::string _curPlayer = String::removeNonAlphanumeric(String::removeColorCodes(module && module->isEnabled() && !NickModule::backupOri.empty() ? module->getOps<std::string>("nick") : SDK::clientInstance->getLocalPlayer()->getPlayerName()));
+                std::string curPlayer = "Player:__" + _curPlayer;
+                if (_curPlayer != cache_curPlayer) {
                     curPlayerMetrics = FlarialGUI::getFlarialTextSize(FlarialGUI::to_wide(curPlayer).c_str(), keycardSize * 5, keycardSize, DWRITE_TEXT_ALIGNMENT_LEADING, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, true);
                     curPlayerMetrics.x += Constraints::SpacingConstraint(0.5, keycardSize);
-                    cache_curPlayer = curPlayer;
+                    cache_curPlayer = _curPlayer;
                 }
 
                 if (totalWidth < playerCountMetrics.x + keycardSize) totalWidth = playerCountMetrics.x + keycardSize;
@@ -1151,15 +1107,16 @@ void TabList::onRender(RenderEvent &event) {
             for (size_t i = 0; i < vecmap.size(); i++) {
                 if (!vecmap[i].name.size() || vecmap[i].name.empty()) continue;
 
-                std::string name = String::removeColorCodes(vecmap[i].name);
-                if (name.empty()) continue;
+                std::string pname = String::removeColorCodes(vecmap[i].name);
+                if (pname.empty()) continue;
 
-                std::string clearedName = String::removeNonAlphanumeric(name);
-                if (clearedName.empty()) clearedName = name;
+                if (refreshCache) vectab[i].clearedName = String::removeNonAlphanumeric(pname);
+                if (vectab[i].clearedName.empty()) vectab[i].clearedName = pname;
 
-                if (module && module->isEnabled() && !NickModule::backupOri.empty() && clearedName == String::removeNonAlphanumeric(String::removeColorCodes(NickModule::backupOri))) {
-                    name = module->getOps<std::string>("nick");
-                    if (name.empty()) name = clearedName;
+                if (refreshCache) {
+                    if (module && module->isEnabled() && !NickModule::backupOri.empty() && vectab[i].clearedName == String::removeNonAlphanumeric(String::removeColorCodes(NickModule::backupOri))) {
+                        if (std::string nick = module->getOps<std::string>("nick"); !nick.empty()) vectab[i].clearedName = nick;
+                    }
                 }
 
                 float xx = 0;
@@ -1183,13 +1140,6 @@ void TabList::onRender(RenderEvent &event) {
 
                         // Determine skin format based on width (0 = classic 64x64, 1 = slim 64x64+)
                         int skinFormat = (skinImage.mWidth == 64) ? 0 : 1;
-                        std::vector<unsigned char> head = SkinStealCommand::cropHead(skinImage, skinFormat);
-                        std::vector<unsigned char> head2 = SkinStealCommand::cropHead(skinImage, skinFormat, true);
-
-                        if (head.empty() && head2.empty()) {
-                            if (logDebug) Logger::debug("Empty head data for player {}", vecmap[i].name);
-                            continue;
-                        }
 
                         std::string uniqueTextureKey = vecmap[i].playerSkin.mId;
 
@@ -1198,6 +1148,13 @@ void TabList::onRender(RenderEvent &event) {
                         if (SwapchainHook::queue != nullptr && g_playerHeadTextures.contains(uniqueTextureKey)) alrExists = true;
                         else if (g_playerHeadTexturesDX11.contains(uniqueTextureKey)) alrExists = true;
 
+                        std::vector<unsigned char> head = SkinStealCommand::cropHead(skinImage, skinFormat);
+                        std::vector<unsigned char> head2 = SkinStealCommand::cropHead(skinImage, skinFormat, true);
+
+                        if (head.empty() && head2.empty()) {
+                            if (logDebug) Logger::debug("Empty head data for player {}", vecmap[i].name);
+                            continue;
+                        }
                         // Dynamic head size detection and scaling for crisp pixels
                         // Support any skin resolution (64x64, 128x128, 256x256, etc.)
                         const int headSize = skinImage.mWidth / 8; // Head is always 1/8th of skin width
@@ -1247,17 +1204,19 @@ void TabList::onRender(RenderEvent &event) {
                             Logger::debug("Player {} scaled head: size={}, visible_pixels={}", playerName, scaledHead.size(), hasVisiblePixels);
                         }
 
-                        float headDisplaySize = Constraints::SpacingConstraint(0.6, keycardSize);
-                        float headDisplaySize2 = Constraints::SpacingConstraint(0.68, keycardSize);
-                        float diff = headDisplaySize2 - headDisplaySize;
+                        if (refreshCache) {
+                            headDisplaySize = Constraints::SpacingConstraint(0.6, keycardSize);
+                            headDisplaySize2 = Constraints::SpacingConstraint(0.68, keycardSize);
+                            diff = headDisplaySize2 - headDisplaySize;
 
-                        // Position for the head (left of the player name)
-                        ImVec2 headPos(fakex + Constraints::SpacingConstraint(0.45, keycardSize), realcenter.y + Constraints::SpacingConstraint(0.3, keycardSize));
-                        ImVec2 headPos2(
-                            fakex + Constraints::SpacingConstraint(0.45, keycardSize) - diff / 2.f,
-                            realcenter.y + Constraints::SpacingConstraint(0.3, keycardSize) - diff / 2.f);
-                        ImVec2 headSize2D(headDisplaySize, headDisplaySize);
-                        ImVec2 headSize22D(headDisplaySize2, headDisplaySize2);
+                            // Position for the head (left of the player name)
+                            vectab[i].headPos = ImVec2(fakex + Constraints::SpacingConstraint(0.45, keycardSize), realcenter.y + Constraints::SpacingConstraint(0.3, keycardSize));
+                            vectab[i].headPos2 = ImVec2(
+                                fakex + Constraints::SpacingConstraint(0.45, keycardSize) - diff / 2.f,
+                                realcenter.y + Constraints::SpacingConstraint(0.3, keycardSize) - diff / 2.f);
+                            vectab[i].headSize2D = ImVec2(headDisplaySize, headDisplaySize);
+                            vectab[i].headSize22D = ImVec2(headDisplaySize2, headDisplaySize2);
+                        }
 
                         if (SwapchainHook::queue != nullptr) {
                             // DX12 path
@@ -1276,10 +1235,10 @@ void TabList::onRender(RenderEvent &event) {
                                     if (logDebug) Logger::debug("DX12 GPU handle for {}: 0x{:x}", playerName, playerTex->srvGpuHandle.ptr);
 
                                     // Render with point filtering for crisp pixels
-                                    RenderPlayerHeadWithPointFiltering(playerTex->srvGpuHandle, D2D1::RectF(headPos.x, headPos.y, headPos.x + headSize2D.x, headPos.y + headSize2D.y), playerName);
-                                    RenderPlayerHeadWithPointFiltering(playerTex2->srvGpuHandle, D2D1::RectF(headPos2.x, headPos2.y, headPos2.x + headSize22D.x, headPos2.y + headSize22D.y), "_" + playerName);
+                                    RenderPlayerHeadWithPointFiltering(playerTex->srvGpuHandle, D2D1::RectF(vectab[i].headPos.x, vectab[i].headPos.y, vectab[i].headPos.x + vectab[i].headSize2D.x, vectab[i].headPos.y + vectab[i].headSize2D.y), playerName);
+                                    RenderPlayerHeadWithPointFiltering(playerTex2->srvGpuHandle, D2D1::RectF(vectab[i].headPos2.x, vectab[i].headPos2.y, vectab[i].headPos2.x + vectab[i].headSize22D.x, vectab[i].headPos2.y + vectab[i].headSize22D.y), "_" + playerName);
 
-                                    if (logDebug) Logger::debug("Rendered DX12 head for player {} at ({}, {})", playerName, headPos.x, headPos.y);
+                                    if (logDebug) Logger::debug("Rendered DX12 head for player {} at ({}, {})", playerName, vectab[i].headPos.x, vectab[i].headPos.y);
                                 }
                             } else {
                                 if (logDebug) Logger::debug("Failed to create/get DX12 texture for player {}", playerName);
@@ -1295,10 +1254,10 @@ void TabList::onRender(RenderEvent &event) {
                                     if (logDebug) Logger::debug("DX11 SRV for {}: 0x{:x}", playerName, reinterpret_cast<uintptr_t>(srv));
 
                                     // Render with point filtering for crisp pixels
-                                    RenderPlayerHeadWithPointFilteringDX11(srv, D2D1::RectF(headPos.x, headPos.y, headPos.x + headSize2D.x, headPos.y + headSize2D.y), playerName);
-                                    RenderPlayerHeadWithPointFilteringDX11(srv2, D2D1::RectF(headPos2.x, headPos2.y, headPos2.x + headSize22D.x, headPos2.y + headSize22D.y), "_" + playerName);
+                                    RenderPlayerHeadWithPointFilteringDX11(srv, D2D1::RectF(vectab[i].headPos.x, vectab[i].headPos.y, vectab[i].headPos.x + vectab[i].headSize2D.x, vectab[i].headPos.y + vectab[i].headSize2D.y), playerName);
+                                    RenderPlayerHeadWithPointFilteringDX11(srv2, D2D1::RectF(vectab[i].headPos2.x, vectab[i].headPos2.y, vectab[i].headPos2.x + vectab[i].headSize22D.x, vectab[i].headPos2.y + vectab[i].headSize22D.y), "_" + playerName);
 
-                                    if (logDebug) Logger::debug("Rendered DX11 head for player {} at ({}, {})", playerName, headPos.x, headPos.y);
+                                    if (logDebug) Logger::debug("Rendered DX11 head for player {} at ({}, {})", playerName, vectab[i].headPos.x, vectab[i].headPos.y);
                                 }
                                 // Don't release - it's managed by the cache now
                             } else {
@@ -1311,8 +1270,11 @@ void TabList::onRender(RenderEvent &event) {
                     // PLAYER HEAD END
                 }
 
-                auto pit = std::ranges::find(APIUtils::onlineUsers, clearedName);
-                ImVec2 pNameMetrics = FlarialGUI::getFlarialTextSize(String::StrToWStr(name).c_str(), columnx[i / maxColumn] - (0.825 * keycardSize), keycardSize, alignments[getOps<std::string>("textalignment")], floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, true);
+                auto pit = std::ranges::find(APIUtils::onlineUsers, vectab[i].clearedName);
+                if (refreshCache) {
+                    vectab[i].pNameMetrics = FlarialGUI::getFlarialTextSize(String::StrToWStr(vectab[i].clearedName).c_str(), columnx[i / maxColumn] - (0.825 * keycardSize), keycardSize, alignments[getOps<std::string>("textalignment")], floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, true);
+                    vectab[i].textWidth = columnx[i / maxColumn] - (0.825 * keycardSize);
+                }
 
                 if (pit != APIUtils::onlineUsers.end()) {
                     // FLARIAL TAG START
@@ -1323,45 +1285,66 @@ void TabList::onRender(RenderEvent &event) {
 
                     int imageResource = roleLogos["Default"];
                     for (const auto &[role, resource]: roleLogos) {
-                        if (APIUtils::hasRole(role, clearedName)) {
+                        if (APIUtils::hasRole(role, vectab[i].clearedName)) {
                             imageResource = resource;
                             break;
                         }
                     }
 
-                    float lol = columnx[i / maxColumn] - pNameMetrics.x;
-                    float trollOffset = keycardSize * (showHeads ? 1 : 0.3f);
+                    if (refreshCache) {
+                        float lol = columnx[i / maxColumn] - vectab[i].pNameMetrics.x;
+                        float trollOffset = keycardSize * (showHeads ? 1 : 0.3f);
 
-                    if (!showHeads && textAlignment == "Center") trollOffset -= keycardSize * 1.75f;
+                        if (!showHeads && textAlignment == "Center") trollOffset -= keycardSize * 1.75f;
 
-                    FlarialGUI::image(imageResource, D2D1::RectF(
-                                          fakex + Constraints::SpacingConstraint(p1, keycardSize) + trollOffset + (textAlignment == "Center" ? (lol / 2.f) - trollOffset * 0.75f : 0.f),
-                                          realcenter.y + Constraints::SpacingConstraint(p2, keycardSize) + Constraints::SpacingConstraint(0.17f, keycardSize),
-                                          fakex + Constraints::SpacingConstraint(p3, keycardSize) + trollOffset + (textAlignment == "Center" ? (lol / 2.f) - trollOffset * 0.75f : 0.f),
-                                          realcenter.y + Constraints::SpacingConstraint(p4, keycardSize) + Constraints::SpacingConstraint(0.17f, keycardSize)));
+                        vectab[i].imageRect = D2D1::RectF(
+                            fakex + Constraints::SpacingConstraint(p1, keycardSize) + trollOffset + (textAlignment == "Center" ? (lol / 2.f) - trollOffset * 0.75f : 0.f),
+                            realcenter.y + Constraints::SpacingConstraint(p2, keycardSize) + Constraints::SpacingConstraint(0.17f, keycardSize),
+                            fakex + Constraints::SpacingConstraint(p3, keycardSize) + trollOffset + (textAlignment == "Center" ? (lol / 2.f) - trollOffset * 0.75f : 0.f),
+                            realcenter.y + Constraints::SpacingConstraint(p4, keycardSize) + Constraints::SpacingConstraint(0.17f, keycardSize));
+                    }
+
+                    FlarialGUI::image(imageResource, vectab[i].imageRect);
 
                     xx += Constraints::SpacingConstraint(0.6, keycardSize);
 
                     // FLARIAL TAG END
 
-                    float textX = fakex + (textAlignment == "Center" ? xx / 2.f : textAlignment == "Right" ? 0 : xx) + keycardSize * (showHeads ? 1.2f : 0.5f);
-                    float textY = realcenter.y + Constraints::SpacingConstraint(0.12, keycardSize);
+                    if (refreshCache) {
+                        vectab[i].textX = fakex + (textAlignment == "Center" ? xx / 2.f : textAlignment == "Right" ? 0 : xx) + keycardSize * (showHeads ? 1.2f : 0.5f);
+                        vectab[i].textY = realcenter.y + Constraints::SpacingConstraint(0.12, keycardSize);
+                    }
+                    if (getOps<bool>("textShadow")) {
+                        if (refreshCache) {
+                            vectab[i].textShadowX = vectab[i].textX + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * getOps<float>("uiscale");
+                            vectab[i].textShadowY = vectab[i].textY + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * getOps<float>("uiscale");
+                        }
 
-                    if (getOps<bool>("textShadow"))
                         FlarialGUI::FlarialTextWithFont(
-                            textX + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * getOps<float>("uiscale"),
-                            textY + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * getOps<float>("uiscale"),
-                            String::StrToWStr(name).c_str(), columnx[i / maxColumn] - (0.825 * keycardSize), keycardSize, alignments[getOps<std::string>("textalignment")], floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, getColor("textShadow"), true);
+                            vectab[i].textShadowX,
+                            vectab[i].textShadowY,
+                            String::StrToWStr(vectab[i].clearedName).c_str(), vectab[i].textWidth, keycardSize, alignments[getOps<std::string>("textalignment")], floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, getColor("textShadow"), true);
+                    }
 
-                    FlarialGUI::FlarialTextWithFont(textX, textY, String::StrToWStr(name).c_str(), columnx[i / maxColumn] - (0.825 * keycardSize), keycardSize, alignments[getOps<std::string>("textalignment")], floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
+                    FlarialGUI::FlarialTextWithFont(vectab[i].textX, vectab[i].textY, String::StrToWStr(vectab[i].clearedName).c_str(), vectab[i].textWidth, keycardSize, alignments[getOps<std::string>("textalignment")], floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
                 } else {
-                    if (getOps<bool>("textShadow"))
+                    if (getOps<bool>("textShadow")) {
+                        if (refreshCache) {
+                            vectab[i].textShadowY2 = (realcenter.y + Constraints::SpacingConstraint(0.12, keycardSize)) + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * getOps<float>("uiscale");
+                            vectab[i].textShadowX2 = (fakex + xx + keycardSize * (showHeads ? 1.2f : 0.5f)) + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * getOps<float>("uiscale");
+                        }
                         FlarialGUI::FlarialTextWithFont(
-                            (fakex + xx + keycardSize * (showHeads ? 1.2f : 0.5f)) + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * getOps<float>("uiscale"),
-                            (realcenter.y + Constraints::SpacingConstraint(0.12, keycardSize)) + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * getOps<float>("uiscale"),
-                            String::StrToWStr(name).c_str(), columnx[i / maxColumn] - (0.825 * keycardSize), keycardSize, alignments[getOps<std::string>("textalignment")], floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, getColor("textShadow"), true);
+                            vectab[i].textShadowX2,
+                            vectab[i].textShadowY2,
+                            String::StrToWStr(vectab[i].clearedName).c_str(), vectab[i].textWidth, keycardSize, alignments[getOps<std::string>("textalignment")], floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, getColor("textShadow"), true);
+                    }
 
-                    FlarialGUI::FlarialTextWithFont(fakex + xx + keycardSize * (showHeads ? 1.2f : 0.5f), realcenter.y + Constraints::SpacingConstraint(0.12, keycardSize), String::StrToWStr(name).c_str(), columnx[i / maxColumn] - (0.825 * keycardSize), keycardSize, alignments[getOps<std::string>("textalignment")], floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
+                    if (refreshCache) {
+                        vectab[i].nfTextX = fakex + xx + keycardSize * (showHeads ? 1.2f : 0.5f);
+                        vectab[i].nfTextY = realcenter.y + Constraints::SpacingConstraint(0.12, keycardSize);
+                    }
+
+                    FlarialGUI::FlarialTextWithFont(vectab[i].nfTextX, vectab[i].nfTextY, String::StrToWStr(vectab[i].clearedName).c_str(), vectab[i].textWidth, keycardSize, alignments[getOps<std::string>("textalignment")], floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
                 }
                 realcenter.y += Constraints::SpacingConstraint(0.70, keycardSize);
 
@@ -1381,13 +1364,13 @@ void TabList::onRender(RenderEvent &event) {
 
                 int imageResource = roleLogos["Default"];
                 for (const auto &[role, resource]: roleLogos) {
-                    if (APIUtils::hasRole(role, curPlayer)) {
+                    if (APIUtils::hasRole(role, cache_curPlayer)) {
                         imageResource = resource;
                         break;
                     }
                 }
 
-                float textX1 = (MC::windowSize.x / 2.f) - (curPlayerMetrics.x / 2.2f);
+                if (refreshCache) textX1 = (MC::windowSize.x / 2.f) - (curPlayerMetrics.x / 2.2f);
 
                 if (getOps<bool>("textShadow"))
                     FlarialGUI::FlarialTextWithFont(
@@ -1397,35 +1380,38 @@ void TabList::onRender(RenderEvent &event) {
 
                 FlarialGUI::FlarialTextWithFont(textX1, curY, L"Player:", 0, keycardSize * 0.5f + Constraints::SpacingConstraint(0.70, keycardSize), DWRITE_TEXT_ALIGNMENT_LEADING, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
 
-                ImVec2 part1Metrics = FlarialGUI::getFlarialTextSize(L"Player:_", keycardSize * 5, keycardSize, DWRITE_TEXT_ALIGNMENT_LEADING, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, true);
+                if (refreshCache) part1Metrics = FlarialGUI::getFlarialTextSize(L"Player:_", keycardSize * 5, keycardSize, DWRITE_TEXT_ALIGNMENT_LEADING, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, true);
+
                 FlarialGUI::image(imageResource, D2D1::RectF(
                                       (MC::windowSize.x / 2.f) - (curPlayerMetrics.x / 2.f) + part1Metrics.x + Constraints::SpacingConstraint(p1, keycardSize) - Constraints::SpacingConstraint(0.1f, keycardSize),
                                       curY + Constraints::SpacingConstraint(p2, keycardSize) + Constraints::SpacingConstraint(p2, keycardSize) - Constraints::SpacingConstraint(0.05f, keycardSize),
                                       ((MC::windowSize.x / 2.f) - (curPlayerMetrics.x / 2.f) + part1Metrics.x) + Constraints::SpacingConstraint(p3, keycardSize) - Constraints::SpacingConstraint(0.1f, keycardSize),
                                       (curY + Constraints::SpacingConstraint(p2, keycardSize) + Constraints::SpacingConstraint(p4, keycardSize) - Constraints::SpacingConstraint(0.05f, keycardSize))));
 
-                float textX2 = (MC::windowSize.x / 2.f) - (curPlayerMetrics.x / 2.2f) + part1Metrics.x + Constraints::SpacingConstraint(0.5, keycardSize);
+                if (refreshCache) textX2 = (MC::windowSize.x / 2.f) - (curPlayerMetrics.x / 2.2f) + part1Metrics.x + Constraints::SpacingConstraint(0.5, keycardSize);
 
                 if (getOps<bool>("textShadow"))
                     FlarialGUI::FlarialTextWithFont(
                         textX2 + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * getOps<float>("uiscale"),
                         curY + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * getOps<float>("uiscale"),
-                        FlarialGUI::to_wide(curPlayer).c_str(), 0, keycardSize * 0.5f + Constraints::SpacingConstraint(0.70, keycardSize), DWRITE_TEXT_ALIGNMENT_LEADING, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, getColor("textShadow"), true);
+                        FlarialGUI::to_wide(cache_curPlayer).c_str(), 0, keycardSize * 0.5f + Constraints::SpacingConstraint(0.70, keycardSize), DWRITE_TEXT_ALIGNMENT_LEADING, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, getColor("textShadow"), true);
 
-                FlarialGUI::FlarialTextWithFont(textX2, curY, FlarialGUI::to_wide(curPlayer).c_str(), 0, keycardSize * 0.5f + Constraints::SpacingConstraint(0.70, keycardSize), DWRITE_TEXT_ALIGNMENT_LEADING, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
+                FlarialGUI::FlarialTextWithFont(textX2, curY, FlarialGUI::to_wide(cache_curPlayer).c_str(), 0, keycardSize * 0.5f + Constraints::SpacingConstraint(0.70, keycardSize), DWRITE_TEXT_ALIGNMENT_LEADING, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
 
                 curY += Constraints::SpacingConstraint(0.70, keycardSize);
 
-                float textX3 = MC::windowSize.x / 2.f;
+                if (refreshCache) textX3 = MC::windowSize.x / 2.f;
 
                 if (getOps<bool>("textShadow"))
                     FlarialGUI::FlarialTextWithFont(
                         textX3 + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * getOps<float>("uiscale"),
                         curY + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * getOps<float>("uiscale"),
-                        FlarialGUI::to_wide(countTxt).c_str(), 0, keycardSize * 0.5f + Constraints::SpacingConstraint(0.70, keycardSize), DWRITE_TEXT_ALIGNMENT_CENTER, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, getColor("textShadow"), true);
+                        FlarialGUI::to_wide(cache_playerCount).c_str(), 0, keycardSize * 0.5f + Constraints::SpacingConstraint(0.70, keycardSize), DWRITE_TEXT_ALIGNMENT_CENTER, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, getColor("textShadow"), true);
 
-                FlarialGUI::FlarialTextWithFont(textX3, curY, FlarialGUI::to_wide(countTxt).c_str(), 0, keycardSize * 0.5f + Constraints::SpacingConstraint(0.70, keycardSize), DWRITE_TEXT_ALIGNMENT_CENTER, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
+                FlarialGUI::FlarialTextWithFont(textX3, curY, FlarialGUI::to_wide(cache_playerCount).c_str(), 0, keycardSize * 0.5f + Constraints::SpacingConstraint(0.70, keycardSize), DWRITE_TEXT_ALIGNMENT_CENTER, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
             }
+
+            refreshCache = false;
         }
     }
 }
