@@ -1,3 +1,4 @@
+#pragma once
 #include "../../SDK/SDK.hpp"
 #include "../../SDK/Client/Level/LevelRender/LevelRender.hpp"
 #include "../../SDK/Client/Render/Material/MaterialPtr.hpp"

@@ -10,8 +10,6 @@ public:
     std::string Description;
     std::vector<std::string> Aliases;
 
-    inline static std::string prefix = ".";
-
     Command(std::string  name, std::string  description,
             const std::vector<std::string>& aliases = {})
         : Name(std::move(name)), Description(std::move(description)), Aliases(aliases) {}
@@ -26,7 +24,7 @@ public:
 
             SDK::clientInstance->getGuiData()->displayClientMessage(formattedMessage);
         } catch (const std::exception& e) {
-            Logger::error("addCommandMessage error: {}", e.what());
+            LOG_ERROR("addCommandMessage error: {}", e.what());
         }
     }
 };

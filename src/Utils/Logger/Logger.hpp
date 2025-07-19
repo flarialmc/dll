@@ -11,6 +11,10 @@
 #include <fmt/os.h>
 #include <fmt/ranges.h>
 
+#define LOG_ERROR(fmt, ...) Logger::error(fmt, __FILE__, __LINE__, ##__VA_ARGS__)
+#define LOG_FATAL(fmt, ...) Logger::fatal(fmt, __FILE__, __LINE__, ##__VA_ARGS__)
+
+
 namespace Logger {
     void writeToFile(const std::string& string);
     void initialize();
@@ -80,12 +84,14 @@ namespace Logger {
         Logger::print(fg(fmt::color::orange), "WARN", fmt, args...);
     }
 
-    void error(const std::string& fmt, auto&& ... args) {
-        Logger::print(fg(fmt::color::crimson), "ERROR", fmt, args...);
+    void error(const std::string& fmt, std::string f = __FILE__, int l = __LINE__, auto&& ... args) {
+        std::string n = fmt; n.insert(0, "[at {}:{}] ");
+        Logger::print(fg(fmt::color::crimson), "ERROR", n, f, l, args...);
     }
 
-    void fatal(const std::string& fmt, auto&& ... args) {
-        Logger::print(fg(fmt::color::rebecca_purple), "FATAL", fmt, args...);
+    void fatal(const std::string& fmt, std::string f = __FILE__, int l = __LINE__, auto&& ... args) {
+        std::string n = fmt; n.insert(0, "[at {}:{}] ");
+        Logger::print(fg(fmt::color::rebecca_purple), "FATAL", n, f, l, args...);
     }
 
     void custom(const fmt::text_style& ts, const std::string& level, const std::string& fmt, auto&& ... args) {
