@@ -2,11 +2,22 @@
 #include <cmath>
 #include <algorithm>
 #include <deque>
+#include <string>
+#include <vector>
+#include <format>
+
+#include <initguid.h>
+#include <windows.h>
+#include <setupapi.h>
+#include <devguid.h>
+#include <devpkey.h>
+
 #include "DebugMenu.hpp"
 #include "Tags.hpp"
 #include "Modules/Time/Time.hpp"
-#include "SDK/Client/Block/BlockLegacy.hpp"
 #include "Modules/CPS/CPSCounter.hpp"
+
+#include "SDK/Client/Block/BlockLegacy.hpp"
 #include "Utils/WinrtUtils.hpp"
 
 void JavaDebugMenu::onEnable() {
@@ -213,32 +224,43 @@ std::string JavaDebugMenu::getFacingDirection(LocalPlayer *player) {
     return std::format("Facing: {} ({:.1f} / {:.1f})", direction, lerpYaw, lerpPitch);
 }
 
-std::string JavaDebugMenu::getCPU() {
-    // AI Slop
-    int cpuInfo[4] = {-1};
-    char cpuBrand[0x40] = {0};
-    __cpuid(cpuInfo, 0x80000002);
-    memcpy(cpuBrand, cpuInfo, sizeof(cpuInfo));
-    __cpuid(cpuInfo, 0x80000003);
-    memcpy(cpuBrand + 16, cpuInfo, sizeof(cpuInfo));
-    __cpuid(cpuInfo, 0x80000004);
-    memcpy(cpuBrand + 32, cpuInfo, sizeof(cpuInfo));
+std::wstring JavaDebugMenu::GetCpuName() {
+    HDEVINFO handle = SetupDiGetClassDevsW(&GUID_DEVCLASS_PROCESSOR, NULL, NULL, DIGCF_PRESENT);
+    SP_DEVINFO_DATA data = {.cbSize = sizeof(SP_DEVINFO_DATA)};
 
-    std::string cpuBrandStr = std::string(cpuBrand);
+    std::vector<byte> buffer{};
 
-    // more ai slop
-    int threadCount = 0;
-    __cpuid(cpuInfo, 0);
-    unsigned int maxLeaf = cpuInfo[0];
+    SetupDiEnumDeviceInfo(handle, 0, &data);
 
-    if (maxLeaf >= 1) {
-        __cpuid(cpuInfo, 1);
-        threadCount = (cpuInfo[1] >> 16) & 0xFF;
-    } else {
-        threadCount = 1; // Default to 1 if unable to determine
-    }
+    DWORD length{};
+    DEVPROPTYPE type{};
+    SetupDiGetDevicePropertyW(handle, &data, &DEVPKEY_Device_FriendlyName, &type, NULL, 0, &length, 0);
 
-    return std::to_string(threadCount) + "x " + cpuBrandStr;
+    buffer.resize(length);
+    SetupDiGetDevicePropertyW(handle, &data, &DEVPKEY_Device_FriendlyName, &type, buffer.data(), length, NULL, 0);
+
+    SetupDiDestroyDeviceInfoList(handle);
+
+    return std::wstring(reinterpret_cast<PWSTR>(buffer.data()));
+}
+
+DWORD JavaDebugMenu::GetCpuCoreCount() {
+    DWORD count{}, length{};
+    std::vector<SYSTEM_LOGICAL_PROCESSOR_INFORMATION> buffer{};
+
+    GetLogicalProcessorInformation(nullptr, &length);
+    buffer.resize(length / sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION));
+
+    GetLogicalProcessorInformation(buffer.data(), &length);
+
+    return std::count_if(buffer.begin(), buffer.end(),
+                         [](const SYSTEM_LOGICAL_PROCESSOR_INFORMATION &info) { return !info.Relationship; });
+}
+
+DWORD JavaDebugMenu::GetCpuThreadCount() {
+    SYSTEM_INFO info{};
+    GetSystemInfo(&info);
+    return info.dwNumberOfProcessors;
 }
 
 std::string JavaDebugMenu::getDimensionName() {
@@ -554,10 +576,13 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
         right.emplace_back("");
 
         if (isOnBlock(8)) {
-            if (spoof) right.emplace_back("Intel 9 7900X3D ProMax Plus");
+            if (spoof) right.emplace_back("69x Intel 9 7900X3D ProMax Plus (420 Cores)");
             else {
-                if (cpuName.empty()) std::string cpuName = getCPU();
-                right.emplace_back(std::format("CPU: {}", getCPU()));
+                if (cpuName.empty()) {
+                    std::wstring temp(std::format(L"CPU: {}x {} ({} Cores)", GetCpuThreadCount(), GetCpuName(), GetCpuCoreCount()));
+                    cpuName = std::string(temp.begin(), temp.end());
+                }
+                right.emplace_back(cpuName);
             }
 
             right.emplace_back("");
