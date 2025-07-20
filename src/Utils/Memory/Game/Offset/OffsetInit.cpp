@@ -58,6 +58,8 @@ void OffsetInit::init2180() {
     ADD_OFFSET("Level::hitResult", 0x250);
     ADD_OFFSET("Level::getPlayerMap", 0x960);
     ADD_OFFSET("Level::worldFolderName", 0x2C0);
+
+    ADD_OFFSET("ChatScreenController::refreshChatMessages", 0xC80);
 }
 
 void OffsetInit::init2170() {

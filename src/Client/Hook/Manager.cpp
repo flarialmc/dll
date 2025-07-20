@@ -37,6 +37,7 @@
 #include "Hooks/Game/getTimeOfDayHook.hpp"
 #include "Hooks/game/ReadFileHook.hpp"
 #include "Hooks/Game/ApplyTurnDeltaHook.hpp"
+#include "Hooks/Game/ChatScreenControllerHook.hpp"
 
 #include "Hooks/Render/BobHurt.hpp"
 #include "Hooks/Visual/ActorShaderParams.hpp"
@@ -129,6 +130,7 @@ void HookManager::initialize() {
     addHook<BobHurtHook>();
     addHook<TintColorHook>();
     addHook<ActorShaderParamsHook>();
+    addHook<ChatScreenControllerHook>();
 
 
     if(VersionUtils::checkAboveOrEqual(21, 40)) {

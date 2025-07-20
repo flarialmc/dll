@@ -36,7 +36,8 @@ public:
         auto address0 = GET_SIG_ADDRESS("ContainerScreenController::_onContainerSlotHovered");
         this->manualHook((void *) address0, (void *) ContainerScreenController__onContainerSlotHovered, (void **) &funcOriginal0);
 
-        auto address1 = Memory::offsetFromSig(GET_SIG_ADDRESS("ContainerScreenController::tick"), 1);
+        // auto address1 = Memory::offsetFromSig(GET_SIG_ADDRESS("ContainerScreenController::tick"), 1);
+        auto address1 = GET_SIG_ADDRESS("ContainerScreenController::tick");
         this->manualHook((void *) address1, (void *) ContainerScreenController__tick, (void **) &funcOriginal1);
     }
 };
