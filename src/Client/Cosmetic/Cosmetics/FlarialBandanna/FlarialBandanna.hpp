@@ -20,7 +20,7 @@ public:
         auto player = SDK::clientInstance->getLocalPlayer();
         Vec3<float> position = player->getLerpedPosition().sub(event.LevelRenderer->getOrigin());
         Vec2<float> Rotations = player->getActorRotationComponent()->rot;
-        Vec3<float> scale = Vec3<float>(0.25, 0.1875, 0); // Kept scale.z = 0 as per your code
+        Vec3<float> scale = Vec3<float>(0.25, 0.1875, 0);
 
         Tessellator* t = event.screenContext->getTessellator();
 
@@ -29,7 +29,6 @@ public:
 
         auto& matrix = stack.top().matrix;
 
-        // Set a default color (white)
         *event.screenContext->getColorHolder() = MCCColor(1.0f, 1.0f, 1.0f, 1.0f);
 
         Rotations.y += 90;
@@ -37,14 +36,12 @@ public:
         // Convert yaw (Rotations.y) and pitch (Rotations.x) to radians
         float yaw = Rotations.y * (M_PI / 180.0f);
         float pitch = Rotations.x * (M_PI / 180.0f); // Pitch around X-axis
-        float cosYaw = sin(yaw); // Kept as per your code
-        float sinYaw = cos(yaw); // Kept as per your code
+        float cosYaw = sin(yaw);
+        float sinYaw = cos(yaw);
         float cosPitch = cos(pitch);
         float sinPitch = sin(pitch);
 
-        // Helper function to rotate a point around the anchor point (position.x, position.y - 0.3, position.z)
         auto rotateVertex = [&](float x, float y, float z) -> Vec3<float> {
-            // Translate to origin relative to anchor point
             float xRel = x - position.x;
             float yRel = y - (position.y - 0.2);
             float zRel = z - position.z;
