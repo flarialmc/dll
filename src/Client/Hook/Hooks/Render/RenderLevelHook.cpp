@@ -12,7 +12,12 @@ void RenderLevelHook::enableHook() {
 }
 
 void RenderLevelHook::RenderLevelCallback(LevelRender* level, ScreenContext* scn, void* a3) {
-    Vec3<float> position = Vec3<float>(0, 30, 0).sub(level->getOrigin());
+
+    auto event = nes::make_holder<Render3DEvent>(level, scn);
+    eventMgr.trigger(event);
+    return funcOriginal(level, scn, a3);
+
+    /*Vec3<float> position = Vec3<float>(0, 30, 0).sub(level->getOrigin());
     Vec3<float> rotation = Vec3<float>(0, 0, 0);
     Vec3<float> scale = Vec3<float>(1, 0, 1);
 
@@ -40,7 +45,5 @@ void RenderLevelHook::RenderLevelCallback(LevelRender* level, ScreenContext* scn
 
     // Render the square
     MeshHelpers::renderMeshImmediately2(scn, t, MaterialUtils::getNametag(), *ptr.clientTexture.get());
-    stack.pop();
-
-    return funcOriginal(level, scn, a3);
+    stack.pop();*/
 }
