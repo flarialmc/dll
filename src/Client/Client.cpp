@@ -17,6 +17,7 @@
 #include <winrt/Windows.Foundation.h>
 
 #include "Utils/APIUtils.hpp"
+#include "Cosmetic/CosmeticManager.hpp"
 
 namespace winrt
 {
@@ -316,6 +317,8 @@ void Client::initialize() {
 	CommandManager::initialize();
 
 	ScriptManager::initialize();
+
+	CosmeticManager::Initialize();
 
 	Client::PerformPostLegacySetup();
 }

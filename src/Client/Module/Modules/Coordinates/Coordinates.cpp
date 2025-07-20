@@ -84,7 +84,7 @@ void Coordinates::settingsRender(float settingsOffset) {
 }
 
 StringMap Coordinates::getCoords(float multiplier) {
-    Vec3<float> *pos = SDK::clientInstance->getLocalPlayer()->getPosition();
+    Vec3<float> *pos = &SDK::clientInstance->getLocalPlayer()->getAABBShapeComponent()->aabb.lower;
 
     int decimalsToShow = getOps<bool>("showDecimals") ? getOps<int>("decimalCount") : -1;
 

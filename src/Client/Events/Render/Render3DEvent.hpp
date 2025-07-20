@@ -7,8 +7,8 @@
 class Render3DEvent : public Event {
 public:
     LevelRender* LevelRenderer;
-    ScreenContext* ScreenContext;
-    explicit Render3DEvent(LevelRender* mLevelRenderer, ScreenContext* mScreenContext) : LevelRenderer(mLevelRenderer), ScreenContext(mScreenContext) {}
+    ScreenContext* screenContext;
+    explicit Render3DEvent(LevelRender* mLevelRenderer, ScreenContext* mScreenContext) : LevelRenderer(mLevelRenderer), screenContext(mScreenContext) {}
 };
 
 

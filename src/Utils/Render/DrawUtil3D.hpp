@@ -18,5 +18,6 @@ public:
     void drawQuad(Vec3<float> a, Vec3<float> b, Vec3<float> c, Vec3<float> d, D2D_COLOR_F const& col);
     void fillQuad(Vec3<float> a, Vec3<float> b, Vec3<float> c, Vec3<float> d, D2D_COLOR_F const& color);
     void drawBox(AABB const& box, D2D_COLOR_F const& color);
+    void TexturedQuad(Vec3<float> a, Vec3<float> b, Vec3<float> c, Vec3<float> d, BedrockTextureData& tex);
     void flush();
 };
