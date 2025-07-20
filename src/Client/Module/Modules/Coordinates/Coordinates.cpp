@@ -1,4 +1,5 @@
 #include "Coordinates.hpp"
+#include <cmath>
 
 #include "Events/EventManager.hpp"
 
@@ -86,15 +87,26 @@ void Coordinates::settingsRender(float settingsOffset) {
 StringMap Coordinates::getCoords(float multiplier) {
     Vec3<float> *pos = SDK::clientInstance->getLocalPlayer()->getPosition();
 
-    int decimalsToShow = getOps<bool>("showDecimals") ? getOps<int>("decimalCount") : -1;
+    std::string xstr;
+    std::string ystr;
+    std::string zstr;
 
-    std::string xstr = std::to_string(pos->x * multiplier);
-    std::string ystr = std::to_string(pos->y * multiplier);
-    std::string zstr = std::to_string(pos->z * multiplier);
+    if (getOps<bool>("showDecimals")) {
+        int decimalsToShow = getOps<int>("decimalCount");
 
-    xstr.erase(xstr.size() - (6 - decimalsToShow));
-    ystr.erase(ystr.size() - (6 - decimalsToShow));
-    zstr.erase(zstr.size() - (6 - decimalsToShow));
+        xstr = std::to_string(pos->x * multiplier);
+        ystr = std::to_string(pos->y * multiplier - 1.62f);
+        zstr = std::to_string(pos->z * multiplier);
+
+        xstr.erase(xstr.size() - (6 - decimalsToShow));
+        ystr.erase(ystr.size() - (6 - decimalsToShow));
+        zstr.erase(zstr.size() - (6 - decimalsToShow));
+    }
+    else {
+        xstr = std::format("{:.0f}", std::floor(pos->x * multiplier));
+        ystr = std::format("{:.0f}", std::floor(pos->y * multiplier - 1.62f));
+        zstr = std::format("{:.0f}", std::floor(pos->z * multiplier));
+    }
 
     return StringMap{
         {"x", xstr},
