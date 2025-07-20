@@ -481,7 +481,7 @@ public:
         if (this->active) event.cancel();
 
 #if !defined(__DEBUG__)
-		if (SDK::getCurrentScreen() != "hud_screen" && SDK::getCurrentScreen() != "pause_screen") {
+		if (SDK::getCurrentScreen() != "hud_screen" && SDK::getCurrentScreen() != "pause_screen" && SDK::getCurrentScreen() != "f3_screen" && SDK::getCurrentScreen() != "zoom_screen") {
 			if (this->active)
 				this->active = false;
 		}
