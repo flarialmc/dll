@@ -150,7 +150,7 @@ public:
     T z = 0;
 
 public:
-    explicit Vec3(T x = 0, T y = 0, T z = 0) : Vec2<T>(x, y) {
+    Vec3(T x = 0, T y = 0, T z = 0) : Vec2<T>(x, y) {
         this->z = z;
     };
 

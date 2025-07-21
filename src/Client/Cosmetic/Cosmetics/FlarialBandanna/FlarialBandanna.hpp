@@ -66,14 +66,14 @@ public:
         Vec3<float> frontPos = position;
         frontPos.z += 0.25;
 
-        t->begin(mce::PrimitiveMode::QuadList, 4);
+        t->begin(mce::PrimitiveMode::QuadList, 32);
         Vec3<float> v1 = rotateVertex(frontPos.x - scale.x, frontPos.y + scale.y, frontPos.z - scale.z);
         Vec3<float> v2 = rotateVertex(frontPos.x + scale.x, frontPos.y + scale.y, frontPos.z - scale.z);
         Vec3<float> v3 = rotateVertex(frontPos.x + scale.x, frontPos.y - scale.y, frontPos.z + scale.z);
         Vec3<float> v4 = rotateVertex(frontPos.x - scale.x, frontPos.y - scale.y, frontPos.z + scale.z);
         t->vertexUV(v1.x, v1.y, v1.z, 0.0f, 0.0f);
-        t->vertexUV(v2.x, v2.y, v2.z, 1.0f, 0.0f);
-        t->vertexUV(v3.x, v3.y, v3.z, 1.0f, 1.0f);
+        t->vertexUV(v2.x, v2.y, v2.z, 0.25f, 0.0f);
+        t->vertexUV(v3.x, v3.y, v3.z, 0.25f, 1.0f);
         t->vertexUV(v4.x, v4.y, v4.z, 0.0f, 1.0f);
 
         v1 = rotateVertex(frontPos.x + scale.x, frontPos.y + scale.y, frontPos.z - scale.z);
@@ -81,13 +81,9 @@ public:
         v3 = rotateVertex(frontPos.x - scale.x, frontPos.y - scale.y, frontPos.z + scale.z);
         v4 = rotateVertex(frontPos.x + scale.x, frontPos.y - scale.y, frontPos.z + scale.z);
         t->vertexUV(v1.x, v1.y, v1.z, 0.0f, 0.0f);
-        t->vertexUV(v2.x, v2.y, v2.z, 1.0f, 0.0f);
-        t->vertexUV(v3.x, v3.y, v3.z, 1.0f, 1.0f);
+        t->vertexUV(v2.x, v2.y, v2.z, 0.25f, 0.0f);
+        t->vertexUV(v3.x, v3.y, v3.z, 0.25f, 1.0f);
         t->vertexUV(v4.x, v4.y, v4.z, 0.0f, 1.0f);
-
-        ResourceLocation loc(Utils::getClientPath() + "\\Cosmetics\\FlarialBandanna\\front.png", true);
-        TexturePtr ptr = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc, false);
-        MeshHelpers::renderMeshImmediately2(event.screenContext, t, MaterialUtils::getNametag(), *ptr.clientTexture.get());
 
         // Back face
         Vec3<float> backPos = position;
@@ -98,23 +94,19 @@ public:
         v2 = rotateVertex(backPos.x + scale.x, backPos.y + scale.y, backPos.z - scale.z);
         v3 = rotateVertex(backPos.x + scale.x, backPos.y - scale.y, backPos.z + scale.z);
         v4 = rotateVertex(backPos.x - scale.x, backPos.y - scale.y, backPos.z + scale.z);
-        t->vertexUV(v1.x, v1.y, v1.z, 0.0f, 0.0f);
-        t->vertexUV(v2.x, v2.y, v2.z, 1.0f, 0.0f);
-        t->vertexUV(v3.x, v3.y, v3.z, 1.0f, 1.0f);
-        t->vertexUV(v4.x, v4.y, v4.z, 0.0f, 1.0f);
+        t->vertexUV(v1.x, v1.y, v1.z, 0.25f, 0.0f);
+        t->vertexUV(v2.x, v2.y, v2.z, 0.50f, 0.0f);
+        t->vertexUV(v3.x, v3.y, v3.z, 0.50f, 1.0f);
+        t->vertexUV(v4.x, v4.y, v4.z, 0.25f, 1.0f);
 
         v1 = rotateVertex(backPos.x + scale.x, backPos.y + scale.y, backPos.z - scale.z);
         v2 = rotateVertex(backPos.x - scale.x, backPos.y + scale.y, backPos.z - scale.z);
         v3 = rotateVertex(backPos.x - scale.x, backPos.y - scale.y, backPos.z + scale.z);
         v4 = rotateVertex(backPos.x + scale.x, backPos.y - scale.y, backPos.z + scale.z);
-        t->vertexUV(v1.x, v1.y, v1.z, 0.0f, 0.0f);
-        t->vertexUV(v2.x, v2.y, v2.z, 1.0f, 0.0f);
-        t->vertexUV(v3.x, v3.y, v3.z, 1.0f, 1.0f);
-        t->vertexUV(v4.x, v4.y, v4.z, 0.0f, 1.0f);
-
-        ResourceLocation loc2(Utils::getClientPath() + "\\Cosmetics\\FlarialBandanna\\Back.png", true);
-        TexturePtr ptr2 = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc2, false);
-        MeshHelpers::renderMeshImmediately2(event.screenContext, t, MaterialUtils::getNametag(), *ptr2.clientTexture.get());
+        t->vertexUV(v1.x, v1.y, v1.z, 0.25f, 0.0f);
+        t->vertexUV(v2.x, v2.y, v2.z, 0.50f, 0.0f);
+        t->vertexUV(v3.x, v3.y, v3.z, 0.50f, 1.0f);
+        t->vertexUV(v4.x, v4.y, v4.z, 0.25f, 1.0f);
 
         // Left face
         Vec3<float> leftPos = position;
@@ -125,23 +117,19 @@ public:
         v2 = rotateVertex(leftPos.x + scale.z, leftPos.y + scale.y, leftPos.z + scale.x);
         v3 = rotateVertex(leftPos.x + scale.z, leftPos.y - scale.y, leftPos.z + scale.x);
         v4 = rotateVertex(leftPos.x - scale.z, leftPos.y - scale.y, leftPos.z - scale.x);
-        t->vertexUV(v1.x, v1.y, v1.z, 0.0f, 0.0f);
-        t->vertexUV(v2.x, v2.y, v2.z, 1.0f, 0.0f);
-        t->vertexUV(v3.x, v3.y, v3.z, 1.0f, 1.0f);
-        t->vertexUV(v4.x, v4.y, v4.z, 0.0f, 1.0f);
+        t->vertexUV(v1.x, v1.y, v1.z, 0.50f, 0.0f);
+        t->vertexUV(v2.x, v2.y, v2.z, 0.75f, 0.0f);
+        t->vertexUV(v3.x, v3.y, v3.z, 0.75f, 1.0f);
+        t->vertexUV(v4.x, v4.y, v4.z, 0.50f, 1.0f);
 
         v1 = rotateVertex(leftPos.x + scale.z, leftPos.y + scale.y, leftPos.z + scale.x);
         v2 = rotateVertex(leftPos.x - scale.z, leftPos.y + scale.y, leftPos.z - scale.x);
         v3 = rotateVertex(leftPos.x - scale.z, leftPos.y - scale.y, leftPos.z - scale.x);
         v4 = rotateVertex(leftPos.x + scale.z, leftPos.y - scale.y, leftPos.z + scale.x);
-        t->vertexUV(v1.x, v1.y, v1.z, 0.0f, 0.0f);
-        t->vertexUV(v2.x, v2.y, v2.z, 1.0f, 0.0f);
-        t->vertexUV(v3.x, v3.y, v3.z, 1.0f, 1.0f);
-        t->vertexUV(v4.x, v4.y, v4.z, 0.0f, 1.0f);
-
-        ResourceLocation loc3(Utils::getClientPath() + "\\Cosmetics\\FlarialBandanna\\Left.png", true);
-        TexturePtr ptr3 = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc3, false);
-        MeshHelpers::renderMeshImmediately2(event.screenContext, t, MaterialUtils::getNametag(), *ptr3.clientTexture.get());
+        t->vertexUV(v1.x, v1.y, v1.z, 0.50f, 0.0f);
+        t->vertexUV(v2.x, v2.y, v2.z, 0.75f, 0.0f);
+        t->vertexUV(v3.x, v3.y, v3.z, 0.75f, 1.0f);
+        t->vertexUV(v4.x, v4.y, v4.z, 0.50f, 1.0f);
 
         // Right face
         Vec3<float> rightPos = position;
@@ -152,21 +140,21 @@ public:
         v2 = rotateVertex(rightPos.x + scale.z, rightPos.y + scale.y, rightPos.z - scale.x);
         v3 = rotateVertex(rightPos.x + scale.z, rightPos.y - scale.y, rightPos.z - scale.x);
         v4 = rotateVertex(rightPos.x - scale.z, rightPos.y - scale.y, rightPos.z + scale.x);
-        t->vertexUV(v1.x, v1.y, v1.z, 0.0f, 0.0f);
+        t->vertexUV(v1.x, v1.y, v1.z, 0.75f, 0.0f);
         t->vertexUV(v2.x, v2.y, v2.z, 1.0f, 0.0f);
         t->vertexUV(v3.x, v3.y, v3.z, 1.0f, 1.0f);
-        t->vertexUV(v4.x, v4.y, v4.z, 0.0f, 1.0f);
+        t->vertexUV(v4.x, v4.y, v4.z, 0.75f, 1.0f);
 
         v1 = rotateVertex(rightPos.x + scale.z, rightPos.y + scale.y, rightPos.z - scale.x);
         v2 = rotateVertex(rightPos.x - scale.z, rightPos.y + scale.y, rightPos.z + scale.x);
         v3 = rotateVertex(rightPos.x - scale.z, rightPos.y - scale.y, rightPos.z + scale.x);
         v4 = rotateVertex(rightPos.x + scale.z, rightPos.y - scale.y, rightPos.z - scale.x);
-        t->vertexUV(v1.x, v1.y, v1.z, 0.0f, 0.0f);
+        t->vertexUV(v1.x, v1.y, v1.z, 0.75f, 0.0f);
         t->vertexUV(v2.x, v2.y, v2.z, 1.0f, 0.0f);
         t->vertexUV(v3.x, v3.y, v3.z, 1.0f, 1.0f);
-        t->vertexUV(v4.x, v4.y, v4.z, 0.0f, 1.0f);
+        t->vertexUV(v4.x, v4.y, v4.z, 0.75f, 1.0f);
 
-        ResourceLocation loc4(Utils::getClientPath() + "\\Cosmetics\\FlarialBandanna\\Right.png", true);
+        ResourceLocation loc4(Utils::getClientPath() + "\\Cosmetics\\FlarialBandanna\\bandanna.png", true);
         TexturePtr ptr4 = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc4, false);
         MeshHelpers::renderMeshImmediately2(event.screenContext, t, MaterialUtils::getNametag(), *ptr4.clientTexture.get());
 
