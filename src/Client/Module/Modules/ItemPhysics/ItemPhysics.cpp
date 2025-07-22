@@ -1,5 +1,6 @@
 #include "ItemPhysics.hpp"
 
+#include "Client.hpp"
 #include "glm/glm/ext/matrix_transform.hpp"
 
 INeedADecentHookClassForMemory::INeedADecentHookClassForMemory(void *function, void *hook) {
