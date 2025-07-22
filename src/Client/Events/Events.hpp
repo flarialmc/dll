@@ -44,3 +44,5 @@
 #include "Game/ReadFileEvent.hpp"
 #include "Render/BobHurtEvent.hpp"
 #include "Game/ChatScreenControllerTickEvent.hpp"
+#include "Render/BobHurtEvent.hpp"
+#include "Render/Render3DEvent.hpp"
