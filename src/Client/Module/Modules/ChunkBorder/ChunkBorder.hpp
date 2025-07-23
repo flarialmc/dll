@@ -9,6 +9,10 @@
 #include "Events/Render/Render3DEvent.hpp"
 
 class ChunkBorder : public Module {
+private:
+    float bottom = -64.0f;
+    float top = 320.0f;
+    int chunkSize = 16.0f;
 
 public:
     ChunkBorder() : Module("Chunk Border", "Chunk Border", IDR_SKULL_PNG, "") {

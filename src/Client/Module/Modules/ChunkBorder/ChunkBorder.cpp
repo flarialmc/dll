@@ -17,9 +17,12 @@ void ChunkBorder::onDisable() {
 }
 
 void ChunkBorder::defaultConfig() {
-
     Module::defaultConfig("core");
-
+    setDef("corner", (std::string) "0000ff", 1.f, false);
+    setDef("mid", (std::string) "ffff00", 1.f, false);
+    setDef("adj", (std::string) "ff0000", 1.f, false);
+    setDef("horizLineSpacing", 2);
+    setDef("vertLineSpacing", 2.f);
 }
 
 void ChunkBorder::settingsRender(float settingsOffset) {
@@ -34,6 +37,15 @@ void ChunkBorder::settingsRender(float settingsOffset) {
                               Constraints::RelativeConstraint(1.0, "width"),
                               Constraints::RelativeConstraint(0.88f, "height"));
 
+    addHeader("Chunk Border");
+    addSliderInt("Horizontal Line Spacing", "", "horizLineSpacing", chunkSize, 1);
+    addSlider("Vertical Line Spacing", "", "vertLineSpacing", 20.f, 1.f);
+
+    addHeader("Line Colors");
+    addColorPicker("Main Line Color", "", "mid");
+    addColorPicker("Adjacent Chunks Line Color", "", "adj");
+    addColorPicker("Corner Line Color", "", "corner");
+
     FlarialGUI::UnsetScrollView();
 
     resetPadding();
@@ -42,121 +54,64 @@ void ChunkBorder::settingsRender(float settingsOffset) {
 void ChunkBorder::onRender3D(Render3DEvent &event) {
     if (!this->isEnabled()) return;
 
-    auto player = SDK::clientInstance->getLocalPlayer();
-
+    const auto player = SDK::clientInstance->getLocalPlayer();
     if (!player) return;
 
-    auto pos = player->getLerpedPosition();
-
+    const auto pos = player->getLerpedPosition();
     mce::MaterialPtr *material = MaterialUtils::getSelectionOverlay();
-
     MCDrawUtil3D dc(event.LevelRenderer, event.screenContext, material);
 
-    Vec3<float> anchor = Vec3<float>{std::floor(pos.x / 16.f) * 16.f, 0.f, std::floor(pos.z / 16.f) * 16.f};
-    float bottom = -64.f;
-    float top = 320.f;
-
-    D2D1_COLOR_F cornerCol = D2D1_COLOR_F(0.f, 0.f, 1.f, 1.f);
-    D2D1_COLOR_F midCol = D2D1_COLOR_F(1.f, 1.f, 0.f, 1.f);
-    D2D1_COLOR_F outCol = D2D1_COLOR_F(1.f, 0.f, 0.f, 1.f);
-
-    auto drawHorizontalLines = [&]() {
-        for (int i = 0; i <= 8; i++) {
-
-            D2D1_COLOR_F col;
-            if (i % 8 == 0) col = cornerCol;
-            else col = midCol;
-
-            float offset = i * 2.f;
-
-            dc.drawLineList(
-                Vec3<float>{anchor.x + offset, bottom, anchor.z},
-                Vec3<float>{anchor.x + offset, top, anchor.z},
-                col
-            );
-
-            dc.drawLineList(
-                Vec3<float>{anchor.x, bottom, anchor.z + offset},
-                Vec3<float>{anchor.x, top, anchor.z + offset},
-                col
-            );
-            dc.drawLineList(
-                Vec3<float>{anchor.x + 16.f, bottom, anchor.z + offset},
-                Vec3<float>{anchor.x + 16.f, top, anchor.z + offset},
-                col
-            );
-            dc.drawLineList(
-                Vec3<float>{anchor.x + offset, bottom, anchor.z  + 16.f},
-                Vec3<float>{anchor.x + offset, top, anchor.z  + 16.f},
-                col
-            );
-        }
+    const Vec3<float> anchor = Vec3{
+        std::floor(pos.x / 16.0f) * 16.0f,
+        0.0f,
+        std::floor(pos.z / 16.0f) * 16.0f
     };
 
-    auto drawVerticalLines = [&]() {
-        for (int i = 0; i <= std::floor((top - bottom) /  2); i++) {
+    const D2D1_COLOR_F cornerCol = getColor("corner");
+    const D2D1_COLOR_F midCol = getColor("mid");
+    const D2D1_COLOR_F adjCol = getColor("adj");
 
-            D2D1_COLOR_F col;
-            if (i % 8 == 0) col = cornerCol;
-            else col = midCol;
+    const float vls = getOps<float>("vertLineSpacing");
+    const int hls = getOps<int>("horizLineSpacing");
 
-            float offset = i * 2.f;
+    // CURRENT CHUNK START
+
+    // vertical lines
+    for (int i = 0; i <= chunkSize / hls; ++i) {
+        const float offset = i * hls;
+        D2D1_COLOR_F col = (i % (chunkSize / hls) == 0) ? cornerCol : midCol;
+
+        // z axis lines
+        dc.drawLineList(Vec3{anchor.x + offset, bottom, anchor.z}, Vec3{anchor.x + offset, top, anchor.z}, col);
+        dc.drawLineList(Vec3{anchor.x + offset, bottom, anchor.z + chunkSize}, Vec3{anchor.x + offset, top, anchor.z + chunkSize}, col);
+
+        // x axis lines
+        dc.drawLineList(Vec3{anchor.x, bottom, anchor.z + offset}, Vec3{anchor.x, top, anchor.z + offset}, col);
+        dc.drawLineList(Vec3{anchor.x + chunkSize, bottom, anchor.z + offset}, Vec3{anchor.x + chunkSize, top, anchor.z + offset}, col);
+    }
+
+    // horizontal lines
+    for (float y = bottom; y <= top; y += vls) {
+        dc.drawLineList(Vec3{anchor.x, y, anchor.z}, Vec3{anchor.x + chunkSize, y, anchor.z}, midCol);
+        dc.drawLineList(Vec3{anchor.x, y, anchor.z}, Vec3{anchor.x, y, anchor.z + chunkSize}, midCol);
+        dc.drawLineList(Vec3{anchor.x + chunkSize, y, anchor.z}, Vec3{anchor.x + chunkSize, y, anchor.z + chunkSize}, midCol);
+        dc.drawLineList(Vec3{anchor.x, y, anchor.z + chunkSize}, Vec3{anchor.x + chunkSize, y, anchor.z + chunkSize}, midCol);
+    }
+
+    // CURRENT CHUNK END
+
+    // adjacent chunks
+    for (int x = -1; x <= 2; ++x) {
+        for (int z = -1; z <= 2; ++z) {
+            if (x >= 0 && x <= 1 && z >= 0 && z <= 1) continue;
 
             dc.drawLineList(
-                Vec3<float>{anchor.x, bottom + offset, anchor.z},
-                Vec3<float>{anchor.x + 16.f, bottom + offset, anchor.z},
-                col
-            );
-
-            dc.drawLineList(
-                Vec3<float>{anchor.x, bottom + offset, anchor.z},
-                Vec3<float>{anchor.x, bottom + offset, anchor.z + 16.f},
-                col
-            );
-
-            dc.drawLineList(
-                Vec3<float>{anchor.x + 16.f, bottom + offset, anchor.z},
-                Vec3<float>{anchor.x + 16.f, bottom + offset, anchor.z + 16.f},
-                col
-            );
-
-            dc.drawLineList(
-                Vec3<float>{anchor.x, bottom + offset, anchor.z + 16.f},
-                Vec3<float>{anchor.x + 16.f, bottom + offset, anchor.z + 16.f},
-                col
-            );
-        }
-    };
-
-    auto drawOutChunks = [&]() {
-        std::vector<std::pair<float, float>> outChunks = {
-            {anchor.x - 16.f, anchor.z + 32.f},
-            {anchor.x, anchor.z + 32.f},
-            {anchor.x + 16.f, anchor.z + 32.f},
-            {anchor.x + 32.f, anchor.z + 32.f},
-            {anchor.x - 16.f, anchor.z + 16.f},
-            {anchor.x + 32.f, anchor.z + 16.f},
-            {anchor.x - 16.f, anchor.z},
-            {anchor.x + 32.f, anchor.z},
-            {anchor.x - 16.f, anchor.z - 16.f},
-            {anchor.x, anchor.z - 16.f},
-            {anchor.x + 16.f, anchor.z - 16.f},
-            {anchor.x + 32.f, anchor.z - 16.f}
-        };
-
-        for (std::pair<float, float>& coords: outChunks) {
-            dc.drawLineList(
-                Vec3<float>(coords.first, bottom, coords.second),
-                Vec3<float>(coords.first, top, coords.second),
-                outCol
+                Vec3{anchor.x + x * chunkSize, bottom, anchor.z + z * chunkSize},
+                Vec3{anchor.x + x * chunkSize, top, anchor.z + z * chunkSize},
+                adjCol
             );
         }
-    };
-
-    drawVerticalLines();
-    drawHorizontalLines();
-    drawOutChunks();
+    }
 
     dc.flush();
-
 }
