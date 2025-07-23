@@ -169,9 +169,9 @@ void Client::initialize() {
 
 
 #if defined(__TEST__)
-	WinrtUtils::setWindowTitle(fmt::format("Flarial v{} {} {}", FLARIAL_VERSION, FLARIAL_BUILD_TYPE, FLARIAL_BUILD_DATE));
+	WinrtUtils::setWindowTitle(fmt::format("Flarial v{} {} {} [{}]", FLARIAL_VERSION, FLARIAL_BUILD_TYPE, FLARIAL_BUILD_DATE, COMMIT_HASH));
 #else
-	WinrtUtils::setWindowTitle(fmt::format("Flarial v{} {} {}", FLARIAL_VERSION, FLARIAL_BUILD_DATE, COMMIT_HASH));
+	WinrtUtils::setWindowTitle(fmt::format("Flarial v{} {} [{}]", FLARIAL_VERSION, FLARIAL_BUILD_DATE, COMMIT_HASH));
 #endif
 
 	VersionUtils::initialize();
