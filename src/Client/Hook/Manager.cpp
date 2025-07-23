@@ -40,6 +40,7 @@
 #include "Hooks/Game/ChatScreenControllerHook.hpp"
 
 #include "Hooks/Render/BobHurt.hpp"
+#include "Hooks/Render/RenderLevelHook.hpp"
 #include "Hooks/Visual/ActorShaderParams.hpp"
 #include "Hooks/Visual/TintColorHook.hpp"
 
@@ -128,6 +129,7 @@ void HookManager::initialize() {
     addHook<getTimeOfDayHook>();
 
     addHook<BobHurtHook>();
+    addHook<RenderLevelHook>();
     addHook<TintColorHook>();
     addHook<ActorShaderParamsHook>();
     addHook<ChatScreenControllerHook>();

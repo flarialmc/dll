@@ -32,6 +32,28 @@ void MCDrawUtil3D::drawLine(Vec3<float> const& p1, Vec3<float> const& p2, D2D_CO
     if (immediate) flush();
 }
 
+void MCDrawUtil3D::drawLineList(Vec3<float> const& p1, Vec3<float> const& p2, D2D_COLOR_F const& color, bool immediate) {
+	auto scn = screenContext;
+	auto tess = scn->getTessellator();
+	*scn->getColorHolder() = {1.f,1.f,1.f,1.f};
+	tess->begin(mce::PrimitiveMode::LineList, 1);
+	tess->color(color.r, color.g, color.b, color.a);
+	auto origin = levelRenderer->getOrigin();
+	Vec3<float> a = p1;
+	Vec3<float> b = p2;
+
+	a.x -= origin.x;
+	a.y -= origin.y;
+	a.z -= origin.z;
+
+	b.x -= origin.x;
+	b.y -= origin.y;
+	b.z -= origin.z;
+	tess->vertex(a.x, a.y, a.z);
+	tess->vertex(b.x, b.y, b.z);
+	if (immediate) flush();
+}
+
 void MCDrawUtil3D::drawQuad(Vec3<float> a, Vec3<float> b, Vec3<float> c, Vec3<float> d, D2D_COLOR_F const& color) {
 	auto scn = screenContext;
 	auto tess = scn->getTessellator();

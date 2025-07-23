@@ -114,6 +114,7 @@
 #include "Modules/MovableDayCounter/MovableDayCounter.hpp"
 #include "Modules/SkinStealer/SkinStealer.hpp"
 #include "Modules/GlintColor/GlintColor.hpp"
+#include "Modules/ChunkBorder/ChunkBorder.hpp"
 
 void ModuleManager::getModules() {
 	for (const auto& pair : moduleMap) {
@@ -270,6 +271,7 @@ void ModuleManager::initialize() {
 	addModule<DeathLogger>();
 	addModule<Twerk>();
 	addModule<CinematicCamera>();
+	addModule<ChunkBorder>();
 
 	addService<GUIKeyListener>();
 	if (!VersionUtils::checkAboveOrEqual(21, 60)) {

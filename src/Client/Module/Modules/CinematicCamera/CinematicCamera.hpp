@@ -2,6 +2,7 @@
 
 #include "../Module.hpp"
 #include "Events/Game/TurnDeltaEvent.hpp"
+#include "Events/Render/RenderEvent.hpp"
 
 class CinematicCamera : public Module {
 private:

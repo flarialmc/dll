@@ -19,6 +19,8 @@ void SigInit::init2190() {
     ADD_SIG("ActorShaderManager::setupShaderParameterHelper", "48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC ? 48 8B 79 ? 45 33 D2");
     // idk how to use lol
     // ADD_SIG("ClientInstance::InGamePlayScreen", "48 89 01 BE ? ? ? ? 48 8B B9 ? ? ? ? 48 C7 81");
+
+    ADD_SIG("LevelRenderer::renderLevel", "48 8B C4 48 89 58 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 44 0F 29 40 ? 44 0F 29 48 ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 4D 8B E8 4C 8B E2 4C 8B F9");
 }
 
 void SigInit::init2180() {
