@@ -15,7 +15,7 @@ private:
     int chunkSize = 16.0f;
 
 public:
-    ChunkBorder() : Module("Chunk Border", "Chunk Border", IDR_SKULL_PNG, "") {
+    ChunkBorder() : Module("Chunk Border", "Chunk Border", IDR_CHUNKBORDER_PNG, "") {
 
     };
 
