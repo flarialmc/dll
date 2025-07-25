@@ -168,6 +168,7 @@ IDR_BEAVER_PNG            PNG "Data\\beaver.png"
 IDR_LEWIS_PNG             PNG "Data\\lewis.png"
 IDR_LEWIS_MP3             MP3 "Data\\Audio\\Lewis.mp3"
 IDR_DELETE_PNG            PNG "Data\\delete.png"
+IDR_DELETE_PNG            PNG "Data\\chunkborder.png"
 
 IDR_PING_AMAZING          PNG "Data\\ping_amazing.png"
 IDR_PING_GOOD             PNG "Data\\ping_good.png"
