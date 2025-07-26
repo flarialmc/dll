@@ -483,18 +483,18 @@ void Module::addConditionalColorPicker(bool condition, std::string text, std::st
     FlarialGUI::ResetOverrideAlphaValues();
 }
 
-void Module::addConditionalDropdown(bool condition, std::string text, std::string subtext, const std::vector<std::string> &options, std::string &value) {
+void Module::addConditionalDropdown(bool condition, std::string text, std::string subtext, const std::vector<std::string> &options, std::string settingName, bool resettable) {
     FlarialGUI::OverrideAlphaValues((Constraints::RelativeConstraint(0.05f, "height", true) - conditionalDropdownAnims[dropdownIndex]) / Constraints::RelativeConstraint(0.05f, "height", true));
 
     if (condition) {
         padding -= conditionalDropdownAnims[dropdownIndex];
         FlarialGUI::lerp(conditionalDropdownAnims[dropdownIndex], 0.0f, 0.25f * FlarialGUI::frameFactor);
-        Module::addDropdown(text, subtext, options, value);
+        Module::addDropdown(text, subtext, options, settingName, resettable);
     } else {
         FlarialGUI::lerp(conditionalDropdownAnims[dropdownIndex], Constraints::RelativeConstraint(0.05f, "height", true), 0.25f * FlarialGUI::frameFactor);
         if (conditionalDropdownAnims[dropdownIndex] < Constraints::RelativeConstraint(0.0499f, "height", true)) {
             padding -= conditionalDropdownAnims[dropdownIndex];
-            Module::addDropdown(text, subtext, options, value);
+            Module::addDropdown(text, subtext, options, settingName, resettable);
         } else dropdownIndex++;
     }
 

@@ -131,7 +131,7 @@ public:
 	void addConditionalColorPicker(bool condition, std::string text, std::string subtext, std::string settingName);
 
 
-	void addConditionalDropdown(bool condition, std::string text, std::string subtext, const std::vector<std::string>& options, std::string& value);
+	void addConditionalDropdown(bool condition, std::string text, std::string subtext, const std::vector<std::string>& options, std::string settingName, bool resettable);
 
 	void addConditionalToggle(bool condition, std::string text, std::string subtext, bool& value);
 	void addConditionalToggle(bool condition, std::string text, std::string subtext, std::string settingName);
