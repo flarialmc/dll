@@ -14,13 +14,7 @@ public:
     static inline std::string original;
     static inline std::string backupOri;
 
-    NickModule();
-
-    void onEnable() override;
-
-    void onDisable() override;
-
-    std::map<std::string, std::string> textColors = {
+    static inline std::map<std::string, std::string> textColors = {
         {"White", "§f"},
         {"Black", "§0"},
         {"Netherite", "§j"},
@@ -49,6 +43,12 @@ public:
         {"Dark Purple", "§5"},
         {"Amethyst", "§u"}
     };
+
+    NickModule();
+
+    void onEnable() override;
+
+    void onDisable() override;
 
     void defaultConfig() override;
 

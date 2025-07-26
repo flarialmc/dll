@@ -2,6 +2,7 @@
 
 #include "../Module.hpp"
 #include "Events/Network/PacketEvent.hpp"
+#include "Events/Game/ChatScreenControllerTickEvent.hpp"
 
 
 class CompactChat : public Module {
@@ -10,7 +11,7 @@ private:
 
     int count = 1;
     std::string mesg;
-    std::map<std::string, std::string> textColors;
+    bool refreshChat = false;
 
 public:
 
@@ -32,6 +33,8 @@ public:
     void replace(std::string& str, std::string from, std::string to);
 
     void onPacketReceive(PacketEvent& event);
+
+    void onChatScreenControllerTickEvent(ChatScreenControllerTickEvent& event);
 
 };
 

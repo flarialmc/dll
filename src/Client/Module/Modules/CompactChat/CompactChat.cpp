@@ -6,11 +6,13 @@
 
 void CompactChat::onEnable() {
     Listen(this, PacketEvent, &CompactChat::onPacketReceive)
+    Listen(this, ChatScreenControllerTickEvent, &CompactChat::onChatScreenControllerTickEvent)
     Module::onEnable();
 }
 
 void CompactChat::onDisable() {
     Deafen(this, PacketEvent, &CompactChat::onPacketReceive)
+    Deafen(this, ChatScreenControllerTickEvent, &CompactChat::onChatScreenControllerTickEvent)
     Module::onDisable();
 }
 
@@ -70,16 +72,12 @@ void CompactChat::settingsRender(float settingsOffset) {
 }
 
 std::string CompactChat::getCountText(int count) {
-    if (textColors.empty()) {
-        std::shared_ptr<NickModule> nickModule = std::dynamic_pointer_cast<NickModule>(ModuleManager::getModule("Nick"));
-        textColors = nickModule->textColors;
-    }
 
-    auto it = textColors.find(getOps<std::string>("countTextColor"));
+    auto it = NickModule::textColors.find(getOps<std::string>("countTextColor"));
 
-    if (it == textColors.end()) {
+    if (it == NickModule::textColors.end()) {
         settings.setValue<std::string>("countTextColor", "Dark Purple");
-        it = textColors.find(getOps<std::string>("countTextColor"));
+        it = NickModule::textColors.find(getOps<std::string>("countTextColor"));
     }
 
     return std::format("{}x{}§r", it->second, count);
@@ -113,7 +111,9 @@ void CompactChat::onPacketReceive(PacketEvent& event) {
             replace(format, "{msg}", mesg);
             replace(format, "{count}", getCountText(count));
 
-            mesgVec.back().fullMsg = "[§c!§r] " + format;
+            mesgVec.back().fullMsg = format;
+
+            refreshChat = true;
             event.cancel();
         }
         else {
@@ -121,5 +121,12 @@ void CompactChat::onPacketReceive(PacketEvent& event) {
             mesg = "";
         }
 
+    }
+}
+
+void CompactChat::onChatScreenControllerTickEvent(ChatScreenControllerTickEvent& event) {
+    if (refreshChat) {
+        event.getChatScreenController()->refreshChatMessages = true;
+        refreshChat = false;
     }
 }
