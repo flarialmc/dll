@@ -1,7 +1,6 @@
 #include "AutoGG.hpp"
 
 #include "Events/EventManager.hpp"
-#include "SDK/Client/Network/Packet/PlayerSkinPacket.hpp"
 
 
 void AutoGG::onEnable() {
@@ -45,13 +44,6 @@ void AutoGG::settingsRender(float settingsOffset) {
 void AutoGG::onPacketReceive(PacketEvent& event) {
     if (!this->isEnabled()) return;
     MinecraftPacketIds id = event.getPacket()->getId();
-
-    // if (id == MinecraftPacketIds::PlayerSkin) {
-    //     auto* pkt = reinterpret_cast<PlayerSkinPacket*>(event.getPacket());
-    //     std::cout << pkt->mLocalizedOldSkinName << " -> " << pkt->mLocalizedNewSkinName << std::endl;
-    //     // Logger::debug("{} -> {}", pkt->mLocalizedOldSkinName, pkt->mLocalizedNewSkinName);
-    // }
-
 
     // TODO: add support for other servers (look for "won the game" text)
     if (id == MinecraftPacketIds::SetTitle) {

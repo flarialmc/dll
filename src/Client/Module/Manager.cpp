@@ -115,6 +115,7 @@
 #include "Modules/SkinStealer/SkinStealer.hpp"
 #include "Modules/GlintColor/GlintColor.hpp"
 #include "Modules/ChunkBorder/ChunkBorder.hpp"
+#include "Modules/CompactChat/CompactChat.hpp"
 
 void ModuleManager::getModules() {
 	for (const auto& pair : moduleMap) {
@@ -272,6 +273,7 @@ void ModuleManager::initialize() {
 	addModule<Twerk>();
 	addModule<CinematicCamera>();
 	addModule<ChunkBorder>();
+	addModule<CompactChat>();
 
 	addService<GUIKeyListener>();
 	if (!VersionUtils::checkAboveOrEqual(21, 60)) {
