@@ -39,6 +39,20 @@ void CompactChat::settingsRender(float settingsOffset) {
                               Constraints::RelativeConstraint(1.0, "width"),
                               Constraints::RelativeConstraint(0.88f, "height"));
 
+    addHeader("Compact Chat");
+    addTextBox("Format", "{msg} for message, {count} for count.", 0, "format");
+    addToggle("Show Brackets", "", "showBrackets");
+    addConditionalDropdown(getOps<bool>("showBrackets"), "Bracket Style", "", std::vector<std::string>{
+                    "( )",
+                    "{ }",
+                    "[ ]",
+                    "< >",
+                }, "bracketStyle", true);
+
+    extraPadding();
+
+    addHeader("Colors");
+
     std::vector<std::string> colors = {
         "White",
         "Black",
@@ -67,16 +81,7 @@ void CompactChat::settingsRender(float settingsOffset) {
         "Amethyst"
     };
 
-    addHeader("Compact Chat");
-    addTextBox("Format", "{msg} for message, {count} for count.", 0, "format");
     addDropdown("Count Text Color", "", colors, "countTextColor", true);
-    addToggle("Show Brackets", "", "showBrackets");
-    addConditionalDropdown(getOps<bool>("showBrackets"), "Bracket Style", "", std::vector<std::string>{
-                    "( )",
-                    "{ }",
-                    "[ ]",
-                    "< >",
-                }, "bracketStyle", true);
     addConditionalDropdown(getOps<bool>("showBrackets"), "Bracket Color", "", colors, "bracketColor", true);
 
     FlarialGUI::UnsetScrollView();
