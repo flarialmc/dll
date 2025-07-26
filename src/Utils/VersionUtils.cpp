@@ -48,6 +48,7 @@ std::string VersionUtils::getFormattedVersion() {
 
 void VersionUtils::initialize() {
     versions = {
+        {"1.21.9", {SigInit::init2190, OffsetInit::init2190}},
         {"1.21.8", {SigInit::init2180, OffsetInit::init2180}},
         {"1.21.7", {SigInit::init2170, OffsetInit::init2170}},
         {"1.21.6", {SigInit::init2160, OffsetInit::init2160}},
@@ -70,10 +71,22 @@ void VersionUtils::initialize() {
 }
 
 bool VersionUtils::isSupported(const std::string& version) {
-    return std::ranges::any_of(versions, [&version](const auto& p) {
+    if (std::ranges::any_of(versions, [&version](const auto& p) {
         return p.first == version;
-    });
+    })) {
+        return true;
+    }
+
+    std::string supported;
+    for (const auto& [v, _] : versions) {
+        if (!supported.empty()) supported += ", ";
+        supported += v;
+    }
+    Logger::debug("unsupported {} vs supported {}", version, supported);
+    return false;
+
 }
+
 
 void VersionUtils::addData() {
     std::thread t1([&](){
