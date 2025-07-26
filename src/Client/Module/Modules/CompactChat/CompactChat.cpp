@@ -103,9 +103,9 @@ std::string CompactChat::getCountText(int count) {
     if (getOps<bool>("showBrackets")) {
         if (getOps<std::string>("bracketStyle").empty()) settings.setValue<std::string>("bracketStyle", "( )");
         std::string bracket = getOps<std::string>("bracketStyle");
-        return std::format("§r{}{}§r{}x{}§r{}{}", bracketCol->second, bracket[0], countCol->second, count, bracketCol->second, bracket[2]);
+        return std::format("§r{}{}§r{}x{}§r{}{}§r", bracketCol->second, bracket[0], countCol->second, count, bracketCol->second, bracket[2]);
     }
-    return std::format("{}x{}§r", countCol->second, count);
+    return std::format("§r{}x{}§r", countCol->second, count);
 }
 
 void CompactChat::replace(std::string& str, std::string from, std::string to) {
