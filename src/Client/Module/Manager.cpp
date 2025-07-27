@@ -116,6 +116,7 @@
 #include "Modules/GlintColor/GlintColor.hpp"
 #include "Modules/ChunkBorder/ChunkBorder.hpp"
 #include "Modules/CompactChat/CompactChat.hpp"
+#include "Modules/MessageLogger/MessageLogger.hpp"
 
 void ModuleManager::getModules() {
 	for (const auto& pair : moduleMap) {
@@ -274,6 +275,7 @@ void ModuleManager::initialize() {
 	addModule<CinematicCamera>();
 	addModule<ChunkBorder>();
 	addModule<CompactChat>();
+	addModule<MessageLogger>();
 
 	addService<GUIKeyListener>();
 	if (!VersionUtils::checkAboveOrEqual(21, 60)) {
