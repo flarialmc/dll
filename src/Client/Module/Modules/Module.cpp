@@ -1030,6 +1030,10 @@ void Module::checkForRightClickAndOpenSettings(float x, float y, float width, fl
             ClickGUI::curr = "settings";
             FlarialGUI::scrollpos = 0;
             FlarialGUI::barscrollpos = 0;
+            if (Client::settings.getSettingByName<bool>("saveScrollPos")->value) {
+                ClickGUI::saved_acumilatedPos = ClickGUI::accumilatedPos;
+                ClickGUI::saved_acumilatedBarPos = ClickGUI::accumilatedBarPos;
+            }
             ClickGUI::accumilatedPos = 0;
             ClickGUI::accumilatedBarPos = 0;
         }

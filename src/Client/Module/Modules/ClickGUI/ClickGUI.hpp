@@ -48,6 +48,8 @@ public:
     static inline PageType page;
     static inline std::string curr = "modules";
     static inline std::map<std::string, ScrollInfo> scrollInfo;
+    static float inline saved_acumilatedPos = 1;
+    static float inline saved_acumilatedBarPos = 1;
     static float inline accumilatedPos = 1;
     static float inline accumilatedBarPos = 1;
     static bool inline isAnimatingModSet = false;
@@ -328,6 +330,10 @@ public:
                 MC::lastMouseScroll = MouseAction::Release;
                 accumilatedPos = 0;
                 accumilatedBarPos = 0;
+                if (Client::settings.getSettingByName<bool>("saveScrollPos")->value) {
+                    accumilatedPos = saved_acumilatedPos;
+                    accumilatedBarPos = saved_acumilatedBarPos;
+                }
 
                 page.type = "normal";
                 curr = "modules";
@@ -391,8 +397,13 @@ public:
                 if (FlarialGUI::TextBoxes[0].isActive) {
                     FlarialGUI::scrollpos = 0;
                     FlarialGUI::barscrollpos = 0;
+
                     accumilatedPos = 0;
                     accumilatedBarPos = 0;
+                    if (FlarialGUI::TextBoxes[0].text.empty() && Client::settings.getSettingByName<bool>("saveScrollPos")->value) {
+                        accumilatedPos = saved_acumilatedPos;
+                        accumilatedBarPos = saved_acumilatedBarPos;
+                    }
                 }
             }
 

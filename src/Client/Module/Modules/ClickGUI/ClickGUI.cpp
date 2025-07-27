@@ -220,6 +220,7 @@ void ClickGUI::onRender(RenderEvent &event) {
 
             curr = "modules";
             page.type = "normal";
+
             FlarialGUI::ResetShit();
 
             auto &scrollData = scrollInfo[curr];
@@ -228,6 +229,11 @@ void ClickGUI::onRender(RenderEvent &event) {
             FlarialGUI::barscrollpos = scrollData.barscrollpos;
             accumilatedPos = scrollData.scrollpos;
             accumilatedBarPos = scrollData.barscrollpos;
+
+            if (Client::settings.getSettingByName<bool>("saveScrollPos")->value) {
+                accumilatedPos = saved_acumilatedPos;
+                accumilatedBarPos = saved_acumilatedBarPos;
+            }
         }
 
 
@@ -736,6 +742,9 @@ void ClickGUI::onRender(RenderEvent &event) {
                 c->extraPadding();
 
                 c->addHeader("Misc");
+                c->addToggle("Save Scroll Position",
+                             "Save scroll position in ClickGUI",
+                             Client::settings.getSettingByName<bool>("saveScrollPos")->value);
                 c->addToggle("Auto Search ClickGUI",
                              "Start searching for modules already when you press a key in ClickGUI",
                              Client::settings.getSettingByName<bool>("autosearch")->value);

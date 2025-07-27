@@ -6,11 +6,12 @@
 #define clickgui ModuleManager::getModule("ClickGUI")
 
 std::map<int, ID2D1Bitmap *> ClickGUIElements::images;
-std::vector<Vec2<float>> sizesr;
-std::vector<Vec2<float>> shadowsizesr;
+std::vector<Vec2<float> > sizesr;
+std::vector<Vec2<float> > shadowsizesr;
 std::vector<bool> hoveringFav;
 
 using namespace winrt::Windows::UI::Core;
+
 void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const int index, bool visible, float opacity) {
     if (opacity == -600.f) opacity = ClickGUI::modcardOpacity;
     Vec2<float> round = Constraints::RoundingConstraint(34, 34);
@@ -43,7 +44,6 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
     if (FlarialGUI::isInScrollView) realY += FlarialGUI::scrollpos;
 
     if (FlarialGUI::CursorInRect(x, realY, BottomRoundedWidth, BottomRoundedHeight)) {
-
         FlarialGUI::lerp(sizesr[index].x, Constraints::RelativeConstraint(0.186f, "height", true),
                          0.15f * FlarialGUI::frameFactor);
         FlarialGUI::lerp(sizesr[index].y, Constraints::RelativeConstraint(0.149f, "height", true),
@@ -54,9 +54,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
 
         FlarialGUI::lerp(shadowsizesr[index].x, BottomRoundedWidth, 0.25f * FlarialGUI::frameFactor);
         FlarialGUI::lerp(shadowsizesr[index].y, BottomRoundedHeight, 0.25f * FlarialGUI::frameFactor);
-
     } else {
-
         FlarialGUI::lerp(sizesr[index].x, Constraints::RelativeConstraint(0.178f, "height", true),
                          0.15f * FlarialGUI::frameFactor);
         FlarialGUI::lerp(sizesr[index].y, Constraints::RelativeConstraint(0.141f, "height", true),
@@ -67,15 +65,12 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
 
         diffX = (sizesr[index].x - Constraints::RelativeConstraint(0.178f, "height", true)) / 2.0f;
         diffY = (sizesr[index].y - Constraints::RelativeConstraint(0.141f, "height", true)) / 2.0f;
-
     }
 
     x -= diffX;
     y -= diffY;
 
     if (shadowsizesr[index].x > Constraints::RelativeConstraint(0.255f, "height")) {
-
-
         float diffX2 = (shadowsizesr[index].x - BottomRoundedWidth) / 2.0f;
         float diffY2 = (shadowsizesr[index].y - BottomRoundedHeight) / 2.0f;
 
@@ -84,7 +79,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
             Vec2<float>(BottomRoundedWidth, BottomRoundedHeight),
             D2D1::ColorF(0, 0, 0, .7),
             round.x,
-            (diffX*5)
+            (diffX * 5)
         );
     }
 
@@ -111,7 +106,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
     FlarialGUI::FlarialTextWithFont(textx, texty, FlarialGUI::to_wide(mod->name).c_str(), textWidth, textHeight,
                                     DWRITE_TEXT_ALIGNMENT_CENTER,
                                     Constraints::SpacingConstraint(0.854, textWidth),
-                                    DWRITE_FONT_WEIGHT_NORMAL, textCol,false);
+                                    DWRITE_FONT_WEIGHT_NORMAL, textCol, false);
 
     // Mod icon
 
@@ -231,13 +226,11 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
 
     D2D1_COLOR_F buttonColor;
     buttonColor = D2D1::ColorF(FlarialGUI::buttonColors[index].r - FlarialGUI::darkenAmounts[index], FlarialGUI::buttonColors[index].g - FlarialGUI::darkenAmounts[index],
-                                   FlarialGUI::buttonColors[index].b - FlarialGUI::darkenAmounts[index], FlarialGUI::buttonColors[index].a);
-
-
+                               FlarialGUI::buttonColors[index].b - FlarialGUI::darkenAmounts[index], FlarialGUI::buttonColors[index].a);
 
 
     FlarialGUI::RoundedRect((buttonx - buttonWidth) - Constraints::SpacingConstraint(0.105f, paddingwidth), buttony - buttonHeight,
-                                  buttonColor, buttonWidth - Constraints::SpacingConstraint(1.5, paddingwidth), buttonHeight, 0.f, 0.f);
+                            buttonColor, buttonWidth - Constraints::SpacingConstraint(1.5, paddingwidth), buttonHeight, 0.f, 0.f);
 
     if (FlarialGUI::RoundedButton(index, buttonx - buttonWidth, buttony - buttonHeight,
                                   FlarialGUI::buttonColors[index], textCol2,
@@ -249,8 +242,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
                 if (newState) {
                     mod->onEnable();
                     mod->settings.getSettingByName<bool>("enabled")->value = newState;
-                }
-                else {
+                } else {
                     mod->onDisable();
                     mod->settings.getSettingByName<bool>("enabled")->value = newState;
                 }
@@ -262,8 +254,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
     FlarialGUI::FlarialTextWithFont((buttonx - buttonWidth) - Constraints::SpacingConstraint(0.15f, paddingwidth), buttony - buttonHeight, FlarialGUI::to_wide(text).c_str(), buttonWidth, buttonHeight, DWRITE_TEXT_ALIGNMENT_CENTER, buttonWidth * 1.08, DWRITE_FONT_WEIGHT_NORMAL, textCol2, false);
 
     D2D1::RectF();
-    if (FlarialGUI::isInScrollView)
-        buttony += FlarialGUI::scrollpos;
+    if (FlarialGUI::isInScrollView) buttony += FlarialGUI::scrollpos;
 
 
     // release
@@ -272,9 +263,9 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
     if (FlarialGUI::CursorInRect(modiconx, modicony + FlarialGUI::scrollpos, paddingSize, paddingSize) && MC::mouseButton == Left && MC::mouseAction == Press && !fix) {
         fix = true;
         mod->settings.getSettingByName<bool>("favorite")->value = !mod->settings.getSettingByName<bool>("favorite")->value;
-            FlarialGUI::Notify("Reopen this menu to view changes.");
-            ClickGUI::favoriteStart = std::chrono::high_resolution_clock::now();
-      }
+        FlarialGUI::Notify("Reopen this menu to view changes.");
+        ClickGUI::favoriteStart = std::chrono::high_resolution_clock::now();
+    }
 
     if (FlarialGUI::CursorInRect(settingx, buttony - buttonHeight,
                                  paddingwidth + Constraints::RelativeConstraint(0.26), buttonHeight) && MC::mouseButton == MouseButton::Left &&
@@ -286,6 +277,10 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
         ClickGUI::curr = "settings";
         FlarialGUI::scrollpos = 0;
         FlarialGUI::barscrollpos = 0;
+        if (Client::settings.getSettingByName<bool>("saveScrollPos")->value) {
+            ClickGUI::saved_acumilatedPos = ClickGUI::accumilatedPos;
+            ClickGUI::saved_acumilatedBarPos = ClickGUI::accumilatedBarPos;
+        }
         ClickGUI::accumilatedPos = 0;
         ClickGUI::accumilatedBarPos = 0;
     }
@@ -295,7 +290,6 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
 #include "../../Structs/ImagesClass.hpp"
 
 void ClickGUIElements::RotatingGear(int index, float x, float y, float width, float height, float imageWidth, float imageHeight) {
-
     float imageY = y;
 
     if (FlarialGUI::isInScrollView) {
@@ -310,9 +304,7 @@ void ClickGUIElements::RotatingGear(int index, float x, float y, float width, fl
 
     if (ImagesClass::images[IDR_SETTINGS_WHITE_PNG] == nullptr) {
         FlarialGUI::LoadImageFromResource(IDR_SETTINGS_WHITE_PNG, &ImagesClass::images[IDR_SETTINGS_WHITE_PNG]);
-
     } else if (ImagesClass::images[IDR_SETTINGS_WHITE_PNG] != nullptr) {
-
         if (FlarialGUI::CursorInRect(x, y, width, height)) {
             FlarialGUI::lerp(FlarialGUI::rotationAngles[index], FlarialGUI::rotationAngles[index] + 15, 0.24f * FlarialGUI::frameFactor);
         }

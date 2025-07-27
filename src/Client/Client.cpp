@@ -252,6 +252,7 @@ void Client::initialize() {
 	ADD_SETTING("vsync", false);
 	ADD_SETTING("recreateAtStart", false);
 	ADD_SETTING("promotions", true);
+	ADD_SETTING("saveScrollPos", true);
 	ADD_SETTING("snappinglines", true);
 	ADD_SETTING("apiusage", true);
 	ADD_SETTING("donotwait", true);
