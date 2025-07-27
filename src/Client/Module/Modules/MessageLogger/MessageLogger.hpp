@@ -6,6 +6,7 @@
 
 class MessageLogger : public Module {
 private:
+    bool update = false;
     int prevMsgVecSize = 0;
 public:
     MessageLogger();
@@ -16,7 +17,9 @@ public:
 
     void defaultConfig() override;
 
-    // void settingsRender(float settingsOffset) override;
+    void settingsRender(float settingsOffset) override;
 
     void onPacket(PacketEvent& event);
+
+    void onTick(TickEvent& event);
 };

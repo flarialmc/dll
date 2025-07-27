@@ -1,58 +1,98 @@
 #include "MessageLogger.hpp"
 
-MessageLogger::MessageLogger(): Module("Message Logger", "Saves chat messages into a file.", IDR_MEMORY_PNG, "")
-{}
+MessageLogger::MessageLogger(): Module("Message Logger", "Saves chat messages into a file.", IDR_MEMORY_PNG, "") {
+}
 
-void MessageLogger::onEnable()
-{
+void MessageLogger::onEnable() {
     Listen(this, PacketEvent, &MessageLogger::onPacket)
+    Listen(this, TickEvent, &MessageLogger::onTick)
     Module::onEnable();
 }
 
-void MessageLogger::onDisable()
-{
+void MessageLogger::onDisable() {
     Deafen(this, PacketEvent, &MessageLogger::onPacket)
+    Deafen(this, TickEvent, &MessageLogger::onTick)
     Module::onDisable();
 }
 
-void MessageLogger::defaultConfig()
-{
+void MessageLogger::defaultConfig() {
     Module::defaultConfig("core");
-
+    setDef("prependTimestamp", true);
+    setDef("saveCleanVersion", true);
 }
+
+void MessageLogger::settingsRender(float settingsOffset) {
+    float x = Constraints::PercentageConstraint(0.019, "left");
+    float y = Constraints::PercentageConstraint(0.10, "top");
+
+    const float scrollviewWidth = Constraints::RelativeConstraint(0.5, "height", true);
+
+
+    FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
+    FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
+                              Constraints::RelativeConstraint(1.0, "width"),
+                              Constraints::RelativeConstraint(0.88f, "height"));
+
+    addHeader("Message Logger");
+    addToggle("Prepend Timestamp", "[timestamp] {msg} format", "prependTimestamp");
+    addToggle("Save Clean Version", "Removes color codes from texts", "saveCleanVersion");
+
+    FlarialGUI::UnsetScrollView();
+    resetPadding();
+}
+
 
 void MessageLogger::onPacket(PacketEvent &event) {
     if (!this->isEnabled()) return;
-    MinecraftPacketIds id = event.getPacket()->getId();
 
-    if (id == MinecraftPacketIds::Text && SDK::clientInstance->getGuiData()->getGuiMessages().size() != prevMsgVecSize) {
-        prevMsgVecSize = SDK::clientInstance->getGuiData()->getGuiMessages().size();
-        std::string path = Utils::getClientPath() + "\\MessageLogger";
+    if (event.getPacket()->getId() == MinecraftPacketIds::Text) update = true;
+}
 
-        auto now = std::chrono::system_clock::now();
-        std::time_t time_t_now = std::chrono::system_clock::to_time_t(now);
-        std::tm* local_tm = std::localtime(&time_t_now);
+void MessageLogger::onTick(TickEvent &event) {
+    if (!this->isEnabled() || !update) return;
+    update = false;
+    if (prevMsgVecSize == SDK::clientInstance->getGuiData()->getGuiMessages().size()) return;
+    prevMsgVecSize = SDK::clientInstance->getGuiData()->getGuiMessages().size();
+    std::string path = Utils::getClientPath() + "\\MessageLogger";
 
-        std::stringstream ss;
-        ss << std::put_time(local_tm, "%b-%d-%Y") << ".txt";
-        std::string filename = ss.str();
+    auto now = std::chrono::system_clock::now();
+    std::time_t time_t_now = std::chrono::system_clock::to_time_t(now);
+    std::tm *local_tm = std::localtime(&time_t_now);
 
-        for (char &c : filename) {
-            c = std::tolower(c);
-        }
+    std::stringstream ss;
+    ss << std::put_time(local_tm, "%b-%d-%Y");
+    std::string filename = ss.str();
 
-        std::string curTxtFile = path + "\\" + filename;
+    std::string curTxtFile = path + "\\" + filename + ".txt";
+    std::string curTxtFile_clean = path + "\\" + filename + "_clean.txt";
 
-        // auto* pkt = reinterpret_cast<TextPacket*>(event.getPacket());
+    std::ofstream logFile(curTxtFile, std::ios::app);
 
-        std::ofstream logFile(curTxtFile, std::ios::app);
-
-        if (logFile.is_open()) {
+    if (logFile.is_open()) {
+        if (getOps<bool>("prependTimestamp")) {
             ss.str("");
             ss.clear();
             ss << std::put_time(local_tm, "%H:%M:%S"); // e.g., "10:23:13"
             logFile << "[" << ss.str() << "] " << SDK::clientInstance->getGuiData()->getGuiMessages().back().fullMsg << std::endl;
-            logFile.close();
-        } else Logger::error("Error opening message logger file {}", curTxtFile);
+        }
+        else logFile << SDK::clientInstance->getGuiData()->getGuiMessages().back().fullMsg << std::endl;
+
+        logFile.close();
+    } else Logger::error("Error opening message logger file {}", curTxtFile);
+
+    if (getOps<bool>("saveCleanVersion")) {
+        std::ofstream logFile_clean(curTxtFile_clean, std::ios::app);
+
+        if (logFile_clean.is_open()) {
+            if (getOps<bool>("prependTimestamp")) {
+                ss.str("");
+                ss.clear();
+                ss << std::put_time(local_tm, "%H:%M:%S"); // e.g., "10:23:13"
+                logFile_clean << "[" << ss.str() << "] " << String::removeColorCodes(SDK::clientInstance->getGuiData()->getGuiMessages().back().fullMsg) << std::endl;
+            }
+            else logFile_clean << String::removeColorCodes(SDK::clientInstance->getGuiData()->getGuiMessages().back().fullMsg) << std::endl;
+
+            logFile_clean.close();
+        } else Logger::error("Error opening message logger file_clean {}", curTxtFile_clean);
     }
 }

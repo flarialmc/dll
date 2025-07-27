@@ -38,8 +38,6 @@
 #include "Hooks/game/ReadFileHook.hpp"
 #include "Hooks/Game/ApplyTurnDeltaHook.hpp"
 #include "Hooks/Game/ChatScreenControllerHook.hpp"
-#include "Hooks/Game/handleChatMsg.hpp"
-#include "Hooks/Game/pushNewChatMsg.hpp"
 
 #include "Hooks/Render/BobHurt.hpp"
 #include "Hooks/Render/RenderLevelHook.hpp"
@@ -135,9 +133,6 @@ void HookManager::initialize() {
     addHook<TintColorHook>();
     addHook<ActorShaderParamsHook>();
     addHook<ChatScreenControllerHook>();
-    addHook<pushNewChatMsgHook>();
-    addHook<handleChatMsgHook>();
-
 
     if(VersionUtils::checkAboveOrEqual(21, 40)) {
         addHook<UpdatePlayerHook>();
