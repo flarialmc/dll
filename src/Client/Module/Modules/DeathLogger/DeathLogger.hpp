@@ -7,6 +7,7 @@ class DeathLogger : public Module {
 
 private:
     bool death = false;
+    bool waypointed = false;
     bool printed = false;
     Vec3<float> deathPos;
 
