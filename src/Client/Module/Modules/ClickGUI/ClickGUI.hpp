@@ -343,6 +343,11 @@ public:
                 SDK::clientInstance->releaseMouse();
 # endif
 
+                if (Client::settings.getSettingByName<bool>("saveScrollPos")->value) {
+                     saved_acumilatedPos = accumilatedPos;
+                     saved_acumilatedBarPos = accumilatedBarPos;
+                }
+
                 FlarialGUI::ResetShit();
                 Client::SaveSettings();
                 Client::SavePrivate();
@@ -369,6 +374,11 @@ public:
                     this->active = false;
                     page.type = "normal";
                     curr = "modules";
+
+                    if (Client::settings.getSettingByName<bool>("saveScrollPos")->value) {
+                        saved_acumilatedPos = accumilatedPos;
+                        saved_acumilatedBarPos = accumilatedBarPos;
+                    }
 
                     FlarialGUI::ResetShit();
                     Client::SaveSettings();

@@ -290,6 +290,9 @@ void ClickGUI::onRender(RenderEvent &event) {
             FlarialGUI::TextBoxes[0].isActive = false;
             curr = "settings";
 
+            saved_acumilatedPos = accumilatedPos;
+            saved_acumilatedBarPos = accumilatedBarPos;
+
             auto &scrollData = scrollInfo[curr];
 
             FlarialGUI::scrollpos = scrollData.scrollpos;
