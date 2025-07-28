@@ -1,6 +1,6 @@
 #include "MessageLogger.hpp"
 
-MessageLogger::MessageLogger(): Module("Message Logger", "Saves chat messages into a file.", IDR_MEMORY_PNG, "") {
+MessageLogger::MessageLogger(): Module("Message Logger", "Saves chat messages into a file.", IDR_COMPACTCHAT_PNG, "") {
 }
 
 void MessageLogger::onEnable() {

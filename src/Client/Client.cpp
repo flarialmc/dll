@@ -268,7 +268,7 @@ void Client::initialize() {
 	ADD_SETTING("centreCursor", false);
 	ADD_SETTING("aliasingMode", std::string("Default"));
 	ADD_SETTING("ejectKeybind", std::string(""));
-	ADD_SETTING("enabledModulesOnTop", false);
+	ADD_SETTING("enabledModulesOnTop", true);
 	ADD_SETTING("rgb_speed", 1.0f);
 	ADD_SETTING("rgb_saturation", 1.0f);
 	ADD_SETTING("rgb_value", 1.0f);

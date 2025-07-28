@@ -1,6 +1,7 @@
 #include "DeathLogger.hpp"
 
 #include "Events/EventManager.hpp"
+#include "Modules/Waypoints/Waypoints.hpp"
 
 void DeathLogger::onEnable() {
     Listen(this, TickEvent, &DeathLogger::onTick)
@@ -16,6 +17,7 @@ void DeathLogger::onDisable() {
 
 void DeathLogger::defaultConfig() {
     Module::defaultConfig("core");
+    setDef("deathWaypoints", true);
 }
 
 void DeathLogger::settingsRender(float settingsOffset) {
@@ -28,6 +30,9 @@ void DeathLogger::settingsRender(float settingsOffset) {
     FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
                               Constraints::RelativeConstraint(1.0, "width"),
                               Constraints::RelativeConstraint(0.88f, "height"));
+
+    addHeader("Death Logger");
+    addToggle("Death Waypoints", "waypoint settings are managed in the waypoints module.", "deathWaypoints");
 
     FlarialGUI::UnsetScrollView();
     resetPadding();
@@ -53,12 +58,35 @@ void DeathLogger::onTick(TickEvent& event) {
         death = false;
         deathPos = Vec3<float>{};
         printed = false;
+        waypointed = false;
     };
 
     if (health == 0 && !death) {
         death = true;
         deathPos = *player->getPosition();
     };
+
+    if (death && getOps<bool>("deathWaypoints") && !waypointed) {
+        std::shared_ptr<Waypoints> waypoints = std::dynamic_pointer_cast<Waypoints>(ModuleManager::getModule("Waypoints"));
+        int index = waypoints->WaypointList.size();
+        while (true) {
+            SettingType<std::string>* s = this->settings.getSettingByName<std::string>("waypoint-" + FlarialGUI::cached_to_string(index));
+            if (s == nullptr) break;
+            index++;
+        }
+        waypoints->addWaypoint(
+            index,
+            "(death) waypoint-" + FlarialGUI::cached_to_string(index),
+            "FFFFFF",
+            Vec3{ SDK::clientInstance->getLocalPlayer()->getPosition()->x, SDK::clientInstance->getLocalPlayer()->getPosition()->y - 1, SDK::clientInstance->getLocalPlayer()->getPosition()->z },
+            true,
+            true,
+            false,
+            100.0f
+        );
+        FlarialGUI::Notify("Added death waypoint!");
+        waypointed = true;
+    }
 
     if (death && !printed) {
         SDK::clientInstance->getGuiData()->displayClientMessage(std::format(
