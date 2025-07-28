@@ -9,9 +9,11 @@ class CompactChat : public Module {
 
 private:
 
-    int count = 1;
-    std::string mesg;
     bool refreshChat = false;
+    std::vector<std::string> messageVec;
+    std::unordered_map<std::string, int> counts;
+    int prevMsgVecSize = -1;
+    bool donext = false;
 
 public:
 
