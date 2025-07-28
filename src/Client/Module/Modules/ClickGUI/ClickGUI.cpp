@@ -692,7 +692,7 @@ void ClickGUI::onRender(RenderEvent &event) {
                              Client::settings.getSettingByName<float>("gui_font_scale")->value, 2.f, 0.5f, true);
                 c->addTextBox("Modules", "", Client::settings.getSettingByName<std::string>("mod_fontname")->value, 48);
                 c->addSlider("Universal Font Scale", "",
-                             Client::settings.getSettingByName<float>("modules_font_scale")->value, 2.f, 0.f, true);
+                             Client::settings.getSettingByName<float>("modules_font_scale")->value, 2.f, 0.5f, true);
                 c->addToggle("Override Font Weight", "",
                              Client::settings.getSettingByName<bool>("overrideFontWeight")->value);
                 c->addDropdown("Font Weight", "Bold, Thin, etc.",

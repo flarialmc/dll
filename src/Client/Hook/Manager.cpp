@@ -38,6 +38,7 @@
 #include "Hooks/game/ReadFileHook.hpp"
 #include "Hooks/Game/ApplyTurnDeltaHook.hpp"
 #include "Hooks/Game/ChatScreenControllerHook.hpp"
+#include "Hooks/Game/HudScreenControllerHook.hpp"
 
 #include "Hooks/Render/BobHurt.hpp"
 #include "Hooks/Render/RenderLevelHook.hpp"
@@ -133,6 +134,7 @@ void HookManager::initialize() {
     addHook<TintColorHook>();
     addHook<ActorShaderParamsHook>();
     addHook<ChatScreenControllerHook>();
+    addHook<HudScreenControllerHook>();
 
     if(VersionUtils::checkAboveOrEqual(21, 40)) {
         addHook<UpdatePlayerHook>();
