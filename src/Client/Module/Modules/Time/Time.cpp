@@ -77,8 +77,8 @@ void Time::onRender(RenderEvent& event)
             if (getOps<bool>("4letterYear")) sub = 1900;
             else sub = -100;
 
-            if (getOps<bool>("donaldTrumpMode")) dateStr = std::format("{}/{}/{}", date.tm_mon, date.tm_mday, date.tm_year + sub);
-            else dateStr = std::format("{}/{}/{}", date.tm_mday, date.tm_mon, date.tm_year + sub);
+            if (getOps<bool>("donaldTrumpMode")) dateStr = std::format("{}/{}/{}", date.tm_mon + 1, date.tm_mday, date.tm_year + sub);
+            else dateStr = std::format("{}/{}/{}", date.tm_mday, date.tm_mon + 1, date.tm_year + sub);
 
             if (getOps<bool>("timeBeforeDate")) text += "\n" + dateStr;
             else text = dateStr + "\n" + text;
