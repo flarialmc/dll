@@ -114,6 +114,25 @@ namespace cosmetic {
 						r.w /= textureSize.y;
 						return r;
 						};
+
+					auto computeNormUv = [&](float u, float v, float w, float h) -> Vec4<float> {
+						float u0 = u;
+						float v0 = v;
+						float u1 = u + w;
+						float v1 = v + h;
+						// Normalize all coordinates
+						u0 /= textureSize.x;
+						u1 /= textureSize.x;
+						v0 /= textureSize.y;
+						v1 /= textureSize.y;
+						// Ensure (u_min, v_min) is top-left and (u_max, v_max) is bottom-right
+						float u_min = std::min(u0, u1);
+						float u_max = std::max(u0, u1);
+						float v_min = std::min(v0, v1);
+						float v_max = std::max(v0, v1);
+						return Vec4<float>(u_min, v_min, u_max, v_max);
+					};
+
 					if (cubeVal.at("uv").is_array()) {
 						uv.isPerFaceUV = false;
 						std::vector<float> uvArray = cubeVal["uv"];
@@ -136,8 +155,9 @@ namespace cosmetic {
 							std::vector<float> uvSizeArray = uvMap[name]["uv_size"];
 							out.uv = Vec2(uvArray[0], uvArray[1]);
 							out.uvSize = Vec2(uvSizeArray[0], uvSizeArray[1]);
-							out.normUv = normUv(Vec4<float>(out.uv.x, out.uv.y, out.uvSize.x, out.uvSize.y));
-							};
+							out.normUv = computeNormUv(out.uv.x, out.uv.y, out.uvSize.x, out.uvSize.y);
+							// Optionally keep the original uv/uvSize for mesh creation logic
+						};
 
 						loadUv(uv.faces.north, "north");
 						loadUv(uv.faces.east, "east");

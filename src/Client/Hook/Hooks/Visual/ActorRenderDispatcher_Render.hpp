@@ -12,18 +12,18 @@
 class ActorRenderDispatcher_Render : public Hook {
 private:
 
-    static void ActorRenderDispatcher_RenderCallback(void* _this, BaseActorRenderContext* entityRenderContext, Actor* entity, glm::vec3* cameraTargetPos, glm::vec3* pos, glm::vec2* rot, bool ignoreLighting) {
-        funcOriginal(_this, entityRenderContext, entity, cameraTargetPos, pos, rot, ignoreLighting);
-        auto event = nes::make_holder<ActorRenderDispatcherEvent>(entity, Vec2(rot->x, rot->y), Vec3<float>(pos->x, pos->y, pos->z));
+    static void ActorRenderDispatcher_RenderCallback(void* a1, void* a2, void* a3) {
+        auto event = nes::make_holder<ActorRenderDispatcherEvent>();
         eventMgr.trigger(event);
+        funcOriginal(a1, a2, a3);
     }
 
 public:
-    typedef void(__thiscall* RenderLevelOriginal)(void* _this, BaseActorRenderContext* entityRenderContext, Actor* entity, glm::vec3* cameraTargetPos, glm::vec3* pos, glm::vec2* rot, bool ignoreLighting);
+    typedef void(__thiscall* RenderLevelOriginal)(void* a1, void* a2, void* a3);
 
     static inline RenderLevelOriginal funcOriginal = nullptr;
 
-    ActorRenderDispatcher_Render() : Hook("ActorRenderDispatcher_Render", Memory::offsetFromSig(GET_SIG_ADDRESS("ActorRenderDispatcher::render"), 1)) {}
+    ActorRenderDispatcher_Render() : Hook("ActorRenderDispatcher_Render", GET_SIG_ADDRESS("ActorRenderDispatcher::render")) {}
 
     void enableHook() override {
         this->autoHook((void*)ActorRenderDispatcher_RenderCallback, (void**)&funcOriginal);

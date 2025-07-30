@@ -25,7 +25,7 @@ public:
     }
 
     CosmeticManager() {
-        model = cosmetic::ModelLoader::LoadFromFile(Utils::getAssetsPath() + "\\wisp.geo.json", "geometry.wisp");
+        model = cosmetic::ModelLoader::LoadFromFile(Utils::getAssetsPath() + "\\amogi.geo.json", "geometry.unknown");
         Init();
         Initialize();  // Call Initialize to set up the cosmetics map
     }
@@ -41,16 +41,17 @@ private:
         else RenderCosmeticsForLocaluser = true;
     }
 
-    void onRenderLevel(ActorRenderDispatcherEvent& event) {
-        if (event.getEntity() ==SDK::clientInstance->getLocalPlayer()) {
-            ResourceLocation loc(Utils::getAssetsPath() + "\\wisp.png", true);
-            TexturePtr ptr = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc, false);
+    void onRenderLevel(ActorRenderDispatcherEvent& event)
+    {
+        ResourceLocation loc(Utils::getAssetsPath() + "\\amogi.png", true);
+        TexturePtr ptr = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc, false);
 
-            if (ptr.clientTexture == nullptr || ptr.clientTexture->clientTexture.resourcePointerBlock == nullptr)
-                return;
+        if (ptr.clientTexture == nullptr || ptr.clientTexture->clientTexture.resourcePointerBlock == nullptr)
+            return;
 
-            model->render(SDK::scn, *ptr.clientTexture, Vec3<float>(0, 100, 0), Vec3<float>(), Vec3<float>(1, 1, 1), true);
-        }
+        std::cout << "uovyhgasdc" << std::endl;
+
+        model->render(SDK::scn, *ptr.clientTexture, Vec3<float>(0, 100, 0), Vec3<float>(), Vec3<float>(1, 1, 1), true);
     }
 
     template<typename T>

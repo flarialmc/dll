@@ -86,14 +86,14 @@ namespace cosmetic {
 
 
 		// right (east)
-		normUv = &cube.uv.faces.west.normUv;
+		normUv = &cube.uv.faces.east.normUv;
 		t->vertexUV(pos.x, pos.y, pos.z + size.z, normUv->x, normUv->w);
 		t->vertexUV(pos.x, pos.y, pos.z, normUv->z, normUv->w);
 		t->vertexUV(pos.x, pos.y + size.y, pos.z, normUv->z, normUv->y);
 		t->vertexUV(pos.x, pos.y + size.y, pos.z + size.z, normUv->x, normUv->y);
 
 		// left (west)
-		normUv = &cube.uv.faces.east.normUv;
+		normUv = &cube.uv.faces.west.normUv;
 		t->vertexUV(pos.x + size.x, pos.y + size.y, pos.z + size.z, normUv->z, normUv->y);
 		t->vertexUV(pos.x + size.x, pos.y + size.y, pos.z, normUv->x, normUv->y);
 		t->vertexUV(pos.x + size.x, pos.y, pos.z, normUv->x, normUv->w);

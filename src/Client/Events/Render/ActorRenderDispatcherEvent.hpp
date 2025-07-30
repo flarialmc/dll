@@ -7,8 +7,8 @@ class ActorRenderDispatcherEvent : public Event {
     Vec2<float> rot;
     Vec3<float> pos;
 public:
-    explicit ActorRenderDispatcherEvent(Actor* acotr, Vec2<float> rot, Vec3<float> pos) {
-        this->ent = acotr;
+    explicit ActorRenderDispatcherEvent() {
+        this->ent = nullptr;
         this->rot = rot;
         this->pos = pos;
     }
