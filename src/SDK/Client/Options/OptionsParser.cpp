@@ -14,7 +14,7 @@ std::map<std::string, std::string> OptionsParser::parseOptionsFile() {
     std::ifstream file(path);
     
     if (!file.is_open()) {
-        Logger::error("Failed to open options.txt");
+        LOG_ERROR("Failed to open options.txt");
         return OptionsParser::options;
     }
 

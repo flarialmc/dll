@@ -6,8 +6,8 @@ class SaveConfigListener : public Listener {
 public:
     void onKey(KeyEvent &event) {
         if (event.getKey() == VK_F7 && static_cast<ActionType>(event.getAction()) == ActionType::Released) {
-            ModuleManager::SaveModulesConfig();
             Client::SaveSettings();
+            Client::SavePrivate();
             FlarialGUI::Notify("Config Saved");
         }
     }

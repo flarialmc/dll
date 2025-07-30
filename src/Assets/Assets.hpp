@@ -152,5 +152,20 @@
 #define IDR_LEWIS_MP3           253
 #define IDR_SUPPORTER_LOGO_PNG	254
 #define IDR_F3_PNG              255
+#define IDR_DELETE_PNG          256
+#define IDR_RENDER_DRAGON_PNG   257
+#define IDR_SKINSTEALER_PNG     263
+#define IDR_CINEMATICCAMERA_PNG 264
+#define IDR_DEATHLOGGER_PNG     265
+#define IDR_TWERK_PNG           266
+#define IDR_CHUNKBORDER_PNG     267
+#define IDR_COMPACTCHAT_PNG     268
 // MAKE SURE YOU ALWAYS UPDATE THIS!
-#define MAX_IMAGE_ID IDR_LEWIS_MP3
+
+#define MAX_IMAGE_ID 262
+
+#define IDR_PING_AMAZING  258
+#define IDR_PING_GOOD     269
+#define IDR_PING_OKAY     260
+#define IDR_PING_BAD      261
+#define IDR_PING_QUIT     262

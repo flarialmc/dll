@@ -1,3 +1,4 @@
+#pragma once
 #include "../Hook.hpp"
 #include "../../../../SDK/Client/Actor/Actor.hpp"
 #include "../../../../SDK/Client/Actor/Gamemode.hpp"
