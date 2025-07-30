@@ -4,8 +4,6 @@
 #include "SDK/Client/Render/GuiMessage.hpp"
 #include "Modules/Nick/NickModule.hpp"
 
-#include <algorithm>
-
 void CompactChat::onEnable() {
     Listen(this, PacketEvent, &CompactChat::onPacketReceive)
     Listen(this, ChatScreenControllerTickEvent, &CompactChat::onChatScreenControllerTickEvent)
@@ -129,26 +127,28 @@ void CompactChat::onPacketReceive(PacketEvent& event) {
 
     if (id == MinecraftPacketIds::Text) {
         auto* pkt = reinterpret_cast<TextPacket*>(event.getPacket());
+        std::vector<GuiMessage>& mesgVec = SDK::clientInstance->getGuiData()->getGuiMessages();
 
-        auto& guiMsgVec = SDK::clientInstance->getGuiData()->getGuiMessages();
+        if (mesgVec.empty()) return;
 
-        if (prevMsgVecSize == guiMsgVec.size()) return;
-        prevMsgVecSize = guiMsgVec.size();
+        if (mesg.empty()) mesg = mesgVec.back().fullMsg;
 
-        auto pos = std::find(messageVec.begin(), messageVec.end(), pkt->message);
+        if (pkt->message == mesgVec.back().msg) {
+            count += 1;
 
-        if (pos != messageVec.end()) {
-            int index = pos - messageVec.begin();
-            guiMsgVec.erase(guiMsgVec.begin() + index);
-            messageVec.erase(messageVec.begin() + index);
+            std::string format = getOps<std::string>("format");
 
-            counts[pkt->message] += 1;
+            replace(format, "{msg}", mesg);
+            replace(format, "{count}", getCountText(count));
+
+            mesgVec.back().fullMsg = format;
 
             refreshChat = true;
+            event.cancel();
         }
         else {
-            messageVec.emplace_back(pkt->message);
-            counts[pkt->message] = 1;
+            count = 1;
+            mesg = "";
         }
 
     }
