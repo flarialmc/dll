@@ -42,6 +42,7 @@
 #include "Hooks/Visual/ActorShaderParams.hpp"
 #include "Hooks/Visual/TintColorHook.hpp"
 #include "Hooks/Render/RenderLevelHook.hpp"
+#include "Hooks/Game/Player_UpdateSkin.hpp"
 
 std::vector<std::shared_ptr<Hook>> HookManager::hooks;
 
@@ -131,6 +132,8 @@ void HookManager::initialize() {
     addHook<TintColorHook>();
     addHook<ActorShaderParamsHook>();
     addHook<RenderLevelHook>();
+
+    addHook<PlayerUpdateSkin>();
 
     if(VersionUtils::checkAboveOrEqual(21, 40)) {
         addHook<UpdatePlayerHook>();

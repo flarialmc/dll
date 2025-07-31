@@ -13,6 +13,7 @@ void RenderLevelHook::enableHook() {
 
 void RenderLevelHook::RenderLevelCallback(LevelRender* level, ScreenContext* scn, void* a3) {
 
+    SDK::scn = scn;
     auto event = nes::make_holder<Render3DEvent>(level, scn);
     eventMgr.trigger(event);
     return funcOriginal(level, scn, a3);

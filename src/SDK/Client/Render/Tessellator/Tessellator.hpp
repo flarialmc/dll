@@ -32,10 +32,16 @@ public:
     void vertexUV(float x, float y, float z, float u, float v) {
         using func_t = void(__fastcall*)(Tessellator*, float, float, float, float, float);
         static auto func = reinterpret_cast<func_t>(GET_SIG_ADDRESS("Tessellator::vertexUV"));
-        x = offset.x + x;
-        y = offset.y + y;
-        z = offset.z + z;
-        func(this, x, y, z, u, v);
+        if (applyTransform) {
+            glm::vec4 vec = transformMatrix * glm::vec4(x, y, z, 1.0f);
+            func(this, vec.x + offset.x, vec.y + offset.y, vec.z + offset.z, u, v);
+        }
+        else {
+            x = offset.x + x;
+            y = offset.y + y;
+            z = offset.z + z;
+            func(this, x, y, z, u, v);
+        }
     }
 
     void color(float r, float g, float b, float a) {

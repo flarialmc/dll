@@ -5,6 +5,7 @@
 #include <cctype>
 
 ClientInstance *SDK::clientInstance = nullptr;
+ScreenContext* SDK::scn = nullptr;
 ScreenView *SDK::screenView = nullptr;
 std::vector<DrawTextQueueEntry> SDK::drawTextQueue;
 std::vector<DrawTextQueueEntry> SDK::drawTextQueue2;

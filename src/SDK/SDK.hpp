@@ -4,6 +4,7 @@
 #include "Client/GUI/RectangleArea.hpp"
 #include "Client/Render/ScreenView/ScreenView.hpp"
 #include "Client/Network/Packet/Packet.hpp"
+#include "Client/Render/ScreenContext.hpp"
 // #include "Client/Render/MinecraftUIRenderContext.hpp"
 //
 
@@ -69,6 +70,7 @@ namespace SDK {
     extern bool hasInstanced;
     extern std::string currentScreen;
     extern uint64_t serverPing;
+    extern ScreenContext* scn;
 
     bool containsIgnoreCase(const std::string &mainString, const std::string &searchString);
 

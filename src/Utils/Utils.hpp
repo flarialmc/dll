@@ -237,8 +237,7 @@ struct AABB {
 
     AABB() = default;
 
-    AABB(Vec3<float> l, Vec3<float> h) : lower(l), upper(h) {
-    };
+    AABB(Vec3<float> l, Vec3<float> h) : lower(l), upper(h) {};
 
     AABB(const AABB &aabb) {
         lower = Vec3<float>(aabb.lower);
@@ -265,7 +264,7 @@ struct AABB {
     }
 
     AABB expandedXYZ(const float amount) {
-        return {lower.sub(amount, 0.f, amount), upper.add(amount, amount, amount)};
+        return { lower.sub(amount, 0.f, amount), upper.add(amount, amount, amount) };
     }
 
     Vec3<float> centerPoint() {
@@ -273,17 +272,27 @@ struct AABB {
         return lower.add(diff.mul(0.5f));
     }
 
-    bool intersects(const AABB &aabb) {
+    bool intersects(const AABB& aabb) {
         return aabb.upper.x > lower.x && upper.x > aabb.lower.x &&
                aabb.upper.y > lower.y && upper.y > aabb.lower.y &&
                aabb.upper.z > lower.z && upper.z > aabb.lower.z;
     }
 
-    bool intersectsXZ(const AABB &aabb) {
+    bool intersectsXZ(const AABB& aabb) {
         return aabb.upper.x > lower.x && upper.x > aabb.lower.x &&
                aabb.upper.z > lower.z && upper.z > aabb.lower.z;
     }
+
+    void expandTo(Vec3<float> point) {
+        if (point.x < lower.x) lower.x = point.x;
+        if (point.y < lower.y) lower.y = point.y;
+        if (point.z < lower.z) lower.z = point.z;
+        if (point.x > upper.x) upper.x = point.x;
+        if (point.y > upper.y) upper.y = point.y;
+        if (point.z > upper.z) upper.z = point.z;
+    }
 };
+
 
 class Utils {
 public:
