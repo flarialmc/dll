@@ -170,9 +170,10 @@ public:
 
     typedef void(__thiscall* drawTextOriginal)(MinecraftUIRenderContext*, void*, float*, std::string*, float*, float, unsigned int, const void*, const void*);
     static inline  drawTextOriginal funcOriginalText = nullptr;
-    SetUpAndRenderHook() : Hook("SetupAndRender", GET_SIG("ScreenView::setupAndRender")) {}
+    SetUpAndRenderHook() : Hook("SetupAndRender", "") {}
 
     void enableHook( ) override {
-        this->autoHook((void *) setUpAndRenderCallback, (void**)&funcOriginal);
+        void* addr = (void *)Memory::offsetFromSig((uintptr_t)GET_SIG_ADDRESS("ScreenView::setupAndRender"), 1);
+        this->manualHook(addr, (void *) setUpAndRenderCallback, (void**)&funcOriginal);
     }
 };

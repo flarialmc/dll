@@ -117,7 +117,9 @@ void ModuleManager::initialize() {
     addModule(new ReachCounter());
     addModule(new ComboCounter());
     addModule(new IPDisplay());
-    addModule(new PingCounter());
+    if(!WinrtUtils::checkAboveOrEqual(21, 100)) {
+        addModule(new PingCounter());
+    }
     addModule(new PotCounter());
     addModule(new ArrowCounter());
     addModule(new Time());
@@ -168,7 +170,9 @@ void ModuleManager::initialize() {
     ////addModule(new OpponentReach());
     addModule(new ViewModel());
     addModule(new HitPing());
-    addModule(new ItemPhysics());
+    if(!WinrtUtils::checkAboveOrEqual(21, 100)) {
+        addModule(new ItemPhysics());
+    }
 
     //addModule(new MovableChat());
     //addModule(new CompactChat());

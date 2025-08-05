@@ -85,7 +85,7 @@ std::string WinrtUtils::getFormattedVersion() {
     // Construct formatted version string
     std::string formattedVersion = parts[0] + "." + parts[1];
     if (parts.size() > 2) {
-        formattedVersion += "." + parts[2].substr(0, 1); // Take only the first character of the patch version
+        formattedVersion += "." + parts[2].substr(0, parts[2].size() - 3); // Take only the first character of the patch version
     }
 
     return formattedVersion;
