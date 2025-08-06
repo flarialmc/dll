@@ -159,6 +159,14 @@ target_link_libraries(Flarial PRIVATE libcurl ws2_32.lib crypt32.lib normaliz.li
 
 target_link_libraries(Flarial PUBLIC MinHook)
 
+if (EXISTS "${CMAKE_SOURCE_DIR}/compiledoom.txt")
+    message(WARNING "Compiling with Doom Module, Flarial may freeze or crash.")
+    add_compile_definitions(COMPILE_DOOM)
+    file(GLOB_RECURSE DOOM_SOURCES "src/Client/Module/Modules/Doom/doomgeneric/*.c" "src/Client/Module/Modules/Doom/doomgeneric/*.h")
+    add_library(DoomModule ${DOOM_SOURCES})
+    target_link_libraries(Flarial PRIVATE DoomModule)
+endif ()
+
 set_property(TARGET Flarial PROPERTY UNITY_BUILD ON)
 set_property(TARGET Flarial PROPERTY UNITY_BUILD_BATCH_SIZE 32)
 

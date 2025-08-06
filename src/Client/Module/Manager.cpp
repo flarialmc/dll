@@ -117,6 +117,9 @@
 #include "Modules/ChunkBorder/ChunkBorder.hpp"
 #include "Modules/CompactChat/CompactChat.hpp"
 #include "Modules/MessageLogger/MessageLogger.hpp"
+#ifdef COMPILE_DOOM
+	#include "Modules/Doom/Doom.hpp"
+#endif
 
 void ModuleManager::getModules() {
 	for (const auto& pair : moduleMap) {
@@ -276,6 +279,9 @@ void ModuleManager::initialize() {
 	addModule<ChunkBorder>();
 	addModule<CompactChat>();
 	addModule<MessageLogger>();
+#ifdef COMPILE_DOOM
+	addModule<DoomModule>();
+#endif
 
 	addService<GUIKeyListener>();
 	if (!VersionUtils::checkAboveOrEqual(21, 60)) {
