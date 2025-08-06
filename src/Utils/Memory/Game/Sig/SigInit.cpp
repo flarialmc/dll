@@ -12,13 +12,17 @@ void SigInit::init21100() {
 
     ADD_SIG("Actor::canSee", "E8 ? ? ? ? 84 C0 74 71 F6 83 10 02 00 00 01");
     // ADD_SIG("Options::getGamma", "");
+
     ADD_SIG("blockHighlightColor", "0F 11 85 18 03 00 00 0F 11 01");
 
     ADD_SIG("MinecraftPackets::createPacket", "48 89 5C 24 10 48 89 6C 24 18 48 89 74 24 20 57 48 83 EC 70 48 8B 05 ? ? ? ? 48 33 C4 48 89 44 24 60 48 8B F9 48 89");
 
-    // ADD_SIG("ItemPositionConst", "");
-    // ADD_SIG("glm_rotateRef", "");
-    // ADD_SIG("glm_translateRef", "");
+    ADD_SIG("ItemPositionConst", "80 BD ? ? ? ? ? 0F 85 ? ? ? ? 66 0F 6E B5");
+
+    ADD_SIG("glm_rotateRef", "48 8B C4 48 89 58 ? 48 89 70 ? 57 48 81 EC ? ? ? ? 0F 29 70 ? 0F 57 C0 0F 29 78 ? F3 0F 10 C2");
+
+    ADD_SIG("glm_translateRef", "E8 ? ? ? ? 80 BD ? ? ? ? ? 0F 85 ? ? ? ? 66 0F 6E B5");
+
     ADD_SIG("ItemRenderer::render", "4C 8B DC 49 89 5B ? 49 89 4B ? 55 56 57 41 54 41 55 41 56 41 57 48 81 EC");
 
     ADD_SIG("ScreenView::setupAndRender", "48 8B C4 48 89 58 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 4C 8B FA 48 89 55");
@@ -28,6 +32,8 @@ void SigInit::init21100() {
     ADD_SIG("LevelRendererPlayer::renderOutlineSelection", "E8 ? ? ? ? 90 48 8D 8D ? ? ? ? E8 ? ? ? ? 48 8B 83");
 
     ADD_SIG("ClientInstance::getScreenName", "48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 41 56 48 83 EC ? 4C 8B F2 48 8B D9 33 ED 48 8B 01 48 8B 80 ? ? ? ? FF 15 ? ? ? ? 84 C0 74");
+
+    DEPRECATE_SIG("AppPlatform::readAssetFile");
 }
 
 

@@ -9,6 +9,9 @@ void OffsetInit::init21100() {
 
     ADD_OFFSET("Level::hitResult", 0x1E8);
     ADD_OFFSET("Level::getPlayerMap", 0x4E8);
+
+    ADD_OFFSET("NetworkSystem::remoteConnectorComposite", 0xF0);
+    ADD_OFFSET("MinecraftGame::textureGroup", 0x758);
 }
 
 

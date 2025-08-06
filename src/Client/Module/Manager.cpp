@@ -232,7 +232,9 @@ void ModuleManager::initialize() {
 	addModule<MovableHotbar>();
 	addModule<MovableDayCounter>();
 	// addModule<CompactChat>();
-	addModule<ItemPhysics>();
+	if(!VersionUtils::checkAboveOrEqual(21, 100)) {
+		addModule<ItemPhysics>();
+	}
 
 	addModule<Mousestrokes>();
 
