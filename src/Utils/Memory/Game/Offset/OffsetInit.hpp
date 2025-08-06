@@ -2,6 +2,7 @@
 
 class OffsetInit {
 public:
+    static void init21100();
     static void init2190();
     static void init2180();
     static void init2170();

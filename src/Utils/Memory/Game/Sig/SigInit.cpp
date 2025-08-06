@@ -4,6 +4,25 @@
 #include <Utils/Logger/Logger.hpp>
 #include <Utils/Memory/Game/SignatureAndOffsetManager.hpp>
 
+void SigInit::init21100() {
+    Logger::custom(fg(fmt::color::gold), "Signatures", "Loading sigs for 1.21.10X");
+
+    ADD_SIG("ThirdPersonNametag", "0F 84 ? ? ? ? 49 8B 45 ? 49 8B CD 48 8B 80 ? ? ? ? FF 15 ? ? ? ? 84 C0 0F 85");
+    ADD_SIG("BlockSource::getBiome", "48 89 5C 24 18 57 48 83 EC 70 48 8B 05 ? ? ? ? 48 33 C4 48 89 44 24 68 48 8B 01");
+
+    ADD_SIG("Actor::canSee", "E8 ? ? ? ? 84 C0 74 71 F6 83 10 02 00 00 01");
+    // ADD_SIG("Options::getGamma", "");
+    ADD_SIG("blockHighlightColor", "0F 11 85 18 03 00 00 0F 11 01");
+
+    ADD_SIG("MinecraftPackets::createPacket", "48 89 5C 24 10 48 89 6C 24 18 48 89 74 24 20 57 48 83 EC 70 48 8B 05 ? ? ? ? 48 33 C4 48 89 44 24 60 48 8B F9 48 89");
+
+    // ADD_SIG("ItemPositionConst", "");
+    // ADD_SIG("glm_rotateRef", "");
+    // ADD_SIG("glm_translateRef", "");
+    // ADD_SIG("ItemRenderer::render", "");
+}
+
+
 void SigInit::init2190() {
     Logger::custom(fg(fmt::color::gold), "Signatures", "Loading sigs for 1.21.9X");
     ADD_SIG("BobHurt", "48 89 5C 24 ? 57 48 81 EC ? ? ? ? 0F 29 B4 24 ? ? ? ? 48 81 C1");
@@ -67,7 +86,7 @@ void SigInit::init2160() {
 
     ADD_SIG("Actor::baseTick", "48 8D 05 ? ? ? ? 48 89 01 BA 33 00 00 00 44 8D 4A 04 44 8D 42 02 66 C7 44 24 20 39 00 E8 ? ? ? ? 48 8B 8F 28 11 00 00");
     ADD_SIG("Actor::getNametag", "48 83 EC 28 48 8B 81 28 01 00 00 48 85 C0 74 4F");
-    ADD_SIG("Actor::getMobEffectsComponent", "48 89 5C 24 08 48 89 74 24 10 48 89 7C 24 18 55 41 54 41 55 41 56 41 57 48 8D 6C 24 C9 48 81 EC F0 00 00 00 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 27 4C"); // 10 BA 2F B4 D6 F7
+    ADD_SIG("Actor::getMobEffectsComponent", "48 89 5C 24 08 48 89 74 24 10 48 89 7C 24 18 55 41 54 41 55 41 56 41 57 48 8D 6C 24 C9 48 81 EC F0 00 00 00 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 27 4C");
 
     ADD_SIG("ThirdPersonNametag", "0F 84 FA 05 00 00 49 8B 04 24");
 
@@ -456,7 +475,7 @@ void SigInit::init2030() {
     Logger::custom(fg(fmt::color::gold), "Signatures", "Loading signatures for 1.20.3X");
 
     ADD_SIG("MinimalViewBobbing", "FF 15 ? ? ? ? 80 7C 24 60 ? 0F 84 ? ? ? ? 48 89");
-    
+
     ADD_SIG("tryGetPrefix", "40 53 48 83 EC 20 48 8B");
 
     ADD_SIG("Keyboard::feed", "? ? ? ? ? ? ? 4C 8D 05 ? ? ? ? 89 54 24 20 88");
@@ -618,7 +637,7 @@ void SigInit::init2030() {
     ADD_SIG("ContainerScreenController::_handleTakeAll", "E8 ? ? ? ? 49 8B ? ? C6 80 ? ? 00 00 01");
 
     //     ADD_SIG("ContainerScreenController::_onContainerSlotHovered", "48 89 ? ? ? 57 41 ? 41 ? 48 83 EC ? 45 8B ? 48 8B ? 48 8B ? 44 39");
-    ADD_SIG("ContainerScreenController::_onContainerSlotHovered", "40 53 48 83 EC 40 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 44 24 30 41 8B D8");// "40 ? 55 56 57 41 ? 48 81 EC ? ? ? ? 41 8B ? 48 8B");
+    ADD_SIG("ContainerScreenController::_onContainerSlotHovered", "40 53 48 83 EC 40 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 44 24 30 41 8B D8"); // "40 ? 55 56 57 41 ? 48 81 EC ? ? ? ? 41 8B ? 48 8B");
 
     ADD_SIG("BobView", "40 53 56 48 83 EC 78 ? ? 7C");
 

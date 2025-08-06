@@ -98,7 +98,7 @@ std::string WinrtUtils::getFormattedVersion() {
     if (lastPart.length() == 3) {
         lastPart = lastPart.substr(0, 1); // Keep only the first digit
     } else if (lastPart.length() > 3) {
-        lastPart = lastPart.substr(0, 2); // Keep the first two digits
+        lastPart = lastPart.substr(0, 3); // Keep the first two digits
     }
 
     return parts[0] + "." + parts[1] + "." + lastPart;

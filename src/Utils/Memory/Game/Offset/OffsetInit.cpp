@@ -4,6 +4,14 @@
 #include <Utils/Logger/Logger.hpp>
 #include <Utils/Memory/Game/SignatureAndOffsetManager.hpp>
 
+void OffsetInit::init21100() {
+    Logger::custom(fg(fmt::color::golden_rod), "Offsets", "Loading offsets for 1.21.10X");
+
+    ADD_OFFSET("Level::hitResult", 0x1E8);
+    ADD_OFFSET("Level::getPlayerMap", 0x4E8);
+}
+
+
 void OffsetInit::init2190() {
     Logger::custom(fg(fmt::color::golden_rod), "Offsets", "Loading offsets for 1.21.9X");
 
