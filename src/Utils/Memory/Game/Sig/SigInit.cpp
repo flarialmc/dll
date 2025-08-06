@@ -18,7 +18,7 @@ void SigInit::init21100() {
 
     ADD_SIG("ItemPositionConst", "80 BD ? ? ? ? ? 0F 85 ? ? ? ? 66 0F 6E B5");
 
-    ADD_SIG("glm_rotateRef", "48 8B C4 48 89 58 ? 48 89 70 ? 57 48 81 EC ? ? ? ? 0F 29 70 ? 0F 57 C0 0F 29 78 ? F3 0F 10 C2");
+    ADD_SIG("glm_rotateRef", "E8 ? ? ? ? 48 8B D0 8B 08 89 0B 8B 48 ? 89 4B ? 8B 48 ? 89 4B ? 8B 48 ? 89 4B ? 8B 48 ? 89 4B ? 8B 48 ? 89 4B ? 8B 40 ? 89 43 ? 8B 42 ? 89 43 ? 8B 42 ? 89 43 ? 8B 42 ? 89 43 ? 8B 42 ? 89 43 ? 8B 42 ? 89 43 ? 8B 42 ? 89 43 ? 8B 42 ? 89 43 ? 8B 42 ? 89 43 ? 8B 42 ? 89 43 ? 48 83 C4");
 
     ADD_SIG("glm_translateRef", "E8 ? ? ? ? 80 BD ? ? ? ? ? 0F 85 ? ? ? ? 66 0F 6E B5");
 
