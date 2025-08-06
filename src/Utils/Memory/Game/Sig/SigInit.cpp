@@ -11,8 +11,7 @@ void SigInit::init21100() {
     ADD_SIG("BlockSource::getBiome", "48 89 5C 24 18 57 48 83 EC 70 48 8B 05 ? ? ? ? 48 33 C4 48 89 44 24 68 48 8B 01");
 
     ADD_SIG("Actor::canSee", "E8 ? ? ? ? 84 C0 74 71 F6 83 10 02 00 00 01");
-    // ADD_SIG("Options::getGamma", "");
-
+    ADD_SIG("Options::getGamma", "48 89 5C 24 ? 57 48 83 EC ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 44 24 ? 48 8B 01 8B FA 41 B8 ? ? ? ? 48 8D 54 24 ? 48 8B 40 ? FF 15 ? ? ? ? 48 8B 18 48 85 DB 74 ? 48 8B 43 ? 48 83 B8 ? ? ? ? ? 75 ? 39 7B ? 74 ? 8B D7 48 8B CB E8 ? ? ? ? 48 8B 4B ? 48 8B D3 89 43 ? E8 ? ? ? ? 48 8B 43 ? 48 8B 88 ? ? ? ? 48 85 C9 74 ? C6 44 24 ? ? 48 8D 54 24 ? 48 8B 01 48 8B 40 ? FF 15 ? ? ? ? 48 8B 4C 24 ? 48 33 CC E8 ? ? ? ? 48 8B 5C 24 ? 48 83 C4 ? 5F C3 E8 ? ? ? ? CC CC CC CC CC 48 83 EC ? 48 8B 01 48 8D 54 24 ? 41 B8 ? ? ? ? 48 8B 40 ? FF 15 ? ? ? ? 48 8B 10 48 85 D2 74 ? 48 8B 42 ? 48 8B 88 ? ? ? ? 48 85 C9 74 ? E8 ? ? ? ? 48 83 C4 ? C3 8B 42 ? 48 83 C4 ? C3 E8 ? ? ? ? CC CC CC CC CC 48 83 EC");
     ADD_SIG("blockHighlightColor", "0F 11 85 18 03 00 00 0F 11 01");
 
     ADD_SIG("MinecraftPackets::createPacket", "48 89 5C 24 10 48 89 6C 24 18 48 89 74 24 20 57 48 83 EC 70 48 8B 05 ? ? ? ? 48 33 C4 48 89 44 24 60 48 8B F9 48 89");
