@@ -2,10 +2,6 @@
 
 #include "Events/EventManager.hpp"
 
-SnapLook::SnapLook(): Module("SnapLook", "Quickly look behind you.", IDR_EYE_PNG, "V")
-{
-    
-}
 
 void SnapLook::onEnable()
 {
@@ -26,8 +22,9 @@ void SnapLook::onDisable()
 void SnapLook::defaultConfig()
 {
     getKeybind();
-    setDef("togglable", false);
     Module::defaultConfig("core");
+    setDef("togglable", false);
+    setDef("mode", std::string("ThirdPersonFront"));
 }
 
 void SnapLook::settingsRender(float settingsOffset)
@@ -46,6 +43,10 @@ void SnapLook::settingsRender(float settingsOffset)
     addHeader("SnapLook");
     addToggle("Togglable", "", "togglable");
     addKeybind("Keybind", "Hold for 2 seconds!", "keybind", true);
+    addDropdown("Mode", "", std::vector<std::string>{
+        "Third Person Front",
+        "Third Person Back",
+        "First Person"}, "mode", true);
 
     FlarialGUI::UnsetScrollView();
 
@@ -68,9 +69,20 @@ void SnapLook::onMouse(MouseEvent &event) {
         this->active = false;
 }
 
-void SnapLook::onGetViewPerspective(PerspectiveEvent& event) const
+void SnapLook::onGetViewPerspective(PerspectiveEvent& event)
 {
     if (!this->enabledState) return;
-    if (this->active)
-        event.setPerspective(Perspective::ThirdPersonFront);
+    if (this->active) {
+
+        auto it = perspectiveMap.find(getOps<std::string>("mode"));
+
+        if (it != perspectiveMap.end()) {
+            event.setPerspective(it->second);
+        }
+        else {
+            getOps<std::string>("mode") = "ThirdPersonFront";
+            event.setPerspective(Perspective::ThirdPersonFront);
+        }
+
+    }
 }
