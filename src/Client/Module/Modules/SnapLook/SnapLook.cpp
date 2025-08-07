@@ -80,7 +80,7 @@ void SnapLook::onGetViewPerspective(PerspectiveEvent& event)
             event.setPerspective(it->second);
         }
         else {
-            getOps<std::string>("mode") = "ThirdPersonFront";
+            getOps<std::string>("mode") = "Third Person Front";
             event.setPerspective(Perspective::ThirdPersonFront);
         }
 
