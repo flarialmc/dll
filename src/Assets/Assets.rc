@@ -88,6 +88,7 @@ IDR_CINEMATICCAMERA_PNG  PNG "Data\\cinematiccamera.png"
 IDR_DEATHLOGGER_PNG      PNG "Data\\deathlogger.png"
 IDR_TWERK_PNG            PNG "Data\\twerk.png"
 IDR_COMPACTCHAT_PNG      PNG "Data\\compactchat.png"
+IDR_KEYSTROKES_PNG       PNG "Data\\keystrokes.png"
 
 IDR_SETTINGS_PNG         PNG "Data\\settings.png"
 IDR_SETTINGS_WHITE_PNG   PNG "Data\\settingswhite.png"
