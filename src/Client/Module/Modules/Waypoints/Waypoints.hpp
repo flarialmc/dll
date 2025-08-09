@@ -2,6 +2,9 @@
 
 #include "../Module.hpp"
 
+#include "../Events/Render/Render3DEvent.hpp"
+
+
 struct Waypoint {
 	Vec3<float> position;
 	bool rgb;
@@ -11,7 +14,9 @@ struct Waypoint {
 };
 
 class Waypoints : public Module {
+
 private:
+
 	std::chrono::time_point<std::chrono::high_resolution_clock> last_used;
 
 public:
@@ -40,5 +45,7 @@ public:
 	//get waypoint color D2D1_COLOR_F color = FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("color-" + FlarialGUI::cached_to_string(pair.second.index))->value);
 
 	void onKey(KeyEvent& event);
+
+	void onRender3D(Render3DEvent& event);
 
 };
