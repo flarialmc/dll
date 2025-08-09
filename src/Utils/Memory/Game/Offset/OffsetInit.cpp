@@ -7,6 +7,9 @@ void OffsetInit::init21100() {
     Logger::debug("[Offsets] Loading offsets for 1.21.10X");
     ADD_OFFSET("Level::hitResult", 0x1E8);
     ADD_OFFSET("Level::getPlayerMap", 0x4E8);
+
+    ADD_OFFSET("MinecraftGame::textureGroup", 0x758);
+    ADD_OFFSET("NetworkSystem::remoteConnectorComposite", 0xF0);
 }
 
 void OffsetInit::init2190() {

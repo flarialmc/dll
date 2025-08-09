@@ -73,7 +73,7 @@
 #include "Modules/FasterInventory/FasterInventory.hpp"
 
 namespace ModuleManager {
-    std::unordered_map<size_t, Module*> moduleMap;
+    std::unordered_map<size_t, Module *> moduleMap;
     std::vector<std::string> onlineUsers;
     std::vector<std::string> onlineDevs;
     std::vector<std::string> onlineCommites;
@@ -82,15 +82,15 @@ namespace ModuleManager {
     bool initialized = false;
 }
 
-void ModuleManager::addModule(Module* module) {
+void ModuleManager::addModule(Module *module) {
     size_t hash = std::hash<std::string>{}(module->name);
     moduleMap[hash] = module;
 }
 
-std::vector<Module*> ModuleManager::getModules() {
-    std::vector<Module*> modulesVector;
-    for (const auto& pair : moduleMap) {
-        if(!pair.second) continue;
+std::vector<Module *> ModuleManager::getModules() {
+    std::vector<Module *> modulesVector;
+    for (const auto &pair: moduleMap) {
+        if (!pair.second) continue;
         modulesVector.push_back(pair.second);
     }
     return modulesVector;
@@ -117,7 +117,7 @@ void ModuleManager::initialize() {
     addModule(new ReachCounter());
     addModule(new ComboCounter());
     addModule(new IPDisplay());
-    if(!WinrtUtils::checkAboveOrEqual(21, 100)) {
+    if (!WinrtUtils::checkAboveOrEqual(21, 100)) {
         addModule(new PingCounter());
     }
     addModule(new PotCounter());
@@ -145,10 +145,10 @@ void ModuleManager::initialize() {
     addModule(new TextHotkey());
     addModule(new AutoGG());
     addModule(new TabList());
-    if(!WinrtUtils::checkAboveOrEqual(21, 50)) {
+    if (!WinrtUtils::checkAboveOrEqual(21, 50)) {
         addModule(new WeatherChanger());
     }
-    if(!WinrtUtils::checkAboveOrEqual(21, 80)) {
+    if (!WinrtUtils::checkAboveOrEqual(21, 80)) {
         addModule(new NickModule());
     }
     addModule(new FreeLook());
@@ -156,7 +156,7 @@ void ModuleManager::initialize() {
     addModule(new SpeedDisplay());
     addModule(new CPSLimiter());
     addModule(new BlockBreakIndicator());
-    if(!WinrtUtils::checkAboveOrEqual(21, 50)) {
+    if (!WinrtUtils::checkAboveOrEqual(21, 50)) {
         addModule(new Animations());
     }
     addModule(new BlockOutline());
@@ -170,7 +170,7 @@ void ModuleManager::initialize() {
     ////addModule(new OpponentReach());
     addModule(new ViewModel());
     addModule(new HitPing());
-    if(!WinrtUtils::checkAboveOrEqual(21, 100)) {
+    if (!WinrtUtils::checkAboveOrEqual(21, 100)) {
         addModule(new ItemPhysics());
     }
 
@@ -191,28 +191,27 @@ void ModuleManager::initialize() {
 
 void ModuleManager::terminate() {
     initialized = false;
-    for (const auto& pair : moduleMap) {
-        if (pair.second != nullptr)
-            pair.second->terminate();
+    for (const auto &pair: moduleMap) {
+        if (pair.second != nullptr) pair.second->terminate();
     }
     moduleMap.clear();
 }
 
 void ModuleManager::SaveModulesConfig() {
-    for (const auto& pair : moduleMap) {
-        if(!pair.second) continue;
+    for (const auto &pair: moduleMap) {
+        if (!pair.second) continue;
         pair.second->saveSettings();
     }
 }
-// TODO: use enums?
-bool ModuleManager::doesAnyModuleHave(const std::string& settingName) {
 
+// TODO: use enums?
+bool ModuleManager::doesAnyModuleHave(const std::string &settingName) {
     bool result = false;
 
-    if(!ModuleManager::initialized) return false;
+    if (!ModuleManager::initialized) return false;
 
-    for (const auto& pair : moduleMap) {
-        if(!pair.second) continue;
+    for (const auto &pair: moduleMap) {
+        if (!pair.second) continue;
 
         if (pair.second->settings.getSettingByName<bool>(settingName) != nullptr)
             if (pair.second->settings.getSettingByName<bool>(settingName)->value &&
@@ -223,10 +222,9 @@ bool ModuleManager::doesAnyModuleHave(const std::string& settingName) {
     }
 
     return result;
-
 }
 
-Module* ModuleManager::getModule(const std::string& name) {
+Module *ModuleManager::getModule(const std::string &name) {
     size_t hash = std::hash<std::string>{}(name);
 
     return moduleMap[hash];
