@@ -931,7 +931,7 @@ void Module::defaultConfig(std::string type) {
         setDef("border", (std::string) "000000", 1.f, false);
         setDef("glow", (std::string) "F0F0F0", 1.f, false);
     } else if (type == "misc") {
-        setDef("responsivewidth", false);
+        setDef("responsivewidth", true);
         setDef("reversepaddingx", false);
         setDef("reversepaddingy", false);
         setDef("padx", 0.0f);
