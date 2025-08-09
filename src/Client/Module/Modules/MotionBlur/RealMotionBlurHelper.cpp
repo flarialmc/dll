@@ -1,6 +1,7 @@
 #include "RealMotionBlurHelper.hpp"
 #include <d3dcompiler.h>
 #include <windows.h>
+#include <unknwn.h>
 #include <assert.h>
 #include "Hook/Hooks/Render/SwapchainHook.hpp"
 #include "Hook/Hooks/Render/UnderUIHooks.hpp"
@@ -294,7 +295,7 @@ void RealMotionBlurHelper::Render(ID3D11RenderTargetView* rtv, winrt::com_ptr<ID
     if (SUCCEEDED(context->Map(m_constantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource)))
     {
         CameraDataBuffer* pData = (CameraDataBuffer*)mappedResource.pData;
-        pData->intensity = module->settings.getSettingByName<float>("intensity")->value;
+        pData->intensity = module->getOps<float>("intensity");
         memcpy(pData->preWorldViewProjection, m_prevWorldMatrix, sizeof(pData->preWorldViewProjection));
         memcpy(pData->invWorldViewProjection, &invCurrWVP[0][0], sizeof(pData->invWorldViewProjection));
         context->Unmap(m_constantBuffer, 0);

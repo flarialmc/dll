@@ -39,6 +39,9 @@ private:
     static void receiveCallbackModalFormRequest(void *packetHandlerDispatcher, void *networkIdentifier, void *netEventCallback,
                                                const std::shared_ptr<Packet>& packet);
 
+    static void receiveCallbackPlayerSkin(void *packetHandlerDispatcher, void *networkIdentifier, void *netEventCallback,
+                                               const std::shared_ptr<Packet>& packet);
+
 public:
 
     static inline void* NetworkIdentifier;
@@ -60,6 +63,7 @@ public:
     static inline receive receivePacketContainerCloseOriginal = nullptr;
     static inline receive receivePacketChangeDimensionOriginal = nullptr;
     static inline receive receivePacketModalFormRequestOriginal = nullptr;
+    static inline receive receivePacketPlayerSkinOriginal = nullptr;
 
     SendPacketHook() : Hook("sendPacket", GET_SIG_ADDRESS("LoopbackPacketSender::sendPacket")) {}
 

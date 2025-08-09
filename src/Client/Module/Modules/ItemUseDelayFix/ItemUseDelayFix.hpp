@@ -16,24 +16,16 @@ public:
         original.resize(6);
         Memory::copyBytes((LPVOID) address, original.data(), 6);
 
-        Module::setup();
+        
     };
 
-    void onEnable() override {
-        patch();
-        Module::onEnable();
-    }
+    void onEnable() override;
 
-    void onDisable() override {
-        unpatch();
-        Module::onDisable();
-    }
+    void onDisable() override;
 
-    static void patch() {
-        Memory::nopBytes((void *)address, original.size());
-    }
+    void defaultConfig() override;
 
-    static void unpatch() {
-        Memory::patchBytes((void *)address, original.data(), original.size());
-    }
+    static void patch();
+
+    static void unpatch();
 };
