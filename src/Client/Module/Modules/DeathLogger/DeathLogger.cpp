@@ -70,14 +70,18 @@ void DeathLogger::onTick(TickEvent& event) {
         std::shared_ptr<Waypoints> waypoints = std::dynamic_pointer_cast<Waypoints>(ModuleManager::getModule("Waypoints"));
         int index = waypoints->WaypointList.size();
         while (true) {
-            SettingType<std::string>* s = this->settings.getSettingByName<std::string>("waypoint-" + FlarialGUI::cached_to_string(index));
+            SettingType<std::string>* s = waypoints->settings.getSettingByName<std::string>("waypoint-" + FlarialGUI::cached_to_string(index));
             if (s == nullptr) break;
             index++;
+        }
+        std::string col = "FFFFFF";
+        if (waypoints->settings.getSettingByName<bool>("randomizeColor") != nullptr) {
+            if (waypoints->getOps<bool>("randomizeColor")) col = FlarialGUI::ColorFToHex(D2D1_COLOR_F(Waypoints::random(), Waypoints::random(), Waypoints::random(), 1.f));
         }
         waypoints->addWaypoint(
             index,
             "(death) waypoint-" + FlarialGUI::cached_to_string(index),
-            "FFFFFF",
+            col,
             Vec3{ SDK::clientInstance->getLocalPlayer()->getPosition()->x, SDK::clientInstance->getLocalPlayer()->getPosition()->y - 1, SDK::clientInstance->getLocalPlayer()->getPosition()->z },
             true,
             true,
