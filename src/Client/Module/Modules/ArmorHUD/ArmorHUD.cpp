@@ -30,6 +30,7 @@ void ArmorHUD::defaultConfig() {
 	setDef("textSize", 0.05f);
 	setDef("uiscale", 1.0f);
 	setDef("show_offhand", true);
+    setDef("show_mainhand", true);
 	setDef("vertical", false);
 	setDef("durability_left", false);
 	setDef("percent", false);
@@ -77,6 +78,7 @@ void ArmorHUD::settingsRender(float settingsOffset) {
 	addToggle("Vertical ArmorHUD", "To switch between a vertical or horizontal layout", "vertical");
 	addConditionalToggle(getOps<bool>("vertical"), "Durability to the left", "", "durability_left");
 	addToggle("Show offhand item", "", "show_offhand");
+    addToggle("Show mainhand item", "", "show_mainhand");
 	addToggle("Fill Empty Slots", "Fill gaps when a piece of armor isn't equipped", "fillGaps");
 	addToggle("Change Color", "", "color");
 
@@ -238,7 +240,7 @@ void ArmorHUD::renderDurability() {
 						}
 					}
 
-					if (SDK::clientInstance->getLocalPlayer()->getSupplies()->getInventory()->getItem(
+					if (getOps<bool>("show_mainhand") && SDK::clientInstance->getLocalPlayer()->getSupplies()->getInventory()->getItem(
 						SDK::clientInstance->getLocalPlayer()->getSupplies()->getSelectedSlot())->getItem() !=
 						nullptr) {
 						ItemStack* currentItem = SDK::clientInstance->getLocalPlayer()->getSupplies()->getInventory()->getItem(
@@ -526,7 +528,7 @@ void ArmorHUD::onSetupAndRender(SetupAndRenderEvent& event) {
 							}
 						}
 
-						if (SDK::clientInstance->getLocalPlayer()->getSupplies()->getInventory()->getItem(
+						if (getOps<bool>("show_mainhand") && SDK::clientInstance->getLocalPlayer()->getSupplies()->getInventory()->getItem(
 							SDK::clientInstance->getLocalPlayer()->getSupplies()->getSelectedSlot())->getItem() !=
 							nullptr) {
 							auto item = SDK::clientInstance->getLocalPlayer()->getSupplies()->getInventory()->getItem(
