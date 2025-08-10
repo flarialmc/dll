@@ -166,7 +166,7 @@
 #define MAX_IMAGE_ID 262
 
 #define IDR_PING_AMAZING  258
-#define IDR_PING_GOOD     269
+#define IDR_PING_GOOD     259
 #define IDR_PING_OKAY     260
 #define IDR_PING_BAD      261
 #define IDR_PING_QUIT     262
