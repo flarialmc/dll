@@ -6,6 +6,7 @@
 #include "Utils/Render/MaterialUtils.hpp"
 
 #include <numbers>
+#include <random>
 
 
 void Waypoints::onEnable() {
@@ -23,10 +24,16 @@ void Waypoints::onDisable() {
 }
 
 
-void Waypoints::addWaypoint(int index, std::string name, std::string color, Vec3<float> position, bool state, bool config, bool rgb, float opacity) {
-	if (config)
-	{
+float Waypoints::random() {
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_int_distribution<int> dis(0, 100);
+	return static_cast<float>(dis(gen)) / 100.f;
+}
 
+
+void Waypoints::addWaypoint(int index, std::string name, std::string color, Vec3<float> position, bool state, bool config, bool rgb, float opacity) {
+	if (config) {
 		std::string end = "-" + FlarialGUI::cached_to_string(index);
 		setDef("waypoint" + end, (std::string)name);
 		setDef("color" + end, (std::string)color);
@@ -64,10 +71,14 @@ void Waypoints::onSetup() {
 		if (duration.count() >= 0.1) {
 			KeyEvent event = std::any_cast<KeyEvent>(args[0]);
 			int index = WaypointList.size();
+			std::string col = "FFFFFF";
+			if (settings.getSettingByName<bool>("randomizeColor") != nullptr) {
+				if (getOps<bool>("randomizeColor")) col = FlarialGUI::ColorFToHex(D2D1_COLOR_F(random(), random(), random(), 1.f));
+			}
 			addWaypoint(
 				index,
 				"waypoint-" + FlarialGUI::cached_to_string(index),
-				"FFFFFF",
+				col,
 				Vec3{ SDK::clientInstance->getLocalPlayer()->getPosition()->x, SDK::clientInstance->getLocalPlayer()->getPosition()->y - 1, SDK::clientInstance->getLocalPlayer()->getPosition()->z },
 				true,
 				true,
@@ -82,20 +93,21 @@ void Waypoints::onSetup() {
 
 	if (getOps<float>("total") > 0) {
 		for (int i = 0; i < getOps<float>("total"); i++) {
-			if (!this->settings.getSettingByName<std::string>("waypoint-" + FlarialGUI::cached_to_string(i))) continue;
+			std::string end = "-" + FlarialGUI::cached_to_string(i);
+			if (!this->settings.getSettingByName<std::string>("waypoint" + end)) continue;
 			addWaypoint(
 				i,
-				getOps<std::string>("waypoint-" + FlarialGUI::cached_to_string(i)),
-				getOps<std::string>("color-" + FlarialGUI::cached_to_string(i)),
+				getOps<std::string>("waypoint" + end),
+				getOps<std::string>("color" + end),
 				Vec3 {
-				getOps<float>("x-" + FlarialGUI::cached_to_string(i)),
-				getOps<float>("y-" + FlarialGUI::cached_to_string(i)),
-				getOps<float>("z-" + FlarialGUI::cached_to_string(i))
+					getOps<float>("x" + end),
+					getOps<float>("y" + end),
+					getOps<float>("z" + end)
 				},
-				getOps<bool>("state-" + FlarialGUI::cached_to_string(i)),
+				getOps<bool>("state" + end),
 				false,
-				getOps<bool>("rgb-" + FlarialGUI::cached_to_string(i)),
-				getOps<float>("opacity-" + FlarialGUI::cached_to_string(i))
+				getOps<bool>("rgb" + end),
+				getOps<float>("opacity" + end)
 			);
 		}
 	}
@@ -135,6 +147,8 @@ void Waypoints::defaultConfig() {
 	setDef("innerBeamRadius", 0.25f);
 	setDef("outerBeamRadius", 0.33f);
 	setDef("sides", 16);
+
+	setDef("randomizeColor", true);
 }
 
 
@@ -159,11 +173,15 @@ void Waypoints::settingsRender(float settingsOffset) {
 			SettingType<std::string>* s = this->settings.getSettingByName<std::string>("waypoint-" + indexStr);
 			if (s == nullptr) break;
 			index++;
-	   }
+		}
+		std::string col = "FFFFFF";
+		if (settings.getSettingByName<bool>("randomizeColor") != nullptr) {
+			if (getOps<bool>("randomizeColor")) col = FlarialGUI::ColorFToHex(D2D1_COLOR_F(random(), random(), random(), 1.f));
+		}
 		addWaypoint(
 			index,
 			"waypoint-" + indexStr,
-			"FFFFFF",
+			col,
 			Vec3{ SDK::clientInstance->getLocalPlayer()->getPosition()->x, SDK::clientInstance->getLocalPlayer()->getPosition()->y - 1, SDK::clientInstance->getLocalPlayer()->getPosition()->z },
 			true,
 			true,
@@ -175,6 +193,7 @@ void Waypoints::settingsRender(float settingsOffset) {
 
 	addKeybind("Add waypoint keybind", "Hold for 2 seconds to set bind.", getKeybind());
 	addSlider("Distance", "Change until which distance waypoints will be drawn.", "distance", 10000.f, 0.f, true);
+	addToggle("Randomize Waypoint Color", "", "randomizeColor");
 	extraPadding();
 
 	addHeader("Background");

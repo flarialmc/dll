@@ -29,13 +29,15 @@ public:
 
 	void onEnable() override;
 
+	void onDisable() override;
+
+	static float random();
+
 	void addWaypoint(int index, std::string name, std::string color, Vec3<float> position, bool state, bool config, bool rgb, float opacity);
 
 	Vec3<float> getPos(int index);
 
 	void onSetup() override;
-
-	void onDisable() override;
 
 	void defaultConfig() override;
 
