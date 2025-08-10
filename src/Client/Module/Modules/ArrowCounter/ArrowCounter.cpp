@@ -18,6 +18,7 @@ void ArrowCounter::onDisable() {
 
 void ArrowCounter::defaultConfig() {
     setDef("text", (std::string)"Arrows: {value}");
+    setDef("onlyRenderWhenHoldingBowOrCrossbow", false);
     Module::defaultConfig("all");
     
 }
@@ -36,6 +37,7 @@ void ArrowCounter::settingsRender(float settingsOffset) {
 
     addHeader("Arrow Counter");
     defaultAddSettings("main");
+    addToggle("Only render when holding bow or crossbow", "", "onlyRenderWhenHoldingBowOrCrossbow");
     extraPadding();
 
     addHeader("Text");
@@ -90,6 +92,26 @@ void ArrowCounter::onTick(TickEvent& event) {
 
 void ArrowCounter::onRender(RenderEvent& event) {
     if (!this->isEnabled()) return;
+
+    if (getOps<bool>("onlyRenderWhenHoldingBowOrCrossbow")) {
+        auto player = SDK::clientInstance->getLocalPlayer();
+        if (player && player->getSupplies() && player->getSupplies()->getInventory()) {
+            auto selectedSlot = player->getSupplies()->getSelectedSlot();
+            auto itemStack = player->getSupplies()->getInventory()->getItem(selectedSlot);
+            
+            if (!itemStack || !itemStack->getItem()) {
+                return;
+            }
+            
+            auto itemName = itemStack->getItem()->name;
+            if (itemName != "bow" && itemName != "crossbow") {
+                return;
+            }
+        } else {
+            return;
+        }
+    }
+
     auto arrowsStr = FlarialGUI::cached_to_string(arrows);
     this->normalRender(13, arrowsStr);
 }
