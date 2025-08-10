@@ -61,56 +61,58 @@ void ArrowCounter::onTick(TickEvent& event) {
         if (SDK::clientInstance->getLocalPlayer() != nullptr) {
             if (SDK::clientInstance->getLocalPlayer()->getSupplies() != nullptr) {
                 if (SDK::getCurrentScreen() != "hud_screen") return;
-                auto arrowsCount = 0;
-
-                auto inventory = SDK::clientInstance->getLocalPlayer()->getSupplies()->getInventory();
-                if (inventory == nullptr) return;
-
-                auto offhandItem = SDK::clientInstance->getLocalPlayer()->getOffhandSlot();
-                if (offhandItem != nullptr)
-                    if (offhandItem->getItem() != nullptr)
-                        if (offhandItem->getItem()->name == "arrow")
-                            arrowsCount = offhandItem->count;
-
-
-                for (int i = 0; i < 36; i++) {
-                    auto item = inventory->getItem(i);
-
-                    if (item->getItem() != nullptr) {
-                        if (item->getItem()->name == "arrow") {
-                            arrowsCount += item->count;
+                
+                shouldRender = true;
+                if (getOps<bool>("onlyRenderWhenHoldingBowOrCrossbow")) {
+                    auto player = SDK::clientInstance->getLocalPlayer();
+                    if (player && player->getSupplies() && player->getSupplies()->getInventory()) {
+                        auto selectedSlot = player->getSupplies()->getSelectedSlot();
+                        auto itemStack = player->getSupplies()->getInventory()->getItem(selectedSlot);
+                        
+                        if (!itemStack || !itemStack->getItem()) {
+                            shouldRender = false;
+                        } else {
+                            auto itemName = itemStack->getItem()->name;
+                            shouldRender = (itemName == "bow" || itemName == "crossbow");
                         }
-
+                    } else {
+                        shouldRender = false;
                     }
                 }
+                
+                if (shouldRender) {
+                    auto arrowsCount = 0;
 
-                arrows = arrowsCount;
+                    auto inventory = SDK::clientInstance->getLocalPlayer()->getSupplies()->getInventory();
+                    if (inventory == nullptr) return;
+
+                    auto offhandItem = SDK::clientInstance->getLocalPlayer()->getOffhandSlot();
+                    if (offhandItem != nullptr)
+                        if (offhandItem->getItem() != nullptr)
+                            if (offhandItem->getItem()->name == "arrow")
+                                arrowsCount = offhandItem->count;
+
+
+                    for (int i = 0; i < 36; i++) {
+                        auto item = inventory->getItem(i);
+
+                        if (item->getItem() != nullptr) {
+                            if (item->getItem()->name == "arrow") {
+                                arrowsCount += item->count;
+                            }
+
+                        }
+                    }
+
+                    arrows = arrowsCount;
+                }
             }
         }
     }
 }
 
 void ArrowCounter::onRender(RenderEvent& event) {
-    if (!this->isEnabled()) return;
-
-    if (getOps<bool>("onlyRenderWhenHoldingBowOrCrossbow")) {
-        auto player = SDK::clientInstance->getLocalPlayer();
-        if (player && player->getSupplies() && player->getSupplies()->getInventory()) {
-            auto selectedSlot = player->getSupplies()->getSelectedSlot();
-            auto itemStack = player->getSupplies()->getInventory()->getItem(selectedSlot);
-            
-            if (!itemStack || !itemStack->getItem()) {
-                return;
-            }
-            
-            auto itemName = itemStack->getItem()->name;
-            if (itemName != "bow" && itemName != "crossbow") {
-                return;
-            }
-        } else {
-            return;
-        }
-    }
+    if (!this->isEnabled() || !shouldRender) return;
 
     auto arrowsStr = FlarialGUI::cached_to_string(arrows);
     this->normalRender(13, arrowsStr);

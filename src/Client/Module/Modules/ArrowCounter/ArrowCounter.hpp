@@ -7,6 +7,7 @@
 class ArrowCounter : public Module {
 private:
 	int arrows = 0;
+    bool shouldRender = true;
 public:
 
 	ArrowCounter() : Module("Arrow Counter", "Counts how many arrows you have\nin your inventory.",
