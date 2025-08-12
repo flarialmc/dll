@@ -385,7 +385,11 @@ void Waypoints::onRender(RenderEvent& event) {
 
 void Waypoints::onKey(KeyEvent& event) {
 
-	if (this->isEnabled()) {
+	if (this->isEnabled() && (
+		SDK::clientInstance->getScreenName() == "hud_screen" ||
+		SDK::clientInstance->getScreenName() == "f3_screen" ||
+		SDK::clientInstance->getScreenName() == "zoom_screen"
+	)) {
 		for (int i = 0; i <= totalKeybinds - 1; ++i) {
 			if (isKeybind(event.keys) && isKeyPartOfKeybind(event.key))
 				keybindActions[i]({ std::any(event) });
