@@ -3,6 +3,8 @@
 #include "SDK/Client/Render/Tessellator/MeshHelpers.hpp"
 #include <thread>
 
+#include "Client.hpp"
+
 class Cosmetic
 {
     int CurrentFrames = 0;

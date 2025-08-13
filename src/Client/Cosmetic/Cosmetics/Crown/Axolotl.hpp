@@ -6,11 +6,11 @@
 
 class AxolotlHat: public Cosmetic {
 public:
-    cosmetic::JsonModel* Axolotl;
+    std::unique_ptr<cosmetic::JsonModel> model;
     AxolotlHat(): Cosmetic("AxolotlHat")
     {
         Listen(this, Render3DEvent, &AxolotlHat::onRender3D)
-        Axolotl = cosmetic::ModelLoader::LoadFromFile(Utils::getClientPath() + "\\Cosmetics\\AxolotlHat\\AxolotlHatModel.json", "geometry.cosmetic1").get();
+        model = cosmetic::ModelLoader::LoadFromFile(Utils::getClientPath() + "\\Cosmetics\\AxolotlHat\\witchhat.geo.json", "geometry.bitch");
     }
 
     void onRender3D(Render3DEvent& event)
@@ -20,9 +20,9 @@ public:
         Vec2<float> Rotations = player->getActorRotationComponent()->rot;
         Vec3<float> scale = Vec3<float>(0.25, 0.1875, 0);
 
-        ResourceLocation loc4(Utils::getClientPath() + "\\Cosmetics\\AxolotlHat\\AxolotlHatTex.png", true);
+        ResourceLocation loc4(Utils::getClientPath() + "\\Cosmetics\\AxolotlHat\\texture.png", true);
         TexturePtr ptr4 = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc4, false);
         SDK::scn = event.screenContext;
-        Axolotl->render(event.screenContext, *ptr4.clientTexture.get(), position, Vec3<float>(Rotations.x, Rotations.y, 0), Vec3<float>(1, 1, 1), true);
+        model->render(event.screenContext, *ptr4.clientTexture.get(), Vec3<float>(), Vec3<float>(0, 0, 0), Vec3<float>(1, 1, 1), true);
     }
 };
