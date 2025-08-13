@@ -68,6 +68,7 @@ void ArrowCounter::onTick(TickEvent& event) {
     
     if (SDK::getCurrentScreen() != "hud_screen") return;
     
+	// Only render when holding bow or crossbow if setting is enabled
     shouldRender = true;
     if (getOps<bool>("onlyRenderWhenHoldingBowOrCrossbow")) {
 
@@ -83,26 +84,33 @@ void ArrowCounter::onTick(TickEvent& event) {
     }
     
     if (shouldRender) {
+        
+		// Cache arrow count by updating every 4 ticks
+        tickCounter++;
+        if (tickCounter % 4 == 0) {
 
-        auto arrowsCount = 0;
-        auto offhandItem = player->getOffhandSlot();
+            auto arrowsCount = 0;
+            auto offhandItem = player->getOffhandSlot();
 
-        if (offhandItem && offhandItem->getItem() && offhandItem->getItem()->name == "arrow") {
-            arrowsCount = offhandItem->count;
-        }
-
-        for (int i = 0; i < 36; i++) {
-            auto item = inventory->getItem(i);
-
-            if (item->getItem() != nullptr) {
-                if (item->getItem()->name == "arrow") {
-                    arrowsCount += item->count;
-                }
-
+            if (offhandItem && offhandItem->getItem() && offhandItem->getItem()->name == "arrow") {
+                arrowsCount = offhandItem->count;
             }
+
+            for (int i = 0; i < 36; i++) {
+                auto item = inventory->getItem(i);
+
+                if (item->getItem() != nullptr) {
+                    if (item->getItem()->name == "arrow") {
+                        arrowsCount += item->count;
+                    }
+
+                }
+            }
+
+            lastArrowCount = arrowsCount;
         }
 
-        arrows = arrowsCount;
+        arrows = lastArrowCount;
     }
 }
 
