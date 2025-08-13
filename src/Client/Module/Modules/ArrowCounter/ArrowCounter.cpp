@@ -20,7 +20,7 @@ void ArrowCounter::defaultConfig() {
     setDef("text", (std::string)"Arrows: {value}");
     setDef("onlyRenderWhenHoldingBowOrCrossbow", false);
     Module::defaultConfig("all");
-    
+
 }
 
 void ArrowCounter::settingsRender(float settingsOffset) {
@@ -58,17 +58,17 @@ void ArrowCounter::settingsRender(float settingsOffset) {
 void ArrowCounter::onTick(TickEvent& event) {
     if (!this->isEnabled()) return;
     if (!SDK::hasInstanced || SDK::clientInstance == nullptr) return;
-    
+
     auto player = SDK::clientInstance->getLocalPlayer();
     if (!player || !player->getSupplies()) return;
-    
+
     auto supplies = player->getSupplies();
     auto inventory = supplies->getInventory();
     if (!inventory) return;
-    
+
     if (SDK::getCurrentScreen() != "hud_screen") return;
-	
-	// Only render when holding bow or crossbow if setting is enabled
+
+    // Only render when holding bow or crossbow if setting is enabled
     shouldRender = true;
     if (getOps<bool>("onlyRenderWhenHoldingBowOrCrossbow")) {
 
@@ -82,10 +82,10 @@ void ArrowCounter::onTick(TickEvent& event) {
             shouldRender = (itemName == "bow" || itemName == "crossbow");
         }
     }
-    
+
     if (shouldRender) {
-		
-		// Cache arrow count by updating every 4 ticks
+
+        // Cache arrow count by updating every 4 ticks
         tickCounter++;
         if (tickCounter % 4 == 0) {
 
