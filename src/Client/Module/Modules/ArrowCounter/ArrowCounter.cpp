@@ -67,7 +67,7 @@ void ArrowCounter::onTick(TickEvent& event) {
     if (!inventory) return;
     
     if (SDK::getCurrentScreen() != "hud_screen") return;
-    
+	
 	// Only render when holding bow or crossbow if setting is enabled
     shouldRender = true;
     if (getOps<bool>("onlyRenderWhenHoldingBowOrCrossbow")) {
@@ -84,7 +84,7 @@ void ArrowCounter::onTick(TickEvent& event) {
     }
     
     if (shouldRender) {
-        
+		
 		// Cache arrow count by updating every 4 ticks
         tickCounter++;
         if (tickCounter % 4 == 0) {
