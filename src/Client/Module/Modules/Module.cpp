@@ -299,9 +299,8 @@ void Module::addElementText(std::string text, std::string subtext) {
     float fontSize2 = Constraints::RelativeConstraint(0.12f, "height", true);
 
     if (!subtext.empty()) {
-        subtextY = y;
         y -= Constraints::RelativeConstraint(0.009f, "height", true);
-        subtextY += Constraints::RelativeConstraint(0.009f, "height", true);
+        subtextY = y;
     } else {
         y += Constraints::RelativeConstraint(0.0015f, "height", true);
     }
@@ -317,7 +316,22 @@ void Module::addElementText(std::string text, std::string subtext) {
     }
 
     FlarialGUI::FlarialTextWithFont(x, y, FlarialGUI::to_wide(text).c_str(), 200, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize, DWRITE_FONT_WEIGHT_MEDIUM, textCol, false);
-    if (!subtext.empty()) FlarialGUI::FlarialTextWithFont(x, subtextY, FlarialGUI::to_wide(subtext).c_str(), 200, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize2, DWRITE_FONT_WEIGHT_MEDIUM, subtextCol, false);
+
+    if (!subtext.empty()) {
+
+        std::vector<std::string> lines;
+        std::stringstream ss(subtext);
+        std::string line;
+
+        while (std::getline(ss, line, '\n')) lines.push_back(line);
+
+        for (std::string t: lines) {
+            subtextY += Constraints::RelativeConstraint(0.017f, "height", true);
+            FlarialGUI::FlarialTextWithFont(x, subtextY, FlarialGUI::to_wide(t).c_str(), 200, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize2, DWRITE_FONT_WEIGHT_MEDIUM, subtextCol, false);
+        }
+
+        padding += Constraints::RelativeConstraint(0.018f, "height", true) * (lines.size() - 1);
+    }
 }
 
 void Module::addButton(const std::string &text, const std::string &subtext, const std::string &buttonText, std::function<void()> action) {

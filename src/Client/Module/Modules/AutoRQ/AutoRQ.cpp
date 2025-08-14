@@ -53,20 +53,20 @@ void AutoRQ::settingsRender(float settingsOffset) {
     FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
                               Constraints::RelativeConstraint(1.0, "width"),
                               Constraints::RelativeConstraint(0.88f, "height"));
-    this->addHeader("General");
-    this->addToggle("Use /hub instead of /q", "", "hub");
+    addHeader("General");
+    addToggle("Use /hub instead of /q", "", "hub");
     // this->addDropdown("Command to use", "Command to execute when somthing gets triggered",  std::vector<std::string>{"Re-Q same game", "Q a Random game", "Go back to the hub"}, getOps<std::string>("commandtouse"));
 
-    this->addHeader("Auto Re Q");
-    this->addToggle("Auto re-queue ", "Find a new game when the current game is over", "ReQ");
-    this->addToggle("Solo mode ", "Re-Q when you finish a game or die and can't respawn.\nNot recomended while in a party.", "solo");
-    this->addToggle("Team Elimination", "Re-Q when the team your on is fully ELIMINATED.", "eliminated");
+    addHeader("Auto Re Q");
+    addToggle("Auto re-queue ", "Find a new game when the current game is over", "ReQ");
+    addToggle("Solo mode ", "Re-Q when you finish a game or die and can't respawn.\nNot recomended while in a party.", "solo");
+    addToggle("Team Elimination", "Re-Q when the team your on is fully ELIMINATED.", "eliminated");
 
-    this->addHeader("Map avoider");
+    addHeader("Map avoider");
 
-    this->addToggle("Map Avoider", "Automatically finds you a new game when a specific map has won the vote", "AutoMapAvoider");
+    addToggle("Map Avoider", "Automatically finds you a new game when a specific map has won the vote", "AutoMapAvoider");
     // this->addTextBox("Maps", " Input one or more maps using comma's.", getOps<std::string>("text"), 100);
-    this->addButton("Add Map", "Add a map you want to avoid.", "Add Map", [this] {
+    addButton("Add Map", "Add a map you want to avoid.", "Add Map", [this] {
 
         // std::string keybindName = "keybind-" + FlarialGUI::cached_to_string(totalKeybinds);
         std::string commandName = "map-" + FlarialGUI::cached_to_string(totalmaps);
@@ -86,7 +86,7 @@ void AutoRQ::settingsRender(float settingsOffset) {
         std::string commandSettingName = "map-" + FlarialGUI::cached_to_string(i);
 
         if (settings.getSettingByName<std::string>(commandSettingName) != nullptr) {
-            this->addTextBox(
+            addTextBox(
                 "Map " + FlarialGUI::cached_to_string(i),
                 "Input a map you would like to avoid.",
                 settings.getSettingByName<std::string>(commandSettingName)->value
@@ -97,17 +97,17 @@ void AutoRQ::settingsRender(float settingsOffset) {
     addHeader("Role Avoider");
 
     addHeader("Murder Mystery");
-    addToggle("Murderer", "re q when you get murderer", "murderer");
-    addToggle("Sheriff", "re q when you get sheriff", "sheriff");
-    addToggle("Innocent", "re q when you get innocent", "innocent");
+    addToggle("Murderer", "Re Q when you get murderer", "murderer");
+    addToggle("Sheriff", "Re Q when you get sheriff", "sheriff");
+    addToggle("Innocent", "Re Q when you get innocent", "innocent");
 
     addHeader("Hide and Seek");
-    addToggle("Hider", "re q when you get hider", "hider");
-    addToggle("Seeker", "re q when you get seeker", "seeker");
+    addToggle("Hider", "Re Q when you get hider", "hider");
+    addToggle("Seeker", "Re Q when you get seeker", "seeker");
 
     addHeader("Deathrun");
-    addToggle("Death", "re q when you get death", "death");
-    addToggle("Runner", "re q when you get runner", "runner");
+    addToggle("Death", "Re Q when you get death", "death");
+    addToggle("Runner", "Re Q when you get runner", "runner");
 
     addHeader("Copy Custom Server code");
     addToggle("Copy CS code", "Automatically copy custom server code to your clipboard", "copyCS");
@@ -116,9 +116,9 @@ void AutoRQ::settingsRender(float settingsOffset) {
     addHeader("Debloat chat");
     addToggle("Promo message", "Removes all promo/info messages starting with [!]", "promomessage");
     addToggle("Unused Unlocks", "Removes 'You have unused unlocks in your Locker!'", "unlocks");
-    addToggle("player joined", "Removes player joined message", "joined");
-    addToggle("player message", "Removes all messages by non ranked players", "playermessage");
-    addToggle("player message Hive+", "Removes all messages from Hive+ players", "playermessageplus");
+    addToggle("Player joined", "Removes player joined message", "joined");
+    addToggle("Player message", "Removes all messages by non ranked players", "playermessage");
+    addToggle("Player message Hive+", "Removes all messages from Hive+ players", "playermessageplus");
     addToggle("No Teaming", "Removes No Teaming!", "noteaming");
 
     addHeader("Auto accept");
