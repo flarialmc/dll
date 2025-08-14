@@ -6,7 +6,7 @@ on:
       - 'beta-*'
       - 'release-*'
   pull_request:
-    branches: [ "main", "scripting-v2" ]
+    branches: [ "main", "legacy" ]
   workflow_dispatch:
 
 env:
