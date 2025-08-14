@@ -13,7 +13,7 @@
 
 
 
-static const std::vector<int> xpTableBedwars = {
+static const std::vector<int> xpTable = {
     0,        // Level 0
     0,        // Level 1
     150,      // Level 2
@@ -115,268 +115,6 @@ static const std::vector<int> xpTableBedwars = {
     550800,   // Level 98
     558450,   // Level 99
     566100    // Level 100
-};
-
-const std::vector<int> xpTableSkywars = {
-    0,        // Level 0
-    0,        // Level 1
-    150,      // Level 2
-    450,      // Level 3
-    900,      // Level 4
-    1500,     // Level 5
-    2250,     // Level 6
-    3150,     // Level 7
-    4200,     // Level 8
-    5400,     // Level 9
-    6750,     // Level 10
-    8250,     // Level 11
-    9900,     // Level 12
-    11700,    // Level 13
-    13650,    // Level 14
-    15750,    // Level 15
-    18000,    // Level 16
-    20400,    // Level 17
-    22950,    // Level 18
-    25650,    // Level 19
-    28500,    // Level 20
-    31500,    // Level 21
-    34650,    // Level 22
-    37950,    // Level 23
-    41400,    // Level 24
-    45000,    // Level 25
-    48750,    // Level 26
-    52650,    // Level 27
-    56700,    // Level 28
-    60900,    // Level 29
-    65250,    // Level 30
-    69750,    // Level 31
-    74400,    // Level 32
-    79200,    // Level 33
-    84150,    // Level 34
-    89250,    // Level 35
-    94500,    // Level 36
-    99900,    // Level 37
-    105450,   // Level 38
-    111150,   // Level 39
-    117000,   // Level 40
-    123000,   // Level 41
-    129150,   // Level 42
-    135450,   // Level 43
-    141900,   // Level 44
-    148500,   // Level 45
-    155250,   // Level 46
-    162150,   // Level 47
-    169200,   // Level 48
-    176400,   // Level 49
-    183750,   // Level 50
-    191250,   // Level 51
-    198900,   // Level 52
-    206550,   // Level 53
-    214200,   // Level 54
-    221850,   // Level 55
-    229500,   // Level 56
-    237150,   // Level 57
-    244800,   // Level 58
-    252450,   // Level 59
-    260100,   // Level 60
-    267750,   // Level 61
-    275400,   // Level 62
-    283050,   // Level 63
-    290700,   // Level 64
-    298350,   // Level 65
-    306000,   // Level 66
-    313650,   // Level 67
-    321300,   // Level 68
-    328950,   // Level 69
-    336600,   // Level 70
-    344250,   // Level 71
-    351900,   // Level 72
-    359550,   // Level 73
-    367200,   // Level 74
-    374850,   // Level 75
-    382500,   // Level 76
-    390150,   // Level 77
-    397800,   // Level 78
-    405450,   // Level 79
-    413100,   // Level 80
-    420750,   // Level 81
-    428400,   // Level 82
-    436050,   // Level 83
-    443700,   // Level 84
-    451350,   // Level 85
-    459000,   // Level 86
-    466650,   // Level 87
-    474300,   // Level 88
-    481950,   // Level 89
-    489600,   // Level 90
-    497250,   // Level 91
-    504900,   // Level 92
-    512550,   // Level 93
-    520200,   // Level 94
-    527850,   // Level 95
-    535500,   // Level 96
-    543150,   // Level 97
-    550800,   // Level 98
-    558450,   // Level 99
-    566100    // Level 100
-};
-
-const std::vector<int> xpTableMM = {
-    0,        // Level 0
-    0,        // Level 1
-    100,      // Level 2
-    300,      // Level 3
-    600,      // Level 4
-    1000,     // Level 5
-    1500,     // Level 6
-    2100,     // Level 7
-    2800,     // Level 8
-    3600,     // Level 9
-    4500,     // Level 10
-    5500,     // Level 11
-    6600,     // Level 12
-    7800,     // Level 13
-    9100,     // Level 14
-    10500,    // Level 15
-    12000,    // Level 16
-    13600,    // Level 17
-    15300,    // Level 18
-    17100,    // Level 19
-    19000,    // Level 20
-    21000,    // Level 21
-    23100,    // Level 22
-    25300,    // Level 23
-    27600,    // Level 24
-    30000,    // Level 25
-    32500,    // Level 26
-    35100,    // Level 27
-    37800,    // Level 28
-    40600,    // Level 29
-    43500,    // Level 30
-    46500,    // Level 31
-    49600,    // Level 32
-    52800,    // Level 33
-    56100,    // Level 34
-    59500,    // Level 35
-    63000,    // Level 36
-    66600,    // Level 37
-    70300,    // Level 38
-    74100,    // Level 39
-    78000,    // Level 40
-    82000,    // Level 41
-    86100,    // Level 42
-    90300,    // Level 43
-    94600,    // Level 44
-    99000,    // Level 45
-    103500,   // Level 46
-    108100,   // Level 47
-    112800,   // Level 48
-    117600,   // Level 49
-    122500,   // Level 50
-    127500,   // Level 51
-    132600,   // Level 52
-    137800,   // Level 53
-    143100,   // Level 54
-    148500,   // Level 55
-    154000,   // Level 56
-    159600,   // Level 57
-    165300,   // Level 58
-    171100,   // Level 59
-    177000,   // Level 60
-    183000,   // Level 61
-    189100,   // Level 62
-    195300,   // Level 63
-    201600,   // Level 64
-    208000,   // Level 65
-    214500,   // Level 66
-    221100,   // Level 67
-    227800,   // Level 68
-    234600,   // Level 69
-    241500,   // Level 70
-    248500,   // Level 71
-    255600,   // Level 72
-    262800,   // Level 73
-    270100,   // Level 74
-    277500,   // Level 75
-    285000,   // Level 76
-    292600,   // Level 77
-    300300,   // Level 78
-    308100,   // Level 79
-    316000,   // Level 80
-    324000,   // Level 81
-    332100,   // Level 82
-    340200,   // Level 83
-    348300,   // Level 84
-    356400,   // Level 85
-    364500,   // Level 86
-    372600,   // Level 87
-    380700,   // Level 88
-    388800,   // Level 89
-    396900,   // Level 90
-    405000,   // Level 91
-    413100,   // Level 92
-    421200,   // Level 93
-    429300,   // Level 94
-    437400,   // Level 95
-    445500,   // Level 96
-    453600,   // Level 97
-    461700,   // Level 98
-    469800,   // Level 99
-    477900    // Level 100
-};
-
-const std::vector<int> xpTableCTF = {
-    0,        // Level 0
-    0,        // Level 1
-    150,      // Level 2
-    450,      // Level 3
-    900,      // Level 4
-    1500,     // Level 5
-    2250,     // Level 6
-    3150,     // Level 7
-    4200,     // Level 8
-    5400,     // Level 9
-    6750,     // Level 10
-    8250,     // Level 11
-    9900,     // Level 12
-    11700,    // Level 13
-    13650,    // Level 14
-    15750,    // Level 15
-    18000,    // Level 16
-    20400,    // Level 17
-    22950,    // Level 18
-    25650,    // Level 19
-    28500,    // Level 20
-    31500,    // Level 21
-    34650,    // Level 22
-    37950,    // Level 23
-    41400,    // Level 24
-    45000,    // Level 25
-    48750,    // Level 26
-    52650,    // Level 27
-    56700,    // Level 28
-    60900,    // Level 29
-    65250,    // Level 30
-    69750,    // Level 31
-    74400,    // Level 32
-    79200,    // Level 33
-    84150,    // Level 34
-    89250,    // Level 35
-    94500,    // Level 36
-    99900,    // Level 37
-    105450,   // Level 38
-    111150,   // Level 39
-    117000,   // Level 40
-    123000,   // Level 41
-    129150,   // Level 42
-    135450,   // Level 43
-    141900,   // Level 44
-    148500,   // Level 45
-    155250,   // Level 46
-    162150,   // Level 47
-    169200,   // Level 48
-    176400,   // Level 49
-    183750    // Level 50
 };
 
 
@@ -481,10 +219,10 @@ namespace Hive {
         return subject;
     }
 
-    inline int getLevelFromXP(int xp, const std::vector<int>& xpTable) {
+    inline int getLevelFromXP(int xp, int max = 100) {
         if (xp <= 0) return 1;
 
-        int maxXP = xpTable.back();
+        int maxXP = xpTable[max];
 
         int prestige = xp / maxXP;
         int remainder = xp % maxXP;
@@ -492,7 +230,7 @@ namespace Hive {
         auto it = std::upper_bound(xpTable.begin(), xpTable.end(), remainder);
         int levelInCycle = static_cast<int>(it - xpTable.begin()) - 1;
 
-        return prestige * (static_cast<int>(xpTable.size()) - 1) + levelInCycle;
+        return prestige * max + levelInCycle;
     }
 
     inline Hive::PlayerStats GetStats(const std::string &gameId, const std::string &username) {
@@ -545,7 +283,7 @@ namespace Hive {
                 stats.setFKDR(roundToSecond((float) finalKills / (float) finalDeaths));
                 stats.setKD(roundToSecond((float) kills / (float) deaths));
                 stats.setWinRate(std::round(((float) victories / (float) played) * 100.0f));
-                stats.setLevel(getLevelFromXP(xp, xpTableBedwars));
+                stats.setLevel(getLevelFromXP(xp));
                 stats.setVictories(victories);
                 stats.setLosses(played - victories);
                 stats.setKills(kills);
@@ -576,7 +314,7 @@ namespace Hive {
                 stats.setFKDR(roundToSecond((float) -1.f));
                 stats.setKD(roundToSecond((float) kills / (float) deaths));
                 stats.setWinRate(std::round(((float) victories / (float) played) * 100.0f));
-                stats.setLevel(getLevelFromXP(xp, xpTableSkywars));
+                stats.setLevel(getLevelFromXP(xp));
                 stats.setVictories(victories);
                 stats.setLosses(played - victories);
                 stats.setKills(kills);
@@ -608,7 +346,7 @@ namespace Hive {
                 stats.setFKDR(roundToSecond(-1.0f));
                 stats.setKD(roundToSecond((float) murders / (float) deaths));
                 stats.setWinRate(std::round(((float) victories / (float) played) * 100.0f));
-                stats.setLevel(getLevelFromXP(xp, xpTableMM));
+                stats.setLevel(getLevelFromXP(xp));
                 stats.setVictories(victories);
                 stats.setLosses(played - victories);
                 stats.setKills(eliminations);
@@ -641,7 +379,7 @@ namespace Hive {
                 stats.setKD(roundToSecond((float) kills / (float) deaths));
                 stats.setFKDR(roundToSecond(-1.0f));
                 stats.setWinRate(std::round(((float) victories / (float) played) * 100.0f));
-                stats.setLevel(getLevelFromXP(xp, xpTableCTF));
+                stats.setLevel(getLevelFromXP(xp, 50));
                 stats.setVictories(victories);
                 stats.setLosses(played - victories);
                 stats.setKills(kills);
