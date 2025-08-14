@@ -13,6 +13,7 @@
 
 
 
+// Refer to https://support.playhive.com/in-game-unlocks/
 static const std::vector<int> xpTable = {
     0,        // Level 0
     0,        // Level 1
@@ -228,9 +229,9 @@ namespace Hive {
         int remainder = xp % maxXP;
 
         auto it = std::upper_bound(xpTable.begin(), xpTable.end(), remainder);
-        int levelInCycle = static_cast<int>(it - xpTable.begin()) - 1;
+        int level = static_cast<int>(it - xpTable.begin()) - 1;
 
-        return prestige * max + levelInCycle;
+        return prestige * max + level;
     }
 
     inline Hive::PlayerStats GetStats(const std::string &gameId, const std::string &username) {
