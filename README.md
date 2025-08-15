@@ -69,3 +69,7 @@ If you encounter issues, check out our [FAQ](https://discord.gg/flarial-communit
    This command compiles the project according to the generated build files.
 
 By following these steps, you should be able to clone and build the project using CMake successfully.
+
+---
+## Acknowledgements
+This application incorporates various icons provided by Flaticon ([www.flaticon.com](http://www.flaticon.com/)). We appreciate their valuable resources.
