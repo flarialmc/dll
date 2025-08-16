@@ -52,7 +52,8 @@ void ComboCounter::settingsRender(float settingsOffset) {
 
     addHeader("Misc");
     defaultAddSettings("misc");
-
+    addToggle("Count to Negatives", "Allows the count to keep going down", "negatives");
+    
     FlarialGUI::UnsetScrollView();
 
     resetPadding();
@@ -61,9 +62,23 @@ void ComboCounter::settingsRender(float settingsOffset) {
 
 void ComboCounter::onAttack(AttackEvent &event) {
     if (!this->isEnabled()) return;
-    if (std::chrono::high_resolution_clock::now() - last_hit > std::chrono::milliseconds(480)) {
+
+    auto now = std::chrono::high_resolution_clock::now();
+
+    if (Combo < 0) {
+        if (!getOps<bool>("negatives")) {
+            Combo = 0;
+            last_hit = now;
+            return;
+        }
         Combo++;
-        last_hit = std::chrono::high_resolution_clock::now();
+        last_hit = now;
+        return;
+    }
+
+    if (now - last_hit > std::chrono::milliseconds(480)) {
+        Combo++;
+        last_hit = now;
     }
 }
 
@@ -73,8 +88,22 @@ void ComboCounter::onTick(TickEvent &event) {
         return;
 
     auto LP = reinterpret_cast<LocalPlayer*>(event.getActor());
-    if (LP->getHurtTime() != 0)
+
+    int currentHurtTime = LP->getHurtTime();
+
+    if (!getOps<bool>("negatives") && Combo < 0) {
         Combo = 0;
+    }
+
+    if (currentHurtTime > 0 && lastHurtTime == 0) {
+        if (negatives) {
+            Combo--;
+        } else {
+            Combo = 0;
+        }
+    }
+    lastHurtTime = currentHurtTime;
+
     std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - last_hit;
     if (duration.count() >= 15) Combo = 0;
 }
