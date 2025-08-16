@@ -96,7 +96,7 @@ void ComboCounter::onTick(TickEvent &event) {
     }
 
     if (currentHurtTime > 0 && lastHurtTime == 0) {
-        if (negatives) {
+        if (getOps<bool>("negatives")) {
             Combo--;
         } else {
             Combo = 0;
