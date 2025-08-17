@@ -68,9 +68,7 @@ void AutoGG::onPacketReceive(PacketEvent& event) {
             std::regex_search(pkt->text, rgxChRu) ||
             //Mineville
             pkt->text == "§aYou Win!" ||
-            pkt->text == "§cGame Over!" ||
-            //Venity
-            pkt->text.find("§ewon the game!")) {
+            pkt->text == "§cGame Over!") {
 
             SendGG();
             }
