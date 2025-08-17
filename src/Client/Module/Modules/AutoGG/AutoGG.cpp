@@ -45,6 +45,10 @@ void AutoGG::onPacketReceive(PacketEvent& event) {
     if (!this->isEnabled()) return;
     MinecraftPacketIds id = event.getPacket()->getId();
 
+    if (id == MinecraftPacketIds::LevelSoundEvent) {
+        Logger::debug("sound packet received");
+    }
+
     // TODO: add support for other servers (look for "won the game" text)
     if (id == MinecraftPacketIds::SetTitle) {
         auto* pkt = reinterpret_cast<SetTitlePacket*>(event.getPacket());
@@ -64,9 +68,7 @@ void AutoGG::onPacketReceive(PacketEvent& event) {
             std::regex_search(pkt->text, rgxChRu) ||
             //Mineville
             pkt->text == "§aYou Win!" ||
-            pkt->text == "§cGame Over!" ||
-            //Venity
-            pkt->text.find("§ewon the game!")) {
+            pkt->text == "§cGame Over!") {
 
             SendGG();
             }
