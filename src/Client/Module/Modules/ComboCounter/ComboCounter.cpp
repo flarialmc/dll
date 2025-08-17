@@ -68,12 +68,7 @@ void ComboCounter::onAttack(AttackEvent &event) {
     bool negatives = getOps<bool>("negatives");
 
     if (Combo < 0) {
-        if (!negatives) {
-            Combo = 0;
-            last_hit = now;
-            return;
-        }
-        Combo = 0;
+        Combo = 1;
         last_hit = now;
         return;
     }
