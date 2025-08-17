@@ -456,6 +456,7 @@ void SwapchainHook::DX11Render(bool underui) {
 
 
                 if (!first && SwapchainHook::init && ModuleManager::getModule("ClickGUI")) {
+                    FlarialGUI::Notify("Faster Inventory is unstable, if you're encountering issues, please disable it.");
                     FlarialGUI::Notify(
                             "Click " + ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
                                     "keybind")->value + " to open the menu in-game.");
