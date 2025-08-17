@@ -20,8 +20,8 @@ void ComboCounter::onDisable() {
 
 void ComboCounter::defaultConfig() {
     setDef("text", (std::string)"Combo: {value}");
-    Module::defaultConfig("all");
-    
+    Module::defaultConfig("core");
+    setDef("negatives", false);
 }
 
 void ComboCounter::settingsRender(float settingsOffset) {
@@ -51,9 +51,10 @@ void ComboCounter::settingsRender(float settingsOffset) {
     defaultAddSettings("colors");
 
     addHeader("Misc");
-    defaultAddSettings("misc");
     addToggle("Count to Negatives", "Allows the count to keep going down", "negatives");
+    defaultAddSettings("misc");
     
+
     FlarialGUI::UnsetScrollView();
 
     resetPadding();
@@ -64,14 +65,15 @@ void ComboCounter::onAttack(AttackEvent &event) {
     if (!this->isEnabled()) return;
 
     auto now = std::chrono::high_resolution_clock::now();
+    bool negatives = getOps<bool>("negatives");
 
     if (Combo < 0) {
-        if (!getOps<bool>("negatives")) {
+        if (!negatives) {
             Combo = 0;
             last_hit = now;
             return;
         }
-        Combo++;
+        Combo = 0;
         last_hit = now;
         return;
     }
@@ -84,23 +86,21 @@ void ComboCounter::onAttack(AttackEvent &event) {
 
 void ComboCounter::onTick(TickEvent &event) {
     if (!this->isEnabled()) return;
-    if (!SDK::clientInstance->getLocalPlayer())
-        return;
+    if (!SDK::clientInstance->getLocalPlayer()) return;
 
     auto LP = reinterpret_cast<LocalPlayer*>(event.getActor());
 
     int currentHurtTime = LP->getHurtTime();
+    bool negatives = getOps<bool>("negatives");
 
-    if (!getOps<bool>("negatives") && Combo < 0) {
-        Combo = 0;
-    }
+    // just in case player toggles negatives off
+    if (!negatives && Combo < 0) Combo = 0;
 
     if (currentHurtTime > 0 && lastHurtTime == 0) {
-        if (getOps<bool>("negatives")) {
-            Combo--;
-        } else {
-            Combo = 0;
-        }
+        if (negatives) {
+            if (Combo > 0) Combo = 0; // reset to 0 first...
+            else Combo--; // ...then it goes down further
+        } else Combo = 0; // default behavior
     }
     lastHurtTime = currentHurtTime;
 
