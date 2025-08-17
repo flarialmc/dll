@@ -43,7 +43,7 @@ public:
 	//TODO: RE CHECK
 	void onMouse(MouseEvent& event);
 
-	void onKey(KeyEvent& event);;
+	void onKey(KeyEvent& event);
 
 	// TODO: add dolly zoom and world2screen zoom stabilization ?
 	// TODO: if someone has disabled hand this will enable it unless changed in settings
