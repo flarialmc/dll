@@ -18,6 +18,7 @@ void FPS::onDisable() {
 void FPS::defaultConfig() {
     setDef("text", (std::string)"FPS: {value}");
     Module::defaultConfig("all");
+    setDef("spoof", false);
     setDef("fpsSpoofer", 1.0f);
     
 }
@@ -34,8 +35,10 @@ void FPS::settingsRender(float settingsOffset) {
                               Constraints::RelativeConstraint(0.88f, "height"));
 
     addHeader("FPS Counter");
+    addToggle("Spoof FPS", "", "spoof");
+    addConditionalSlider(getOps<bool>("spoof"), "Spoofer", "Adjusts the displayed FPS.", "fpsSpoofer", 10.0f);
+    extraPadding();
     defaultAddSettings("main");
-    addSlider("FPS Spoofer", "Adjusts the displayed FPS.", "fpsSpoofer", 10.0f);
     extraPadding();
 
     addHeader("Text");
@@ -59,20 +62,25 @@ void FPS::onRenderUnderUI(RenderUnderUIEvent &event) {
 
 void FPS::onRender(RenderEvent &event) {
     if (this->isEnabled()) {
-        float fpsSpooferValue = getOps<float>("fpsSpoofer");
 
-        if (fpsSpooferValue > 10.0f) {
-            fpsSpooferValue = 10.0f;
+        float fps = MC::fps;
+
+        if (getOps<bool>("spoof")) {
+            float fpsSpooferValue = getOps<float>("fpsSpoofer");
+
+            if (fpsSpooferValue > 10.0f) {
+                fpsSpooferValue = 10.0f;
+            }
+            if (fpsSpooferValue < 1.0f) {
+                fpsSpooferValue = 1.0f;
+            }
+
+            getOps<float>("fpsSpoofer") = fpsSpooferValue;
+
+            fps *= round(fpsSpooferValue);
         }
-        if (fpsSpooferValue < 1.0f) {
-            fpsSpooferValue = 1.0f;
-        }
 
-        getOps<float>("fpsSpoofer") = fpsSpooferValue;
-
-        int fps = (int)round(((float)MC::fps * round(fpsSpooferValue)));
-
-        auto fpsStr = FlarialGUI::cached_to_string(fps);
+        std::string fpsStr = FlarialGUI::cached_to_string((int)round(fps));
 
         this->normalRender(0, fpsStr);
     }
