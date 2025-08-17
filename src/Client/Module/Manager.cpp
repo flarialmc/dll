@@ -222,7 +222,7 @@ void ModuleManager::initialize() {
 	addModule<OpponentReach>();
 	addModule<ViewModel>();
 	addModule<PotionHUD>();
-	//addModule<FasterInventory>();
+	addModule<FasterInventory>();
 	//addModule<MovableHUD>();
 	addModule<MovableScoreboard>();
 	addModule<MovableTitle>();
