@@ -7,10 +7,13 @@
 class ArrowCounter : public Module {
 private:
 	int arrows = 0;
+    bool shouldRender = true;
+    int lastArrowCount = 0;
+    int tickCounter = 0;
 public:
 
 	ArrowCounter() : Module("Arrow Counter", "Counts how many arrows you have\nin your inventory.",
-		IDR_ARROW_PNG, "") {
+		IDR_ARROW_PNG, ""), arrows(0), shouldRender(true), lastArrowCount(0), tickCounter(0) {
 		
 	};
 

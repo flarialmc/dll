@@ -160,12 +160,13 @@
 #define IDR_TWERK_PNG           266
 #define IDR_CHUNKBORDER_PNG     267
 #define IDR_COMPACTCHAT_PNG     268
+#define IDR_KEYSTROKES_PNG      269
 // MAKE SURE YOU ALWAYS UPDATE THIS!
 
 #define MAX_IMAGE_ID 262
 
 #define IDR_PING_AMAZING  258
-#define IDR_PING_GOOD     269
+#define IDR_PING_GOOD     259
 #define IDR_PING_OKAY     260
 #define IDR_PING_BAD      261
 #define IDR_PING_QUIT     262
