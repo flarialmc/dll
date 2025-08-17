@@ -1001,7 +1001,7 @@ void TabList::onRender(RenderEvent &event) {
                 }
                 if (totalWidth < worldNameMetrics.x + keycardSize) totalWidth = worldNameMetrics.x + keycardSize;
 
-                totalHeight += keycardSize * 1.25f;
+                totalHeight += keycardSize * 0.75f;
             }
 
             if (getOps<bool>("serverPing")) {
@@ -1013,8 +1013,10 @@ void TabList::onRender(RenderEvent &event) {
                 }
                 if (totalWidth < curPingMetrics.x + keycardSize) totalWidth = curPingMetrics.x + keycardSize;
 
-                totalHeight += keycardSize * 0.75f;
+                totalHeight += keycardSize * 0.5f;
             }
+
+            totalHeight += keycardSize * 0.5f;
 
             if (getOps<bool>("playerCount")) {
                 std::string playerCount = std::to_string(validPlayers) + " player(s) online";
@@ -1036,6 +1038,7 @@ void TabList::onRender(RenderEvent &event) {
 
                 totalHeight += keycardSize * 2.f;
             }
+            else totalHeight += keycardSize * 0.5f;
 
             Vec2<float> realcenter;
             if (settingperc.x != 0 || settingperc.y != 0) realcenter = Vec2<float>(settingperc.x * MC::windowSize.x, settingperc.y * MC::windowSize.y);
@@ -1070,6 +1073,7 @@ void TabList::onRender(RenderEvent &event) {
 
                 FlarialGUI::FlarialTextWithFont(textX, textY, FlarialGUI::to_wide(cache_worldName).c_str(), 0, keycardSize * 0.5f + Constraints::SpacingConstraint(0.70, keycardSize), DWRITE_TEXT_ALIGNMENT_CENTER, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
             }
+            else realcenter.y -= keycardSize * 0.75f;
 
             if (getOps<bool>("serverPing")) {
                 static float p1 = 0.175;
@@ -1106,6 +1110,7 @@ void TabList::onRender(RenderEvent &event) {
 
                 FlarialGUI::FlarialTextWithFont(textX2, realcenter.y, FlarialGUI::to_wide(std::format(" {}ms", SDK::getServerPing())).c_str(), 0, keycardSize * 0.5f + Constraints::SpacingConstraint(0.70, keycardSize), DWRITE_TEXT_ALIGNMENT_LEADING, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
             }
+            else realcenter.y -= keycardSize * 0.5f;
 
             realcenter.y += keycardSize * 1.25f;
 
@@ -1360,7 +1365,11 @@ void TabList::onRender(RenderEvent &event) {
             }
 
             if (getOps<bool>("playerCount")) {
-                float curY = vec2.y + totalHeight - 1.75f * keycardSize;
+                float curY = vec2.y + totalHeight;
+
+                if (getOps<bool>("serverPing") == getOps<bool>("worldName")) curY -= keycardSize * 1.75f;
+                else if (!getOps<bool>("serverPing")) curY -= keycardSize * 1.75f;
+                else if (!getOps<bool>("worldName")) curY -= keycardSize * 1.5f;
 
                 static float p1 = 0.175;
                 static float p2 = 0.196;
