@@ -45,10 +45,6 @@ void AutoGG::onPacketReceive(PacketEvent& event) {
     if (!this->isEnabled()) return;
     MinecraftPacketIds id = event.getPacket()->getId();
 
-    if (id == MinecraftPacketIds::LevelSoundEvent) {
-        Logger::debug("sound packet received");
-    }
-
     // TODO: add support for other servers (look for "won the game" text)
     if (id == MinecraftPacketIds::SetTitle) {
         auto* pkt = reinterpret_cast<SetTitlePacket*>(event.getPacket());
