@@ -7,7 +7,7 @@ void FasterInventory::onEnable() {
     Listen(this, PacketSendEvent, &FasterInventory::onPacketSend)
     Listen(this, PacketEvent, &FasterInventory::onPacketReceive)
     Listen(this, TickEvent, &FasterInventory::onTick)
-
+    FlarialGUI::Notify("Faster Inventory is unstable, if you're encountering issues, please disable it.");
     Module::onEnable();
 }
 
@@ -16,6 +16,7 @@ void FasterInventory::onDisable() {
     Deafen(this, PacketSendEvent, &FasterInventory::onPacketSend)
     Deafen(this, PacketEvent, &FasterInventory::onPacketReceive)
     Deafen(this, TickEvent, &FasterInventory::onTick)
+    FlarialGUI::Notify("Faster Inventory is unstable, if you're encountering issues, please disable it.");
     Module::onDisable();
 }
 
