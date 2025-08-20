@@ -9,7 +9,7 @@
 
 #include <string>
 
-class AppleSkin : public Module {
+class BetterHungerBar : public Module {
 private:
 
     int gameMode = 0;
@@ -28,8 +28,8 @@ private:
     
 public:
 
-    AppleSkin() : Module("AppleSkin", "Adds a hunger and saturation overlay similar to Java.\n- Only works with the vanilla textures atm!! -",
-        IDR_APPLESKIN_PNG, "") {
+    BetterHungerBar() : Module("Better Hunger Bar", "Adds a hunger and saturation overlay similar to Java.\n- Only works with the vanilla textures atm!! -",
+        IDR_BetterHungerBar_PNG, "") {
         
     };
     

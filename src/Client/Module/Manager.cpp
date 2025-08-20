@@ -117,7 +117,7 @@
 #include "Modules/ChunkBorder/ChunkBorder.hpp"
 #include "Modules/CompactChat/CompactChat.hpp"
 #include "Modules/MessageLogger/MessageLogger.hpp"
-#include "Modules/AppleSkin/AppleSkin.hpp"
+#include "Modules/BetterHungerBar/BetterHungerBar.hpp"
 #ifdef COMPILE_DOOM
 	#include "Modules/Doom/Doom.hpp"
 #endif
@@ -282,7 +282,7 @@ void ModuleManager::initialize() {
 	addModule<ChunkBorder>();
 	addModule<CompactChat>();
 	addModule<MessageLogger>();
-	addModule<AppleSkin>();
+	addModule<BetterHungerBar>();
 #ifdef COMPILE_DOOM
 	addModule<DoomModule>();
 #endif

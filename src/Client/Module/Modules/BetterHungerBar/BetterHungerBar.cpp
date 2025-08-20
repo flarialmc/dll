@@ -2,7 +2,7 @@
 // TODO - use dynamic icons based on texture pack
 // TODO - place icons correctly and dynamically change pos based on screen size
 
-#include "AppleSkin.hpp"
+#include "BetterHungerBar.hpp"
 
 #include "Events/EventManager.hpp"
 #include "Events/Game/TickEvent.hpp"
@@ -15,19 +15,19 @@
 #include <algorithm>
 #include <chrono>
 
-void AppleSkin::onEnable() {
-    Listen(this, TickEvent, &AppleSkin::onTick)
-    Listen(this, RenderEvent, &AppleSkin::onRender)
+void BetterHungerBar::onEnable() {
+    Listen(this, TickEvent, &BetterHungerBar::onTick)
+    Listen(this, RenderEvent, &BetterHungerBar::onRender)
     Module::onEnable();
 }
 
-void AppleSkin::onDisable() {
-    Deafen(this, TickEvent, &AppleSkin::onTick)
-    Deafen(this, RenderEvent, &AppleSkin::onRender)
+void BetterHungerBar::onDisable() {
+    Deafen(this, TickEvent, &BetterHungerBar::onTick)
+    Deafen(this, RenderEvent, &BetterHungerBar::onRender)
     Module::onDisable();
 }
 
-void AppleSkin::defaultConfig() {
+void BetterHungerBar::defaultConfig() {
     Module::defaultConfig("core");
     setDef("saturationColor", (std::string)"FFBB00", 1.f, false);
     setDef("fadeSpeed", 7.f);
@@ -38,7 +38,7 @@ void AppleSkin::defaultConfig() {
     setDef("scale", 1.f);
 }
 
-void AppleSkin::settingsRender(float settingsOffset) {
+void BetterHungerBar::settingsRender(float settingsOffset) {
 
     float x = Constraints::PercentageConstraint(0.019, "left");
     float y = Constraints::PercentageConstraint(0.10, "top");
@@ -51,7 +51,7 @@ void AppleSkin::settingsRender(float settingsOffset) {
                               Constraints::RelativeConstraint(1.0, "width"),
                               Constraints::RelativeConstraint(0.88f, "height"));
 
-    addHeader("AppleSkin");
+    addHeader("Main");
     addColorPicker("Saturation Color", "", "saturationColor");
     addSlider("Fade Speed", "", "fadeSpeed", 10.0f);
     addToggle("Prioritize Cake", "When looking at a cake, the cake values override the hold-food values.", "prioritizeCake");
@@ -120,7 +120,7 @@ std::map<std::string, Food> foods = {
     {"nothing",                {0, 0}}
 };
 
-void AppleSkin::onTick(TickEvent& event) {
+void BetterHungerBar::onTick(TickEvent& event) {
     if (!this->isEnabled() ||
         !SDK::hasInstanced ||
         SDK::clientInstance == nullptr ||
@@ -200,7 +200,7 @@ void AppleSkin::onTick(TickEvent& event) {
     }
 }
 
-int AppleSkin::getPredictedHunger() {
+int BetterHungerBar::getPredictedHunger() {
     auto food = foods[itemName];
     int newHunger = currentHunger + food.hunger;
     
@@ -208,7 +208,7 @@ int AppleSkin::getPredictedHunger() {
     return std::min(newHunger, 20);
 }
 
-double AppleSkin::getPredictedSaturation() {
+double BetterHungerBar::getPredictedSaturation() {
     auto food = foods[itemName];
     double newSaturation = currentSaturation + food.saturation;
     double newHunger = currentHunger + food.hunger;
@@ -217,14 +217,14 @@ double AppleSkin::getPredictedSaturation() {
     return std::floor(std::min(newSaturation, newHunger));
 }
 
-double AppleSkin::getCurrentTime() {
+double BetterHungerBar::getCurrentTime() {
     auto now = std::chrono::steady_clock::now();
     auto duration = now.time_since_epoch();
 
     return std::chrono::duration<double>(duration).count();
 }
 
-void AppleSkin::onRender(RenderEvent& event) {
+void BetterHungerBar::onRender(RenderEvent& event) {
     if (
         !this->isEnabled() || 
         SDK::getCurrentScreen() != "hud_screen"
