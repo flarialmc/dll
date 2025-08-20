@@ -29,7 +29,7 @@ private:
 public:
 
     BetterHungerBar() : Module("Better Hunger Bar", "Adds a hunger and saturation overlay similar to Java.\n- Only works with the vanilla textures atm!! -",
-        IDR_BetterHungerBar_PNG, "") {
+        IDR_BETTERHUNGERBAR_PNG, "") {
         
     };
     
