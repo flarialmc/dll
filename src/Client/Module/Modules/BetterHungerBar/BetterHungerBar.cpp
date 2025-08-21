@@ -1,4 +1,4 @@
-// TODO - only proceed if (gameMode != 0 && gameMode != 2) and not in f1 screen
+// TODO - only proceed if not in f1 screen
 // TODO - use dynamic icons based on texture pack
 // TODO - place icons correctly and dynamically change pos based on screen size
 
@@ -61,7 +61,7 @@ void BetterHungerBar::settingsRender(float settingsOffset) {
     addHeader("Misc");
     addToggle("Manual Fix", "Enable this and adjust the values below manually if you experience issues\nwith the positioning/size of the icons!", "manualFix");
     if (getOps<bool>("manualFix"))
-	{
+    {
         addSlider("xOffset [Use Integers]", "", "xOffset", 500.0f);
         addSlider("yOffset [Use Integers]", "", "yOffset", 500.0f);
         addSlider("Scale [Use Integers]", "", "scale", 2.0f);
@@ -129,6 +129,12 @@ void BetterHungerBar::onTick(TickEvent& event) {
 
     auto player = SDK::clientInstance->getLocalPlayer();
     if (!player) return;
+
+	// Only proceed if in survival (0) or adventure (2) mode
+    gameMode = player->getGameModeType();
+    if (gameMode != 0 && gameMode != 2) {
+        return;
+    }
 
     currentHunger = player->getHunger();
     currentSaturation = player->getSaturation();
@@ -227,7 +233,8 @@ double BetterHungerBar::getCurrentTime() {
 void BetterHungerBar::onRender(RenderEvent& event) {
     if (
         !this->isEnabled() || 
-        SDK::getCurrentScreen() != "hud_screen"
+        SDK::getCurrentScreen() != "hud_screen" ||
+		(gameMode != 0 && gameMode != 2)
     ) return;
     
     // Used for the fade/pulse animation in 1.2, 2.2 and 3.2
