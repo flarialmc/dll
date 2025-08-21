@@ -131,11 +131,14 @@ void BetterHungerBar::onTick(TickEvent& event) {
     if (!player) return;
 
 	// Only proceed if in survival (0) or adventure (2) mode
-    gameMode = player->getGameModeType();
+    auto gameModeComponent = player->getGameModeType();
+    if (!gameModeComponent) return;
+    
+    gameMode = static_cast<int>(gameModeComponent->gameType);
     if (gameMode != 0 && gameMode != 2) {
         return;
     }
-
+	
     currentHunger = player->getHunger();
     currentSaturation = player->getSaturation();
 
