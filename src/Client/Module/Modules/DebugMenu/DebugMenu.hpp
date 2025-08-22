@@ -65,27 +65,25 @@ public:
 
 	bool isOnSetting(std::string settingName, int block);
 
-	void updateTimedVector(std::vector<TimedObj>& vec, float diff);
-
-	static int GetTicks();
+	static void updateTimedVector(std::vector<TimedObj>& vec, float diff);
 
 	void getOnePercLows();
 
 	std::string getFacingDirection(LocalPlayer* player);
 
-	std::wstring GetCpuName();
+	static std::wstring GetCpuName();
 
-	DWORD GetCpuCoreCount();
+	static DWORD GetCpuCoreCount();
 
-	DWORD GetCpuThreadCount();
+	static DWORD GetCpuThreadCount();
 
-	std::string getDimensionName();
+	static std::string getDimensionName();
 
-	std::pair<std::string, std::vector<float>> getWeatherInfo();
+	static std::pair<std::string, std::vector<float>> getWeatherInfo();
 
-	std::string getTime();
+	static std::string getTime();
 
-	std::string getFormattedTime(long long seconds);
+	static std::string getFormattedTime(long long seconds);
 
 	void onTick(TickEvent& event);
 
