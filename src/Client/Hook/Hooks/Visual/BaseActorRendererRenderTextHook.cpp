@@ -10,12 +10,9 @@ void BaseActorRendererRenderTextHook::drawLogo(ScreenContext* screenContext, con
     std::string clearedName = String::removeNonAlphanumeric(String::removeColorCodes(nameTag));
     if (clearedName.empty()) clearedName = String::removeColorCodes(nameTag); // nametag might contain some unclearable stuff
 
-    if (!contains(APIUtils::onlineUsers, clearedName)) return;
-
     if (MaterialUtils::getUITextured() == nullptr)
         MaterialUtils::update();
 
-    ResourceLocation loc(Utils::getAssetsPath() + "\\red-logo.png", true);
     // maintaining the old structure below, can be used in future
     /*static std::map<std::string, std::string> roleLogos = {
                 {"Dev", "dev-logo.png"},
@@ -32,18 +29,25 @@ void BaseActorRendererRenderTextHook::drawLogo(ScreenContext* screenContext, con
         {"Supporter", "supporter-logo.png"},
         {"Regular", "red-logo.png"}
     };
+
+    std::optional<ResourceLocation> loc{};
+
     for (const auto& [role, logo] : roleLogos) {
         if (APIUtils::hasRole(role, clearedName)) {
-            loc = { Utils::getAssetsPath() + "\\" + logo, true };
+            loc.emplace(Utils::getAssetsPath() + "\\" + logo, true);
             break;
         }
+    }
+
+    if (!loc) {
+        return;
     }
 
     if (!SDK::clientInstance->getMinecraftGame()->textureGroup) {
         return;
     }
 
-    TexturePtr ptr = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc, false);
+    TexturePtr ptr = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(*loc, false);
 
     if(ptr.clientTexture == nullptr || ptr.clientTexture->clientTexture.resourcePointerBlock == nullptr)
         return;

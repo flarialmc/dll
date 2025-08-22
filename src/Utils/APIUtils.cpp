@@ -11,7 +11,7 @@
 #include "SDK/SDK.hpp"
 
 std::vector<std::string> APIUtils::onlineUsers;
-std::map<std::string, std::string> APIUtils::onlineVips;
+std::map<std::string, std::string> APIUtils::vipUserToRole;
 
 
 size_t WriteCallback(void* contents, size_t size, size_t nmemb, std::string* output) {
@@ -299,15 +299,17 @@ nlohmann::json APIUtils::getUsers() {
 }
 
 bool APIUtils::hasRole(const std::string& role, const std::string& name) {
-    try {
-        auto it = onlineVips.find(name);
-        bool onlineVip = it != onlineVips.end() && it->second == role;
-        bool online = std::find(onlineUsers.begin(), onlineUsers.end(), name) != onlineUsers.end();
-        return onlineVip || (!onlineVip && online && role == "Regular");
-    } catch (const std::exception& e) {
-        LOG_ERROR("An error occurred while checking roles: {}", e.what());
-        return false;
+    const auto vipIt = vipUserToRole.find(name);
+    const auto isVip = (vipIt != vipUserToRole.cend()) && (vipIt->second == role);
+
+    if (isVip) {
+        return true;
     }
+
+    const auto onlineIt = std::ranges::find(onlineUsers, name);
+    const auto isOnline = (onlineIt != onlineUsers.cend());
+
+    return isOnline && (role == "Regular");
 }
 
 std::vector<std::string> APIUtils::ListToVector(const std::string& commandListStr) {

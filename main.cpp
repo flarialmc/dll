@@ -128,7 +128,7 @@ DWORD WINAPI init() {
                 }
 
                 if (!updatedVips.empty()) {
-                    APIUtils::onlineVips = std::move(updatedVips);
+                    APIUtils::vipUserToRole = std::move(updatedVips);
                 }
                 lastVipFetchTime = now;
             } catch (const std::exception& e) {

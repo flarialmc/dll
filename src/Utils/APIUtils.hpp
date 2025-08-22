@@ -5,7 +5,7 @@
 class APIUtils {
   public:
   static std::vector<std::string> onlineUsers;
-  static std::map<std::string, std::string> onlineVips;
+  static std::map<std::string, std::string> vipUserToRole;
 
   static std::pair<long, std::string> POST_Simple(const std::string &url, const std::string &postData);
 
