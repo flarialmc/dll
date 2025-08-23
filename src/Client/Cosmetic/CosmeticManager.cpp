@@ -1,4 +1,5 @@
 #include "CosmeticManager.hpp"
+#include "../Capes/CapeManager.hpp"
 
 
 #include "Cosmetics/FlarialBandanna/FlarialBandanna.hpp"

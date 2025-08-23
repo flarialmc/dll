@@ -109,6 +109,15 @@ void SendPacketHook::receiveCallbackPlayerSkin(void *packetHandlerDispatcher, vo
         receivePacketPlayerSkinOriginal(packetHandlerDispatcher, networkIdentifier, netEventCallback, packet);
 }
 
+void SendPacketHook::receiveCallbackPlayerList(void *packetHandlerDispatcher, void *networkIdentifier, void *netEventCallback,
+                                                    const std::shared_ptr<Packet>& packet) {
+    Logger::debug("Recieved packet from player list");
+    SendPacketHook::setVariables(packetHandlerDispatcher, networkIdentifier, netEventCallback);
+    auto event = nes::make_holder<PacketEvent>(packet.get());
+    eventMgr.trigger(event);
+    if (!event->isCancelled())
+        receivePacketPLayerListOriginal(packetHandlerDispatcher, networkIdentifier, netEventCallback, packet);
+}
 
 void SendPacketHook::enableHook() {
     /*for (int num = 1; num <= (int)MinecraftPacketIds::PacketViolationWarning; num++) {
@@ -159,6 +168,10 @@ void SendPacketHook::enableHook() {
     std::shared_ptr<Packet> SkinPacket = SDK::createPacket((int) MinecraftPacketIds::PlayerSkin);
     Memory::hookFunc((void *) SkinPacket->packetHandler->vTable[1], (void *)receiveCallbackPlayerSkin,
                      (void **) &receivePacketPlayerSkinOriginal, "ReceivePacketHook");
+
+    std::shared_ptr<Packet> PlayerListPacket = SDK::createPacket((int) MinecraftPacketIds::PlayerList);
+    Memory::hookFunc((void *) PlayerListPacket->packetHandler->vTable[1], (void *)receiveCallbackPlayerList,
+                     (void **) &receivePacketPLayerListOriginal, "ReceivePacketHook");
 
     this->autoHook((void *) callback, (void **) &sendPacketOriginal);
 }

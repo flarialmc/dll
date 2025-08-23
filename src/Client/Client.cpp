@@ -16,6 +16,7 @@
 #include <winrt/Windows.Foundation.Collections.h>
 #include <winrt/Windows.Foundation.h>
 
+#include "Capes/CapeManager.hpp"
 #include "Utils/APIUtils.hpp"
 #include "Cosmetic/CosmeticManager.hpp"
 
@@ -319,6 +320,9 @@ void Client::initialize() {
 	ScriptManager::initialize();
 
 	CosmeticManager::Initialize();
+
+	CapeManager Capes;
+	Capes.Init();
 
 	Client::PerformPostLegacySetup();
 }
