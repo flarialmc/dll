@@ -117,6 +117,8 @@ public:
 	D2D_COLOR_F getColor(std::string text);
 	D2D_COLOR_F getColor(std::string text, std::string mod);
 
+	static void initSettingsPage();
+
 	void resetPadding();
 	void extraPadding();
 	void addElementText(std::string text, std::string subtext = "");

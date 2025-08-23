@@ -23,6 +23,19 @@ D2D_COLOR_F Module::getColor(std::string text, std::string mod) {
     D2D_COLOR_F col = lol->getOps<bool>(text + "RGB") ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(lol->getOps<std::string>(text + "Col"));
     col.a = lol->getOps<float>(text + "Opacity");
     return col;
+}
+
+void Module::initSettingsPage() {
+    float x = Constraints::PercentageConstraint(0.019, "left");
+    float y = Constraints::PercentageConstraint(0.10, "top");
+
+    const float scrollviewWidth = Constraints::RelativeConstraint(0.5, "height", true);
+
+
+    FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
+    FlarialGUI::SetScrollView(x, Constraints::PercentageConstraint(0.00, "top"),
+                              Constraints::RelativeConstraint(1.0, "width"),
+                              Constraints::RelativeConstraint(0.88f, "height"));
 };
 
 void Module::normalRenderCore(int index, std::string &text) {
@@ -317,7 +330,6 @@ void Module::addElementText(std::string text, std::string subtext) {
     FlarialGUI::FlarialTextWithFont(x, y, FlarialGUI::to_wide(text).c_str(), 200, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize, DWRITE_FONT_WEIGHT_MEDIUM, textCol, false);
 
     if (!subtext.empty()) {
-
         std::vector<std::string> lines;
         std::stringstream ss(subtext);
         std::string line;

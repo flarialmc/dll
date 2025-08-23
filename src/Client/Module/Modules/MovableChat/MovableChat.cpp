@@ -44,16 +44,7 @@ void MovableChat::defaultConfig() {
 }
 
 void MovableChat::settingsRender(float settingsOffset) {
-    float x = Constraints::PercentageConstraint(0.019, "left");
-    float y = Constraints::PercentageConstraint(0.10, "top");
-
-    const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
-
-
-    FlarialGUI::ScrollBar(x, y, 140, 5000, 2);
-    FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
-                              Constraints::RelativeConstraint(1.0, "width"),
-                              Constraints::RelativeConstraint(0.88f, "height"));
+    initSettingsPage();
 
     this->addHeader("Movable Chat");
     this->addToggle("Ping Sound", "Plays a sound when you're mentioned in the chat.", "pingsound");
