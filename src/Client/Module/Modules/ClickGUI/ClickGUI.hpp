@@ -264,7 +264,7 @@ public:
         addColorPicker("Disabled", "", "modCardDisabled");
         addColorPicker("Primary 1", "Active elements, main color of sliders, bg color of enabled toggles", "primary1");
         addColorPicker("Primary 2", "Minor color of toggles and sliders, text Indicator color", "primary2");
-        addColorPicker("Primary 3", "Color of inactive elements, unfilled slider bar color, inner color of color pickers, background color of disabled toggles", "primary3");
+        addColorPicker("Primary 3", "Color of inactive elements, unfilled slider bar color, inner color of color\npickers, background color of disabled toggles", "primary3");
         addColorPicker("Primary 4", "Base color of color pickers, hover color of dropdown childrens", "primary4");
         addColorPicker("Secondary 1", "Background color of settings", "secondary1");
         addColorPicker("Secondary 2", "Background color of navigation bar, tooltips, and buttons", "secondary2");
