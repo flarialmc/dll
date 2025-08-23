@@ -193,6 +193,9 @@ public:
         setDef("editmenubind", (std::string) "L");
         setDef("custom_logo", false);
         setDef("globalText", (std::string) "ffffff", 1.f, false);
+        setDef("headerText", (std::string)"ffffff", 1.f, false);
+        setDef("settingsText", (std::string)"ffffff", 1.f, false);
+        setDef("settingsSubtext", (std::string)"473b3d", 1.f, false);
         setDef("modNameText", (std::string) "8b767a", 1.f, false);
         setDef("modCardEnabled", (std::string) "188830", 1.f, false);
         setDef("modCardDisabled", (std::string) "7d1820", 1.f, false);
@@ -253,6 +256,9 @@ public:
         addColorPicker("Radio Button Icon Disabled", "", "enabledRadioButton");
         addColorPicker("Radio Button Icon Enabled", "", "disabledRadioButton");
         addColorPicker("Text Color", "", "globalText");
+        addColorPicker("Header Text", "", "headerText");
+        addColorPicker("Settings Text", "", "settingsText");
+        addColorPicker("Settings Subtext", "", "settingsSubtext");
         addColorPicker("Module Name Text Color", "", "modNameText");
         addColorPicker("Enabled", "", "modCardEnabled");
         addColorPicker("Disabled", "", "modCardDisabled");
