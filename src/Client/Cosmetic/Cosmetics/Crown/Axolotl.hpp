@@ -23,6 +23,6 @@ public:
         ResourceLocation loc4(Utils::getClientPath() + "\\Cosmetics\\AxolotlHat\\texture.png", true);
         TexturePtr ptr4 = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc4, false);
         SDK::scn = event.screenContext;
-        model->render(event.screenContext, *ptr4.clientTexture.get(), Vec3<float>(), Vec3<float>(0, 0, 0), Vec3<float>(1, 1, 1), true);
+        model->render(event.screenContext, ptr4, Vec3<float>(), Vec3<float>(0, 0, 0), Vec3<float>(1, 1, 1), true);
     }
 };

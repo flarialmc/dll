@@ -174,7 +174,7 @@ namespace cosmetic {
 
 
 
-	void JsonModel::render(ScreenContext* screenContext, BedrockTextureData texture, const Vec3<float>& position, const Vec3<float>& rotation, const Vec3<float>& scale, bool renderInsideFaces) {
+	void JsonModel::render(ScreenContext* screenContext, TexturePtr texture, const Vec3<float>& position, const Vec3<float>& rotation, const Vec3<float>& scale, bool renderInsideFaces) {
 		Tessellator* t = screenContext->getTessellator();
 		const Vec3<float> prevScale = t->getPostScaleOffset();
 		Vec3<float> renderOrigin = SDK::clientInstance->getLevelRender()->getOrigin().mul(-1.f);
@@ -221,7 +221,7 @@ namespace cosmetic {
 		modelAABB.upper.y = modelAabbStop.y;
 		modelAABB.upper.z = modelAabbStop.z;
 
-		MeshHelpers::renderMeshImmediately2(screenContext, t, MaterialUtils::getSelectionOverlay(), texture);
+		MeshHelpers::renderMeshImmediately2(screenContext, t, MaterialUtils::getSelectionOverlay(), *texture.clientTexture.get());
 
 		t->setPostScaleOffset(prevScale);
 

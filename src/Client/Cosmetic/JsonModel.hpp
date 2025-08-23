@@ -47,7 +47,7 @@ namespace cosmetic {
 
 
 		JsonBone* getBone(const std::string& name);
-		void render(ScreenContext* ctx, BedrockTextureData tex, const Vec3<float>& pos, const Vec3<float>& rot, const Vec3<float>& scl, bool drawInnerFaces);
+		void render(ScreenContext* ctx, TexturePtr tex, const Vec3<float>& pos, const Vec3<float>& rot, const Vec3<float>& scl, bool drawInnerFaces);
 
 	private:
 		void ComputeAABB();
