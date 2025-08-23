@@ -193,6 +193,9 @@ public:
         setDef("editmenubind", (std::string) "L");
         setDef("custom_logo", false);
         setDef("globalText", (std::string) "ffffff", 1.f, false);
+        setDef("headerText", (std::string)"ffffff", 1.f, false);
+        setDef("settingsText", (std::string)"ffffff", 1.f, false);
+        setDef("settingsSubtext", (std::string)"473b3d", 1.f, false);
         setDef("modNameText", (std::string) "8b767a", 1.f, false);
         setDef("modCardEnabled", (std::string) "188830", 1.f, false);
         setDef("modCardDisabled", (std::string) "7d1820", 1.f, false);
@@ -223,15 +226,7 @@ public:
     void settingsRender(float settingsOffset) override {
         if (getOps<std::string>("editmenubind").empty()) getOps<std::string>("editmenubind") = "L";
 
-        float x = Constraints::PercentageConstraint(0.019, "left");
-        float y = Constraints::PercentageConstraint(0.10, "top");
-
-        const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
-
-        FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
-        FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
-                                  Constraints::RelativeConstraint(1.0, "width"),
-                                  Constraints::RelativeConstraint(0.88f, "height"));
+        initSettingsPage();
 
         this->addHeader("Keybinds");
         this->addKeybind("Open Menu Bind", "", "keybind", true);
@@ -253,12 +248,15 @@ public:
         addColorPicker("Radio Button Icon Disabled", "", "enabledRadioButton");
         addColorPicker("Radio Button Icon Enabled", "", "disabledRadioButton");
         addColorPicker("Text Color", "", "globalText");
+        addColorPicker("Header Text", "", "headerText");
+        addColorPicker("Settings Text", "", "settingsText");
+        addColorPicker("Settings Subtext", "", "settingsSubtext");
         addColorPicker("Module Name Text Color", "", "modNameText");
         addColorPicker("Enabled", "", "modCardEnabled");
         addColorPicker("Disabled", "", "modCardDisabled");
         addColorPicker("Primary 1", "Active elements, main color of sliders, bg color of enabled toggles", "primary1");
         addColorPicker("Primary 2", "Minor color of toggles and sliders, text Indicator color", "primary2");
-        addColorPicker("Primary 3", "Color of inactive elements, unfilled slider bar color, inner color of color pickers, background color of disabled toggles", "primary3");
+        addColorPicker("Primary 3", "Color of inactive elements, unfilled slider bar color, inner color of color\npickers, background color of disabled toggles", "primary3");
         addColorPicker("Primary 4", "Base color of color pickers, hover color of dropdown childrens", "primary4");
         addColorPicker("Secondary 1", "Background color of settings", "secondary1");
         addColorPicker("Secondary 2", "Background color of navigation bar, tooltips, and buttons", "secondary2");

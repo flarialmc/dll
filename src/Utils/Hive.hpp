@@ -225,13 +225,14 @@ namespace Hive {
 
         int maxXP = xpTable[max];
 
-        int prestige = xp / maxXP;
-        int remainder = xp % maxXP;
-
-        auto it = std::upper_bound(xpTable.begin(), xpTable.end(), remainder);
-        int level = static_cast<int>(it - xpTable.begin()) - 1;
-
-        return prestige * max + level;
+        if (xp >= maxXP) {
+            return max;
+        }
+        else {
+            auto it = std::upper_bound(xpTable.begin(), xpTable.end(), xp);
+            int level = static_cast<int>(it - xpTable.begin()) - 1;
+            return level;
+        }
     }
 
     inline Hive::PlayerStats GetStats(const std::string &gameId, const std::string &username) {
