@@ -28,7 +28,7 @@ public:
         if (imageFileSize == 0) return Image();
 
         int width, height, channels;
-        unsigned char* image_data = stbi_load_from_memory(pImageFile, imageFileSize, &width, &height, &channels, 4)
+        unsigned char* image_data = stbi_load_from_memory(pImageFile, imageFileSize, &width, &height, &channels, 4);
 
         std::vector<unsigned char> rgba_data(image_data, image_data + (width * height * 4));
         stbi_image_free(image_data);
