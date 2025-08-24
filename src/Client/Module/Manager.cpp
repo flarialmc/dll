@@ -117,6 +117,8 @@
 #include "Modules/ChunkBorder/ChunkBorder.hpp"
 #include "Modules/CompactChat/CompactChat.hpp"
 #include "Modules/MessageLogger/MessageLogger.hpp"
+#include "Modules/TotemCounter/TotemCounter.hpp"
+
 #ifdef COMPILE_DOOM
 	#include "Modules/Doom/Doom.hpp"
 #endif
@@ -281,6 +283,8 @@ void ModuleManager::initialize() {
 	addModule<ChunkBorder>();
 	addModule<CompactChat>();
 	addModule<MessageLogger>();
+	addModule<TotemCounter>();
+
 #ifdef COMPILE_DOOM
 	addModule<DoomModule>();
 #endif
