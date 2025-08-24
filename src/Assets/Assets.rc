@@ -92,6 +92,7 @@ IDR_KEYSTROKES_PNG            PNG "Data\\keystrokes.png"
 IDR_CHUNKBORDER_PNG           PNG "Data\\chunkborder.png"
 IDR_SUBTITLES_PNG             PNG "Data\\subtitles.png"
 IDR_TOTEM_PNG                 PNG "Data\\totem.png"
+IDR_BETTERHUNGERBAR_PNG       PNG "Data\\betterhungerbar.png"
 
 IDR_FREEZEENGINE_PNG          PNG "Data\\freezeengine.png"
 IDR_STONEHUNTER_PNG           PNG "Data\\stonehunter.png"
