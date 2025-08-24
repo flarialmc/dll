@@ -302,7 +302,7 @@ bool APIUtils::hasRole(std::string_view role, std::string_view name) {
         return true;
     }
 
-    const auto isOnline = (onlineUsersSet.find(name) != onlineUsersSet.cend());
+    const auto isOnline = onlineUsersSet.contains(name);
     return isOnline && (role == "Regular");
 }
 
