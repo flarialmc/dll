@@ -21,20 +21,20 @@ void BaseActorRendererRenderTextHook::drawLogo(ScreenContext* screenContext, con
                 {"Booster", "booster-logo.png"},
                 {"Regular", "red-logo.png"}
         };*/
-    static std::vector<std::pair<std::string, std::string>> roleLogos = {
+    constexpr auto roleLogos = std::to_array<std::pair<std::string_view, std::string_view>>({
         {"Dev", "dev-logo.png"},
         {"Staff", "white-logo.png"},
         {"Gamer", "gamer-logo.png"},
         {"Booster", "booster-logo.png"},
         {"Supporter", "supporter-logo.png"},
         {"Regular", "red-logo.png"}
-    };
+    });
 
     std::optional<ResourceLocation> loc{};
 
     for (const auto& [role, logo] : roleLogos) {
         if (APIUtils::hasRole(role, clearedName)) {
-            loc.emplace(Utils::getAssetsPath() + "\\" + logo, true);
+            loc.emplace(std::format("{}{}{}", Utils::getAssetsPath(), "\\", logo), true);
             break;
         }
     }

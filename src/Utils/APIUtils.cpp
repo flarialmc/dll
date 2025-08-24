@@ -10,10 +10,6 @@
 
 #include "SDK/SDK.hpp"
 
-std::vector<std::string> APIUtils::onlineUsers;
-std::map<std::string, std::string> APIUtils::vipUserToRole;
-
-
 size_t WriteCallback(void* contents, size_t size, size_t nmemb, std::string* output) {
     size_t totalSize = size * nmemb;
     output->append(static_cast<char*>(contents), totalSize);
@@ -298,7 +294,7 @@ nlohmann::json APIUtils::getUsers() {
     }
 }
 
-bool APIUtils::hasRole(const std::string& role, const std::string& name) {
+bool APIUtils::hasRole(std::string_view role, std::string_view name) {
     const auto vipIt = vipUserToRole.find(name);
     const auto isVip = (vipIt != vipUserToRole.cend()) && (vipIt->second == role);
 
@@ -306,9 +302,7 @@ bool APIUtils::hasRole(const std::string& role, const std::string& name) {
         return true;
     }
 
-    const auto onlineIt = std::ranges::find(onlineUsers, name);
-    const auto isOnline = (onlineIt != onlineUsers.cend());
-
+    const auto isOnline = (onlineUsersSet.find(name) != onlineUsersSet.cend());
     return isOnline && (role == "Regular");
 }
 

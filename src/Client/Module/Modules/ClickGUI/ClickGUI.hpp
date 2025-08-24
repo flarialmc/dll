@@ -54,6 +54,7 @@ public:
     static float inline accumilatedBarPos = 1;
     static bool inline isAnimatingModSet = false;
     static std::chrono::time_point<std::chrono::high_resolution_clock> favoriteStart;
+    static constexpr uint8_t section1stPart{ 0xC2 }, section2ndPart{ 0xA7 };
 
     static inline D2D_COLOR_F getColor(std::string text) {
         D2D_COLOR_F col = clickgui->settings.getSettingByName<bool>(text + "RGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>(text + "Col")->value);
@@ -61,26 +62,33 @@ public:
         return col;
     }
 
-    static bool containsAny(const std::string &str) {
-        return std::any_of(APIUtils::onlineUsers.begin(), APIUtils::onlineUsers.end(),
-                           [&](const std::string &user) {
-                               return !user.empty() && str.find(user) != std::string::npos;
-                           });
-    }
-
-    std::pair<std::string, size_t> findFirstOf(std::string text, std::vector<std::string> words) {
-        size_t first_pos = std::string::npos;
-        std::string first;
-
-        for (const auto &word: words) {
-            size_t pos = text.find(word);
-            if (pos != std::string::npos && pos < first_pos) {
-                first_pos = pos;
-                first = word;
+    std::optional<std::pair<std::string_view /*name*/, size_t /*text index*/>> findFirstOf(std::string_view text, auto&& words) {
+        for (auto&& w : words) {
+            if (const auto pos = text.find(w); pos != std::string::npos) {
+                return std::pair{ std::string_view{ text.data() + pos, w.length() }, pos };
             }
         }
-        std::pair<std::string, size_t> pair{first, first_pos};
-        return pair;
+        return {};
+    }
+
+    size_t sanitizedToRawIndex(std::string_view raw, size_t sanIdx) {
+        size_t rawIdx = 0, visible = 0;
+
+        while ((rawIdx < raw.length()) && (visible < sanIdx)) {
+            const auto b0 = static_cast<uint8_t>(raw[rawIdx]);
+            if (
+                ((rawIdx + 2) < raw.length()) &&
+                (b0 == section1stPart) &&
+                (static_cast<uint8_t>(raw[rawIdx + 1]) == section2ndPart)
+                ) {
+                rawIdx += 3; // skip section symbol (2 bytes) + 1 code byte
+                continue;
+            }
+            ++rawIdx;
+            ++visible;
+        }
+
+        return rawIdx; // raw insertion point corresponding to sanitized index
     }
 
     void onPacketReceive(PacketEvent &event) {
@@ -89,44 +97,52 @@ public:
         std::string message = pkt->message;
         if (message == " ") event.cancel(); //remove onix promotion on zeqa
         if (Client::settings.getSettingByName<bool>("nochaticon")->value) return;
-        if (!message.empty() && !containsAny(String::removeNonAlphanumeric(String::removeColorCodes(message)))) return;
 
-        std::pair<std::string, size_t> name = findFirstOf(message, APIUtils::onlineUsers);
+        std::optional<std::string> prefix{};
+        const auto sanitizedMsg = String::removeColorCodes(message);
+        auto data = findFirstOf(sanitizedMsg, std::views::keys(APIUtils::vipUserToRole)); // std::views::concat with APIUtils::onlineUsers
+        if (!data) {
+            data = findFirstOf(sanitizedMsg, APIUtils::onlineUsers);
+        }
 
-        static std::vector<std::pair<std::string, std::string> > roleColors = {
+        if (!data) {
+            return;
+        }
+
+        constexpr auto roleColors = std::to_array<std::pair<std::string_view, std::string_view>>({
             {"Dev", "§b"},
             {"Staff", "§f"},
             {"Gamer", "§u"},
             {"Booster", "§d"},
             {"Supporter", "§5"},
             {"Regular", "§4"}
-        };
-
-        std::string prefix = "§f[§4FLARIAL§f]§r ";
+        });
 
         for (const auto &[role, color]: roleColors) {
-            if (APIUtils::hasRole(role, name.first)) {
-                prefix = "§f[" + color + "FLARIAL§f]§r ";
+            if (APIUtils::hasRole(role, data->first)) {
+                prefix.emplace(std::format("{}{}{}", "§f[", color, "FLARIAL§f]§r "));
                 break;
             }
         }
 
-        if (name.second < message.size()) {
+        if (prefix) {
+            const auto rawIdx = sanitizedToRawIndex(message, data->second);
+            std::string formats{};
 
-            std::string formats;
-            for (size_t i = 0; i + 3 <= name.second; ++i) {
+            for (size_t i = 0; ((i + 2) <= rawIdx) && ((i + 2) <= message.length()); ++i) {
                 if (
-                    (i < name.second) &&
-                    (static_cast<unsigned char>(message[i]) == 0xC2) &&
-                    (static_cast<unsigned char>(message[i + 1]) == 0xA7)
-                ) {
-                    formats += message.substr(i, 3);
-                    i += 2;
+                    (static_cast<uint8_t>(message[i]) == section1stPart) &&
+                    (static_cast<uint8_t>(message[i + 1]) == section2ndPart)
+                    ) {
+                    if ((i + 2) < message.size()) {
+                        formats.append(message, i, 3);
+                        i += 2;
+                    }
                 }
             }
 
-            message.insert(name.second, prefix + formats);
-            pkt->message = message;
+            message.insert(rawIdx, *prefix + formats);
+            pkt->message = std::move(message);
         }
     }
 
