@@ -54,62 +54,10 @@ public:
     static float inline accumilatedBarPos = 1;
     static bool inline isAnimatingModSet = false;
     static std::chrono::time_point<std::chrono::high_resolution_clock> favoriteStart;
+
     static constexpr uint8_t section1stPart{ 0xC2 }, section2ndPart{ 0xA7 };
 
-    static inline D2D_COLOR_F getColor(std::string text) {
-        D2D_COLOR_F col = clickgui->settings.getSettingByName<bool>(text + "RGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>(text + "Col")->value);
-        col.a = clickgui->settings.getSettingByName<float>(text + "Opacity")->value;
-        return col;
-    }
-
-    std::optional<std::pair<std::string_view /*name*/, size_t /*text index*/>> findFirstOf(std::string_view text, auto&& words) {
-        for (auto&& w : words) {
-            if (const auto pos = text.find(w); pos != std::string::npos) {
-                return std::pair{ std::string_view{ text.data() + pos, w.length() }, pos };
-            }
-        }
-        return {};
-    }
-
-    size_t sanitizedToRawIndex(std::string_view raw, size_t sanIdx) {
-        size_t rawIdx = 0, visible = 0;
-
-        while ((rawIdx < raw.length()) && (visible < sanIdx)) {
-            const auto b0 = static_cast<uint8_t>(raw[rawIdx]);
-            if (
-                ((rawIdx + 2) < raw.length()) &&
-                (b0 == section1stPart) &&
-                (static_cast<uint8_t>(raw[rawIdx + 1]) == section2ndPart)
-                ) {
-                rawIdx += 3; // skip section symbol (2 bytes) + 1 code byte
-                continue;
-            }
-            ++rawIdx;
-            ++visible;
-        }
-
-        return rawIdx; // raw insertion point corresponding to sanitized index
-    }
-
-    void onPacketReceive(PacketEvent &event) {
-        if (event.getPacket()->getId() != MinecraftPacketIds::Text) return;
-        auto *pkt = reinterpret_cast<TextPacket *>(event.getPacket());
-        std::string message = pkt->message;
-        if (message == " ") event.cancel(); //remove onix promotion on zeqa
-        if (Client::settings.getSettingByName<bool>("nochaticon")->value) return;
-
-        std::optional<std::string> prefix{};
-        const auto sanitizedMsg = String::removeColorCodes(message);
-        auto data = findFirstOf(sanitizedMsg, std::views::keys(APIUtils::vipUserToRole)); // std::views::concat with APIUtils::onlineUsers
-        if (!data) {
-            data = findFirstOf(sanitizedMsg, APIUtils::onlineUsers);
-        }
-
-        if (!data) {
-            return;
-        }
-
-        constexpr auto roleColors = std::to_array<std::pair<std::string_view, std::string_view>>({
+    static constexpr auto roleColors = std::to_array<std::pair<std::string_view, std::string_view>>({
             {"Dev", "§b"},
             {"Staff", "§f"},
             {"Gamer", "§u"},
@@ -118,33 +66,26 @@ public:
             {"Regular", "§4"}
         });
 
-        for (const auto &[role, color]: roleColors) {
-            if (APIUtils::hasRole(role, data->first)) {
-                prefix.emplace(std::format("{}{}{}", "§f[", color, "FLARIAL§f]§r "));
-                break;
-            }
-        }
-
-        if (prefix) {
-            const auto rawIdx = sanitizedToRawIndex(message, data->second);
-            std::string formats{};
-
-            for (size_t i = 0; ((i + 2) <= rawIdx) && ((i + 2) <= message.length()); ++i) {
-                if (
-                    (static_cast<uint8_t>(message[i]) == section1stPart) &&
-                    (static_cast<uint8_t>(message[i + 1]) == section2ndPart)
-                    ) {
-                    if ((i + 2) < message.size()) {
-                        formats.append(message, i, 3);
-                        i += 2;
-                    }
-                }
-            }
-
-            message.insert(rawIdx, *prefix + formats);
-            pkt->message = std::move(message);
-        }
+    static inline D2D_COLOR_F getColor(std::string text) {
+        D2D_COLOR_F col = clickgui->settings.getSettingByName<bool>(text + "RGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>(text + "Col")->value);
+        col.a = clickgui->settings.getSettingByName<float>(text + "Opacity")->value;
+        return col;
     }
+
+private:
+    std::optional<std::pair<std::string_view /*first word match*/, size_t /*text index*/>> findFirstOf(std::string_view text, auto&& words) {
+        for (auto&& w : words) {
+            if (const auto pos = text.find(w); pos != std::string::npos) {
+                return std::pair{ std::string_view{ text.data() + pos, w.length() }, pos };
+            }
+        }
+        return {};
+    }
+
+    size_t sanitizedToRawIndex(std::string_view raw, size_t sanIdx);
+
+public:
+    void onPacketReceive(PacketEvent& event);
 
     ClickGUI() : Module("ClickGUI", "What do you think it is?", IDR_CLICKGUI_PNG, "K") {
         this->ghostMainModule = new Module("main", "troll", IDR_COMBO_PNG, "");
