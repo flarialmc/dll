@@ -1,33 +1,33 @@
-#include "ArrowCounter.hpp"
+#include "TotemCounter.hpp"
 
 #include "Events/EventManager.hpp"
 #include "Events/Game/TickEvent.hpp"
 
 
-void ArrowCounter::onEnable() {
-    Listen(this, TickEvent, &ArrowCounter::onTick)
-    Listen(this, RenderEvent, &ArrowCounter::onRender)
+void TotemCounter::onEnable() {
+    Listen(this, TickEvent, &TotemCounter::onTick)
+    Listen(this, RenderEvent, &TotemCounter::onRender)
     Module::onEnable();
 }
 
-void ArrowCounter::onDisable() {
-    Deafen(this, TickEvent, &ArrowCounter::onTick)
-    Deafen(this, RenderEvent, &ArrowCounter::onRender)
+void TotemCounter::onDisable() {
+    Deafen(this, TickEvent, &TotemCounter::onTick)
+    Deafen(this, RenderEvent, &TotemCounter::onRender)
     Module::onDisable();
 }
 
-void ArrowCounter::defaultConfig() {
-    setDef("text", (std::string)"Arrows: {value}");
-    setDef("onlyRenderWhenHoldingBowOrCrossbow", false);
+void TotemCounter::defaultConfig() {
+    setDef("text", (std::string)"Totems: {value}");
+    setDef("onlyRenderWhenHoldingTotem", false);
     Module::defaultConfig("all");
 
 }
 
-void ArrowCounter::settingsRender(float settingsOffset) {
+void TotemCounter::settingsRender(float settingsOffset) {
     initSettingsPage();
 
-    addHeader("Arrow Counter");
-    addToggle("Only render when holding bow or crossbow", "", "onlyRenderWhenHoldingBowOrCrossbow");
+    addHeader("Totem Counter");
+    addToggle("Only render when holding totem.", "", "onlyRenderWhenHoldingTotem");
     defaultAddSettings("main");
     extraPadding();
 
@@ -46,7 +46,7 @@ void ArrowCounter::settingsRender(float settingsOffset) {
     resetPadding();
 }
 
-void ArrowCounter::onTick(TickEvent& event) {
+void TotemCounter::onTick(TickEvent& event) {
     if (!this->isEnabled()) return;
     if (!SDK::hasInstanced || SDK::clientInstance == nullptr) return;
 
@@ -59,9 +59,8 @@ void ArrowCounter::onTick(TickEvent& event) {
 
     if (SDK::getCurrentScreen() != "hud_screen") return;
 
-    // Only render when holding bow or crossbow if setting is enabled
     shouldRender = true;
-    if (getOps<bool>("onlyRenderWhenHoldingBowOrCrossbow")) {
+    if (getOps<bool>("onlyRenderWhenHoldingTotem")) {
 
         auto selectedSlot = supplies->getSelectedSlot();
         auto itemStack = inventory->getItem(selectedSlot);
@@ -70,44 +69,43 @@ void ArrowCounter::onTick(TickEvent& event) {
             shouldRender = false;
         } else {
             auto itemName = itemStack->getItem()->name;
-            shouldRender = (itemName == "bow" || itemName == "crossbow");
+            shouldRender = (itemName == "totem_of_undying");
         }
     }
 
     if (shouldRender) {
 
-        // Cache arrow count by updating every 4 ticks
         tickCounter++;
         if (tickCounter % 4 == 0) {
 
-            auto arrowsCount = 0;
+            auto totemsCount = 0;
             auto offhandItem = player->getOffhandSlot();
 
-            if (offhandItem && offhandItem->getItem() && offhandItem->getItem()->name == "arrow") {
-                arrowsCount = offhandItem->count;
+            if (offhandItem && offhandItem->getItem() && offhandItem->getItem()->name == "totem_of_undying") {
+                totemsCount = offhandItem->count;
             }
 
             for (int i = 0; i < 36; i++) {
                 auto item = inventory->getItem(i);
 
                 if (item->getItem() != nullptr) {
-                    if (item->getItem()->name == "arrow") {
-                        arrowsCount += item->count;
+                    if (item->getItem()->name == "totem_of_undying") {
+                        totemsCount += item->count;
                     }
 
                 }
             }
 
-            lastArrowCount = arrowsCount;
+            lastTotemCount = totemsCount;
         }
 
-        arrows = lastArrowCount;
+        totems = lastTotemCount;
     }
 }
 
-void ArrowCounter::onRender(RenderEvent& event) {
+void TotemCounter::onRender(RenderEvent& event) {
     if (!this->isEnabled() || !shouldRender) return;
 
-    auto arrowsStr = FlarialGUI::cached_to_string(arrows);
-    this->normalRender(13, arrowsStr);
+    auto totemsStr = FlarialGUI::cached_to_string(totems);
+    this->normalRender(13, totemsStr);
 }

@@ -8,11 +8,11 @@ namespace mce {
         float a;
 
     public:
-        Color() {
-            this->r = 1;
-            this->g = 1;
-            this->b = 1;
-            this->a = 1;
+        Color(float r = 1.0f, float g = 1.0f, float b = 1.0f, float a = 1.0f) {
+            this->r = r;
+            this->g = g;
+            this->b = b;
+            this->a = a;
         }
     };
 }

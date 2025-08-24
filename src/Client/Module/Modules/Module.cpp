@@ -13,16 +13,29 @@
 static std::string Lname = "";
 
 D2D_COLOR_F Module::getColor(std::string text) {
-    D2D_COLOR_F col = this->settings.getSettingByName<bool>(text + "RGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>(text + "Col")->value);
-    col.a = this->settings.getSettingByName<float>(text + "Opacity")->value;
+    D2D_COLOR_F col = this->getOps<bool>(text + "RGB") ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(this->getOps<std::string>(text + "Col"));
+    col.a = this->getOps<float>(text + "Opacity");
     return col;
 };
 
 D2D_COLOR_F Module::getColor(std::string text, std::string mod) {
     auto lol = ModuleManager::getModule(mod);
-    D2D_COLOR_F col = lol->settings.getSettingByName<bool>(text + "RGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(lol->settings.getSettingByName<std::string>(text + "Col")->value);
-    col.a = lol->settings.getSettingByName<float>(text + "Opacity")->value;
+    D2D_COLOR_F col = lol->getOps<bool>(text + "RGB") ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(lol->getOps<std::string>(text + "Col"));
+    col.a = lol->getOps<float>(text + "Opacity");
     return col;
+}
+
+void Module::initSettingsPage() {
+    float x = Constraints::PercentageConstraint(0.019, "left");
+    float y = Constraints::PercentageConstraint(0.10, "top");
+
+    const float scrollviewWidth = Constraints::RelativeConstraint(0.5, "height", true);
+
+
+    FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
+    FlarialGUI::SetScrollView(x, Constraints::PercentageConstraint(0.00, "top"),
+                              Constraints::RelativeConstraint(1.0, "width"),
+                              Constraints::RelativeConstraint(0.88f, "height"));
 };
 
 void Module::normalRenderCore(int index, std::string &text) {
@@ -273,8 +286,7 @@ void Module::addHeader(std::string text) {
 
     D2D1_COLOR_F col = ClickGUI::getColor("secondary6");
     col.a = ClickGUI::settingsOpacity;
-    D2D1_COLOR_F textCol = D2D1::ColorF(D2D1::ColorF::White);
-    textCol.a = ClickGUI::settingsOpacity;;
+    D2D1_COLOR_F textCol = clickgui->getColor("headerText");
 
     std::string name = FlarialGUI::FlarialTextWithFont(x, y, FlarialGUI::to_wide(text).c_str(), 500, 0, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.215f, "height", true), DWRITE_FONT_WEIGHT_BOLD, textCol, false);
 
@@ -305,10 +317,10 @@ void Module::addElementText(std::string text, std::string subtext) {
         y += Constraints::RelativeConstraint(0.0015f, "height", true);
     }
 
-    D2D1_COLOR_F textCol = D2D1::ColorF(D2D1::ColorF::White);
-    D2D1_COLOR_F subtextCol = FlarialGUI::HexToColorF("473b3d");
-    textCol.a = clickgui->getColor("globalText", "ClickGUI").a * clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value;
-    subtextCol.a = clickgui->getColor("globalText", "ClickGUI").a * clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value;
+    D2D1_COLOR_F textCol = clickgui->getColor("settingsText", "ClickGUI");
+    D2D1_COLOR_F subtextCol = clickgui->getColor("settingsSubtext", "ClickGUI");
+    textCol.a *= clickgui->getOps<float>("_overrideAlphaValues_");
+    subtextCol.a *= clickgui->getOps<float>("_overrideAlphaValues_");
 
     if (ClickGUI::settingsOpacity != 1) {
         textCol.a = ClickGUI::settingsOpacity;
@@ -318,7 +330,6 @@ void Module::addElementText(std::string text, std::string subtext) {
     FlarialGUI::FlarialTextWithFont(x, y, FlarialGUI::to_wide(text).c_str(), 200, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize, DWRITE_FONT_WEIGHT_MEDIUM, textCol, false);
 
     if (!subtext.empty()) {
-
         std::vector<std::string> lines;
         std::stringstream ss(subtext);
         std::string line;
@@ -389,7 +400,7 @@ void Module::addTextBox(std::string text, std::string subtext, int limit, std::s
     float x = Constraints::PercentageConstraint(0.33f, "right");
     float y = Constraints::PercentageConstraint(0.10, "top") + padding;
 
-    std::string &value = settings.getSettingByName<std::string>(settingName)->value;
+    std::string &value = getOps<std::string>(settingName);
 
     FlarialGUI::TextBoxVisual(textboxIndex, value, limit, x, y, "", this->name, settingName);
 
@@ -591,7 +602,7 @@ void Module::addSliderInt(std::string text, std::string subtext, std::string set
     float elementX = Constraints::PercentageConstraint(0.33f, "right");
     float y = Constraints::PercentageConstraint(0.10, "top") + padding;
 
-    int &value = settings.getSettingByName<int>(settingName)->value;
+    int &value = getOps<int>(settingName);
 
     value = std::clamp(value, minVal, maxVal);
 
@@ -621,7 +632,7 @@ void Module::addSlider(std::string text, std::string subtext, std::string settin
     float elementX = Constraints::PercentageConstraint(0.33f, "right");
     float y = Constraints::PercentageConstraint(0.10, "top") + padding;
 
-    float &value = settings.getSettingByName<float>(settingName)->value;
+    float &value = getOps<float>(settingName);
 
     value = std::clamp(value, minVal, maxVal);
 
@@ -1023,11 +1034,11 @@ void Module::checkForRightClickAndOpenSettings(float x, float y, float width, fl
     if (MC::scrollId != _lastScrollId) {
         if (FlarialGUI::CursorInRect(x, y, width, height)) {
             if (MC::lastMouseScroll == MouseAction::ScrollUp) {
-                auto uiscale = this->settings.getSettingByName<float>("uiscale");
+                auto uiscale = settings.getSettingByName<float>("uiscale");
                 if (uiscale != nullptr) uiscale->value = std::min(5.f, uiscale->value + 0.05f);
                 _lastScrollId = MC::scrollId;
             } else {
-                auto uiscale = this->settings.getSettingByName<float>("uiscale");
+                auto uiscale = settings.getSettingByName<float>("uiscale");
                 if (uiscale != nullptr) uiscale->value = std::max(0.01f, uiscale->value - 0.05f);
                 _lastScrollId = MC::scrollId;
             }

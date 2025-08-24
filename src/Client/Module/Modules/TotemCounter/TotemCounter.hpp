@@ -4,18 +4,19 @@
 #include "Events/Game/TickEvent.hpp"
 #include "Events/Render/RenderEvent.hpp"
 
-class ArrowCounter : public Module {
+class TotemCounter : public Module {
+
 private:
 
-	int arrows = 0;
+	int totems = 0;
     bool shouldRender = true;
-    int lastArrowCount = 0;
+    int lastTotemCount = 0;
     int tickCounter = 0;
 
 public:
 
-	ArrowCounter() : Module("Arrow Counter", "Counts how many arrows you have\nin your inventory.",
-		IDR_ARROW_PNG, ""), arrows(0), shouldRender(true), lastArrowCount(0), tickCounter(0) {
+	TotemCounter() : Module("Totem Counter", "Counts how many totems you have\nin your inventory.",
+		IDR_TOTEM_PNG, ""), totems(0), shouldRender(true), lastTotemCount(0), tickCounter(0) {
 		
 	};
 
