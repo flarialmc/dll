@@ -107,5 +107,5 @@ void TotemCounter::onRender(RenderEvent& event) {
     if (!this->isEnabled() || !shouldRender) return;
 
     auto totemsStr = FlarialGUI::cached_to_string(totems);
-    this->normalRender(13, totemsStr);
+    this->normalRender(35, totemsStr);
 }
