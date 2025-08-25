@@ -27,16 +27,29 @@ public:
         bool negativeZ = d(gen);
 
 
-        std::uniform_real_distribution<> disX(0.1, 1);
-        std::uniform_real_distribution<> disZ(0.1, 1);
+        const double inner_radius = 0.5;
+        const double outer_radius = 1.0;
+
+        std::uniform_real_distribution<> angle_dist(0, 2 * M_PI);
+        std::uniform_real_distribution<> radius_dist(0, 1);
+
+        // Generate random angle between 0 and 2*pi
+        double angle = angle_dist(gen);
+
+        // Generate random radius with sqrt to ensure uniform distribution in area
+        double radius = std::sqrt(radius_dist(gen) * (outer_radius * outer_radius - inner_radius * inner_radius) + inner_radius * inner_radius);
+
+        // Calculate x, y coordinates
+        double x = radius * std::cos(angle);
+        double y = radius * std::sin(angle);
         std::uniform_real_distribution<> disY(-2, -1.5);
 
         std::uniform_real_distribution<> disYMax(-0.5, 0);
 
         std::uniform_real_distribution<> disRot(0, 45);
 
-        origin.x = position.x = disX(gen) *  (negativeX ? -1 : 1);
-        origin.z = position.z = disZ(gen) *  (negativeZ ? -1 : 1);
+        origin.x = position.x = x;
+        origin.z = position.z = y;
         origin.y = position.y = disY(gen);
 
         MaxHeight = disYMax(gen);
