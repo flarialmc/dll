@@ -73,7 +73,7 @@ public:
     }
 
 private:
-    std::optional<std::pair<std::string_view /*first word match*/, size_t /*text index*/>> findFirstOf(std::string_view text, auto&& words) {
+    static std::optional<std::pair<std::string_view /*first word match*/, size_t /*text index*/>> findFirstOf(std::string_view text, auto&& words) {
         for (auto&& w : words) {
             if (const auto pos = text.find(w); pos != std::string::npos) {
                 return std::pair{ std::string_view{ text.data() + pos, w.length() }, pos };
@@ -82,7 +82,8 @@ private:
         return {};
     }
 
-    size_t sanitizedToRawIndex(std::string_view raw, size_t sanIdx);
+    static size_t sanitizedToRawIndex(std::string_view raw, size_t sanIdx);
+    static std::string& getMutableTextForWatermark(TextPacket& pkt);
 
 public:
     void onPacketReceive(PacketEvent& event);

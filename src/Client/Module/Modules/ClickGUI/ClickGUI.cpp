@@ -60,15 +60,20 @@ size_t ClickGUI::sanitizedToRawIndex(std::string_view raw, size_t sanIdx) {
     return rawIdx; // raw insertion point corresponding to sanitized index
 }
 
+std::string& ClickGUI::getMutableTextForWatermark(TextPacket& pkt) {
+    return ((pkt.type == TextPacketType::CHAT) && !pkt.name.empty()) ? pkt.name : pkt.message;
+}
+
 void ClickGUI::onPacketReceive(PacketEvent& event) {
     if (event.getPacket()->getId() != MinecraftPacketIds::Text) return;
     auto* pkt = reinterpret_cast<TextPacket*>(event.getPacket());
-    std::string message = pkt->message;
-    if (message == " ") event.cancel(); //remove onix promotion on zeqa
+    if (pkt->message == " ") event.cancel(); //remove onix promotion on zeqa
     if (Client::settings.getSettingByName<bool>("nochaticon")->value) return;
 
+    auto& txt = getMutableTextForWatermark(*pkt);
+
     std::optional<std::string> prefix{};
-    const auto sanitizedMsg = String::removeColorCodes(message);
+    const auto sanitizedMsg = String::removeColorCodes(txt);
     auto data = findFirstOf(sanitizedMsg, std::views::keys(APIUtils::vipUserToRole)); // std::views::concat with APIUtils::onlineUsers
     if (!data) {
         data = findFirstOf(sanitizedMsg, APIUtils::onlineUsers);
@@ -86,23 +91,22 @@ void ClickGUI::onPacketReceive(PacketEvent& event) {
     }
 
     if (prefix) {
-        const auto rawIdx = sanitizedToRawIndex(message, data->second);
+        const auto rawIdx = sanitizedToRawIndex(txt, data->second);
         std::string formats{};
 
-        for (size_t i = 0; ((i + 2) <= rawIdx) && ((i + 2) <= message.length()); ++i) {
+        for (size_t i = 0; ((i + 2) <= rawIdx) && ((i + 2) <= txt.length()); ++i) {
             if (
-                (static_cast<uint8_t>(message[i]) == section1stPart) &&
-                (static_cast<uint8_t>(message[i + 1]) == section2ndPart)
+                (static_cast<uint8_t>(txt[i]) == section1stPart) &&
+                (static_cast<uint8_t>(txt[i + 1]) == section2ndPart)
                 ) {
-                if ((i + 2) < message.length()) {
-                    formats.append(message, i, 3);
+                if ((i + 2) < txt.length()) {
+                    formats.append(txt, i, 3);
                     i += 2;
                 }
             }
         }
 
-        message.insert(rawIdx, *prefix + formats);
-        pkt->message = std::move(message);
+        txt.insert(rawIdx, *prefix + formats);
     }
 }
 
