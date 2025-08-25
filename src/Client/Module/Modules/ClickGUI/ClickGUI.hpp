@@ -55,80 +55,38 @@ public:
     static bool inline isAnimatingModSet = false;
     static std::chrono::time_point<std::chrono::high_resolution_clock> favoriteStart;
 
-    static inline D2D_COLOR_F getColor(std::string text) {
-        D2D_COLOR_F col = clickgui->settings.getSettingByName<bool>(text + "RGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>(text + "Col")->value);
-        col.a = clickgui->settings.getSettingByName<float>(text + "Opacity")->value;
-        return col;
-    }
+    static constexpr uint8_t section1stPart{ 0xC2 }, section2ndPart{ 0xA7 };
 
-    static bool containsAny(const std::string &str) {
-        return std::any_of(APIUtils::onlineUsers.begin(), APIUtils::onlineUsers.end(),
-                           [&](const std::string &user) {
-                               return !user.empty() && str.find(user) != std::string::npos;
-                           });
-    }
-
-    std::pair<std::string, size_t> findFirstOf(std::string text, std::vector<std::string> words) {
-        size_t first_pos = std::string::npos;
-        std::string first;
-
-        for (const auto &word: words) {
-            size_t pos = text.find(word);
-            if (pos != std::string::npos && pos < first_pos) {
-                first_pos = pos;
-                first = word;
-            }
-        }
-        std::pair<std::string, size_t> pair{first, first_pos};
-        return pair;
-    }
-
-    void onPacketReceive(PacketEvent &event) {
-        if (event.getPacket()->getId() != MinecraftPacketIds::Text) return;
-        auto *pkt = reinterpret_cast<TextPacket *>(event.getPacket());
-        std::string message = pkt->message;
-        if (message == " ") event.cancel(); //remove onix promotion on zeqa
-        if (Client::settings.getSettingByName<bool>("nochaticon")->value) return;
-        if (!message.empty() && !containsAny(String::removeNonAlphanumeric(String::removeColorCodes(message)))) return;
-
-        std::pair<std::string, size_t> name = findFirstOf(message, APIUtils::onlineUsers);
-
-        static std::vector<std::pair<std::string, std::string> > roleColors = {
+    static constexpr auto roleColors = std::to_array<std::pair<std::string_view, std::string_view>>({
             {"Dev", "§b"},
             {"Staff", "§f"},
             {"Gamer", "§u"},
             {"Booster", "§d"},
             {"Supporter", "§5"},
             {"Regular", "§4"}
-        };
+        });
 
-        std::string prefix = "§f[§4FLARIAL§f]§r ";
-
-        for (const auto &[role, color]: roleColors) {
-            if (APIUtils::hasRole(role, name.first)) {
-                prefix = "§f[" + color + "FLARIAL§f]§r ";
-                break;
-            }
-        }
-
-        if (name.second < message.size()) {
-
-            std::string formats;
-            for (size_t i = 0; i + 3 <= name.second; ++i) {
-                if (
-                    (i < name.second) &&
-                    (static_cast<unsigned char>(message[i]) == 0xC2) &&
-                    (static_cast<unsigned char>(message[i + 1]) == 0xA7)
-                ) {
-                    formats += message.substr(i, 3);
-                    i += 2;
-                }
-            }
-
-            message.insert(name.second, prefix + formats);
-            pkt->message = message;
-        }
+    static inline D2D_COLOR_F getColor(std::string text) {
+        D2D_COLOR_F col = clickgui->settings.getSettingByName<bool>(text + "RGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>(text + "Col")->value);
+        col.a = clickgui->settings.getSettingByName<float>(text + "Opacity")->value;
+        return col;
     }
+
+private:
+    static std::optional<std::pair<std::string_view /*first word match*/, size_t /*text index*/>> findFirstOf(std::string_view text, auto&& words) {
+        for (auto&& w : words) {
+            if (const auto pos = text.find(w); pos != std::string::npos) {
+                return std::pair{ std::string_view{ text.data() + pos, w.length() }, pos };
+            }
+        }
+        return {};
+    }
+
+    static size_t sanitizedToRawIndex(std::string_view raw, size_t sanIdx);
+    static std::string& getMutableTextForWatermark(TextPacket& pkt);
+
+public:
+    void onPacketReceive(PacketEvent& event);
 
     ClickGUI() : Module("ClickGUI", "What do you think it is?", IDR_CLICKGUI_PNG, "K") {
         this->ghostMainModule = new Module("main", "troll", IDR_COMBO_PNG, "");

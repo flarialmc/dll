@@ -2,10 +2,14 @@
 
 #include <json/json.hpp>
 
+template<typename T>
+struct transparent_hash : std::hash<T> { using is_transparent = void; };
+
 class APIUtils {
   public:
-  static std::vector<std::string> onlineUsers;
-  static std::map<std::string, std::string> onlineVips;
+  static inline std::vector<std::string> onlineUsers{};
+  static inline std::unordered_set<std::string, transparent_hash<std::string_view>, std::equal_to<>> onlineUsersSet{};
+  static inline std::map<std::string, std::string, std::less<>> vipUserToRole{};
 
   static std::pair<long, std::string> POST_Simple(const std::string &url, const std::string &postData);
 
@@ -19,7 +23,7 @@ class APIUtils {
   static std::string get(const std::string& link);
   static nlohmann::json getVips();
   static nlohmann::json getUsers();
-  static bool hasRole(const std::string& role, const std::string& name);
+  static bool hasRole(std::string_view role, std::string_view name);
 
   static std::vector<std::string> ListToVector(const std::string &listStr);
 
