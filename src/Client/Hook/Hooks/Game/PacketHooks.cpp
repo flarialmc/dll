@@ -111,7 +111,6 @@ void SendPacketHook::receiveCallbackPlayerSkin(void *packetHandlerDispatcher, vo
 
 void SendPacketHook::receiveCallbackPlayerList(void *packetHandlerDispatcher, void *networkIdentifier, void *netEventCallback,
                                                     const std::shared_ptr<Packet>& packet) {
-    Logger::debug("Recieved packet from player list");
     SendPacketHook::setVariables(packetHandlerDispatcher, networkIdentifier, netEventCallback);
     auto event = nes::make_holder<PacketEvent>(packet.get());
     eventMgr.trigger(event);
