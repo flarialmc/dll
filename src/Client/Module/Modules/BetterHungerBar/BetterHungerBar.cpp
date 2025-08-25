@@ -35,8 +35,8 @@ void BetterHungerBar::defaultConfig() {
     setDef("prioritizeCake", false);
     setDef("showOnFullHunger", true);
     setDef("manualFix", false);
-    setDef("xOffset", 246.f);
-    setDef("yOffset", 123.f);
+    setDef("xOffset", 82.f);
+    setDef("yOffset", 41.f);
     setDef("scale", 1.f);
 }
 
@@ -252,19 +252,19 @@ void BetterHungerBar::onSetupAndRender(const SetupAndRenderEvent &event) {
     mce::Color satColorSolid(baseColor.r, baseColor.g, baseColor.b, 1.0f);
     mce::Color satColorTransparent(baseColor.r, baseColor.g, baseColor.b);
     mce::Color defaultColor;
-    
-    // TODO: somehow find out how to make this dynamic based on screen size
-    auto currentPos = Vec2<float>(
-        (MC::windowSize.x / 2 + std::round(getOps<float>("xOffset"))), 
-        (MC::windowSize.y - std::round(getOps<float>("yOffset")))
-    );
-    Vec2<float> scaledPos = PositionUtils::getScaledPos(currentPos);
-    
+
     float guiscale = SDK::clientInstance->getGuiData()->getGuiScale();
     float manualscale = getOps<float>("scale");
 
     float iconSize = 9.0f * manualscale;
     float iconSpacing = 8.0f * manualscale;
+    
+    auto currentPos = Vec2<float>(
+        (MC::windowSize.x / 2 + (std::round(getOps<float>("xOffset")) * guiscale)), 
+        (MC::windowSize.y - (std::round(getOps<float>("yOffset")) * guiscale))
+    );
+
+    Vec2<float> scaledPos = PositionUtils::getScaledPos(currentPos);
     
     Vec2<float> uvSize = Vec2<float>((9.f/256.f), (9.f/256.f));  // Standard 9x9 icons
     Vec2<float> uvSizeSaturationHalf = Vec2<float>((5.f/256.f), (9.f/256.f)); // Half saturation is 5x9
@@ -325,7 +325,6 @@ void BetterHungerBar::onSetupAndRender(const SetupAndRenderEvent &event) {
 
         // 2.2) Render predicted saturation outline icons
         bool shouldShowPredictedSaturation;
-        
         if (currentHunger == 20) {
             if (getOps<bool>("showOnFullHunger")) {
                 shouldShowPredictedSaturation = true;
