@@ -65,11 +65,11 @@ public:
                         lua_rawgeti(state, LUA_REGISTRYINDEX, ref);
                         if (lua_isfunction(state, -1)) {
                             if (lua_pcall(state, 0, 0, 0) != LUA_OK) {
-                                Logger::error("Error in button callback: {}", lua_tostring(state, -1));
+                                LOG_ERROR("Error in button callback: {}", lua_tostring(state, -1));
                                 lua_pop(state, 1);
                             }
                         } else {
-                            Logger::error("Button callback function not found.");
+                            LOG_ERROR("Button callback function not found.");
                             lua_pop(state, 1);
                         }
                     };

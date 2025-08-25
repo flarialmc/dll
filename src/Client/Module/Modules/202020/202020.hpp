@@ -10,7 +10,7 @@ public:
 	std::chrono::seconds elapsed;
 
 	Module202020() : Module("Meds", "Implements the medical 202020 rule\ninto minecraft.", IDR_TIME_PNG, "") {
-		Module::setup();
+		
 	};
 
 	void onEnable() override {
@@ -27,39 +27,32 @@ public:
 
 	void defaultConfig() override {
 		Module::defaultConfig();
-
-		if (settings.getSettingByName<bool>("extreme") == nullptr) settings.addSetting("extreme", false);
+		setDef("extreme", false);
+		
 	}
 
 	void settingsRender(float settingsOffset) override {
-		float x = Constraints::PercentageConstraint(0.019, "left");
-		float y = Constraints::PercentageConstraint(0.10, "top");
+		initSettingsPage();
 
-		const float scrollviewWidth = Constraints::RelativeConstraint(0.5, "height", true);
-
-		FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
-		FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
-			Constraints::RelativeConstraint(1.0, "width"),
-			Constraints::RelativeConstraint(0.88f, "height"));
-
-		this->addHeader("Main");
-		this->addToggle("Extreme Mode", "", this->settings.getSettingByName<bool>("extreme")->value);
+		addHeader("Main");
+		addToggle("Extreme Mode", "", "extreme");
 
 		FlarialGUI::UnsetScrollView();
-		this->resetPadding();
+		resetPadding();
 	}
 
 	void onRender(RenderEvent& event) {
+		if (!this->isEnabled()) return;
 		now = std::chrono::steady_clock::now();
 		elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - last);
 
 		if (elapsed >= std::chrono::minutes(20)) {
-			if (!this->settings.getSettingByName<bool>("extreme")->value) FlarialGUI::Notify("Look at something 20 feet away for 20 seconds!");
+			if (!getOps<bool>("extreme")) FlarialGUI::Notify("Look at something 20 feet away for 20 seconds!");
 			last = now;
 			blackscreen = now;
 		}
 
-		if (this->settings.getSettingByName<bool>("extreme")->value and std::chrono::duration_cast<std::chrono::seconds>(now - last) < std::chrono::seconds(20) and elapsed >= std::chrono::minutes(20)) {
+		if (getOps<bool>("extreme") and std::chrono::duration_cast<std::chrono::seconds>(now - last) < std::chrono::seconds(20) and elapsed >= std::chrono::minutes(20)) {
 			FlarialGUI::RoundedRect(0, 0, { 0.f, 0.f, 0.f, 1.f }, Constraints::PercentageConstraint(1, "left"), Constraints::PercentageConstraint(1, "top"), 0, 0);
 		}
 	}

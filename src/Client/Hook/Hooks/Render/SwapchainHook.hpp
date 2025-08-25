@@ -7,6 +7,10 @@
 #include <d3d12.h>
 #include <d3d11.h>
 #include <d3d11on12.h>
+#include <chrono>
+#include <unordered_map>
+#include <queue>
+#include <mutex>
 
 #include "kiero/kiero.h"
 #include "../../../../SDK/Client/Render/FrameTransform.hpp"
@@ -61,6 +65,8 @@ public:
     static bool currentVsyncState;
     static inline ID3D11Texture2D* SavedD3D11BackBuffer;
     static inline ID3D11Texture2D* ExtraSavedD3D11BackBuffer;
+    static inline UINT lastBackbufferWidth = 0;
+    static inline UINT lastBackbufferHeight = 0;
 
     static ID3D12CommandQueue *queue;
     static HANDLE fenceEvent;
@@ -82,12 +88,35 @@ public:
     static inline ID3D12Device5* d3d12Device5 = nullptr;
 
 
-    static inline ID3D12DescriptorHeap* d3d12DescriptorHeapImGuiIMAGE = nullptr;
-    static inline ID3D12DescriptorHeap* d3d12DescriptorHeapImGuiRender = nullptr;
+    // Removed: d3d12DescriptorHeapImGuiIMAGE - now using consolidated descriptor heap approach
+    static inline ID3D12DescriptorHeap* d3d12DescriptorHeapImGuiRender = nullptr; // Consolidated heap for ImGui + Images
     static inline ID3D12DescriptorHeap* d3d12DescriptorHeapBackBuffers = nullptr;
     static inline ID3D12GraphicsCommandList* d3d12CommandList = nullptr;
     static inline ID3D12CommandQueue* d3d12CommandQueue = nullptr;
     static inline ID3D12CommandAllocator* allocator = nullptr;
+
+    // PlayerHead descriptor constants (defined first for use in TOTAL_CONSOLIDATED_DESCRIPTORS)
+    static constexpr UINT PLAYERHEAD_DESCRIPTOR_START = 10000;    // Start well beyond static images
+    static constexpr UINT MAX_PLAYERHEAD_DESCRIPTORS = 2000;     // Support 2000 concurrent playerheads
+    static constexpr UINT PLAYERHEAD_DESCRIPTOR_END = PLAYERHEAD_DESCRIPTOR_START + MAX_PLAYERHEAD_DESCRIPTORS;
+    
+    // Consolidated descriptor heap management
+    static constexpr UINT IMGUI_FONT_DESCRIPTORS = 1;        // ImGui font texture
+    static constexpr UINT MAX_IMAGE_DESCRIPTORS = 300;       // All image resources (257 + buffer)
+    static constexpr UINT TOTAL_CONSOLIDATED_DESCRIPTORS = IMGUI_FONT_DESCRIPTORS + MAX_IMAGE_DESCRIPTORS + MAX_PLAYERHEAD_DESCRIPTORS;
+    static inline UINT nextAvailableDescriptorIndex = IMGUI_FONT_DESCRIPTORS; // Start after ImGui font descriptor
+    static inline std::mutex descriptorAllocationMutex;
+    
+    // PlayerHead descriptor management data
+    struct PlayerHeadDescriptorInfo {
+        std::string playerName;
+        std::chrono::steady_clock::time_point lastUsed;
+        bool inUse = false;
+    };
+    static inline std::unordered_map<UINT, PlayerHeadDescriptorInfo> playerHeadDescriptors;
+    static inline std::queue<UINT> freePlayerHeadDescriptors;
+    static inline UINT nextPlayerHeadDescriptorId;
+    static inline std::mutex playerHeadDescriptorMutex;
 
     static inline uint64_t buffersCounts = 0;
     static inline std::vector<FrameContext> frameContexts = {};
@@ -97,4 +126,15 @@ public:
     static inline int transformDelay = 3;
 
     static inline UINT flagsreal;
+
+    // Consolidated descriptor heap management functions
+    static bool AllocateImageDescriptor(UINT imageId, D3D12_CPU_DESCRIPTOR_HANDLE* out_cpu_handle, D3D12_GPU_DESCRIPTOR_HANDLE* out_gpu_handle);
+    static void FreeImageDescriptor(UINT imageId);
+    static void ResetDescriptorAllocation();
+    
+    // PlayerHead descriptor management functions
+    static bool AllocatePlayerHeadDescriptor(const std::string& playerName, D3D12_CPU_DESCRIPTOR_HANDLE* out_cpu_handle, D3D12_GPU_DESCRIPTOR_HANDLE* out_gpu_handle, UINT* out_descriptor_id);
+    static void FreePlayerHeadDescriptor(UINT descriptorId);
+    static void CleanupOldPlayerHeads(size_t maxCached = 500);
+    static void ResetPlayerHeadDescriptors();
 };

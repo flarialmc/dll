@@ -1,39 +1,26 @@
 #pragma once
 
 #include "../Module.hpp"
+#include "Events/Game/PerspectiveEvent.hpp"
 
 
 class ThirdPerson : public Module {
 private:
     static inline std::vector<uint8_t> original;
     static inline uintptr_t address;
+    static inline bool patched = false;
 public:
-    ThirdPerson() : Module("Nametag", "Shows your nametag for you while\nin 3rd person mode.",
-                           IDR_NAMETAG_PNG, "") {
+    ThirdPerson();;
 
-        address = GET_SIG_ADDRESS("ThirdPersonNametag");
+    void defaultConfig() override;
 
-        original.resize(6);
-        Memory::copyBytes((LPVOID) address, original.data(), 6);
+    void onEnable() override;
 
-        Module::setup();
-    };
+    void onDisable() override;
 
-    void onEnable() override {
-        patch();
-        Module::onEnable();
-    }
+    static void patch();
 
-    void onDisable() override {
-        unpatch();
-        Module::onDisable();
-    }
+    static void unpatch();
 
-    static void patch() {
-        Memory::nopBytes((void *)address, 6);
-    }
-
-    static void unpatch() {
-        Memory::patchBytes((void *)address, original.data(), original.size());
-    }
+    void onGetViewPerspective(PerspectiveEvent& event);
 };

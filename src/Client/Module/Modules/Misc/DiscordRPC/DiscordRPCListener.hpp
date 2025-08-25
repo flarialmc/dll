@@ -49,7 +49,7 @@ private:
                                         OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 
         if (fileHandle == INVALID_HANDLE_VALUE) {
-            Logger::error("Failed to create file: {}", settingspath);
+            LOG_ERROR("Failed to create file: {}", settingspath);
             return;
         }
 
@@ -63,7 +63,7 @@ private:
             previousIp = ip;
             outputFile.close();
         } else {
-            Logger::error("Failed to open file: {}", settingspath);
+            LOG_ERROR("Failed to open file: {}", settingspath);
         }
     }
 };
