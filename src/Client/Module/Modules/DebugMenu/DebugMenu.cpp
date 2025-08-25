@@ -482,7 +482,10 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
 
             left.emplace_back(getDimensionName());
 
-            if (curBiome != nullptr) left.emplace_back(std::format("minecraft:{}", curBiome->getName()));
+            if (curBiome != nullptr) {
+                if (VersionUtils::checkAboveOrEqual(21, 100)) left.emplace_back(curBiome->getName());
+                else left.emplace_back(std::format("minecraft:{}", curBiome->getName()));
+            }
             else left.emplace_back("Unknown biome");
 
             left.emplace_back("");
