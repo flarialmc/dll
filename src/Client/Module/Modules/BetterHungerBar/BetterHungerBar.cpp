@@ -324,12 +324,19 @@ void BetterHungerBar::onSetupAndRender(const SetupAndRenderEvent &event) {
         
 
         // 2.2) Render predicted saturation outline icons
-        bool shouldShowPredictedSaturation = getOps<bool>("showOnFullHunger");
-        if (!shouldShowPredictedSaturation) {
-            // Only show for consumable items when showOnFullHunger is disabled
-            shouldShowPredictedSaturation = (itemName == "golden_apple" || 
-                                           itemName == "enchanted_golden_apple" || 
-                                           itemName == "honey_bottle");
+        bool shouldShowPredictedSaturation;
+        
+        if (currentHunger == 20) {
+            if (getOps<bool>("showOnFullHunger")) {
+                shouldShowPredictedSaturation = true;
+            } else {
+                // Only show for special consumable items when showOnFullHunger is false
+                shouldShowPredictedSaturation = (itemName == "golden_apple" || 
+                                               itemName == "enchanted_golden_apple" || 
+                                               itemName == "honey_bottle");
+            }
+        } else {
+            shouldShowPredictedSaturation = true;
         }
 
         if (shouldShowPredictedSaturation && predictedSaturation / 2 > i) {
