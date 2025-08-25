@@ -294,12 +294,14 @@ void BetterHungerBar::onSetupAndRender(const SetupAndRenderEvent &event) {
         muirc->drawImage(texture, position, size, uvOutline, uvSize);
         muirc->flushImages(defaultColor, 1.0f, flushLayer);
         
+
         // 1.2) Render predicted outline icons
         if (itemName == "milk_bucket") {
             muirc->drawImage(texture, position, size, uvOutlineNormal, uvSize);
             muirc->flushImages(defaultColor, (alpha / 255.0f), flushLayer);
         }
         
+
         // 2.1) Render current saturation outline icons
         if (std::floor(currentSaturation) / 2 > i) {
             bool fullIcon = i != (std::floor(currentSaturation) - 1) / 2;
@@ -320,6 +322,7 @@ void BetterHungerBar::onSetupAndRender(const SetupAndRenderEvent &event) {
             muirc->flushImages(satColorSolid, 1.0f, flushLayer);
         }
         
+
         // 2.2) Render predicted saturation outline icons
         bool shouldShowPredictedSaturation = getOps<bool>("showOnFullHunger");
         if (!shouldShowPredictedSaturation) {
@@ -348,6 +351,7 @@ void BetterHungerBar::onSetupAndRender(const SetupAndRenderEvent &event) {
             muirc->flushImages(satColorTransparent, (alpha / 255.0f), flushLayer);
         }
         
+
         // 3.1) Render current hunger icons
         float hungerValue = currentHunger / 2.0f;
         if (hungerValue > i) {
@@ -363,6 +367,7 @@ void BetterHungerBar::onSetupAndRender(const SetupAndRenderEvent &event) {
             muirc->flushImages(defaultColor, 1.0f, flushLayer);
         }
         
+		
         // 3.2) Render predicted hunger icons
         float predictedHungerValue = predictedHunger / 2.0f;
         if (predictedHungerValue > i) {

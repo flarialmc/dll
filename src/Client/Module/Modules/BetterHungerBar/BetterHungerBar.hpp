@@ -27,7 +27,7 @@ private:
     
 public:
 
-    BetterHungerBar() : Module("Better Hunger Bar", "Adds a hunger and saturation overlay similar to AppleSkin.\n- Only works with the vanilla textures atm!! -",
+    BetterHungerBar() : Module("Better Hunger Bar", "Adds a hunger and saturation overlay similar to AppleSkin.",
         IDR_BETTERHUNGERBAR_PNG, "") {
         
     };
