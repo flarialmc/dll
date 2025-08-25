@@ -1,5 +1,4 @@
-// TODO: - only proceed if not in f1 screen
-// TODO: - place icons correctly and dynamically change pos based on screen size
+// TODO: - only proceed if not in f1 screen (any idea how to do that?)
 
 #include "BetterHungerBar.hpp"
 

@@ -285,7 +285,7 @@ void ModuleManager::initialize() {
 	addModule<CompactChat>();
 	addModule<MessageLogger>();
 	addModule<TotemCounter>();
-    addModule<BetterHungerBar>();
+	addModule<BetterHungerBar>();
 
 #ifdef COMPILE_DOOM
 	addModule<DoomModule>();
