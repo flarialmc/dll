@@ -3,17 +3,25 @@
 #include "Client.hpp"
 #include "Events/EventManager.hpp"
 
-void CommandHotkey::onSetup() {
 
-	for (int i = 0; i < totalKeybinds; ++i) {
-		keybindActions.push_back([this, i](std::vector<std::any> args) -> std::any {
+void CommandHotkey::addHotkey(int index) {
+	keybindActions.push_back([this, index](std::vector<std::any> args) -> std::any {
 
-			KeyEvent event = std::any_cast<KeyEvent>(args[0]);
-			std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - last_used;
-			if (duration.count() >= 2.5) {
-				std::string count;
-				if (i > 0) count = "-" + FlarialGUI::cached_to_string(i);
-				if (this->isKeybind(event.keys, i) && this->isKeyPartOfKeybind(event.key, i)) {
+		KeyEvent event = std::any_cast<KeyEvent>(args[0]);
+		std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - last_used;
+		if (duration.count() >= 2.5) {
+			std::string count;
+			if (index > 0) count = "-" + FlarialGUI::cached_to_string(index);
+			if (this->isKeybind(event.keys, index) && this->isKeyPartOfKeybind(event.key, index)) {
+				std::string serverIP = SDK::getServerIP();
+				if (serverIP.find("plutonium") != std::string::npos) {
+					FlarialGUI::Notify("Can't use Command Hotkey on " + serverIP);
+					this->restricted = true;
+				}
+				else {
+					this->restricted = false;
+				}
+				if (!this->restricted) {
 					std::shared_ptr<Packet> packet = SDK::createPacket(77);
 					auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
 					command_packet->command = this->settings.getSettingByName<std::string>("command" + count)->value;
@@ -24,10 +32,16 @@ void CommandHotkey::onSetup() {
 					last_used = std::chrono::high_resolution_clock::now();
 				}
 			}
+		}
+		return {};
 
-			return {};
+	});
+}
 
-			});
+void CommandHotkey::onSetup() {
+
+	for (int i = 0; i < totalKeybinds; ++i) {
+		addHotkey(i);
 	}
 }
 
@@ -61,30 +75,12 @@ void CommandHotkey::settingsRender(float settingsOffset) {
 
 
 		int i = totalKeybinds;
-		keybindActions.push_back([this, i](std::vector<std::any> args) -> std::any {
-			KeyEvent event = std::any_cast<KeyEvent>(args[0]);
-			std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - last_used;
-			if (duration.count() >= 2.5) {
-				std::string count;
-				if (i > 0) count = "-" + FlarialGUI::cached_to_string(i);
-				if (this->isKeybind(event.keys, i) && this->isKeyPartOfKeybind(event.key, i)) {
-					std::shared_ptr<Packet> packet = SDK::createPacket(77);
-					auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
-					command_packet->command = this->settings.getSettingByName<std::string>("command" + count)->value;
-					command_packet->origin.type = CommandOriginType::Player;
-					command_packet->InternalSource = true;
-					SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
-
-					last_used = std::chrono::high_resolution_clock::now();
-				}
-			}
-			return {};
-			});
+		addHotkey(i);
 
 		totalKeybinds++;
 		FlarialGUI::Notify("Added! Scroll down for options.");
 		
-		});
+	});
 
 
 	for (int i = 0; i < totalKeybinds; ++i) {
@@ -104,7 +100,7 @@ void CommandHotkey::settingsRender(float settingsOffset) {
 				this->settings.deleteSetting(commandSettingName);
 				this->settings.deleteSetting("keybind-" + FlarialGUI::cached_to_string(i));
 				Client::SaveSettings();
-				});
+			});
 			this->extraPadding();
 		}
 	}
@@ -120,7 +116,7 @@ void CommandHotkey::onKey(KeyEvent& event) {
 		SDK::getCurrentScreen() == "hud_screen" ||
 		SDK::getCurrentScreen() == "zoom_screen" ||
 		SDK::getCurrentScreen() == "f3_screen"
-		)) {
+	)) {
 		for (int i = 0; i <= totalKeybinds; ++i) {
 			keybindActions[i]({ std::any(event) });
 		}
