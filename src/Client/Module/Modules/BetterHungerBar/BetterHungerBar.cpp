@@ -33,6 +33,7 @@ void BetterHungerBar::defaultConfig() {
     setDef("fadeSpeed", 7.f);
     setDef("maxFadeOpacity", 185.f);
     setDef("prioritizeCake", false);
+    setDef("showOnFullHunger", true);
     setDef("manualFix", false);
     setDef("xOffset", 246.f);
     setDef("yOffset", 123.f);
@@ -48,6 +49,7 @@ void BetterHungerBar::settingsRender(float settingsOffset) {
     addSlider("Fade Speed", "", "fadeSpeed", 10.0f);
     addSlider("Max Fade Opacity", "", "maxFadeOpacity", 255.0f);
     addToggle("Prioritize Cake", "When looking at a cake, the cake values override the hold-food values.", "prioritizeCake");
+    addToggle("Show on full hunger", "Displays predicted saturation despite not being able to eat the held food.", "showOnFullHunger");
     
     extraPadding();
     
@@ -319,7 +321,15 @@ void BetterHungerBar::onSetupAndRender(const SetupAndRenderEvent &event) {
         }
         
         // 2.2) Render predicted saturation outline icons
-        if (predictedSaturation / 2 > i) {
+        bool shouldShowPredictedSaturation = getOps<bool>("showOnFullHunger");
+        if (!shouldShowPredictedSaturation) {
+            // Only show for consumable items when showOnFullHunger is disabled
+            shouldShowPredictedSaturation = (itemName == "golden_apple" || 
+                                           itemName == "enchanted_golden_apple" || 
+                                           itemName == "honey_bottle");
+        }
+
+        if (shouldShowPredictedSaturation && predictedSaturation / 2 > i) {
             bool fullIcon = i != (predictedSaturation - 1) / 2;
             Vec2<float> uvSat = fullIcon ? uvSaturationFull : uvSaturationHalf;
             
