@@ -163,6 +163,7 @@
 #define IDR_KEYSTROKES_PNG             269
 #define IDR_SUBTITLES_PNG              270
 #define IDR_TOTEM_PNG                  271
+#define IDR_BETTERHUNGERBAR_PNG        272
 
 // MAKE SURE YOU ALWAYS UPDATE THIS!
 
