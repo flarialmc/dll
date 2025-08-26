@@ -44,7 +44,7 @@ void SavePlayerCache() {
         LOG_ERROR("Could not open file for writing: " + filePath);
     }
 }
-
+// hi
 float Client::elapsed;
 uint64_t Client::start;
 
