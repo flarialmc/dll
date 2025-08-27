@@ -306,6 +306,24 @@ bool APIUtils::hasRole(std::string_view role, std::string_view name) {
     return isOnline && (role == "Regular");
 }
 
+std::optional<std::string_view> APIUtils::getRole(std::string_view name) {
+    const auto vipIt = vipUserToRole.find(name);
+    if (vipIt != vipUserToRole.cend()) {
+        return vipIt->second;
+    }
+
+    const auto isOnline = onlineUsersSet.contains(name);
+    if (isOnline) {
+        return "Regular";
+    }
+
+    return {};
+}
+
+bool APIUtils::hasAnyRole(std::string_view name) {
+    return getRole(name).has_value();
+}
+
 std::vector<std::string> APIUtils::ListToVector(const std::string& commandListStr) {
     std::vector<std::string> commands;
     std::stringstream ss(commandListStr);

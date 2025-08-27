@@ -205,14 +205,14 @@ public:
         std::string msg = lua_tostring(L, 1);
 
         std::shared_ptr<Packet> packet = SDK::createPacket(9);
-        auto* pkt = reinterpret_cast<TextPacket*>(packet.get());
+        auto* pkt = reinterpret_cast<TextPacketProxy*>(packet.get());
 
-        pkt->type = TextPacketType::CHAT;
-        pkt->message = msg;
-        pkt->platformId = "";
-        pkt->translationNeeded = false;
-        pkt->xuid = "";
-        pkt->name = player->getPlayerName();
+        pkt->getType() = TextPacketType::CHAT;
+        pkt->getMessage() = msg;
+        pkt->getPlatformId() = "";
+        pkt->getTranslationNeeded() = false;
+        pkt->getXuid() = "";
+        pkt->getName() = player->getPlayerName();
 
         SDK::clientInstance->getPacketSender()->sendToServer(pkt);
 

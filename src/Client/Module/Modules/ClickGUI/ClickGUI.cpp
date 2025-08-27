@@ -5,6 +5,7 @@
 #include <Scripting/ModuleScript.hpp>
 
 #include "Modules/Misc/ScriptMarketplace/ScriptMarketplace.hpp"
+#include <SDK/Client//Network/Packet/TextPacket.hpp>
 
 std::chrono::time_point<std::chrono::high_resolution_clock> ClickGUI::favoriteStart;
 
@@ -40,74 +41,148 @@ void ClickGUI::fov(FOVEvent& event) {
 	event.setFOV(cFov);
 };*/
 
-size_t ClickGUI::sanitizedToRawIndex(std::string_view raw, size_t sanIdx) {
-    size_t rawIdx = 0, visible = 0;
+std::string& ClickGUI::getMutableTextForWatermark(TextPacketProxy& pkt) {
+    return ((pkt.getType() == TextPacketType::CHAT) && !pkt.getName().empty()) ? pkt.getName() : pkt.getMessage();
+}
 
-    while ((rawIdx < raw.length()) && (visible < sanIdx)) {
-        const auto b0 = static_cast<uint8_t>(raw[rawIdx]);
-        if (
-            ((rawIdx + 2) < raw.length()) &&
-            (b0 == section1stPart) &&
-            (static_cast<uint8_t>(raw[rawIdx + 1]) == section2ndPart)
-            ) {
-            rawIdx += 3; // skip section symbol (2 bytes) + 1 code byte
-            continue;
-        }
-        ++rawIdx;
+size_t ClickGUI::sanitizedToRawIndex(std::string_view raw, size_t sanIdx) {
+    size_t i = 0, visible = 0;
+
+    // skip any leading format codes even when `sanIdx` == 0
+    i = advancePastFormatCodes(raw, i);
+
+    while ((i < raw.length()) && (visible < sanIdx)) {
+        // consume exactly 1 visible byte
+        ++i;
         ++visible;
+
+        // skip any format codes immediately after that visible byte
+        i = advancePastFormatCodes(raw, i);
     }
 
-    return rawIdx; // raw insertion point corresponding to sanitized index
+    // now `i` is the byte index in raw where the `sanIdx`-th visible byte begins
+    return i;
+}
+std::string ClickGUI::collectFormatsBefore(std::string_view raw, size_t pos) {
+    std::string out{};
+    pos = std::min(pos, raw.length());
+    out.reserve(pos);
+
+    size_t i = 0;
+    while (i < pos) {
+        if (isSectionAt(raw, i)) {
+            if ((i + 3) <= pos) { // only collect if the whole format chunk is strictly before `pos`
+                out.append(raw.substr(i, 3));
+            }
+            i += 3;
+        }
+        else {
+            ++i;
+        }
+    }
+
+    return out;
 }
 
-std::string& ClickGUI::getMutableTextForWatermark(TextPacket& pkt) {
-    return ((pkt.type == TextPacketType::CHAT) && !pkt.name.empty()) ? pkt.name : pkt.message;
+bool ClickGUI::isValidFormatCode(char c) {
+    switch (c) {
+    case '0': case '1': case '2': case '3': case '4':
+    case '5': case '6': case '7': case '8': case '9':
+    case 'a': case 'b': case 'c': case 'd': case 'e':
+    case 'f': case 'g': case 'h': case 'i': case 'j':
+    case 'k': case 'l': case 'm': case 'n': case 'o':
+    case 'p': case 'q': case 'r': case 's': case 't':
+    case 'u': {
+        return true;
+    }
+        
+    default: {
+        return false;
+    }      
+    }
 }
 
-void ClickGUI::onPacketReceive(PacketEvent& event) {
-    if (event.getPacket()->getId() != MinecraftPacketIds::Text) return;
-    auto* pkt = reinterpret_cast<TextPacket*>(event.getPacket());
-    if (pkt->message == " ") event.cancel(); //remove onix promotion on zeqa
-    if (Client::settings.getSettingByName<bool>("nochaticon")->value) return;
+bool ClickGUI::isSectionAt(std::string_view raw, size_t pos, char* outCode) {
+    if ((pos + 2) >= raw.length()) {
+        return false;
+    }
 
-    auto& txt = getMutableTextForWatermark(*pkt);
+    const auto b0 = static_cast<uint8_t>(raw[pos + 0]);
+    const auto b1 = static_cast<uint8_t>(raw[pos + 1]);
+    const auto c = raw[pos + 2];
+    if ((b0 == section1stPart) && (b1 == section2ndPart) && isValidFormatCode(c)) {
+        if (outCode) {
+            *outCode = c;
+        }
+        return true;
+    }
 
-    std::optional<std::string> prefix{};
-    const auto sanitizedMsg = String::removeColorCodes(txt);
+    return false;
+}
+
+size_t ClickGUI::advancePastFormatCodes(std::string_view raw, size_t i) {
+    while (isSectionAt(raw, i)) {
+        i += 3; // skip section symbol (2 bytes) + 1 code byte
+    }
+    return i;
+}
+
+bool ClickGUI::playerListContainsTextPrefix(std::string_view text) {
+    /*const*/ auto* lp = SDK::clientInstance->getLocalPlayer();
+    if (!lp) return false;
+
+    /*const*/ auto* lvl = lp->getLevel();
+    if (!lvl) return false;
+
+    for (const auto& [_, entry] : lvl->getPlayerMap()) {
+        if (text.starts_with(entry.name)) return true;
+    }
+
+    return false;
+}
+
+bool ClickGUI::tryApplyWatermark(std::string& text) {
+    const auto sanitizedMsg = String::removeColorCodes(text);
     auto data = findFirstOf(sanitizedMsg, std::views::keys(APIUtils::vipUserToRole)); // std::views::concat with APIUtils::onlineUsers
     if (!data) {
         data = findFirstOf(sanitizedMsg, APIUtils::onlineUsers);
     }
 
     if (!data) {
-        return;
+        return false;
     }
 
-    for (const auto& [role, color] : roleColors) {
+    if (!playerListContainsTextPrefix(data->first)) {
+        return false; // false match, there was text in a chat message of a player's username but it wasn't likely to refer to a real player in game
+    }
+
+    std::optional<std::string> prefix{};
+
+    for (const auto& [role, color] : getRoleNameToFormatCodeTable()) {
         if (APIUtils::hasRole(role, data->first)) {
-            prefix.emplace(std::format("{}{}{}", "§f[", color, "FLARIAL§f]§r "));
+            prefix.emplace(std::format("{}{}{}", "§r§f[", color, "FLARIAL§f]§r "));
             break;
         }
     }
 
     if (prefix) {
-        const auto rawIdx = sanitizedToRawIndex(txt, data->second);
-        std::string formats{};
-
-        for (size_t i = 0; ((i + 2) <= rawIdx) && ((i + 2) <= txt.length()); ++i) {
-            if (
-                (static_cast<uint8_t>(txt[i]) == section1stPart) &&
-                (static_cast<uint8_t>(txt[i + 1]) == section2ndPart)
-                ) {
-                if ((i + 2) < txt.length()) {
-                    formats.append(txt, i, 3);
-                    i += 2;
-                }
-            }
-        }
-
-        txt.insert(rawIdx, *prefix + formats);
+        const auto rawIdx = sanitizedToRawIndex(text, data->second);
+        const auto formats = collectFormatsBefore(text, rawIdx);
+        text.insert(rawIdx, *prefix + formats);
+        return true;
     }
+
+    return false;
+}
+
+void ClickGUI::onPacketReceive(PacketEvent& event) {
+    if (event.getPacket()->getId() != MinecraftPacketIds::Text) return;
+    auto* pkt = reinterpret_cast<TextPacketProxy*>(event.getPacket());
+    if (pkt->getMessage() == " ") event.cancel(); //remove onix promotion on zeqa
+    if (Client::settings.getSettingByName<bool>("nochaticon")->value) return;
+
+    auto& text = getMutableTextForWatermark(*pkt);
+    tryApplyWatermark(text);
 }
 
 void ClickGUI::onRender(RenderEvent &event) {

@@ -67,9 +67,9 @@ void MovableChat::onPacket(PacketEvent &event) {
     Packet *packet = event.getPacket();
     if (packet->getId() != MinecraftPacketIds::Text) return;
 
-    auto pkt = reinterpret_cast<TextPacket *>(packet);
-    std::string msg = pkt->message;
-    if (!pkt || msg.empty() || pkt->type != TextPacketType::CHAT) return;
+    auto pkt = reinterpret_cast<TextPacketProxy *>(packet);
+    std::string msg = pkt->getMessage();
+    if (!pkt || msg.empty() || pkt->getType() != TextPacketType::CHAT) return;
 }
 
 void MovableChat::onRender(RenderEvent &event) {

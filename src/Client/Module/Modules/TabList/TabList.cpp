@@ -458,19 +458,30 @@ void TabList::settingsRender(float settingsOffset) {
 }
 
 int TabList::getRolePriority(const std::string &name) {
-    std::string clearedName = String::removeNonAlphanumeric(String::removeColorCodes(name));
-    if (clearedName.empty()) return 5; // Lowest priority for invalid names
+    const auto roleOpt = APIUtils::getRole(String::removeColorCodes(name));
+    if (!roleOpt) {
+        return 5;
+    }
 
-    auto it = std::ranges::find(APIUtils::onlineUsers, clearedName);
-    if (it == APIUtils::onlineUsers.end()) return 5; // Non-Flarial users
-
-    // Check roles in order of priority using ApiUtils
-    if (APIUtils::hasRole("Dev", clearedName)) return 0;
-    if (APIUtils::hasRole("Staff", clearedName)) return 1;
-    if (APIUtils::hasRole("Gamer", clearedName)) return 2;
-    if (APIUtils::hasRole("Supporter", clearedName)) return 3;
-    if (APIUtils::hasRole("Booster", clearedName)) return 4;
-    return 5; // Default Flarial user (in onlineUsers but no specific role)
+    // there should really be an enum for this...
+    if (*roleOpt == "Dev") {
+        return 0;
+    }
+    else if (*roleOpt == "Staff") {
+        return 1;
+    }
+    else if (*roleOpt == "Gamer") {
+        return 2;
+    }
+    else if (*roleOpt == "Supporter") {
+        return 3;
+    }
+    else if (*roleOpt == "Booster") {
+        return 4;
+    }
+    else {
+        return 5;
+    }
 }
 
 std::vector<PlayerListEntry> TabList::sortVecmap(
@@ -483,11 +494,7 @@ std::vector<PlayerListEntry> TabList::sortVecmap(
             const PlayerListEntry &entry = pair.second;
             if (entry.name.empty()) continue;
 
-            std::string clearedName = String::removeNonAlphanumeric(String::removeColorCodes(entry.name));
-            if (clearedName.empty()) clearedName = entry.name;
-
-            auto it = std::ranges::find(APIUtils::onlineUsers, clearedName);
-            if (it != APIUtils::onlineUsers.end()) {
+            if (APIUtils::hasAnyRole(String::removeColorCodes(entry.name))) {
                 flarialEntries.push_back(entry);
             } else {
                 nonFlarialEntries.push_back(entry);
@@ -967,8 +974,7 @@ void TabList::onRender(RenderEvent &event) {
 
                     auto textMetric = FlarialGUI::getFlarialTextSize(String::StrToWStr(name).c_str(), keycardSize * 5, keycardSize, DWRITE_TEXT_ALIGNMENT_LEADING, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, true);
 
-                    auto it = std::ranges::find(APIUtils::onlineUsers, clearedName);
-                    if (it != APIUtils::onlineUsers.end()) textMetric.x += Constraints::SpacingConstraint(0.6, keycardSize);
+                    if (APIUtils::hasAnyRole(clearedName)) textMetric.x += Constraints::SpacingConstraint(0.6, keycardSize);
 
                     if (textMetric.x > curMax) curMax = textMetric.x;
                     if (i < maxColumn) totalHeight += keycardSize * 0.7f;
@@ -1274,13 +1280,12 @@ void TabList::onRender(RenderEvent &event) {
                     // PLAYER HEAD END
                 }
 
-                auto pit = std::ranges::find(APIUtils::onlineUsers, vectab[i].clearedName);
                 if (refreshCache) {
                     vectab[i].pNameMetrics = FlarialGUI::getFlarialTextSize(String::StrToWStr(vectab[i].clearedName).c_str(), columnx[i / maxColumn] - (0.825 * keycardSize), keycardSize, alignments[getOps<std::string>("textalignment")], floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, true);
                     vectab[i].textWidth = columnx[i / maxColumn] - (0.825 * keycardSize);
                 }
 
-                if (pit != APIUtils::onlineUsers.end()) {
+                if (APIUtils::hasAnyRole(vectab[i].clearedName)) {
                     // FLARIAL TAG START
                     static float p1 = 0.175;
                     static float p2 = 0.196;
