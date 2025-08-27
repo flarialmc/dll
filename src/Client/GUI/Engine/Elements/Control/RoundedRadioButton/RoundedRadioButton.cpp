@@ -1,5 +1,6 @@
 #include "../../../Engine.hpp"
 #include "../../../animations/fadeinout.hpp"
+#include <Utils/WinrtUtils.hpp>
 
 bool once2 = false;
 
