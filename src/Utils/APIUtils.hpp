@@ -2,13 +2,15 @@
 
 #include <json/json.hpp>
 
-template<typename T>
-struct transparent_hash : std::hash<T> { using is_transparent = void; };
+namespace detail {
+    template<typename T>
+    struct transparent_hash : std::hash<T> { using is_transparent = void; };
+}
 
 class APIUtils {
   public:
   static inline std::vector<std::string> onlineUsers{};
-  static inline std::unordered_set<std::string, transparent_hash<std::string_view>, std::equal_to<>> onlineUsersSet{};
+  static inline std::unordered_set<std::string, detail::transparent_hash<std::string_view>, std::equal_to<>> onlineUsersSet{};
   static inline std::map<std::string, std::string, std::less<>> vipUserToRole{};
 
   static std::pair<long, std::string> POST_Simple(const std::string &url, const std::string &postData);
