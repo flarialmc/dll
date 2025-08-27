@@ -52,9 +52,6 @@ jobs:
               echo "should_build=false" >> "$GITHUB_OUTPUT"
           fi
 
-          echo "type=2" >> "$GITHUB_OUTPUT"
-          echo "should_build=true" >> "$GITHUB_OUTPUT"
-
   windows-build:
     runs-on: windows-latest
     needs: check-commit
@@ -83,12 +80,12 @@ jobs:
         uses: actions/upload-artifact@v4.6.1
         with:
            name: Flarial_DLL
-           path: C:\a\dll\dll\build\Flarial.dll
+           path: C:\a\falafel-clint\falafel-clint\build\Flarial.dll
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v4.6.1
         with:
           name: Flarial_DLL
-          path: D:\a\dll\dll\build\Flarial.dll
+          path: D:\a\falafel-clint\falafel-clint\build\Flarial.dll
 
   upload-to-cdn:
     runs-on: ubuntu-latest
