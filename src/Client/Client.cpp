@@ -224,6 +224,7 @@ void Client::initialize() {
 		file.close();
 
 		APIUtils::onlineUsers = APIUtils::ListToVector(playersList);
+		APIUtils::onlineUsersSet = APIUtils::onlineUsers | std::ranges::to<decltype(APIUtils::onlineUsersSet)>();
 		});
 
 	updateThread.detach();

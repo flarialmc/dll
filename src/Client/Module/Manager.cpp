@@ -118,6 +118,7 @@
 #include "Modules/CompactChat/CompactChat.hpp"
 #include "Modules/MessageLogger/MessageLogger.hpp"
 #include "Modules/TotemCounter/TotemCounter.hpp"
+#include "Modules/BetterHungerBar/BetterHungerBar.hpp"
 
 #ifdef COMPILE_DOOM
 	#include "Modules/Doom/Doom.hpp"
@@ -284,6 +285,7 @@ void ModuleManager::initialize() {
 	addModule<CompactChat>();
 	addModule<MessageLogger>();
 	addModule<TotemCounter>();
+	addModule<BetterHungerBar>();
 
 #ifdef COMPILE_DOOM
 	addModule<DoomModule>();

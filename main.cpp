@@ -44,7 +44,7 @@ void SavePlayerCache() {
         LOG_ERROR("Could not open file for writing: " + filePath);
     }
 }
-
+// hi
 float Client::elapsed;
 uint64_t Client::start;
 
@@ -105,6 +105,7 @@ DWORD WINAPI init() {
                 std::string data = APIUtils::VectorToList(APIUtils::onlineUsers);
                 std::pair<long, std::string> post = APIUtils::POST_Simple("https://api.flarial.xyz/allOnlineUsers", data);
                 APIUtils::onlineUsers = APIUtils::UpdateVector(APIUtils::onlineUsers, post.second);
+                APIUtils::onlineUsersSet = APIUtils::onlineUsers | std::ranges::to<decltype(APIUtils::onlineUsersSet)>();
                 SavePlayerCache();
                 lastOnlineUsersFetchTime = now;
             } catch (const std::exception &ex) {
@@ -115,7 +116,7 @@ DWORD WINAPI init() {
         if (vipFetchElapsed >= std::chrono::minutes(3) && Client::settings.getSettingByName<bool>("apiusage")->value) {
             try {
                 auto vipsJson = APIUtils::getVips();
-                std::map<std::string, std::string> updatedVips;
+                decltype(APIUtils::vipUserToRole) updatedVips;
 
                 for (const auto& [role, users] : vipsJson.items()) {
                     if (users.is_array()) {
@@ -128,7 +129,7 @@ DWORD WINAPI init() {
                 }
 
                 if (!updatedVips.empty()) {
-                    APIUtils::onlineVips = std::move(updatedVips);
+                    APIUtils::vipUserToRole = std::move(updatedVips);
                 }
                 lastVipFetchTime = now;
             } catch (const std::exception& e) {

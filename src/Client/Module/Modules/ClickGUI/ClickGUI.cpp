@@ -1,4 +1,4 @@
-#include "ClickGUI.hpp"
+﻿#include "ClickGUI.hpp"
 
 #include <random>
 #include <Scripting/ScriptManager.hpp>
@@ -40,6 +40,75 @@ void ClickGUI::fov(FOVEvent& event) {
 	event.setFOV(cFov);
 };*/
 
+size_t ClickGUI::sanitizedToRawIndex(std::string_view raw, size_t sanIdx) {
+    size_t rawIdx = 0, visible = 0;
+
+    while ((rawIdx < raw.length()) && (visible < sanIdx)) {
+        const auto b0 = static_cast<uint8_t>(raw[rawIdx]);
+        if (
+            ((rawIdx + 2) < raw.length()) &&
+            (b0 == section1stPart) &&
+            (static_cast<uint8_t>(raw[rawIdx + 1]) == section2ndPart)
+            ) {
+            rawIdx += 3; // skip section symbol (2 bytes) + 1 code byte
+            continue;
+        }
+        ++rawIdx;
+        ++visible;
+    }
+
+    return rawIdx; // raw insertion point corresponding to sanitized index
+}
+
+std::string& ClickGUI::getMutableTextForWatermark(TextPacket& pkt) {
+    return ((pkt.type == TextPacketType::CHAT) && !pkt.name.empty()) ? pkt.name : pkt.message;
+}
+
+void ClickGUI::onPacketReceive(PacketEvent& event) {
+    if (event.getPacket()->getId() != MinecraftPacketIds::Text) return;
+    auto* pkt = reinterpret_cast<TextPacket*>(event.getPacket());
+    if (pkt->message == " ") event.cancel(); //remove onix promotion on zeqa
+    if (Client::settings.getSettingByName<bool>("nochaticon")->value) return;
+
+    auto& txt = getMutableTextForWatermark(*pkt);
+
+    std::optional<std::string> prefix{};
+    const auto sanitizedMsg = String::removeColorCodes(txt);
+    auto data = findFirstOf(sanitizedMsg, std::views::keys(APIUtils::vipUserToRole)); // std::views::concat with APIUtils::onlineUsers
+    if (!data) {
+        data = findFirstOf(sanitizedMsg, APIUtils::onlineUsers);
+    }
+
+    if (!data) {
+        return;
+    }
+
+    for (const auto& [role, color] : roleColors) {
+        if (APIUtils::hasRole(role, data->first)) {
+            prefix.emplace(std::format("{}{}{}", "§f[", color, "FLARIAL§f]§r "));
+            break;
+        }
+    }
+
+    if (prefix) {
+        const auto rawIdx = sanitizedToRawIndex(txt, data->second);
+        std::string formats{};
+
+        for (size_t i = 0; ((i + 2) <= rawIdx) && ((i + 2) <= txt.length()); ++i) {
+            if (
+                (static_cast<uint8_t>(txt[i]) == section1stPart) &&
+                (static_cast<uint8_t>(txt[i + 1]) == section2ndPart)
+                ) {
+                if ((i + 2) < txt.length()) {
+                    formats.append(txt, i, 3);
+                    i += 2;
+                }
+            }
+        }
+
+        txt.insert(rawIdx, *prefix + formats);
+    }
+}
 
 void ClickGUI::onRender(RenderEvent &event) {
     float allahu = Constraints::RelativeConstraint(0.65);
