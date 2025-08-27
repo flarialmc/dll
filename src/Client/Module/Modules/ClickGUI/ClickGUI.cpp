@@ -140,7 +140,7 @@ bool ClickGUI::tryApplyWatermark(std::string& text) {
 
     std::optional<std::string> prefix{};
 
-    for (const auto& [role, color] : roleColors) {
+    for (const auto& [role, color] : getRoleNameToFormatCodeTable()) {
         if (APIUtils::hasRole(role, data->first)) {
             prefix.emplace(std::format("{}{}{}", "§r§f[", color, "FLARIAL§f]§r "));
             break;

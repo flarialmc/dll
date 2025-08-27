@@ -53,17 +53,7 @@ public:
     static float inline accumilatedBarPos = 1;
     static bool inline isAnimatingModSet = false;
     static std::chrono::time_point<std::chrono::high_resolution_clock> favoriteStart;
-
     static constexpr uint8_t section1stPart{ 0xC2 }, section2ndPart{ 0xA7 };
-
-    static constexpr auto roleColors = std::to_array<std::pair<std::string_view, std::string_view>>({
-            {"Dev", "§b"},
-            {"Staff", "§f"},
-            {"Gamer", "§u"},
-            {"Booster", "§d"},
-            {"Supporter", "§5"},
-            {"Regular", "§4"}
-        });
 
     static inline D2D_COLOR_F getColor(std::string text) {
         D2D_COLOR_F col = clickgui->settings.getSettingByName<bool>(text + "RGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>(text + "Col")->value);
@@ -88,6 +78,16 @@ private:
     static bool isSectionAt(std::string_view raw, size_t pos, char* outCode = nullptr);
     static size_t advancePastFormatCodes(std::string_view raw, size_t i);
     static bool tryApplyWatermark(std::string& text);
+    static constexpr auto getRoleNameToFormatCodeTable() {
+        return std::to_array<std::pair<std::string_view, std::string_view>>({
+            {"Dev", "§b"},
+            {"Staff", "§f"},
+            {"Gamer", "§u"},
+            {"Booster", "§d"},
+            {"Supporter", "§5"},
+            {"Regular", "§4"},
+            });
+    }
 
 public:
     void onPacketReceive(PacketEvent& event);

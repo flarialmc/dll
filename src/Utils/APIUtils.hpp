@@ -24,6 +24,8 @@ class APIUtils {
   static nlohmann::json getVips();
   static nlohmann::json getUsers();
   static bool hasRole(std::string_view role, std::string_view name);
+  static std::optional<std::string_view> getRole(std::string_view name);
+  static bool hasAnyRole(std::string_view name);
 
   static std::vector<std::string> ListToVector(const std::string &listStr);
 
