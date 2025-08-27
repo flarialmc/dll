@@ -82,7 +82,9 @@ private:
     }
 
     static size_t sanitizedToRawIndex(std::string_view raw, size_t sanIdx);
+    static std::string collectFormatsBefore(std::string_view raw, size_t pos);
     static std::string& getMutableTextForWatermark(TextPacketProxy& pkt);
+    static bool isValidFormatCode(char c);
 
 public:
     void onPacketReceive(PacketEvent& event);

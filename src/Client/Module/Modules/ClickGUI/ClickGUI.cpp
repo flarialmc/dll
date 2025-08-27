@@ -42,27 +42,81 @@ void ClickGUI::fov(FOVEvent& event) {
 };*/
 
 size_t ClickGUI::sanitizedToRawIndex(std::string_view raw, size_t sanIdx) {
-    size_t rawIdx = 0, visible = 0;
+    size_t i = 0;
 
-    while ((rawIdx < raw.length()) && (visible < sanIdx)) {
-        const auto b0 = static_cast<uint8_t>(raw[rawIdx]);
-        if (
-            ((rawIdx + 2) < raw.length()) &&
-            (b0 == section1stPart) &&
-            (static_cast<uint8_t>(raw[rawIdx + 1]) == section2ndPart)
-            ) {
-            rawIdx += 3; // skip section symbol (2 bytes) + 1 code byte
-            continue;
+    const auto _isSectionAt = [&](size_t p) constexpr {
+        return ((p + 2) < raw.length()) &&
+            (static_cast<uint8_t>(raw[p]) == section1stPart) &&
+            (static_cast<uint8_t>(raw[p + 1]) == section2ndPart) &&
+            isValidFormatCode(raw[p + 2]);
+        };
+
+    const auto _skipSections = [&] constexpr {
+        while (_isSectionAt(i)) {
+            i += 3;
         }
-        ++rawIdx;
+        };
+
+    // skip any leading format codes even when sanIdx == 0
+    _skipSections();
+
+    size_t visible = 0;
+    while ((i < raw.length()) && (visible < sanIdx)) {
+        // consume exactly 1 visible byte
+        ++i;
         ++visible;
+
+        // skip any format codes immediately after that visible byte
+        _skipSections();
     }
 
-    return rawIdx; // raw insertion point corresponding to sanitized index
+    // now i is the byte index in raw where the `sanIdx`-th visible byte begins
+    return i;
+}
+std::string ClickGUI::collectFormatsBefore(std::string_view raw, size_t pos) {
+    std::string out{};
+    out.reserve(pos);
+
+    size_t i = 0;
+    pos = std::min(pos, raw.length());
+
+    while ((i + 2) < pos) {
+        const auto b0 = static_cast<uint8_t>(raw[i]);
+        const auto b1 = static_cast<uint8_t>(raw[i + 1]);
+        if ((b0 == section1stPart) && (b1 == section2ndPart)) {
+            const auto code = raw[i + 2];  // we know i+2 < pos <= raw.length()
+            if (isValidFormatCode(code)) {
+                out.append(raw.substr(i, 3));
+                i += 3;
+                continue;
+            }
+        }
+        ++i;
+    }
+
+    return out;
 }
 
 std::string& ClickGUI::getMutableTextForWatermark(TextPacketProxy& pkt) {
     return ((pkt.getType() == TextPacketType::CHAT) && !pkt.getName().empty()) ? pkt.getName() : pkt.getMessage();
+}
+
+bool ClickGUI::isValidFormatCode(char c) {
+    switch (c) {
+    case '0': case '1': case '2': case '3': case '4':
+    case '5': case '6': case '7': case '8': case '9':
+    case 'a': case 'b': case 'c': case 'd': case 'e':
+    case 'f': case 'g': case 'h': case 'i': case 'j':
+    case 'k': case 'l': case 'm': case 'n': case 'o':
+    case 'p': case 'q': case 'r': case 's': case 't':
+    case 'u': {
+        return true;
+    }
+        
+    default: {
+        return false;
+    }      
+    }
 }
 
 void ClickGUI::onPacketReceive(PacketEvent& event) {
@@ -86,27 +140,14 @@ void ClickGUI::onPacketReceive(PacketEvent& event) {
 
     for (const auto& [role, color] : roleColors) {
         if (APIUtils::hasRole(role, data->first)) {
-            prefix.emplace(std::format("{}{}{}", "§f[", color, "FLARIAL§f]§r "));
+            prefix.emplace(std::format("{}{}{}", "§r§f[", color, "FLARIAL§f]§r "));
             break;
         }
     }
 
     if (prefix) {
         const auto rawIdx = sanitizedToRawIndex(txt, data->second);
-        std::string formats{};
-
-        for (size_t i = 0; ((i + 2) <= rawIdx) && ((i + 2) <= txt.length()); ++i) {
-            if (
-                (static_cast<uint8_t>(txt[i]) == section1stPart) &&
-                (static_cast<uint8_t>(txt[i + 1]) == section2ndPart)
-                ) {
-                if ((i + 2) < txt.length()) {
-                    formats.append(txt, i, 3);
-                    i += 2;
-                }
-            }
-        }
-
+        const auto formats = collectFormatsBefore(txt, rawIdx);
         txt.insert(rawIdx, *prefix + formats);
     }
 }
