@@ -3,7 +3,6 @@
 #include "../Module.hpp"
 #include "../../../Client.hpp"
 #include "Elements/ClickGUIElements.hpp"
-#include "SDK/Client/Network/Packet/TextPacket.hpp"
 #include "Utils/APIUtils.hpp"
 #include "Utils/WinrtUtils.hpp"
 #include <chrono>
@@ -11,7 +10,7 @@
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 
-class TextPacket;
+class TextPacketProxy;
 
 struct PageType {
     std::string type = "normal";
@@ -83,7 +82,7 @@ private:
     }
 
     static size_t sanitizedToRawIndex(std::string_view raw, size_t sanIdx);
-    static std::string& getMutableTextForWatermark(TextPacket& pkt);
+    static std::string& getMutableTextForWatermark(TextPacketProxy& pkt);
 
 public:
     void onPacketReceive(PacketEvent& event);

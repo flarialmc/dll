@@ -72,62 +72,62 @@ void ZeqaUtils::onPacketReceive(PacketEvent& event)
         ip.find("zeqa") != std::string::npos
     ) {
         if (id == MinecraftPacketIds::Text) {
-            auto* pkt = reinterpret_cast<TextPacket*>(event.getPacket());
+            auto* pkt = reinterpret_cast<TextPacketProxy*>(event.getPacket());
 
             if (getOps<bool>("promomessage")) {
-                if (pkt->message == " " ||
-                    pkt->message == " " ||
-                    pkt->message == " " || //onix promotion
-                    pkt->message == " " ||
-                    pkt->message == " ") {
+                if (pkt->getMessage() == " " ||
+                    pkt->getMessage() == " " ||
+                    pkt->getMessage() == " " || //onix promotion
+                    pkt->getMessage() == " " ||
+                    pkt->getMessage() == " ") {
                     event.cancel();
                 }
             }
             if (getOps<bool>("join")) {
 
-                if (pkt->message.substr(0, 15) == "§8[§a+§8]§a") {
+                if (pkt->getMessage().substr(0, 15) == "§8[§a+§8]§a") {
                     event.cancel();
                 }
             }
             if (getOps<bool>("leave")) {
 
-                if (pkt->message.substr(0, 15) == "§8[§c-§8]§c") {
+                if (pkt->getMessage().substr(0, 15) == "§8[§c-§8]§c") {
                     event.cancel();
                 }
             }
             if (getOps<bool>("killstreak")) {
-                if (pkt->message.contains("§g has gotten a ") && pkt->message.contains("§g killstreak")) {
+                if (pkt->getMessage().contains("§g has gotten a ") && pkt->getMessage().contains("§g killstreak")) {
                     event.cancel();
                 }
             }
             if (getOps<bool>("friendaccept")) {
-                if (pkt->message.find("§l§q» §r§aYou have received a friend request from ") != std::string::npos) {
+                if (pkt->getMessage().find("§l§q» §r§aYou have received a friend request from ") != std::string::npos) {
 
                     std::shared_ptr<Packet> packet = SDK::createPacket(77);
                     auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
-                    command_packet->command = "/f accept " + pkt->message.substr(61, pkt->message.length() - 68);
+                    command_packet->command = "/f accept " + pkt->getMessage().substr(61, pkt->getMessage().length() - 68);
 
                     command_packet->origin.type = CommandOriginType::Player;
 
                     command_packet->InternalSource = true;
                     SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
 
-                    FlarialGUI::Notify("Accepted friend invite from: " + pkt->message.substr(61, pkt->message.length() - 68));
+                    FlarialGUI::Notify("Accepted friend invite from: " + pkt->getMessage().substr(61, pkt->getMessage().length() - 68));
                 }
             }
             if (getOps<bool>("duelaccept")) {
-                if (pkt->message.find(/*"to accept the invite!" &&*/ " §7Type §g/accept") != std::string::npos) {
+                if (pkt->getMessage().find(/*"to accept the invite!" &&*/ " §7Type §g/accept") != std::string::npos) {
 
                     std::shared_ptr<Packet> packet = SDK::createPacket(77);
                     auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
-                    command_packet->command = "/accept " + pkt->message.substr(23, pkt->message.length() - 48);
+                    command_packet->command = "/accept " + pkt->getMessage().substr(23, pkt->getMessage().length() - 48);
 
                     command_packet->origin.type = CommandOriginType::Player;
 
                     command_packet->InternalSource = true;
                     SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
 
-                    FlarialGUI::Notify("Accepted duel invite from: " + pkt->message.substr(23, pkt->message.length() - 48));
+                    FlarialGUI::Notify("Accepted duel invite from: " + pkt->getMessage().substr(23, pkt->getMessage().length() - 48));
                 }
             }
         }

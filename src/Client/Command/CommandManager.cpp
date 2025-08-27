@@ -38,13 +38,13 @@ void CommandManager::onPacket(PacketSendEvent &event) {
     MinecraftPacketIds id = event.getPacket()->getId();
     if (id != MinecraftPacketIds::Text) return;
 
-    auto pkt = reinterpret_cast<TextPacket*>(event.getPacket());
-    if (!pkt || pkt->message.empty() || pkt->message[0] != Client::settings.getSettingByName<std::string>("dotcmdprefix")->value[0]) return;
+    auto pkt = reinterpret_cast<TextPacketProxy*>(event.getPacket());
+    if (!pkt || pkt->getMessage().empty() || pkt->getMessage()[0] != Client::settings.getSettingByName<std::string>("dotcmdprefix")->value[0]) return;
 
     event.setCancelled(true);
 
     // Remove the prefix
-    std::string cmd = pkt->message.substr(1);
+    std::string cmd = pkt->getMessage().substr(1);
     const std::vector<std::string> args = String::split(cmd, ' ');
 
     if (args.empty()) return;

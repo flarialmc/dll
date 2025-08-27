@@ -117,14 +117,14 @@ void CompactChat::onPacketReceive(PacketEvent& event) {
     MinecraftPacketIds id = event.getPacket()->getId();
 
     if (id == MinecraftPacketIds::Text) {
-        auto* pkt = reinterpret_cast<TextPacket*>(event.getPacket());
+        auto* pkt = reinterpret_cast<TextPacketProxy*>(event.getPacket());
         std::vector<GuiMessage>& mesgVec = SDK::clientInstance->getGuiData()->getGuiMessages();
 
         if (mesgVec.empty()) return;
 
         if (mesg.empty()) mesg = mesgVec.back().fullMsg;
 
-        if (pkt->message == mesgVec.back().msg) {
+        if (pkt->getMessage() == mesgVec.back().msg) {
             count += 1;
 
             std::string format = getOps<std::string>("format");

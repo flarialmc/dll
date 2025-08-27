@@ -55,11 +55,11 @@ void ModuleScript::onPacketReceive(PacketEvent &event) {
         auto id = event.getPacket()->getId();
 
         if (id == MinecraftPacketIds::Text) {
-            const auto* tp = reinterpret_cast<TextPacket*>(event.getPacket());
+            const auto* tp = reinterpret_cast<TextPacketProxy*>(event.getPacket());
             if (tp) {
-                std::string msg = tp->message;
-                std::string name = tp->name;
-                int type = static_cast<int>(tp->type);
+                std::string msg = tp->getMessage();
+                std::string name = tp->getName();
+                int type = static_cast<int>(tp->getType());
 
                 bool ChatReceiveEvent = script->registerCancellableEvent("ChatReceiveEvent", msg, name, type);
                 if (ChatReceiveEvent) cancel = true;
@@ -110,11 +110,11 @@ void ModuleScript::onPacketSend(PacketSendEvent& event) {
         bool cancel = false;
 
         if (event.getPacket()->getId() == MinecraftPacketIds::Text) {
-            const auto *pkt = reinterpret_cast<TextPacket*>(event.getPacket());
+            const auto *pkt = reinterpret_cast<TextPacketProxy*>(event.getPacket());
             if (pkt) {
-                std::string msg = pkt->message;
-                std::string name = pkt->name;
-                auto type = pkt->type;
+                std::string msg = pkt->getMessage();
+                std::string name = pkt->getName();
+                auto type = pkt->getType();
 
                 bool ChatSendEvent = script->registerCancellableEvent("ChatSendEvent", msg, name, static_cast<int>(type));
                 if (ChatSendEvent) cancel = true;

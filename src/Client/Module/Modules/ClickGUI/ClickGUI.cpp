@@ -5,6 +5,7 @@
 #include <Scripting/ModuleScript.hpp>
 
 #include "Modules/Misc/ScriptMarketplace/ScriptMarketplace.hpp"
+#include <SDK/Client//Network/Packet/TextPacket.hpp>
 
 std::chrono::time_point<std::chrono::high_resolution_clock> ClickGUI::favoriteStart;
 
@@ -60,14 +61,14 @@ size_t ClickGUI::sanitizedToRawIndex(std::string_view raw, size_t sanIdx) {
     return rawIdx; // raw insertion point corresponding to sanitized index
 }
 
-std::string& ClickGUI::getMutableTextForWatermark(TextPacket& pkt) {
-    return ((pkt.type == TextPacketType::CHAT) && !pkt.name.empty()) ? pkt.name : pkt.message;
+std::string& ClickGUI::getMutableTextForWatermark(TextPacketProxy& pkt) {
+    return ((pkt.getType() == TextPacketType::CHAT) && !pkt.getName().empty()) ? pkt.getName() : pkt.getMessage();
 }
 
 void ClickGUI::onPacketReceive(PacketEvent& event) {
     if (event.getPacket()->getId() != MinecraftPacketIds::Text) return;
-    auto* pkt = reinterpret_cast<TextPacket*>(event.getPacket());
-    if (pkt->message == " ") event.cancel(); //remove onix promotion on zeqa
+    auto* pkt = reinterpret_cast<TextPacketProxy*>(event.getPacket());
+    if (pkt->getMessage() == " ") event.cancel(); //remove onix promotion on zeqa
     if (Client::settings.getSettingByName<bool>("nochaticon")->value) return;
 
     auto& txt = getMutableTextForWatermark(*pkt);

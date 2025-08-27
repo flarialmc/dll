@@ -40,15 +40,15 @@ void TextHotkey::settingsRender(float settingsOffset) {
 					auto player = SDK::clientInstance->getLocalPlayer();
 					//std::string xuid = *player->getXuid(&xuid);
 					std::shared_ptr<Packet> packet = SDK::createPacket(9);
-					auto* akbar = reinterpret_cast<TextPacket*>(packet.get());
+					auto* akbar = reinterpret_cast<TextPacketProxy*>(packet.get());
 
-					akbar->type = TextPacketType::CHAT;
-					akbar->message = std::regex_replace(
+					akbar->getType() = TextPacketType::CHAT;
+					akbar->getMessage() = std::regex_replace(
 						this->settings.getSettingByName<std::string>("text" + count)->value, std::regex("�"), "§");
-					akbar->platformId = "";
-					akbar->translationNeeded = false;
+					akbar->getPlatformId() = "";
+					akbar->getTranslationNeeded() = false;
 					//akbar->xuid = xuid;
-					akbar->name = player->getPlayerName();
+					akbar->getName() = player->getPlayerName();
 
 					SDK::clientInstance->getPacketSender()->sendToServer(akbar);
 
@@ -107,15 +107,15 @@ void TextHotkey::onSetup() {
 					auto player = SDK::clientInstance->getLocalPlayer();
 					//std::string xuid = *player->getXuid(&xuid);
 					std::shared_ptr<Packet> packet = SDK::createPacket(9);
-					auto* akbar = reinterpret_cast<TextPacket*>(packet.get());
+					auto* akbar = reinterpret_cast<TextPacketProxy*>(packet.get());
 
-					akbar->type = TextPacketType::CHAT;
-					akbar->message = std::regex_replace(
+					akbar->getType() = TextPacketType::CHAT;
+					akbar->getMessage() = std::regex_replace(
 						this->settings.getSettingByName<std::string>("text" + count)->value, std::regex("�"), "§");
-					akbar->platformId = "";
-					akbar->translationNeeded = false;
+					akbar->getPlatformId() = "";
+					akbar->getTranslationNeeded() = false;
 					//akbar->xuid = xuid;
-					akbar->name = player->getPlayerName();
+					akbar->getName() = player->getPlayerName();
 
 					SDK::clientInstance->getPacketSender()->sendToServer(akbar);
 

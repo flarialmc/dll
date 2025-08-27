@@ -62,10 +62,10 @@ void AutoGG::onPacketReceive(PacketEvent& event) {
     }
 
     if (id == MinecraftPacketIds::Text) {
-        auto* pkt = reinterpret_cast<TextPacket*>(event.getPacket());
-        if (pkt->message == "§c§l» §r§c§lGame OVER!" || //The Hive
-            pkt->message.find("§r§a won the game!") != std::string::npos || //CubeCraft
-            pkt->message.find("§a has won the game!") != std::string::npos) { //Lifeboat
+        auto* pkt = reinterpret_cast<TextPacketProxy*>(event.getPacket());
+        if (pkt->getMessage() == "§c§l» §r§c§lGame OVER!" || //The Hive
+            pkt->getMessage().find("§r§a won the game!") != std::string::npos || //CubeCraft
+            pkt->getMessage().find("§a has won the game!") != std::string::npos) { //Lifeboat
             SendGG();
             }
     }
@@ -77,15 +77,15 @@ void AutoGG::SendGG() {
     if (!win_message.empty()) {
         auto player = SDK::clientInstance->getLocalPlayer();
         std::shared_ptr<Packet> packet = SDK::createPacket(9);
-        auto* text = reinterpret_cast<TextPacket*>(packet.get());
+        auto* text = reinterpret_cast<TextPacketProxy*>(packet.get());
 
 
-        text->type = TextPacketType::CHAT;
-        text->message = win_message;
-        text->platformId = "";
-        text->translationNeeded = false;
-        text->xuid = "";
-        text->name = player->getPlayerName();
+        text->getType() = TextPacketType::CHAT;
+        text->getMessage() = win_message;
+        text->getPlatformId() = "";
+        text->getTranslationNeeded() = false;
+        text->getXuid() = "";
+        text->getName() = player->getPlayerName();
 
         SDK::clientInstance->getPacketSender()->sendToServer(text);
     }
