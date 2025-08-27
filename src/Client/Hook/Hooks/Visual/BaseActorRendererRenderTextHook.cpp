@@ -6,10 +6,6 @@
 void BaseActorRendererRenderTextHook::drawLogo(ScreenContext* screenContext, const Vec3<float>& cameraPos,
                                                const Vec3<float>& cameraTargetPos, const std::string& nameTag, const Vec3<float>& tagPos, Font* font)
 {
-
-    std::string clearedName = String::removeNonAlphanumeric(String::removeColorCodes(nameTag));
-    if (clearedName.empty()) clearedName = String::removeColorCodes(nameTag); // nametag might contain some unclearable stuff
-
     if (MaterialUtils::getUITextured() == nullptr)
         MaterialUtils::update();
 
@@ -30,6 +26,7 @@ void BaseActorRendererRenderTextHook::drawLogo(ScreenContext* screenContext, con
         {"Regular", "red-logo.png"}
     });
 
+    const auto clearedName = String::removeColorCodes(nameTag);
     std::optional<ResourceLocation> loc{};
 
     for (const auto& [role, logo] : roleLogos) {
