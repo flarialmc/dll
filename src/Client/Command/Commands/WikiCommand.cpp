@@ -30,12 +30,12 @@ void WikiCommand::execute(const std::vector<std::string> &args) {
 
     if (args[0] == "open") {
         WinrtUtils::launchURI(link);
-        addCommandMessage(std::format("Launched wiki page for <{}>!", item->name));
+        addCommandMessage(std::format("Launched the wiki page for <{}>!", item->name));
         return;
     }
     else if (args[0] == "copy") {
         WinrtUtils::setClipboard(link);
-        addCommandMessage(std::format("Copied wiki link for <{}>!", item->name));
+        addCommandMessage(std::format("Copied the wiki link for <{}>!", item->name));
         return;
     }
 
