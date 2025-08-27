@@ -127,6 +127,20 @@ size_t ClickGUI::advancePastFormatCodes(std::string_view raw, size_t i) {
     return i;
 }
 
+bool ClickGUI::playerListContainsTextPrefix(std::string_view text) {
+    /*const*/ auto* lp = SDK::clientInstance->getLocalPlayer();
+    if (!lp) return false;
+
+    /*const*/ auto* lvl = lp->getLevel();
+    if (!lvl) return false;
+
+    for (const auto& [_, entry] : lvl->getPlayerMap()) {
+        if (text.starts_with(entry.name)) return true;
+    }
+
+    return false;
+}
+
 bool ClickGUI::tryApplyWatermark(std::string& text) {
     const auto sanitizedMsg = String::removeColorCodes(text);
     auto data = findFirstOf(sanitizedMsg, std::views::keys(APIUtils::vipUserToRole)); // std::views::concat with APIUtils::onlineUsers
@@ -136,6 +150,10 @@ bool ClickGUI::tryApplyWatermark(std::string& text) {
 
     if (!data) {
         return false;
+    }
+
+    if (!playerListContainsTextPrefix(data->first)) {
+        return false; // false match, there was text in a chat message of a player's username but it wasn't likely to refer to a real player in game
     }
 
     std::optional<std::string> prefix{};

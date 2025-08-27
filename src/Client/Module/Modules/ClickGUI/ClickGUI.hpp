@@ -77,6 +77,7 @@ private:
     static bool isValidFormatCode(char c);
     static bool isSectionAt(std::string_view raw, size_t pos, char* outCode = nullptr);
     static size_t advancePastFormatCodes(std::string_view raw, size_t i);
+    static bool playerListContainsTextPrefix(std::string_view text);
     static bool tryApplyWatermark(std::string& text);
     static constexpr auto getRoleNameToFormatCodeTable() {
         return std::to_array<std::pair<std::string_view, std::string_view>>({
