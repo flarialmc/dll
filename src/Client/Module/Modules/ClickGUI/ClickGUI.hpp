@@ -81,10 +81,13 @@ private:
         return {};
     }
 
+    static std::string& getMutableTextForWatermark(TextPacketProxy& pkt);
     static size_t sanitizedToRawIndex(std::string_view raw, size_t sanIdx);
     static std::string collectFormatsBefore(std::string_view raw, size_t pos);
-    static std::string& getMutableTextForWatermark(TextPacketProxy& pkt);
     static bool isValidFormatCode(char c);
+    static bool isSectionAt(std::string_view raw, size_t pos, char* outCode = nullptr);
+    static size_t advancePastFormatCodes(std::string_view raw, size_t i);
+    static bool tryApplyWatermark(std::string& text);
 
 public:
     void onPacketReceive(PacketEvent& event);

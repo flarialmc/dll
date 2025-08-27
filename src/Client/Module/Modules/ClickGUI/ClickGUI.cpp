@@ -41,64 +41,47 @@ void ClickGUI::fov(FOVEvent& event) {
 	event.setFOV(cFov);
 };*/
 
+std::string& ClickGUI::getMutableTextForWatermark(TextPacketProxy& pkt) {
+    return ((pkt.getType() == TextPacketType::CHAT) && !pkt.getName().empty()) ? pkt.getName() : pkt.getMessage();
+}
+
 size_t ClickGUI::sanitizedToRawIndex(std::string_view raw, size_t sanIdx) {
-    size_t i = 0;
+    size_t i = 0, visible = 0;
 
-    const auto _isSectionAt = [&](size_t p) constexpr {
-        return ((p + 2) < raw.length()) &&
-            (static_cast<uint8_t>(raw[p]) == section1stPart) &&
-            (static_cast<uint8_t>(raw[p + 1]) == section2ndPart) &&
-            isValidFormatCode(raw[p + 2]);
-        };
+    // skip any leading format codes even when `sanIdx` == 0
+    i = advancePastFormatCodes(raw, i);
 
-    const auto _skipSections = [&] constexpr {
-        while (_isSectionAt(i)) {
-            i += 3;
-        }
-        };
-
-    // skip any leading format codes even when sanIdx == 0
-    _skipSections();
-
-    size_t visible = 0;
     while ((i < raw.length()) && (visible < sanIdx)) {
         // consume exactly 1 visible byte
         ++i;
         ++visible;
 
         // skip any format codes immediately after that visible byte
-        _skipSections();
+        i = advancePastFormatCodes(raw, i);
     }
 
-    // now i is the byte index in raw where the `sanIdx`-th visible byte begins
+    // now `i` is the byte index in raw where the `sanIdx`-th visible byte begins
     return i;
 }
 std::string ClickGUI::collectFormatsBefore(std::string_view raw, size_t pos) {
     std::string out{};
+    pos = std::min(pos, raw.length());
     out.reserve(pos);
 
     size_t i = 0;
-    pos = std::min(pos, raw.length());
-
-    while ((i + 2) < pos) {
-        const auto b0 = static_cast<uint8_t>(raw[i]);
-        const auto b1 = static_cast<uint8_t>(raw[i + 1]);
-        if ((b0 == section1stPart) && (b1 == section2ndPart)) {
-            const auto code = raw[i + 2];  // we know i+2 < pos <= raw.length()
-            if (isValidFormatCode(code)) {
+    while (i < pos) {
+        if (isSectionAt(raw, i)) {
+            if ((i + 3) <= pos) { // only collect if the whole format chunk is strictly before `pos`
                 out.append(raw.substr(i, 3));
-                i += 3;
-                continue;
             }
+            i += 3;
         }
-        ++i;
+        else {
+            ++i;
+        }
     }
 
     return out;
-}
-
-std::string& ClickGUI::getMutableTextForWatermark(TextPacketProxy& pkt) {
-    return ((pkt.getType() == TextPacketType::CHAT) && !pkt.getName().empty()) ? pkt.getName() : pkt.getMessage();
 }
 
 bool ClickGUI::isValidFormatCode(char c) {
@@ -119,24 +102,43 @@ bool ClickGUI::isValidFormatCode(char c) {
     }
 }
 
-void ClickGUI::onPacketReceive(PacketEvent& event) {
-    if (event.getPacket()->getId() != MinecraftPacketIds::Text) return;
-    auto* pkt = reinterpret_cast<TextPacketProxy*>(event.getPacket());
-    if (pkt->getMessage() == " ") event.cancel(); //remove onix promotion on zeqa
-    if (Client::settings.getSettingByName<bool>("nochaticon")->value) return;
+bool ClickGUI::isSectionAt(std::string_view raw, size_t pos, char* outCode) {
+    if ((pos + 2) >= raw.length()) {
+        return false;
+    }
 
-    auto& txt = getMutableTextForWatermark(*pkt);
+    const auto b0 = static_cast<uint8_t>(raw[pos + 0]);
+    const auto b1 = static_cast<uint8_t>(raw[pos + 1]);
+    const auto c = raw[pos + 2];
+    if ((b0 == section1stPart) && (b1 == section2ndPart) && isValidFormatCode(c)) {
+        if (outCode) {
+            *outCode = c;
+        }
+        return true;
+    }
 
-    std::optional<std::string> prefix{};
-    const auto sanitizedMsg = String::removeColorCodes(txt);
+    return false;
+}
+
+size_t ClickGUI::advancePastFormatCodes(std::string_view raw, size_t i) {
+    while (isSectionAt(raw, i)) {
+        i += 3; // skip section symbol (2 bytes) + 1 code byte
+    }
+    return i;
+}
+
+bool ClickGUI::tryApplyWatermark(std::string& text) {
+    const auto sanitizedMsg = String::removeColorCodes(text);
     auto data = findFirstOf(sanitizedMsg, std::views::keys(APIUtils::vipUserToRole)); // std::views::concat with APIUtils::onlineUsers
     if (!data) {
         data = findFirstOf(sanitizedMsg, APIUtils::onlineUsers);
     }
 
     if (!data) {
-        return;
+        return false;
     }
+
+    std::optional<std::string> prefix{};
 
     for (const auto& [role, color] : roleColors) {
         if (APIUtils::hasRole(role, data->first)) {
@@ -146,10 +148,23 @@ void ClickGUI::onPacketReceive(PacketEvent& event) {
     }
 
     if (prefix) {
-        const auto rawIdx = sanitizedToRawIndex(txt, data->second);
-        const auto formats = collectFormatsBefore(txt, rawIdx);
-        txt.insert(rawIdx, *prefix + formats);
+        const auto rawIdx = sanitizedToRawIndex(text, data->second);
+        const auto formats = collectFormatsBefore(text, rawIdx);
+        text.insert(rawIdx, *prefix + formats);
+        return true;
     }
+
+    return false;
+}
+
+void ClickGUI::onPacketReceive(PacketEvent& event) {
+    if (event.getPacket()->getId() != MinecraftPacketIds::Text) return;
+    auto* pkt = reinterpret_cast<TextPacketProxy*>(event.getPacket());
+    if (pkt->getMessage() == " ") event.cancel(); //remove onix promotion on zeqa
+    if (Client::settings.getSettingByName<bool>("nochaticon")->value) return;
+
+    auto& text = getMutableTextForWatermark(*pkt);
+    tryApplyWatermark(text);
 }
 
 void ClickGUI::onRender(RenderEvent &event) {
