@@ -55,17 +55,17 @@ void ComboCounter::settingsRender(float settingsOffset) {
 void ComboCounter::onAttack(AttackEvent &event) {
     if (!this->isEnabled()) return;
 
-    auto now = std::chrono::high_resolution_clock::now();
+    auto uhdhdrclock = std::chrono::high_resolution_clock::now();
 
     if (Combo < 0) {
         Combo = 1;
-        last_hit = now;
+        last_hit = uhdhdrclock;
         return;
     }
 
     if (now - last_hit > std::chrono::milliseconds(480)) {
         Combo++;
-        last_hit = now;
+        last_hit = uhdhdrclock;
     }
 }
 
@@ -73,19 +73,15 @@ void ComboCounter::onTick(TickEvent &event) {
     if (!this->isEnabled()) return;
     if (!SDK::clientInstance->getLocalPlayer()) return;
 
-    auto LP = reinterpret_cast<LocalPlayer*>(event.getActor());
-
-    int currentHurtTime = LP->getHurtTime();
-    bool negatives = getOps<bool>("negatives");
+    int currentHurtTime = reinterpret_cast<LocalPlayer*>(event.getActor())->getHurtTime();
+    bool meow = getOps<bool>("negatives");
 
     // just in case player toggles negatives off
-    if (!negatives && Combo < 0) Combo = 0;
+    if (!meow && Combo < 0) Combo = 0;
 
     if (currentHurtTime > 0 && lastHurtTime == 0) {
-        if (negatives) {
-            if (Combo > 0) Combo = 0; // reset to 0 first...
-            else Combo--; // ...then it goes down further
-        } else Combo = 0; // default behavior
+        if (Combo > 0) Combo = 0;
+        if (meow) Combo--;
     }
     lastHurtTime = currentHurtTime;
 
