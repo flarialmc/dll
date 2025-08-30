@@ -56,7 +56,6 @@ void ComboCounter::onAttack(AttackEvent &event) {
     if (!this->isEnabled()) return;
 
     auto now = std::chrono::high_resolution_clock::now();
-    bool negatives = getOps<bool>("negatives");
 
     if (Combo < 0) {
         Combo = 1;
