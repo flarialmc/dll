@@ -2,11 +2,6 @@
 
 #include "Events/EventManager.hpp"
 
-PingCounter::PingCounter(): Module("Ping Counter", "Displays your current latency to the server.",
-                                   IDR_PING_PNG, "")
-{
-    
-}
 
 void PingCounter::onEnable()
 {
@@ -22,27 +17,22 @@ void PingCounter::onDisable()
 
 void PingCounter::defaultConfig()
 {
+    Module::defaultConfig("all");
+    setDef("spoof", false);
+    setDef("pingSpoofer", 1.0f);
     setDef("text", (std::string)"{value}ms");
     setDef("textscale", 0.8f);
-    Module::defaultConfig("all");
-    
 }
 
 void PingCounter::settingsRender(float settingsOffset)
 {
-    float x = Constraints::PercentageConstraint(0.019, "left");
-    float y = Constraints::PercentageConstraint(0.10, "top");
-
-    const float scrollviewWidth = Constraints::RelativeConstraint(0.5, "height", true);
-
-
-    FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
-    FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
-                              Constraints::RelativeConstraint(1.0, "width"),
-                              Constraints::RelativeConstraint(0.88f, "height"));
+    initSettingsPage();
 
 
     addHeader("Ping Counter");
+    addToggle("Spoof Ping", "", "spoof");
+    addConditionalSlider(getOps<bool>("spoof"), "Spoofer", "Adjusts the displayed ping.", "pingSpoofer", 10.0f);
+    extraPadding();
     defaultAddSettings("main");
     extraPadding();
 
@@ -64,6 +54,12 @@ void PingCounter::settingsRender(float settingsOffset)
 void PingCounter::onRender(RenderEvent& event)
 {
     if (!this->isEnabled()) return;
-    auto pingStr = FlarialGUI::cached_to_string(SDK::getServerPing());
+
+    float ping = SDK::getServerPing();
+
+    if (getOps<bool>("spoof")) ping *= round(getOps<float>("pingSpoofer"));
+
+    auto pingStr = FlarialGUI::cached_to_string((int)round(ping));
+
     this->normalRender(11, pingStr);
 }

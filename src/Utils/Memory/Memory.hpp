@@ -46,24 +46,26 @@ AS_FIELD(type, name, get##name);                                                
 type get##name() const { return direct_access<type>(ptr, offset); }                                                     \
 void set##name(type v) const { direct_access<type>(ptr, offset) = v; }
 
+#define BUILD_ACCESS_REF(ptr, type, name, offset)                                                                    \
+type& get##name() { return direct_access<type>(ptr, offset); }                                                    \
+const type& get##name() const { return direct_access<type>(ptr, offset); }                                        \
+void set##name(const type& v) { direct_access<type>(ptr, offset) = v; }
 
 class Memory {
 public:
-
     template<unsigned int IIdx, typename TRet, typename... TArgs>
     static auto CallVFunc(void *thisptr, TArgs... argList) -> TRet {
         using Fn = TRet(__thiscall *)(void *, decltype(argList)...);
         return (*static_cast<Fn **>(thisptr))[IIdx](thisptr, std::forward<TArgs>(argList)...);
     }
 
-    template <typename TRet, typename... TArgs>
-    static auto CallVFuncI(uint32_t index, void* thisptr, TArgs... argList) -> TRet {
-        using Fn = TRet(__thiscall*)(void*, TArgs...);
-        return (*static_cast<Fn**>(thisptr))[index](thisptr, std::forward<TArgs>(argList)...);
+    template<typename TRet, typename... TArgs>
+    static auto CallVFuncI(uint32_t index, void *thisptr, TArgs... argList) -> TRet {
+        using Fn = TRet(__thiscall*)(void *, TArgs...);
+        return (*static_cast<Fn **>(thisptr))[index](thisptr, std::forward<TArgs>(argList)...);
     }
 
     static void hookFunc(void *pTarget, void *pDetour, void **ppOriginal, std::string name) {
-
         if (pTarget == nullptr) {
             Logger::custom(fg(fmt::color::crimson), "vFunc Hook", "{} has invalid address", name);
             return;
@@ -117,6 +119,7 @@ public:
         }
     }
 
+
     // Overload for winrt::com_ptr - smart pointer handles Release() automatically
     template<typename T>
     static void SafeRelease(winrt::com_ptr<T> &pPtr) {
@@ -124,18 +127,18 @@ public:
     }
 
     static uintptr_t findDMAAddy(uintptr_t ptr, const std::vector<unsigned int>& offsets) {
+
         uintptr_t addr = ptr;
 
-        for (unsigned int offset : offsets) {
+        for (unsigned int offset: offsets) {
             addr = *(uintptr_t *) addr;
             addr += offset;
         }
         return addr;
     }
 
-    static void nopBytes(void* dst, const unsigned int size) {
-        if (dst == nullptr)
-            return;
+    static void nopBytes(void *dst, const unsigned int size) {
+        if (dst == nullptr) return;
 
         DWORD oldprotect;
         VirtualProtect(dst, size, PAGE_EXECUTE_READWRITE, &oldprotect);
@@ -143,9 +146,8 @@ public:
         VirtualProtect(dst, size, oldprotect, &oldprotect);
     }
 
-    static void copyBytes(void* src, void* dst, const unsigned int size) {
-        if (src == nullptr || dst == nullptr)
-            return;
+    static void copyBytes(void *src, void *dst, const unsigned int size) {
+        if (src == nullptr || dst == nullptr) return;
 
         DWORD oldprotect;
         VirtualProtect(src, size, PAGE_EXECUTE_READWRITE, &oldprotect);
@@ -154,8 +156,7 @@ public:
     }
 
     static void patchBytes(void *dst, const void *src, const unsigned int size) {
-        if (src == nullptr || dst == nullptr)
-            return;
+        if (src == nullptr || dst == nullptr) return;
 
         DWORD oldprotect;
         VirtualProtect(dst, size, PAGE_EXECUTE_READWRITE, &oldprotect);
@@ -163,13 +164,14 @@ public:
         VirtualProtect(dst, size, oldprotect, &oldprotect);
     }
 
-    static uintptr_t offsetFromSig(uintptr_t sig, int offset) { // REL RIP ADDR RESOLVER
+    static uintptr_t offsetFromSig(uintptr_t sig, int offset) {
+        // REL RIP ADDR RESOLVER
         // pointer is relative to the code it is in - it is how far to the left in bytes you need to move to get to the value it points to,
         // this function returns absolute address in memory ("(sig)A B C (+offset)? ? ? ?(+4)(from here + bytes to move to get to value pointer points to) D E F")
         // offset val = *reinterpret_cast<int *>(sig + offset)
         // base = sig + offset + 4
 
-        if(sig == 0) return 0;
+        if (sig == 0) return 0;
         return sig + offset + 4 + *reinterpret_cast<int *>(sig + offset);
     }
 
@@ -190,15 +192,15 @@ public:
     }
 
     static uintptr_t GetAddressByIndex(uintptr_t vtable, int index) {
-        return *reinterpret_cast<uintptr_t*>(vtable + 8 * index);
+        return *reinterpret_cast<uintptr_t *>(vtable + 8 * index);
     }
+
     static void SetProtection(uintptr_t addr, size_t size, DWORD protect) {
         DWORD oldProtect;
-        VirtualProtect((LPVOID)addr, size, protect, &oldProtect);
+        VirtualProtect((LPVOID) addr, size, protect, &oldProtect);
     }
 
     static std::vector<std::byte> readFile(std::filesystem::path path) {
-
         std::ifstream file(path, std::ios::binary);
         if (!file.is_open()) {
             return {};
@@ -208,7 +210,7 @@ public:
         file.seekg(0, std::ios::beg);
 
         std::vector<std::byte> buffer(fileSize);
-        file.read(reinterpret_cast<char*>(buffer.data()), fileSize);
+        file.read(reinterpret_cast<char *>(buffer.data()), fileSize);
         file.close();
 
         return buffer;

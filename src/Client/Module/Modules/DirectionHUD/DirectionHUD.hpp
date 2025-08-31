@@ -9,7 +9,6 @@
 class DirectionHUD : public Module {
 public:
 	float lerpYaw = 0.f;
-	float yaw = 0.f;
 
 
 	DirectionHUD() : Module("DirectionHUD", "Shows a compass showing your direction",

@@ -65,12 +65,13 @@ std::string ClientInstance::getTopScreenName() {
 }
 
 std::string ClientInstance::getScreenName() {
-    std::string screen = "no_screen";
+    return SDK::currentScreen;
+    // std::string screen = "no_screen";
 
-    static auto sig = GET_SIG_ADDRESS("ClientInstance::getScreenName");
+    /*static auto sig = GET_SIG_ADDRESS("ClientInstance::getScreenName");
     auto fn = reinterpret_cast<std::string& (__thiscall *)(ClientInstance*, std::string&)>(sig);
     screen = fn(this, screen);
-    return screen;
+    return screen;*/
 }
 
 

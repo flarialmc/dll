@@ -4,8 +4,20 @@
 #include "Events/Game/PerspectiveEvent.hpp"
 
 class SnapLook : public Module {
+
+private:
+
+	std::unordered_map<std::string, Perspective> perspectiveMap = {
+		{"Third Person Front", Perspective::ThirdPersonFront},
+		{"Third Person Back", Perspective::ThirdPersonBack},
+		{"First Person", Perspective::FirstPerson}
+	};
+
 public:
-	SnapLook();;
+	SnapLook() : Module("SnapLook", "Quickly look behind you.",
+		IDR_EYE_PNG, "V") {
+
+	};
 
 	void onEnable() override;
 
@@ -15,8 +27,9 @@ public:
 
 	void settingsRender(float settingsOffset) override;
 
-	// TODO: make it togglable
-	void onKey(KeyEvent& event);;
+	void onKey(KeyEvent& event);
 
-	void onGetViewPerspective(PerspectiveEvent& event) const;
+	void onMouse(MouseEvent& event);
+
+	void onGetViewPerspective(PerspectiveEvent& event);
 };

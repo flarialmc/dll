@@ -3,10 +3,12 @@
 #include "../Module.hpp"
 #include "Events/Game/TickEvent.hpp"
 
-
 class WeatherChanger : public Module {
 public:
-	WeatherChanger();;
+	float oldTemp;
+	Biome* oldBiome = nullptr;
+
+	WeatherChanger();
 
 	void onEnable() override;
 
@@ -17,5 +19,6 @@ public:
 	void settingsRender(float settingsOffset) override;
 
 	void onTick(TickEvent& event);
-};
 
+	void onRender(RenderEvent& event);
+};

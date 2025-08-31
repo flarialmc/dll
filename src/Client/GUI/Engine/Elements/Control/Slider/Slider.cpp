@@ -28,19 +28,6 @@ float FlarialGUI::Slider(int index, float x, float y, float& startingPoint, cons
 		}
 	}
 
-	// bool ye = false;
-
-	/*
-	for (auto& rect : SliderRects) {
-
-		if (rect.isMovingElement && i != index) {
-			ye = true;
-			break;
-		}
-
-		i++;
-	}*/
-
 	// Define the total slider rect width and height
 	const bool isAdditionalY = shouldAdditionalY;
 	const float totalWidth = Constraints::RelativeConstraint(0.15, "height", true);
@@ -77,7 +64,7 @@ float FlarialGUI::Slider(int index, float x, float y, float& startingPoint, cons
 
 	D2D_COLOR_F colToSet = TextBoxes[30 + index].isActive ? color : disabledColor;
 
-	TextBoxes[30 + index].curBgCol = FlarialGUI::LerpColor(TextBoxes[30 + index].curBgCol, CursorInRect(x, y + (isInScrollView ? scrollpos : 0), percWidth, percHeight) ? D2D1::ColorF(colToSet.r * 0.8, colToSet.g * 0.8, colToSet.b * 0.8, colToSet.a) : colToSet, 0.1f * FlarialGUI::frameFactor);
+	TextBoxes[30 + index].curBgCol = LerpColor(TextBoxes[30 + index].curBgCol, CursorInRect(x, y + (isInScrollView ? scrollpos : 0), percWidth, percHeight) ? D2D1::ColorF(colToSet.r * 0.8, colToSet.g * 0.8, colToSet.b * 0.8, colToSet.a) : colToSet, 0.1f * frameFactor);
 
 	if (CursorInRect(x, y + (isInScrollView ? scrollpos : 0), percWidth, percHeight) && !TextBoxes[30 + index].isHovering) {
 		TextBoxes[30 + index].isHovering = true;
@@ -88,58 +75,51 @@ float FlarialGUI::Slider(int index, float x, float y, float& startingPoint, cons
 		WinrtUtils::setCursorTypeThreaded(CoreCursorType::Arrow);
 	}
 
-	FlarialGUI::RoundedRect(x, y, TextBoxes[30 + index].curBgCol, percWidth, percHeight, round.x, round.x);
+	RoundedRect(x, y, TextBoxes[30 + index].curBgCol, percWidth, percHeight, round.x, round.x);
 
 	int limit = 5;
-	if (text.find('-') != std::string::npos) limit = 6;
 
-	text = FlarialGUI::TextBox(30 + index, text, limit, x, y, percWidth, percHeight, 2, moduleName, settingName);
+	startingPoint = std::clamp(startingPoint, zerosafe && minValue == 0.f ? 0.001f : minValue, maxValue);
+	if (SliderRects[index].validFloat == -1.f) SliderRects[index].validFloat = std::clamp(startingPoint, zerosafe && minValue == 0.f ? 0.001f : minValue, maxValue);
+
+	text = TextBox(30 + index, text, limit, x, y, percWidth, percHeight, 2, moduleName, settingName);
 	text = String::removeNonNumeric(text);
-	if (text == ".") {
-		if (zerosafe) text = "0.01";
-		else text = "0.";
-	}
 
-	if (FlarialGUI::TextBoxes[30 + index].isActive) {
-		if (FlarialGUI::TextBoxes[30 + index].isAt1) FlarialGUI::lerp(FlarialGUI::TextBoxes[30 + index].cursorOpac, -1.0f, 0.05f * FlarialGUI::frameFactor);
-		else FlarialGUI::lerp(FlarialGUI::TextBoxes[30 + index].cursorOpac, 2.0f, 0.05f * FlarialGUI::frameFactor);
-	}
+	if (text.empty() || text == ".") SliderRects[index].isValid = false;
 	else {
-		FlarialGUI::TextBoxes[30 + index].cursorOpac = 0;
+		SliderRects[index].isValid = true;
+		SliderRects[index].validFloat = std::clamp(std::stof(text), zerosafe && minValue == 0.f ? 0.001f : minValue, maxValue);
 	}
 
-	if (FlarialGUI::TextBoxes[30 + index].cursorOpac > 1) FlarialGUI::TextBoxes[30 + index].isAt1 = true;
-	if (FlarialGUI::TextBoxes[30 + index].cursorOpac < 0) FlarialGUI::TextBoxes[30 + index].isAt1 = false;
-
-	if (startingPoint > maxValue) {
-		startingPoint = maxValue;
-		TextBoxes[30 + index].text = FlarialGUI::cached_to_string(startingPoint);
+	if (TextBoxes[30 + index].isActive) {
+		if (TextBoxes[30 + index].isAt1) lerp(TextBoxes[30 + index].cursorOpac, -1.0f, 0.05f * frameFactor);
+		else lerp(TextBoxes[30 + index].cursorOpac, 2.0f, 0.05f * frameFactor);
 	}
-	else if (startingPoint < minValue) {
-		startingPoint = zerosafe ? 0.001f : minValue;
-		TextBoxes[30 + index].text = FlarialGUI::cached_to_string(startingPoint);
-	}
-	else if (!text.empty()) startingPoint = std::stof(text);
+	else TextBoxes[30 + index].cursorOpac = 0;
 
-	std::string ok = FlarialGUI::FlarialTextWithFont(
-		x + (FlarialGUI::TextBoxes[30 + index].isActive ? Constraints::SpacingConstraint(0.1, percWidth) : 0),
-		y, FlarialGUI::to_wide(text).c_str(), percWidth, percHeight,
-		FlarialGUI::TextBoxes[30 + index].isActive ? DWRITE_TEXT_ALIGNMENT_LEADING : DWRITE_TEXT_ALIGNMENT_CENTER,
+
+	if (TextBoxes[30 + index].cursorOpac > 1) TextBoxes[30 + index].isAt1 = true;
+	if (TextBoxes[30 + index].cursorOpac < 0) TextBoxes[30 + index].isAt1 = false;
+
+	std::string ok = FlarialTextWithFont(
+		x + (TextBoxes[30 + index].isActive ? Constraints::SpacingConstraint(0.1, percWidth) : 0),
+		y, to_wide(text).c_str(), percWidth, percHeight,
+		TextBoxes[30 + index].isActive ? DWRITE_TEXT_ALIGNMENT_LEADING : DWRITE_TEXT_ALIGNMENT_CENTER,
 		Constraints::FontScaler(percWidth * 14.5f), DWRITE_FONT_WEIGHT_NORMAL);
 
 	D2D1_COLOR_F cursorCol = ClickGUI::getColor("primary2");
 
-	cursorCol.a = FlarialGUI::TextBoxes[30 + index].cursorOpac;
+	cursorCol.a = TextBoxes[30 + index].cursorOpac;
 
-	FlarialGUI::lerp(FlarialGUI::TextBoxes[30 + index].cursorX,
-		x + FlarialGUI::TextSizes[ok] + Constraints::SpacingConstraint(0.11, percWidth),
-		0.420f * FlarialGUI::frameFactor);
+	lerp(TextBoxes[30 + index].cursorX,
+		x + TextSizes[ok] + Constraints::SpacingConstraint(0.11, percWidth),
+		0.420f * frameFactor);
 
 	// white cursor blinky
 
-	if (FlarialGUI::TextBoxes[30 + index].cursorX > x)
-		FlarialGUI::RoundedRect(
-			FlarialGUI::TextBoxes[30 + index].cursorX,
+	if (TextBoxes[30 + index].cursorX > x)
+		RoundedRect(
+			TextBoxes[30 + index].cursorX,
 			y + Constraints::RelativeConstraint(0.035f) / 3.0f, cursorCol,
 			Constraints::RelativeConstraint(0.005f),
 			percHeight - Constraints::RelativeConstraint(0.025f), 0, 0);
@@ -158,7 +138,7 @@ float FlarialGUI::Slider(int index, float x, float y, float& startingPoint, cons
 
 	float circleY;
 
-	if (FlarialGUI::isInScrollView) circleY = (y + scrollpos) + height / 2.0f;
+	if (isInScrollView) circleY = (y + scrollpos) + height / 2.0f;
 	else circleY = y + height / 2.0f;
 
 	float rectangleLeft = farLeftX;
@@ -171,14 +151,13 @@ float FlarialGUI::Slider(int index, float x, float y, float& startingPoint, cons
 		if (!TextBoxes[30 + index].isActive)
 			circleX = (SliderRects[index].percentageX - minValue) * (rectangleWidth / (maxValue - minValue)) +
 			rectangleLeft;
-		else circleX = (startingPoint - minValue) * (rectangleWidth / (maxValue - minValue)) + rectangleLeft;
+		else circleX = (SliderRects[index].validFloat - minValue) * (rectangleWidth / (maxValue - minValue)) + rectangleLeft;
 
 	}
-	else if (startingPoint != 50.0f && !SliderRects[index].hasBeenMoved) {
+	else if (SliderRects[index].validFloat != 50.0f && !SliderRects[index].hasBeenMoved)
+		circleX = (SliderRects[index].validFloat - minValue) * (rectangleWidth / (maxValue - minValue)) + rectangleLeft;
 
-		circleX = (startingPoint - minValue) * (rectangleWidth / (maxValue - minValue)) + rectangleLeft;
 
-	}
 
 	// Calculate the position and width of the enabled portion rect
 	const float enabledWidth = circleX - farLeftX;
@@ -191,12 +170,12 @@ float FlarialGUI::Slider(int index, float x, float y, float& startingPoint, cons
 	// Draw the enabled portion rect
 	RoundedRect(farLeftX, y, color, enabledWidth, height, round.x, round.x);
 
-	if (SliderRects[index].isMovingElement || Utils::CursorInEllipse(circleX, circleY, Constraints::SpacingConstraint(circleRadius, 1.5f), Constraints::SpacingConstraint(circleRadius, 1.5f))) { 
-		FlarialGUI::lerp(SliderRects[index].hoveredAnim, 1.f, 0.25f * FlarialGUI::frameFactor); 
+	if (SliderRects[index].isMovingElement || Utils::CursorInEllipse(circleX, circleY, Constraints::SpacingConstraint(circleRadius, 1.5f), Constraints::SpacingConstraint(circleRadius, 1.5f))) {
+		lerp(SliderRects[index].hoveredAnim, 1.f, 0.25f * frameFactor);
 		if (!SliderRects[index].firstHover) {
 
 			WinrtUtils::setCursorTypeThreaded(CoreCursorType::SizeWestEast);
-			
+
 			SliderRects[index].firstHover = true;
 		}
 	}
@@ -205,12 +184,12 @@ float FlarialGUI::Slider(int index, float x, float y, float& startingPoint, cons
 			WinrtUtils::setCursorTypeThreaded(CoreCursorType::Arrow);
 			SliderRects[index].firstHover = false;
 		}
-		FlarialGUI::lerp(SliderRects[index].hoveredAnim, 0.f, 0.25f * FlarialGUI::frameFactor);
+		lerp(SliderRects[index].hoveredAnim, 0.f, 0.25f * frameFactor);
 	}
 
 	// Draw the circle in the middle
-	FlarialGUI::Circle(circleX, circleY, color, Constraints::SpacingConstraint(circleRadius, 1.1f + (1.1f * 0.35f * SliderRects[index].hoveredAnim)));
-	FlarialGUI::Circle(circleX, circleY, circleColor, Constraints::SpacingConstraint(circleRadius, 0.55f + (0.55f * 0.35f * SliderRects[index].hoveredAnim)));
+	Circle(circleX, circleY, color, Constraints::SpacingConstraint(circleRadius, 1.1f + (1.1f * 0.35f * SliderRects[index].hoveredAnim)));
+	Circle(circleX, circleY, circleColor, Constraints::SpacingConstraint(circleRadius, 0.55f + (0.55f * 0.35f * SliderRects[index].hoveredAnim)));
 
 	// Calculate the percentage
 	float percentage = ((circleX - rectangleLeft) / rectangleWidth) * (maxValue - minValue) + minValue;
@@ -236,15 +215,6 @@ float FlarialGUI::Slider(int index, float x, float y, float& startingPoint, cons
 		SliderRects[index].percentageX = percentage;
 
 	}
-
-	/* if (CursorInRect(oriX, y, percWidth, percHeight) && TextBoxes[30 + index].isActive && MC::mouseButton == MouseButton::Right && !MC::held && clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value > 0.95f) {
-		 if (Client::settings.getSettingByName<bool>("resettableSettings")->value && moduleName != "" && settingName != "") {
-			 auto mod = ModuleManager::getModule(moduleName);
-			 mod->settings.deleteSetting(settingName);
-			 mod->defaultConfig();
-			 text = std::to_string(mod->settings.getSettingByName<float>(settingName)->value);
-		 }
-	 }*/
 
 	if (Utils::CursorInEllipse(circleX, circleY, Constraints::SpacingConstraint(circleRadius, 1.5f), Constraints::SpacingConstraint(circleRadius, 1.5f)) && MC::held &&
 		(activeSliders == 0 || SliderRects[index].isMovingElement) && clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value > 0.95f) {
@@ -291,7 +261,7 @@ float FlarialGUI::Slider(int index, float x, float y, float& startingPoint, cons
 
 	if (isAdditionalY) SetIsInAdditionalYMode();
 
-	startingPoint = percentage;
+	if (SliderRects[index].isValid) startingPoint = percentage;
 
 	if (settingName == "uiscale") ModuleManager::getModule(moduleName)->prevAlignments = std::vector<DWRITE_TEXT_ALIGNMENT>(100, DWRITE_TEXT_ALIGNMENT_JUSTIFIED);
 

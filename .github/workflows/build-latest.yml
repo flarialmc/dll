@@ -6,7 +6,7 @@ on:
       - 'beta-*'
       - 'release-*'
   pull_request:
-    branches: [ "main", "scripting-v2" ]
+    branches: [ "main", "legacy" ]
   workflow_dispatch:
 
 env:
@@ -35,15 +35,15 @@ jobs:
                   echo "Unknown tag type, skipping build"
                   echo "should_build=false" >> "$GITHUB_OUTPUT"
               fi
-          elif [[ "${{ github.event.head_commit.message }}" == *"nightly:"* ]]; then
+          elif [[ "${{ github.event.head_commit.message }}" == *"nightly:"* ]] || [[ "${{ github.event.head_commit.message }}" == *"Revert"*"nightly:"* ]]; then
               echo "Build needed for nightly"
               echo "should_build=true" >> "$GITHUB_OUTPUT"
               echo "type=0" >> "$GITHUB_OUTPUT"
-          elif [[ "${{ github.event.head_commit.message }}" == *"release:"* ]]; then
+          elif [[ "${{ github.event.head_commit.message }}" == *"release:"* ]] || [[ "${{ github.event.head_commit.message }}" == *"Revert"*"release:"* ]]; then
               echo "Build needed for release"
               echo "should_build=true" >> "$GITHUB_OUTPUT"
               echo "type=1" >> "$GITHUB_OUTPUT"
-          elif [[ "${{ github.event.head_commit.message }}" == *"beta:"* ]]; then
+          elif [[ "${{ github.event.head_commit.message }}" == *"beta:"* ]] || [[ "${{ github.event.head_commit.message }}" == *"Revert"*"beta:"* ]]; then
               echo "Build needed for beta"
               echo "should_build=true" >> "$GITHUB_OUTPUT"
               echo "type=2" >> "$GITHUB_OUTPUT"
@@ -81,6 +81,11 @@ jobs:
         with:
            name: Flarial_DLL
            path: C:\a\dll\dll\build\Flarial.dll
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v4.6.1
+        with:
+          name: Flarial_DLL
+          path: D:\a\dll\dll\build\Flarial.dll
 
   upload-to-cdn:
     runs-on: ubuntu-latest
@@ -144,7 +149,7 @@ jobs:
         run: |
           git config user.name "GitHub Actions Bot"
           git config user.email "actions@example.com"
-          mv -f Flarial_DLL/Flarial.dll "./dll/latest.dll"
+          cp -f Flarial_DLL/Flarial.dll "./dll/latest.dll"
           git add ./dll/latest.dll
           git commit -m "Add Release for Release Commit: '${{ github.event.head_commit.message }}'"
           git push origin main
@@ -184,7 +189,7 @@ jobs:
         run: |
           git config user.name "GitHub Actions Bot"
           git config user.email "actions@example.com"
-          mv -f Flarial_DLL/Flarial.dll "./dll/beta.dll"
+          cp -f Flarial_DLL/Flarial.dll "./dll/beta.dll"
           git add ./dll/beta.dll
           git commit -m "Add Beta for Beta Commit: '${{ github.event.head_commit.message }}'"
           git push origin main
@@ -224,7 +229,7 @@ jobs:
         run: |
           git config user.name "GitHub Actions Bot"
           git config user.email "actions@example.com"
-          curl https://api.github.com/repos/TTF-fog/newcdn/tags > cache.txt
+          curl https://api.github.com/repos/flarialmc/newcdn/tags > cache.txt
   
           git add cache.txt
           git commit -m "Add Cache for Tags (API)"

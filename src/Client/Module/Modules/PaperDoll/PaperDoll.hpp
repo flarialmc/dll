@@ -5,13 +5,15 @@
 #include "Events/Render/SetupAndRenderEvent.hpp"
 
 class PaperDoll : public Module {
-private:
+public:
 	Vec2<float> currentPos{};
 	bool enabled = false;
+	bool delayDisable = false;
+	bool restored = false;
 	static inline Vec2<float> originalPos = Vec2<float>{ 0.0f, 0.0f };
 	Vec2<float> currentSize = Vec2<float>{ 0.0f, 0.0f };
-public:
-	PaperDoll();;
+
+	PaperDoll();
 
 	void onEnable() override;
 

@@ -5,11 +5,6 @@
 #include "Modules/ClickGUI/ClickGUI.hpp"
 
 void ArmorHUD::onEnable() {
-	if (FlarialGUI::inMenu) {
-		std::string s = "To change the position of ArmorHUD, Please click " + ModuleManager::getModule("ClickGUI")->getOps<std::string>("editmenubind") + " in the settings tab.";
-		std::cout << s << std::endl;
-		FlarialGUI::Notify(s);
-	}
 	Listen(this, RenderEvent, &ArmorHUD::onRender)
 		Listen(this, SetupAndRenderEvent, &ArmorHUD::onSetupAndRender)
 		Module::onEnable();
@@ -30,6 +25,7 @@ void ArmorHUD::defaultConfig() {
 	setDef("textSize", 0.05f);
 	setDef("uiscale", 1.0f);
 	setDef("show_offhand", true);
+	setDef("show_mainhand", true);
 	setDef("vertical", false);
 	setDef("durability_left", false);
 	setDef("percent", false);
@@ -60,16 +56,7 @@ void ArmorHUD::defaultConfig() {
 }
 
 void ArmorHUD::settingsRender(float settingsOffset) {
-	float x = Constraints::PercentageConstraint(0.019, "left");
-	float y = Constraints::PercentageConstraint(0.10, "top");
-
-	const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
-
-
-	FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
-	FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
-		Constraints::RelativeConstraint(1.0, "width"),
-		Constraints::RelativeConstraint(0.88f, "height"));
+	initSettingsPage();
 
 	addHeader("Armor HUD");
 	addSlider("Size", "", "uiscale", 5.f, 0.f, true);
@@ -77,6 +64,7 @@ void ArmorHUD::settingsRender(float settingsOffset) {
 	addToggle("Vertical ArmorHUD", "To switch between a vertical or horizontal layout", "vertical");
 	addConditionalToggle(getOps<bool>("vertical"), "Durability to the left", "", "durability_left");
 	addToggle("Show offhand item", "", "show_offhand");
+	addToggle("Show mainhand item", "", "show_mainhand");
 	addToggle("Fill Empty Slots", "Fill gaps when a piece of armor isn't equipped", "fillGaps");
 	addToggle("Change Color", "", "color");
 
@@ -84,8 +72,7 @@ void ArmorHUD::settingsRender(float settingsOffset) {
 
 	addHeader("Durability");
 	addToggle("Durability Text", "", "showdurability");
-	addSlider("Text Offset X", "", "textOffsetX", 50.f, 0.0f, false);
-	//addConditionalSlider(getOps<bool>("showdurability") && getOps<bool>("vertical"), "Text Offset X", "", "textOffsetX", 50.f, 0.0f, false);
+	addConditionalSlider(getOps<bool>("showdurability") && getOps<bool>("vertical"), "Text Offset X", "", "textOffsetX", 50.f, 0.0f, false);
 	addConditionalSlider(getOps<bool>("showdurability") && !getOps<bool>("vertical"), "Text Offset Y", "", "textOffsetY", 50.f, 0.0f, false);
 	addConditionalSlider(getOps<bool>("showdurability"), "Text Size", "", "textSize", 0.25f, 0.0f, true);
 	addConditionalToggle(getOps<bool>("showdurability"), "Show Durability in %", "", "percent");
@@ -239,7 +226,7 @@ void ArmorHUD::renderDurability() {
 						}
 					}
 
-					if (SDK::clientInstance->getLocalPlayer()->getSupplies()->getInventory()->getItem(
+					if (getOps<bool>("show_mainhand") && SDK::clientInstance->getLocalPlayer()->getSupplies()->getInventory()->getItem(
 						SDK::clientInstance->getLocalPlayer()->getSupplies()->getSelectedSlot())->getItem() !=
 						nullptr) {
 						ItemStack* currentItem = SDK::clientInstance->getLocalPlayer()->getSupplies()->getInventory()->getItem(
@@ -527,7 +514,7 @@ void ArmorHUD::onSetupAndRender(SetupAndRenderEvent& event) {
 							}
 						}
 
-						if (SDK::clientInstance->getLocalPlayer()->getSupplies()->getInventory()->getItem(
+						if (getOps<bool>("show_mainhand") && SDK::clientInstance->getLocalPlayer()->getSupplies()->getInventory()->getItem(
 							SDK::clientInstance->getLocalPlayer()->getSupplies()->getSelectedSlot())->getItem() !=
 							nullptr) {
 							auto item = SDK::clientInstance->getLocalPlayer()->getSupplies()->getInventory()->getItem(

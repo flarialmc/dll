@@ -18,4 +18,3 @@ public:
 
 	void onRender(RenderEvent& event);
 };
-

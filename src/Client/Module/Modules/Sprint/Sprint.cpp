@@ -1,56 +1,43 @@
 #include "Sprint.hpp"
 
 #include "Events/EventManager.hpp"
+#include "Modules/Sneak/Sneak.hpp"
 
-Sprint::Sprint(): Module("Toggle Sprint", "Automatically sprints for you!!!", IDR_AUTO_SPRINT_PNG, "CTRL")
-{
-    
-}
-
-void Sprint::onEnable()
-{
+void Sprint::onEnable() {
     Listen(this, KeyEvent, &Sprint::onKey)
+    Listen(this, MouseEvent, &Sprint::onMouse)
     Listen(this, RenderEvent, &Sprint::onRender)
     Listen(this, TickEvent, &Sprint::onTick)
     Module::onEnable();
 }
 
-void Sprint::onDisable()
-{
+void Sprint::onDisable() {
     Deafen(this, KeyEvent, &Sprint::onKey)
+    Deafen(this, MouseEvent, &Sprint::onMouse)
     Deafen(this, RenderEvent, &Sprint::onRender)
     Deafen(this, TickEvent, &Sprint::onTick)
     Module::onDisable();
 }
 
-void Sprint::defaultConfig()
-{
+void Sprint::defaultConfig() {
     getKeybind();
     Module::defaultConfig("all");
-    setDef("status", false);
+    setDef("status", true);
+    setDef("toggleStatus", true);
     setDef("textscale", 0.80f);
     setDef("always", false);
     
 }
 
-void Sprint::settingsRender(float settingsOffset)
-{
-    float x = Constraints::PercentageConstraint(0.019, "left");
-    float y = Constraints::PercentageConstraint(0.10, "top");
-
-    const float scrollviewWidth = Constraints::RelativeConstraint(0.5, "height", true);
-
-
-    FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
-    FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
-                              Constraints::RelativeConstraint(1.0, "width"),
-                              Constraints::RelativeConstraint(0.88f, "height"));
+void Sprint::settingsRender(float settingsOffset) {
+    initSettingsPage();
 
 
     addHeader("Toggle Sprint");
     addKeybind("Keybind", "Hold for 2 seconds!", "keybind", true);
     addToggle("Always Sprint", "Also known as auto sprint", "always");
     addToggle("Show Status", "", "status");
+    addConditionalToggle(getOps<bool>("status"), "Show Toggle Status", "", "toggleStatus");
     extraPadding();
 
     addHeader("Main");
@@ -72,8 +59,7 @@ void Sprint::settingsRender(float settingsOffset)
     resetPadding();
 }
 
-void Sprint::onSetup()
-{
+void Sprint::onSetup() {
     keybindActions.clear();
     keybindActions.push_back([this](std::vector<std::any> args) -> std::any {
         toggleSprinting = !toggleSprinting;
@@ -81,16 +67,21 @@ void Sprint::onSetup()
     });
 }
 
-void Sprint::onKey(KeyEvent& event)
-{
+void Sprint::onKey(KeyEvent& event) {
     if (!this->isEnabled()) return;
     if (this->isKeybind(event.keys) && this->isKeyPartOfKeybind(event.key)) {
         keybindActions[0]({});
     }
 }
 
-void Sprint::onRender(RenderEvent& event)
-{
+void Sprint::onMouse(MouseEvent &event) {
+    if (!this->isEnabled()) return;
+    if (Utils::getMouseAsString(event.getButton()) == getOps<std::string>("keybind") && event.getAction() == MouseAction::Press) {
+        keybindActions[0]({});
+    }
+}
+
+void Sprint::onRender(RenderEvent& event) {
     if (!this->isEnabled()) return;
     if (!this->isEnabled() || SDK::getCurrentScreen() != "hud_screen") return;
 
@@ -98,42 +89,42 @@ void Sprint::onRender(RenderEvent& event)
 
     if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
 
+        std::shared_ptr<Sneak> toggleSneak = std::dynamic_pointer_cast<Sneak>(ModuleManager::getModule("Toggle Sneak"));
+
         if (SDK::clientInstance->getLocalPlayer() != nullptr) {
             std::string text = "Standing";
+            bool showStatus = true;
+            bool status = toggleSprinting;
+
             if (SDK::clientInstance->getLocalPlayer()->getActorFlag(ActorFlags::FLAG_SNEAKING)) {
                 text = "Sneaking";
-                this->normalRender(5, text);
+
+                if (toggleSneak != nullptr && toggleSneak->getOps<bool>("enabled")) status = toggleSneak->toggled;
+                else showStatus = false;
             }
-            else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(ActorFlags::FLAG_SWIMMING)) {
-                text = "Swimming";
-                this->normalRender(5, text);
-            }
+            else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(ActorFlags::FLAG_SWIMMING)) text = "Swimming";
             else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(ActorFlags::FLAG_GLIDING)) {
                 text = "Gliding";
-                this->normalRender(5, text);
+                showStatus = false;
             }
             else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(ActorFlags::FLAG_SLEEPING)) {
                 text = "Sleeping";
-                this->normalRender(5, text);
+                showStatus = false;
             }
-            else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(ActorFlags::FLAG_SPRINTING)) {
-                text = "Sprinting";
-                this->normalRender(5, text);
+            else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(ActorFlags::FLAG_SPRINTING)) text = "Sprinting";
+            else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(FLAG_MOVING)) text = "Walking";
+
+            if (getOps<bool>("toggleStatus") && showStatus) {
+                std::string text2 = std::format("{} ({})", text, status ? "Toggled": "Vanilla");
+                this->normalRender(5, text2);
             }
-            else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(FLAG_MOVING)) {
-                text = "Walking";
-                this->normalRender(5, text);
-            }
-            else {
-                this->normalRender(5, text);
-            }
+            else this->normalRender(5, text);
 
         }
     }
 }
 
-void Sprint::onTick(TickEvent& event)
-{
+void Sprint::onTick(TickEvent& event) {
     if (!this->isEnabled()) return;
     if (SDK::clientInstance != nullptr) {
         if (SDK::clientInstance->getLocalPlayer() != nullptr) {

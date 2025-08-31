@@ -18,6 +18,7 @@ private:
 	std::string lookingAt = "minecraft:empty";
 	std::string lastLookingAt = "";
 	std::vector<std::string> lookingAtTags = {};
+	Biome* curBiome = nullptr;
 
 	Vec3<float> PrevPos{};
 	float xVelo = 0.f;
@@ -50,7 +51,6 @@ public:
 
 	JavaDebugMenu() : Module("Java Debug Menu", "Displays Java-style debug information.\nSimilar to F3 menu in Minecraft Java Edition.",
 		IDR_F3_PNG, "F3") {
-			
 	}
 
 	void onEnable() override;
@@ -59,31 +59,31 @@ public:
 
 	void defaultConfig() override;
 
-	void customToggle(std::string text, std::string subtext, std::string settingName);
-
-	void customConditionalToggle(bool condition, std::string text, std::string subtext, std::string settingName);
-
-	void customConditionalSlider(bool condition, std::string text, std::string subtext, std::string settingName, float maxVal = 100.0f, float minVal = 0.0f, bool zerosafe = true);
-
 	void settingsRender(float settingsOffset) override;
 
-	bool isOn(std::string settingName);
+	bool isOnBlock(int block);
 
-	void updateTimedVector(std::vector<TimedObj>& vec, float diff);
+	bool isOnSetting(std::string settingName, int block);
 
-	static int GetTicks();
+	static void updateTimedVector(std::vector<TimedObj>& vec, float diff);
 
 	void getOnePercLows();
 
 	std::string getFacingDirection(LocalPlayer* player);
 
-	std::string getCPU();
+	static std::wstring GetCpuName();
 
-	std::string getDimensionName();
+	static DWORD GetCpuCoreCount();
 
-	std::string getTime();
+	static DWORD GetCpuThreadCount();
 
-	std::string getFormattedTime(long long seconds);
+	static std::string getDimensionName();
+
+	static std::pair<std::string, std::vector<float>> getWeatherInfo();
+
+	static std::string getTime();
+
+	static std::string getFormattedTime(long long seconds);
 
 	void onTick(TickEvent& event);
 
@@ -93,6 +93,8 @@ public:
 
 	void onKey(KeyEvent& event);
 
+	void onMouse(MouseEvent& event);
+
 	void onHudCursorRendererRender(HudCursorRendererRenderEvent& event);
 
 	void onSetTopScreenName(SetTopScreenNameEvent& event);
@@ -100,4 +102,5 @@ public:
 	void onGetViewPerspective(PerspectiveEvent& event);
 
 	void drawVector(ImDrawList* drawList, ImVec2 center, ImVec2 endPos, ImU32 col, float lineWidth, float lineLength, float guiscale);
+
 };

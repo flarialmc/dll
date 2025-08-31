@@ -31,7 +31,7 @@ public:
 
 
 	Keystrokes() : Module("Keystrokes", "Displays real-time information about your\nWASD and mouse inputs.",
-		IDR_KEYBOARD_PNG, "") {
+		IDR_KEYSTROKES_PNG, "") {
 		
 	};
 

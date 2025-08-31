@@ -5,17 +5,16 @@
 #include "Events/EventManager.hpp"
 
 class MovableChat : public Module {
-private:
+public:
 	static inline std::string layerName = "chat_panel";
-	Vec2<float> currentPos{ -120.0f, -120.0f };;
+	Vec2<float> currentPos{ -120.0f, -120.0f };
 	bool enabled = false;
 	static inline Vec2<float> originalPos = Vec2<float>{ 0.0f, 0.0f };
 	Vec2<float> currentSize = Vec2<float>{ 0.0f, 0.0f };
 	Vec2<float> lastAppliedPos = Vec2<float>{ 0.0f, 0.0f };
 	bool restored = false;
-public:
 
-	MovableChat();;
+	MovableChat();
 
 	void onEnable() override;
 

@@ -1,8 +1,8 @@
 #pragma once
 
 class RectangleArea {
-    float _x0;
-    float _x1;
-    float _y0;
-    float _y1;
+public:
+    float left, right, top, bottom;
+    RectangleArea(float left, float right, float top, float bottom) : left(left), right(right), top(top), bottom(bottom) {
+    }
 };

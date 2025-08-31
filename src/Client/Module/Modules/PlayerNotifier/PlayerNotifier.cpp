@@ -43,9 +43,9 @@ void PlayerNotifier::loadSettings(bool softLoad) {
 }
 
 void PlayerNotifier::check() {
-	std::unordered_map<mcUUID, PlayerListEntry>& playerMap = SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap();
+	std::unordered_map<mcUUID, PlayerListEntry> playerMap = SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap();
 
-	for (const auto& [uuid, entry] : playerMap) {
+	for (const auto entry: playerMap | std::views::values) {
 		for (int i = 0; i < totalPlayers; i++) {
 			if (!this->settings.getSettingByName<bool>("player" + FlarialGUI::cached_to_string(i) + "Enabled")) continue;
 			if (this->settings.getSettingByName<bool>("player" + FlarialGUI::cached_to_string(i) + "Enabled")->value) {
@@ -74,16 +74,7 @@ void PlayerNotifier::onTick(TickEvent& event) {
 
 void PlayerNotifier::settingsRender(float settingsOffset) {
 
-	float x = Constraints::PercentageConstraint(0.019, "left");
-	float y = Constraints::PercentageConstraint(0.10, "top");
-
-	const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
-
-
-	FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
-	FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
-		Constraints::RelativeConstraint(1.0, "width"),
-		Constraints::RelativeConstraint(0.88f, "height"));
+	initSettingsPage();
 
 	this->addHeader("Player Notifier");
 	this->addButton("Add new player", "", "ADD", [&]() {
@@ -107,7 +98,7 @@ void PlayerNotifier::settingsRender(float settingsOffset) {
 }
 
 void PlayerNotifier::onKey(KeyEvent& event) {
-	if (this->isKeyPartOfKeybind(event.key)) {
+	if (this->isKeyPartOfKeybind(event.key) && (SDK::getCurrentScreen() == "hud_screen" || SDK::getCurrentScreen() == "f3_screen" || SDK::getCurrentScreen() == "zoom_screen")) {
 		if (this->isKeybind(event.keys)) { // key is defo pressed
 			keybindActions[0]({});
 		}

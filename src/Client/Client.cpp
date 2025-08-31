@@ -169,9 +169,9 @@ void Client::initialize() {
 
 
 #if defined(__TEST__)
-	WinrtUtils::setWindowTitle(fmt::format("Flarial v{} {} {}", FLARIAL_VERSION, FLARIAL_BUILD_TYPE, FLARIAL_BUILD_DATE));
+	WinrtUtils::setWindowTitle(fmt::format("Flarial v{} {} {} [{}]", FLARIAL_VERSION, FLARIAL_BUILD_TYPE, FLARIAL_BUILD_DATE, COMMIT_HASH));
 #else
-	WinrtUtils::setWindowTitle(fmt::format("Flarial v{} {}", FLARIAL_VERSION, FLARIAL_BUILD_DATE));
+	WinrtUtils::setWindowTitle(fmt::format("Flarial v{} {} [{}]", FLARIAL_VERSION, FLARIAL_BUILD_DATE, COMMIT_HASH));
 #endif
 
 	VersionUtils::initialize();
@@ -194,7 +194,8 @@ void Client::initialize() {
         Utils::getRoamingPath() + "\\Flarial\\logs",
         Utils::getRoamingPath() + "\\Flarial\\Config",
         Utils::getRoamingPath() + "\\Flarial\\Scripts",
-        Utils::getRoamingPath() + "\\Flarial\\Crosshairs"
+        Utils::getRoamingPath() + "\\Flarial\\Crosshairs",
+        Utils::getRoamingPath() + "\\Flarial\\MessageLogger"
     };
 
 
@@ -223,6 +224,7 @@ void Client::initialize() {
 		file.close();
 
 		APIUtils::onlineUsers = APIUtils::ListToVector(playersList);
+		APIUtils::onlineUsersSet = APIUtils::onlineUsers | std::ranges::to<decltype(APIUtils::onlineUsersSet)>();
 		});
 
 	updateThread.detach();
@@ -252,6 +254,7 @@ void Client::initialize() {
 	ADD_SETTING("vsync", false);
 	ADD_SETTING("recreateAtStart", false);
 	ADD_SETTING("promotions", true);
+	ADD_SETTING("saveScrollPos", true);
 	ADD_SETTING("snappinglines", true);
 	ADD_SETTING("apiusage", true);
 	ADD_SETTING("donotwait", true);
@@ -266,7 +269,7 @@ void Client::initialize() {
 	ADD_SETTING("centreCursor", false);
 	ADD_SETTING("aliasingMode", std::string("Default"));
 	ADD_SETTING("ejectKeybind", std::string(""));
-	ADD_SETTING("enabledModulesOnTop", false);
+	ADD_SETTING("enabledModulesOnTop", true);
 	ADD_SETTING("rgb_speed", 1.0f);
 	ADD_SETTING("rgb_saturation", 1.0f);
 	ADD_SETTING("rgb_value", 1.0f);
@@ -277,6 +280,7 @@ void Client::initialize() {
 	ADD_SETTING("fontWeight", std::string("Normal"));
 	ADD_SETTING("nologoicon", false);
 	ADD_SETTING("nochaticon", false);
+	ADD_SETTING("singlewatermark", false);
 	ADD_SETTING("currentConfig", std::string("default.json"));
 	ADD_SETTING("resettableSettings", true);
 	ADD_SETTING("clearTextBoxWhenClicked", true);

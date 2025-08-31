@@ -3,7 +3,6 @@
 void FOVChanger::onEnable() {
     Listen(this, FOVEvent, &FOVChanger::onGetFOV)
     Module::onEnable();
-
 }
 
 void FOVChanger::onDisable() {
@@ -15,21 +14,10 @@ void FOVChanger::defaultConfig() {
     Module::defaultConfig("core");
     setDef("fovvalue", 60.00f);
     setDef("fovaffectshand", false);
-    
 }
 
 void FOVChanger::settingsRender(float settingsOffset) {
-
-    float x = Constraints::PercentageConstraint(0.019, "left");
-    float y = Constraints::PercentageConstraint(0.10, "top");
-
-    const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
-
-
-    FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
-    FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
-                              Constraints::RelativeConstraint(1.0, "width"),
-                              Constraints::RelativeConstraint(0.88f, "height"));
+    initSettingsPage();
 
     addHeader("FOV Changer");
     addSlider("FOV Value", "", "fovvalue", 359.0f, 0, false);
@@ -42,6 +30,7 @@ void FOVChanger::settingsRender(float settingsOffset) {
 
 void FOVChanger::onGetFOV(FOVEvent &event) {
     if (!this->isEnabled()) return;
+    if (auto zoom = ModuleManager::getModule("Zoom"); zoom && zoom->active) return;
     if (!getOps<bool>("fovaffectshand")) {
         if (event.getFOV() == 70) return;
     }

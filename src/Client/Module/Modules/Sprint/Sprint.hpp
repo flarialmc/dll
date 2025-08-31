@@ -7,7 +7,9 @@
 
 class Sprint : public Module {
 public:
-	Sprint();;
+	Sprint(): Module("Toggle Sprint", "Automatically sprints for you!!!",
+		IDR_AUTO_SPRINT_PNG, "CTRL") {
+	}
 
 	void onEnable() override;
 
@@ -21,7 +23,9 @@ public:
 
 	void onSetup() override;
 
-	void onKey(KeyEvent& event);;
+	void onKey(KeyEvent& event);
+
+	void onMouse(MouseEvent& event);
 
 	void onRender(RenderEvent& event);
 

@@ -31,7 +31,6 @@
 #include "Modules/ArmorHUD/ArmorHUD.hpp"
 #include "Modules/PaperDoll/PaperDoll.hpp"
 #include "Modules/PatarHD/PatarHD.hpp"
-#include "Modules/HurtColor/HurtColor.hpp"
 #include "Modules/FogColor/FogColor.hpp"
 #include "Modules/TimeChanger/TimeChanger.hpp"
 #include "Modules/RenderOptions/RenderOptions.hpp"
@@ -95,6 +94,7 @@
 #include "Scripting/ScriptManager.hpp"
 #include "Modules/AutoPerspective/AutoPerspective.hpp"
 #include "Modules/BlockHit/BlockHit.hpp"
+#include "Modules/CinematicCamera/CinematicCamera.hpp"
 #include "Modules/LowHealthIndicator/LowHealthIndicator.hpp"
 #include "Modules/PlayerNotifier/PlayerNotifier.hpp"
 #include "Modules/ZeqaUtils/ZeqaUtils.hpp"
@@ -107,8 +107,24 @@
 #include "Modules/DisableMouseWheel/DisableMouseWheel.hpp"
 #include "Modules/DebugMenu/DebugMenu.hpp"
 #include "Modules/DirectionHUD/DirectionHUD.hpp"
+#include "Modules/JavaViewBobbing/JavaViewBobbing.hpp"
+#include "Modules/DeathLogger/DeathLogger.hpp"
+#include "Modules/HurtColor/HurtColor.hpp"
+#include "Modules/Twerk/Twerk.hpp"
+#include "Modules/MovableDayCounter/MovableDayCounter.hpp"
+#include "Modules/SkinStealer/SkinStealer.hpp"
+#include "Modules/GlintColor/GlintColor.hpp"
+#include "Modules/ChunkBorder/ChunkBorder.hpp"
+#include "Modules/CompactChat/CompactChat.hpp"
+#include "Modules/MessageLogger/MessageLogger.hpp"
+#include "Modules/TotemCounter/TotemCounter.hpp"
+#include "Modules/BetterHungerBar/BetterHungerBar.hpp"
 
-void ModuleManager::getModules() { // TODO: some module is null here for some reason, investigation required
+#ifdef COMPILE_DOOM
+	#include "Modules/Doom/Doom.hpp"
+#endif
+
+void ModuleManager::getModules() {
 	for (const auto& pair : moduleMap) {
 		if (pair.second == nullptr) continue;
 		modulesVector.push_back(pair.second);
@@ -172,6 +188,7 @@ void ModuleManager::initialize() {
 	addModule<Sneak>();
 	addModule<Sprint>();
 	addModule<Hitbox>();
+	if (VersionUtils::checkAboveOrEqual(21, 80)) addModule<GlintColor>();
 	addModule<HurtColor>();
 	addModule<ThirdPerson>();
 	addModule<JavaDynamicFOV>();
@@ -216,8 +233,11 @@ void ModuleManager::initialize() {
 	addModule<MovableChat>();
 	addModule<MovableCoordinates>();
 	addModule<MovableHotbar>();
+	addModule<MovableDayCounter>();
 	// addModule<CompactChat>();
-	addModule<ItemPhysics>();
+	if(!VersionUtils::checkAboveOrEqual(21, 100)) {
+		addModule<ItemPhysics>();
+	}
 
 	addModule<Mousestrokes>();
 
@@ -234,6 +254,7 @@ void ModuleManager::initialize() {
 	addModule<ModernKeybindHandling>();
 	addModule<CustomCrosshair>();
 	addModule<Waila>();
+	addModule<SkinStealer>();
 
 	addModule<RawInputBuffer>();
 	if (VersionUtils::checkAboveOrEqual(21, 00)) { // Due to entt
@@ -254,6 +275,21 @@ void ModuleManager::initialize() {
 	addModule<DisableMouseWheel>();
 	addModule<JavaDebugMenu>();
 	addModule<DirectionHUD>();
+
+	addModule<JavaViewBobbing>();
+
+	addModule<DeathLogger>();
+	addModule<Twerk>();
+	addModule<CinematicCamera>();
+	addModule<ChunkBorder>();
+	addModule<CompactChat>();
+	addModule<MessageLogger>();
+	addModule<TotemCounter>();
+	addModule<BetterHungerBar>();
+
+#ifdef COMPILE_DOOM
+	addModule<DoomModule>();
+#endif
 
 	addService<GUIKeyListener>();
 	if (!VersionUtils::checkAboveOrEqual(21, 60)) {

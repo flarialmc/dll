@@ -55,6 +55,7 @@ void FreeLook::onEnable() {
     Listen(this, PerspectiveEvent, &FreeLook::onGetViewPerspective)
     Listen(this, UpdatePlayerEvent, &FreeLook::onUpdatePlayer)
     Listen(this, KeyEvent, &FreeLook::onKey)
+    Listen(this, MouseEvent, &FreeLook::onMouse)
     Module::onEnable();
 
 }
@@ -65,6 +66,7 @@ void FreeLook::onDisable() {
     Deafen(this, PerspectiveEvent, &FreeLook::onGetViewPerspective)
     Deafen(this, UpdatePlayerEvent, &FreeLook::onUpdatePlayer)
     Deafen(this, KeyEvent, &FreeLook::onKey)
+    Deafen(this, MouseEvent, &FreeLook::onMouse)
     Module::onDisable();
 }
 
@@ -100,16 +102,7 @@ void FreeLook::defaultConfig() {
 
 void FreeLook::settingsRender(float settingsOffset) {
 
-    float x = Constraints::PercentageConstraint(0.019, "left");
-    float y = Constraints::PercentageConstraint(0.10, "top");
-
-    const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
-
-
-    FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
-    FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
-                              Constraints::RelativeConstraint(1.0, "width"),
-                              Constraints::RelativeConstraint(0.88f, "height"));
+    initSettingsPage();
 
     addHeader("Freelook");
     addKeybind("Freelook Keybind", "Hold for 2 seconds!", "keybind", true);
@@ -123,7 +116,7 @@ void FreeLook::settingsRender(float settingsOffset) {
 
 void FreeLook::onKey(KeyEvent &event) {
     if (!this->isEnabled()) return;
-    if (this->isKeyPartOfKeybind(event.key)) {
+    if (this->isKeyPartOfKeybind(event.key) && (SDK::getCurrentScreen() == "hud_screen" || SDK::getCurrentScreen() == "f3_screen" || SDK::getCurrentScreen() == "zoom_screen")) {
         if (this->isKeybind(event.keys)) { // key is defo pressed
             keybindActions[0]({});
         }
@@ -132,6 +125,12 @@ void FreeLook::onKey(KeyEvent &event) {
         }
     }
 
+}
+
+void FreeLook::onMouse(MouseEvent &event) {
+    if (!this->isEnabled()) return;
+    if (Utils::getMouseAsString(event.getButton()) == getOps<std::string>("keybind") && event.getAction() == MouseAction::Press) keybindActions[0]({});
+    else if (Utils::getMouseAsString(event.getButton()) == getOps<std::string>("keybind") && event.getAction() == MouseAction::Release) keybindActions[1]({});
 }
 
 void FreeLook::onUpdatePlayer(UpdatePlayerEvent& event) {

@@ -17,6 +17,9 @@ private:
 
 	static inline bool fisrtTime = true;
 
+	Vec2<float> smoothDelta{0, 0};
+	std::chrono::time_point<std::chrono::steady_clock> lastTime = std::chrono::steady_clock::now();
+
 public:
 	static inline bool animationFinished = true;
 	static inline bool jdfAnimationFinished = true;
@@ -33,14 +36,14 @@ public:
 
 	void onGetFOV(FOVEvent& event);
 
-
+	void checkKeybind(int key);
 
 	void onRender(RenderEvent& event);
 
 	//TODO: RE CHECK
 	void onMouse(MouseEvent& event);
 
-	void onKey(KeyEvent& event);;
+	void onKey(KeyEvent& event);
 
 	// TODO: add dolly zoom and world2screen zoom stabilization ?
 	// TODO: if someone has disabled hand this will enable it unless changed in settings

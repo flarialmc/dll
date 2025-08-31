@@ -40,7 +40,7 @@ std::string VersionUtils::getFormattedVersion() {
     // Construct formatted version string
     std::string formattedVersion = parts[0] + "." + parts[1];
     if (parts.size() > 2) {
-        formattedVersion += "." + parts[2].substr(0, 1); // Take only the first character of the patch version
+        formattedVersion += "." + parts[2].substr(0, parts[2].size() - 3); // Take only the first character of the patch version
     }
 
     return formattedVersion;
@@ -48,6 +48,7 @@ std::string VersionUtils::getFormattedVersion() {
 
 void VersionUtils::initialize() {
     versions = {
+        {"1.21.10", {SigInit::init21100, OffsetInit::init21100}},
         {"1.21.9", {SigInit::init2190, OffsetInit::init2190}},
         {"1.21.8", {SigInit::init2180, OffsetInit::init2180}},
         {"1.21.7", {SigInit::init2170, OffsetInit::init2170}},

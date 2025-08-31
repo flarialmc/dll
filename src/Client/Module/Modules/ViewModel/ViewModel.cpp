@@ -41,22 +41,16 @@ void ViewModel::defaultConfig()
     setDef("rotx", 0.0f);
     setDef("roty", 0.0f);
     setDef("rotz", 0.0f);
+    setDef("scalex", 1.0f);
+    setDef("scaley", 1.0f);
+    setDef("scalez", 1.0f);
     
 }
 
 void ViewModel::settingsRender(float settingsOffset)
 {
 
-    float x = Constraints::PercentageConstraint(0.019, "left");
-    float y = Constraints::PercentageConstraint(0.10, "top");
-
-    const float scrollviewWidth = Constraints::RelativeConstraint(0.5, "height", true);
-
-
-    FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
-    FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
-                              Constraints::RelativeConstraint(1.0, "width"),
-                              Constraints::RelativeConstraint(0.88f, "height"));
+    initSettingsPage();
 
 
     addHeader("View Model");
@@ -71,6 +65,10 @@ void ViewModel::settingsRender(float settingsOffset)
     addSlider("Rotation X", "Changes the rotation in the X axis", "rotx", 360);
     addSlider("Rotation Y", "Changes the rotation in the Y axis", "roty", 360);
     addSlider("Rotation Z", "Changes the rotation in the Z axis", "rotz", 360);
+
+    addSlider("Scale X", "Changes the scale in the X axis", "scalex", 3, -3);
+    addSlider("Scale Y", "Changes the scale in the Y axis", "scaley", 3, -3);
+    addSlider("Scale Z", "Changes the scale in the Z axis", "scalez", 3, -3);
 
     FlarialGUI::UnsetScrollView();
     resetPadding();
@@ -107,9 +105,15 @@ void ViewModel::onRenderItemInHand(RenderItemInHandEvent& event)
         auto roty = getOps<float>("roty");
         auto rotz = getOps<float>("rotz");
 
+        auto scalex = getOps<float>("scalex");
+        auto scaley = getOps<float>("scaley");
+        auto scalez = getOps<float>("scalez");
+
+
         auto rotAngle = getOps<float>("rotangle");
 
         matrix = glm::translate<float>(matrix, glm::vec3(posx - 4, posy - 4, posz - 4));
         matrix = glm::rotate<float>(matrix, glm::radians(rotAngle), glm::vec3(rotx, roty, rotz));
+        matrix = glm::scale(matrix, glm::vec3(scalex, scaley, scalez));
     }
 }

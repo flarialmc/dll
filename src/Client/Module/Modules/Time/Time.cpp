@@ -77,8 +77,8 @@ void Time::onRender(RenderEvent& event)
             if (getOps<bool>("4letterYear")) sub = 1900;
             else sub = -100;
 
-            if (getOps<bool>("donaldTrumpMode")) dateStr = std::format("{}/{}/{}", date.tm_mon, date.tm_mday, date.tm_year + sub);
-            else dateStr = std::format("{}/{}/{}", date.tm_mday, date.tm_mon, date.tm_year + sub);
+            if (getOps<bool>("donaldTrumpMode")) dateStr = std::format("{}/{}/{}", date.tm_mon + 1, date.tm_mday, date.tm_year + sub);
+            else dateStr = std::format("{}/{}/{}", date.tm_mday, date.tm_mon + 1, date.tm_year + sub);
 
             if (getOps<bool>("timeBeforeDate")) text += "\n" + dateStr;
             else text = dateStr + "\n" + text;
@@ -104,16 +104,7 @@ void Time::defaultConfig()
 
 void Time::settingsRender(float settingsOffset)
 {
-    float x = Constraints::PercentageConstraint(0.019, "left");
-    float y = Constraints::PercentageConstraint(0.10, "top");
-
-    const float scrollviewWidth = Constraints::RelativeConstraint(0.5, "height", true);
-
-
-    FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
-    FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
-                              Constraints::RelativeConstraint(1.0, "width"),
-                              Constraints::RelativeConstraint(0.88f, "height"));
+    initSettingsPage();
 
 
     addHeader("Main");

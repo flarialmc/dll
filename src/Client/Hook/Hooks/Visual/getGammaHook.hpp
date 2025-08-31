@@ -1,4 +1,4 @@
- #pragma once
+#pragma once
 
 #include "../Hook.hpp"
 #include "../../../../Utils/Memory/Memory.hpp"
@@ -8,11 +8,10 @@
 
 class getGammaHook : public Hook {
 private:
-
     static float getGammaCallback(uintptr_t a1);
 
 public:
-    typedef float(__thiscall *getGammaOriginal)(uintptr_t);
+    typedef float (__thiscall *getGammaOriginal)(uintptr_t);
 
     static inline getGammaOriginal funcOriginal = nullptr;
 

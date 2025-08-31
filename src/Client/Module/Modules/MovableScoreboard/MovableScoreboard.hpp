@@ -6,7 +6,8 @@
 #include "Utils/Render/PositionUtils.hpp"
 
 class MovableScoreboard : public Module {
-private:
+
+public:
 	static inline std::string layerName = "sidebar";
 	Vec2<float> currentPos{ -120.0f, -120.0f };;
 	bool enabled = false;
@@ -14,7 +15,7 @@ private:
 	Vec2<float> currentSize = Vec2<float>{ 0.0f, 0.0f };
 	Vec2<float> lastAppliedPos = Vec2<float>{ 0.0f, 0.0f };
 	bool restored = false;
-public:
+
 	static inline std::string mname = "Scoreboard"; // dont use "name" var pls cuz it will override this->name so Module("name here") would be useless
 
 	MovableScoreboard();;

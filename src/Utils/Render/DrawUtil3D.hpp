@@ -15,8 +15,10 @@ public:
     void setMaterial(mce::MaterialPtr* material) { this->material = material; }
 
     void drawLine(Vec3<float> const& pos1, Vec3<float> const& pos2, D2D_COLOR_F const& color, bool immediate = false);
+    void drawLineList(Vec3<float> const& pos1, Vec3<float> const& pos2, D2D_COLOR_F const& color, bool immediate = false);
     void drawQuad(Vec3<float> a, Vec3<float> b, Vec3<float> c, Vec3<float> d, D2D_COLOR_F const& col);
     void fillQuad(Vec3<float> a, Vec3<float> b, Vec3<float> c, Vec3<float> d, D2D_COLOR_F const& color);
     void drawBox(AABB const& box, D2D_COLOR_F const& color);
+    void TexturedQuad(Vec3<float> a, Vec3<float> b, Vec3<float> c, Vec3<float> d, BedrockTextureData& tex);
     void flush();
 };

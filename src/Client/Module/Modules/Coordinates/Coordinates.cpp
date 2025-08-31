@@ -1,4 +1,5 @@
 #include "Coordinates.hpp"
+#include <cmath>
 
 #include "Events/EventManager.hpp"
 
@@ -13,12 +14,13 @@ void Coordinates::onDisable() {
 }
 
 void Coordinates::defaultConfig() {
+    settings.changeType<float, int>("decimalCount");
     setDef("responsivewidth", true);
     setDef("text", (std::string) "{D} X: {X} Y: {Y} Z: {Z}");
     setDef("textscale", 0.80f);
     Module::defaultConfig("all");
     setDef("showDecimals", false);
-    setDef("decimalCount", 2.f);
+    setDef("decimalCount", 2);
     setDef("verticalMode", false);
     setDef("showVelocity", true);
     setDef("showYvelocity", true);
@@ -33,15 +35,7 @@ void Coordinates::defaultConfig() {
 }
 
 void Coordinates::settingsRender(float settingsOffset) {
-    float x = Constraints::PercentageConstraint(0.019, "left");
-    float y = Constraints::PercentageConstraint(0.10, "top");
-
-    const float scrollviewWidth = Constraints::RelativeConstraint(0.5, "height", true);
-
-    FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
-    FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
-                              Constraints::RelativeConstraint(1.0, "width"),
-                              Constraints::RelativeConstraint(0.88f, "height"));
+    initSettingsPage();
 
     addHeader("Coordinates");
     defaultAddSettings("main");
@@ -50,8 +44,7 @@ void Coordinates::settingsRender(float settingsOffset) {
     addHeader("Text");
     defaultAddSettings("text");
     addToggle("Show Decimals", "", "showDecimals");
-    addConditionalSlider(getOps<bool>("showDecimals"), "Number of Decimals", "", getOps<float>("decimalCount"), 6.f,
-                         1.f);
+    addConditionalSliderInt(getOps<bool>("showDecimals"), "Number of Decimals", "", "decimalCount", 6, 1);
     extraPadding();
 
     addHeader("Module Settings");
@@ -86,15 +79,26 @@ void Coordinates::settingsRender(float settingsOffset) {
 StringMap Coordinates::getCoords(float multiplier) {
     Vec3<float> *pos = SDK::clientInstance->getLocalPlayer()->getPosition();
 
-    int decimalsToShow = getOps<bool>("showDecimals") ? std::floor(getOps<float>("decimalCount")) : -1;
+    std::string xstr;
+    std::string ystr;
+    std::string zstr;
 
-    std::string xstr = std::to_string(pos->x * multiplier);
-    std::string ystr = std::to_string(pos->y * multiplier);
-    std::string zstr = std::to_string(pos->z * multiplier);
+    if (getOps<bool>("showDecimals")) {
+        int decimalsToShow = getOps<int>("decimalCount");
 
-    xstr.erase(xstr.size() - (6 - decimalsToShow));
-    ystr.erase(ystr.size() - (6 - decimalsToShow));
-    zstr.erase(zstr.size() - (6 - decimalsToShow));
+        xstr = std::to_string(pos->x * multiplier);
+        ystr = std::to_string(pos->y * multiplier - 1.62f);
+        zstr = std::to_string(pos->z * multiplier);
+
+        xstr.erase(xstr.size() - (6 - decimalsToShow));
+        ystr.erase(ystr.size() - (6 - decimalsToShow));
+        zstr.erase(zstr.size() - (6 - decimalsToShow));
+    }
+    else {
+        xstr = std::format("{:.0f}", std::floor(pos->x * multiplier));
+        ystr = std::format("{:.0f}", std::floor(pos->y * multiplier - 1.62f));
+        zstr = std::format("{:.0f}", std::floor(pos->z * multiplier));
+    }
 
     return StringMap{
         {"x", xstr},

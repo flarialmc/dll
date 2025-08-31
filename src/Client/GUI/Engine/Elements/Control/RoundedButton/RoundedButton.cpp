@@ -101,6 +101,7 @@ bool FlarialGUI::RoundedButton(const int index, float x, float y, const D2D_COLO
 
     if (CursorInRect(x, y, width, height) && MC::mouseButton == MouseButton::Left && !MC::held) {
         MC::mouseButton = MouseButton::None;
+        once = false;
         return true;
     }
 

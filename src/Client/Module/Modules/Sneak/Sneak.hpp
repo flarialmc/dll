@@ -8,7 +8,9 @@ class Sneak : public Module {
 public:
 
 
-	Sneak();;
+	Sneak(): Module("Toggle Sneak", "No need to hold down your sneak key.",
+		IDR_SLOWLY_PNG, "SHIFT") {
+	}
 
 	void onEnable() override;
 
@@ -21,7 +23,9 @@ public:
 	bool toggleSneaking = false;
 	bool toggled = false;
 
-	void onKey(KeyEvent& event);;
+	void onKey(KeyEvent& event);
+
+	void onMouse(MouseEvent& event);
 
 	void onTick(TickEvent& event);
 };

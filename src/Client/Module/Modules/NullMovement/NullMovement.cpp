@@ -36,16 +36,7 @@ void NullMovement::defaultConfig()
 
 void NullMovement::settingsRender(float settingsOffset)
 {
-    float x = Constraints::PercentageConstraint(0.019, "left");
-    float y = Constraints::PercentageConstraint(0.10, "top");
-
-    const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
-
-
-    FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
-    FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
-                              Constraints::RelativeConstraint(1.0, "width"),
-                              Constraints::RelativeConstraint(0.88f, "height"));
+    initSettingsPage();
 
     addHeader("Misc");
     addToggle("Vertical Nulling", "W & S keys", "vertical");
@@ -66,7 +57,11 @@ void NullMovement::onTick(TickEvent& event)
     static int leftKey = safe_stoi(parser.options["keyboard_type_0_key.left"]);
     static int rightKey = safe_stoi(parser.options["keyboard_type_0_key.right"]);
 
-    if (SDK::clientInstance != nullptr && SDK::clientInstance->getLocalPlayer() != nullptr) {
+    if (SDK::clientInstance != nullptr && SDK::clientInstance->getLocalPlayer() != nullptr && (
+        SDK::getCurrentScreen() == "hud_screen" ||
+        SDK::getCurrentScreen() == "zoom_screen" ||
+        SDK::getCurrentScreen() == "f3_screen"
+        )) {
         auto* handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
         if (handler != nullptr) {
             if (!movementKeyStack.empty()) {
@@ -120,7 +115,11 @@ void NullMovement::onTick(TickEvent& event)
 
 void NullMovement::onKey(KeyEvent& event)
 {
-    if (!this->isEnabled()) return;
+    if (!this->isEnabled() && (
+        SDK::getCurrentScreen() != "hud_screen" &&
+        SDK::getCurrentScreen() != "zoom_screen" &&
+        SDK::getCurrentScreen() != "f3_screen"
+        )) return;
     lastKey = event.getKey();
     lastKeys = event.keys;
     lastAction = event.getAction();

@@ -9,4 +9,7 @@ public:
     explicit displayClientMessageEvent(std::string message) {
         this->message = message;
     }
+    std::string getMessage() {
+        return message;
+    }
 };

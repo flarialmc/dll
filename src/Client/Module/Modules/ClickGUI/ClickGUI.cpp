@@ -1,4 +1,4 @@
-#include "ClickGUI.hpp"
+﻿#include "ClickGUI.hpp"
 
 #include <random>
 #include <Scripting/ScriptManager.hpp>
@@ -39,6 +39,112 @@ void ClickGUI::fov(FOVEvent& event) {
 	}
 	event.setFOV(cFov);
 };*/
+
+size_t ClickGUI::sanitizedToRawIndex(std::string_view raw, size_t sanIdx) {
+    size_t rawIdx = 0, visible = 0;
+
+    while ((rawIdx < raw.length()) && (visible < sanIdx)) {
+        const auto b0 = static_cast<uint8_t>(raw[rawIdx]);
+        if (
+            ((rawIdx + 2) < raw.length()) &&
+            (b0 == section1stPart) &&
+            (static_cast<uint8_t>(raw[rawIdx + 1]) == section2ndPart)
+            ) {
+            rawIdx += 3; // skip section symbol (2 bytes) + 1 code byte
+            continue;
+        }
+        ++rawIdx;
+        ++visible;
+    }
+
+    return rawIdx; // raw insertion point corresponding to sanitized index
+}
+
+std::string& ClickGUI::getMutableTextForWatermark(TextPacket& pkt) {
+    return ((pkt.type == TextPacketType::CHAT) && !pkt.name.empty()) ? pkt.name : pkt.message;
+}
+
+/*
+ * Todo:
+        Modify both, pkt->name and pkt->message (mainly for local worlds and realms)
+        Add toggle to disable multiple watermarks
+ */
+void ClickGUI::onPacketReceive(PacketEvent& event) {
+    if (event.getPacket()->getId() != MinecraftPacketIds::Text) return;
+    auto* pkt = reinterpret_cast<TextPacket*>(event.getPacket());
+    if (pkt->message == " ") event.cancel(); //remove onix promotion on zeqa
+    if (Client::settings.getSettingByName<bool>("nochaticon")->value) return;
+
+    auto& txt = getMutableTextForWatermark(*pkt);
+    const auto sanitized = String::removeColorCodes(txt);
+
+    std::vector<std::pair<std::string, size_t>> hits;
+    for (auto& user : APIUtils::onlineUsers) {
+        size_t pos = 0;
+        while ((pos = sanitized.find(user, pos)) != std::string_view::npos) {
+            hits.emplace_back(user, pos);
+            pos += user.size();
+        }
+    }
+    if (hits.empty()) return;
+
+    std::unordered_set<std::string> onlinePlayers;
+    for (auto& pair : SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap()) {
+        if (!pair.second.name.empty()) {
+            onlinePlayers.insert(String::removeColorCodes(pair.second.name));
+        }
+    }
+
+    std::unordered_set<std::string> seen;
+    std::vector<std::pair<size_t,std::string>> ins;
+
+    auto getPrefix = [&](const std::string& name)->std::optional<std::string> {
+        for (const auto& [role, color] : roleColors)
+            if (APIUtils::hasRole(role, name))
+                return std::format("{}{}{}", "§f[", color, "FLARIAL§f]§r ");
+        return std::nullopt;
+    };
+
+    auto originalFormat = [&](size_t rawIndex){
+        std::string res;
+        const size_t N = std::min(rawIndex, txt.size());
+
+        for (size_t i = 0; i + 2 <= N && i + 2 <= txt.size(); ++i) {
+            if (
+                static_cast<uint8_t>(txt[i]) == section1stPart &&
+                static_cast<uint8_t>(txt[i+1]) == section2ndPart
+            ) {
+                if (i + 2 < txt.size()) {
+                    res.append(txt, i, 3);
+                    i += 2;
+                }
+            }
+        }
+        return res;
+    };
+
+    for (auto& [name, sanitizedIndex] : hits) {
+        if (seen.contains(name)) continue;
+        if (!onlinePlayers.contains(name)) continue;
+
+        auto prefix = getPrefix(name);
+        if (!prefix) continue;
+
+        const size_t rawIndex = sanitizedToRawIndex(txt, sanitizedIndex);
+        ins.emplace_back(rawIndex, *prefix + originalFormat(rawIndex));
+        seen.insert(name);
+    }
+
+    if (ins.empty()) return;
+
+    std::ranges::sort(ins, [](auto& a, auto& b) {
+        return a.first > b.first;
+    });
+
+    for (auto& t : ins) {
+        txt.insert(std::min(t.first, txt.size()), t.second);
+    }
+}
 
 
 void ClickGUI::onRender(RenderEvent &event) {
@@ -220,6 +326,7 @@ void ClickGUI::onRender(RenderEvent &event) {
 
             curr = "modules";
             page.type = "normal";
+
             FlarialGUI::ResetShit();
 
             auto &scrollData = scrollInfo[curr];
@@ -228,6 +335,11 @@ void ClickGUI::onRender(RenderEvent &event) {
             FlarialGUI::barscrollpos = scrollData.barscrollpos;
             accumilatedPos = scrollData.scrollpos;
             accumilatedBarPos = scrollData.barscrollpos;
+
+            if (Client::settings.getSettingByName<bool>("saveScrollPos")->value) {
+                accumilatedPos = saved_acumilatedPos;
+                accumilatedBarPos = saved_acumilatedBarPos;
+            }
         }
 
 
@@ -283,6 +395,9 @@ void ClickGUI::onRender(RenderEvent &event) {
 
             FlarialGUI::TextBoxes[0].isActive = false;
             curr = "settings";
+
+            saved_acumilatedPos = accumilatedPos;
+            saved_acumilatedBarPos = accumilatedBarPos;
 
             auto &scrollData = scrollInfo[curr];
 
@@ -683,7 +798,7 @@ void ClickGUI::onRender(RenderEvent &event) {
                              Client::settings.getSettingByName<float>("gui_font_scale")->value, 2.f, 0.5f, true);
                 c->addTextBox("Modules", "", Client::settings.getSettingByName<std::string>("mod_fontname")->value, 48);
                 c->addSlider("Universal Font Scale", "",
-                             Client::settings.getSettingByName<float>("modules_font_scale")->value, 2.f, 0.f, true);
+                             Client::settings.getSettingByName<float>("modules_font_scale")->value, 2.f, 0.5f, true);
                 c->addToggle("Override Font Weight", "",
                              Client::settings.getSettingByName<bool>("overrideFontWeight")->value);
                 c->addDropdown("Font Weight", "Bold, Thin, etc.",
@@ -736,6 +851,9 @@ void ClickGUI::onRender(RenderEvent &event) {
                 c->extraPadding();
 
                 c->addHeader("Misc");
+                c->addToggle("Save Scroll Position",
+                             "Save scroll position in ClickGUI",
+                             Client::settings.getSettingByName<bool>("saveScrollPos")->value);
                 c->addToggle("Auto Search ClickGUI",
                              "Start searching for modules already when you press a key in ClickGUI",
                              Client::settings.getSettingByName<bool>("autosearch")->value);
@@ -756,6 +874,8 @@ void ClickGUI::onRender(RenderEvent &event) {
                              Client::settings.getSettingByName<bool>("nologoicon")->value);
                 c->addToggle("No Flarial Chat Icon", "No [FLARIAL] in chat </3",
                              Client::settings.getSettingByName<bool>("nochaticon")->value);
+                c->addConditionalToggle(!Client::settings.getSettingByName<bool>("nochaticon")->value, "Single watermark", "The [FLARIAL] tag will only apply to the first user found in each message. This will be the player sending the messages in a local world.",
+                             Client::settings.getSettingByName<bool>("singlewatermark")->value);
                 c->addToggle("Clear Text Box When Clicked", "",
                              Client::settings.getSettingByName<bool>("clearTextBoxWhenClicked")->value);
 
@@ -973,10 +1093,9 @@ void ClickGUI::onRender(RenderEvent &event) {
                     L"RESET POS", buttonWidth, buttonHeight, round.x, round.x)) {
                     auto currentModule = ModuleManager::getModule(page.module);
                     if (currentModule != nullptr) {
-                        if (currentModule->settings.getSettingByName<float>("percentageX") != nullptr)
-                            currentModule->settings.getSettingByName<float>("percentageX")->value = 0.0f;
-                        if (currentModule->settings.getSettingByName<float>("percentageY") != nullptr)
-                            currentModule->settings.getSettingByName<float>("percentageY")->value = 0.0f;
+                        currentModule->settings.deleteSetting("percentageX");
+                        currentModule->settings.deleteSetting("percentageY");
+                        currentModule->defaultConfig();
                         FlarialGUI::ResetShit();
                     }
                 }

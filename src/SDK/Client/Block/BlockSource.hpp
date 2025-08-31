@@ -13,5 +13,5 @@ public:
 
     Dimension* getDimension();
 
-    Biome *getBiome(const Vec3<int> &);
+    Biome *getBiome(BlockPos const & bp);
 };

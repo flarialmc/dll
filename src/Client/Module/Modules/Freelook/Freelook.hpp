@@ -59,4 +59,6 @@ public:
 	void onGetViewPerspective(PerspectiveEvent& event);
 
 	void onKey(KeyEvent& event);
+
+	void onMouse(MouseEvent& event);
 };

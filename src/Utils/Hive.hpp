@@ -11,345 +11,112 @@
 
 #pragma comment(lib, "wininet.lib")
 
-const std::map<int, int> xpToLevelBedWars = {
-        {0, 0},
-        {150, 1},
-        {450, 2},
-        {900, 3},
-        {1500, 4},
-        {2250, 5},
-        {3150, 6},
-        {4200, 7},
-        {5400, 8},
-        {6750, 9},
-        {8250, 10},
-        {9900, 11},
-        {11700, 12},
-        {13650, 13},
-        {15750, 14},
-        {18000, 15},
-        {20400, 16},
-        {22950, 17},
-        {25650, 18},
-        {28500, 19},
-        {31500, 20},
-        {34650, 21},
-        {37950, 22},
-        {41400, 23},
-        {45000, 24},
-        {48750, 25},
-        {52650, 26},
-        {56700, 27},
-        {60900, 28},
-        {65250, 29},
-        {69750, 30},
-        {74400, 31},
-        {79200, 32},
-        {84150, 33},
-        {89250, 34},
-        {94500, 35},
-        {99900, 36},
-        {105450, 37},
-        {111150, 38},
-        {117000, 39},
-        {123000, 40},
-        {129150, 41},
-        {135450, 42},
-        {141900, 43},
-        {148500, 44},
-        {155250, 45},
-        {162150, 46},
-        {169200, 47},
-        {176400, 48},
-        {183750, 49},
-        {191250, 50},
-        {198900, 51},
-        {206550, 52},
-        {214200, 53},
-        {221850, 54},
-        {229500, 55},
-        {237150, 56},
-        {244800, 57},
-        {252450, 58},
-        {260100, 59},
-        {267750, 60},
-        {275400, 61},
-        {283050, 62},
-        {290700, 63},
-        {298350, 64},
-        {306000, 65},
-        {313650, 66},
-        {321300, 67},
-        {328950, 68},
-        {336600, 69},
-        {344250, 70},
-        {351900, 71},
-        {359550, 72},
-        {367200, 73},
-        {374850, 74}
+
+
+// Refer to https://support.playhive.com/in-game-unlocks/
+static const std::vector<int> xpTable = {
+    0,        // Level 0
+    0,        // Level 1
+    150,      // Level 2
+    450,      // Level 3
+    900,      // Level 4
+    1500,     // Level 5
+    2250,     // Level 6
+    3150,     // Level 7
+    4200,     // Level 8
+    5400,     // Level 9
+    6750,     // Level 10
+    8250,     // Level 11
+    9900,     // Level 12
+    11700,    // Level 13
+    13650,    // Level 14
+    15750,    // Level 15
+    18000,    // Level 16
+    20400,    // Level 17
+    22950,    // Level 18
+    25650,    // Level 19
+    28500,    // Level 20
+    31500,    // Level 21
+    34650,    // Level 22
+    37950,    // Level 23
+    41400,    // Level 24
+    45000,    // Level 25
+    48750,    // Level 26
+    52650,    // Level 27
+    56700,    // Level 28
+    60900,    // Level 29
+    65250,    // Level 30
+    69750,    // Level 31
+    74400,    // Level 32
+    79200,    // Level 33
+    84150,    // Level 34
+    89250,    // Level 35
+    94500,    // Level 36
+    99900,    // Level 37
+    105450,   // Level 38
+    111150,   // Level 39
+    117000,   // Level 40
+    123000,   // Level 41
+    129150,   // Level 42
+    135450,   // Level 43
+    141900,   // Level 44
+    148500,   // Level 45
+    155250,   // Level 46
+    162150,   // Level 47
+    169200,   // Level 48
+    176400,   // Level 49
+    183750,   // Level 50
+    191250,   // Level 51
+    198900,   // Level 52
+    206550,   // Level 53
+    214200,   // Level 54
+    221850,   // Level 55
+    229500,   // Level 56
+    237150,   // Level 57
+    244800,   // Level 58
+    252450,   // Level 59
+    260100,   // Level 60
+    267750,   // Level 61
+    275400,   // Level 62
+    283050,   // Level 63
+    290700,   // Level 64
+    298350,   // Level 65
+    306000,   // Level 66
+    313650,   // Level 67
+    321300,   // Level 68
+    328950,   // Level 69
+    336600,   // Level 70
+    344250,   // Level 71
+    351900,   // Level 72
+    359550,   // Level 73
+    367200,   // Level 74
+    374850,   // Level 75
+    382500,   // Level 76
+    390150,   // Level 77
+    397800,   // Level 78
+    405450,   // Level 79
+    413100,   // Level 80
+    420750,   // Level 81
+    428400,   // Level 82
+    436050,   // Level 83
+    443700,   // Level 84
+    451350,   // Level 85
+    459000,   // Level 86
+    466650,   // Level 87
+    474300,   // Level 88
+    481950,   // Level 89
+    489600,   // Level 90
+    497250,   // Level 91
+    504900,   // Level 92
+    512550,   // Level 93
+    520200,   // Level 94
+    527850,   // Level 95
+    535500,   // Level 96
+    543150,   // Level 97
+    550800,   // Level 98
+    558450,   // Level 99
+    566100    // Level 100
 };
-
-
-const std::map<int, int> xpToLevelSkyWars = {
-        {0, 0},
-        {150, 1},
-        {450, 2},
-        {900, 3},
-        {1500, 4},
-        {2250, 5},
-        {3150, 6},
-        {4200, 7},
-        {5400, 8},
-        {6750, 9},
-        {8250, 10},
-        {9900, 11},
-        {11700, 12},
-        {13650, 13},
-        {15750, 14},
-        {18000, 15},
-        {20400, 16},
-        {22950, 17},
-        {25650, 18},
-        {28500, 19},
-        {31500, 20},
-        {34650, 21},
-        {37950, 22},
-        {41400, 23},
-        {45000, 24},
-        {48750, 25},
-        {52650, 26},
-        {56700, 27},
-        {60900, 28},
-        {65250, 29},
-        {69750, 30},
-        {74400, 31},
-        {79200, 32},
-        {84150, 33},
-        {89250, 34},
-        {94500, 35},
-        {99900, 36},
-        {105450, 37},
-        {111150, 38},
-        {117000, 39},
-        {123000, 40},
-        {129150, 41},
-        {135450, 42},
-        {141900, 43},
-        {148500, 44},
-        {155250, 45},
-        {162150, 46},
-        {169200, 47},
-        {176400, 48},
-        {183750, 49},
-        {191250, 50},
-        {198900, 51},
-        {206550, 52},
-        {214200, 53},
-        {221850, 54},
-        {229500, 55},
-        {237150, 56},
-        {244800, 57},
-        {252450, 58},
-        {260100, 59},
-        {267750, 60},
-        {275400, 61},
-        {283050, 62},
-        {290700, 63},
-        {298350, 64},
-        {306000, 65},
-        {313650, 66},
-        {321300, 67},
-        {328950, 68},
-        {336600, 69},
-        {344250, 70},
-        {351900, 71},
-        {359550, 72},
-        {367200, 73},
-        {374850, 74},
-        {382500, 75},
-        {390150, 76},
-        {397800, 77},
-        {405450, 78},
-        {413100, 79},
-        {420750, 80},
-        {428400, 81},
-        {436050, 82},
-        {443700, 83},
-        {451350, 84},
-        {459000, 85},
-        {466650, 86},
-        {474300, 87},
-        {481950, 88},
-        {489600, 89},
-        {497250, 90},
-        {504900, 91},
-        {512550, 92},
-        {520200, 93},
-        {527850, 94},
-        {535500, 95},
-        {543150, 96},
-        {550800, 97},
-        {558450, 98},
-        {566100, 99}
-};
-
-
-const std::map<int, int> xpToLevelMurderMystery = {
-        {0, 0},
-        {100, 1},
-        {300, 2},
-        {600, 3},
-        {1000, 4},
-        {1500, 5},
-        {2100, 6},
-        {2800, 7},
-        {3600, 8},
-        {4500, 9},
-        {5500, 10},
-        {6600, 11},
-        {7800, 12},
-        {9100, 13},
-        {10500, 14},
-        {12000, 15},
-        {13600, 16},
-        {15300, 17},
-        {17100, 18},
-        {19000, 19},
-        {21000, 20},
-        {23100, 21},
-        {25300, 22},
-        {27600, 23},
-        {30000, 24},
-        {32500, 25},
-        {35100, 26},
-        {37800, 27},
-        {40600, 28},
-        {43500, 29},
-        {46500, 30},
-        {49600, 31},
-        {52800, 32},
-        {56100, 33},
-        {59500, 34},
-        {63000, 35},
-        {66600, 36},
-        {70300, 37},
-        {74100, 38},
-        {78000, 39},
-        {82000, 40},
-        {86100, 41},
-        {90300, 42},
-        {94600, 43},
-        {99000, 44},
-        {103500, 45},
-        {108100, 46},
-        {112800, 47},
-        {117600, 48},
-        {122500, 49},
-        {127500, 50},
-        {132600, 51},
-        {137800, 52},
-        {143100, 53},
-        {148500, 54},
-        {154000, 55},
-        {159600, 56},
-        {165300, 57},
-        {171100, 58},
-        {177000, 59},
-        {183000, 60},
-        {189100, 61},
-        {195300, 62},
-        {201600, 63},
-        {208000, 64},
-        {214500, 65},
-        {221100, 66},
-        {227800, 67},
-        {234600, 68},
-        {241500, 69},
-        {248500, 70},
-        {255600, 71},
-        {262800, 72},
-        {270100, 73},
-        {277500, 74},
-        {285000, 75},
-        {292600, 76},
-        {300300, 77},
-        {308100, 78},
-        {316000, 79},
-        {324000, 80},
-        {332100, 81},
-        {340200, 82},
-        {348300, 83},
-        {356400, 84},
-        {364500, 85},
-        {372600, 86},
-        {380700, 87},
-        {388800, 88},
-        {396900, 89},
-        {405000, 90},
-        {413100, 91},
-        {421200, 92},
-        {429300, 93},
-        {437400, 94},
-        {445500, 95},
-        {453600, 96},
-        {461700, 97},
-        {469800, 98},
-        {477900, 99}
-};
-
-const std::map<int, int> xpToLevelCTF = {
-        {0, 0},
-        {150, 1},
-        {450, 2},
-        {900, 3},
-        {1500, 4},
-        {2250, 5},
-        {3150, 6},
-        {4200, 7},
-        {5400, 8},
-        {6750, 9},
-        {8250, 10},
-        {9900, 11},
-        {11700, 12},
-        {13650, 13},
-        {15750, 14},
-        {18000, 15},
-        {20400, 16},
-        {22950, 17},
-        {25650, 18},
-        {28500, 19},
-        {31500, 20},
-        {34650, 21},
-        {37950, 22},
-        {41400, 23},
-        {45000, 24},
-        {48750, 25},
-        {52650, 26},
-        {56700, 27},
-        {60900, 28},
-        {65250, 29},
-        {69750, 30},
-        {74400, 31},
-        {79200, 32},
-        {84150, 33},
-        {89250, 34},
-        {94500, 35},
-        {99900, 36},
-        {105450, 37},
-        {111150, 38},
-        {117000, 39},
-        {123000, 40},
-        {129150, 41},
-        {135450, 42},
-        {141900, 43},
-        {148500, 44},
-        {155250, 45},
-        {162150, 46},
-        {169200, 47},
-        {176400, 48},
-        {183750, 49}
-};
-
 
 
 
@@ -453,23 +220,19 @@ namespace Hive {
         return subject;
     }
 
-    inline int getLevelForXP(int xp, const std::map<int, int>& xpToLevel) {
-        auto it = xpToLevel.lower_bound(xp);
+    inline int getLevelFromXP(int xp, int max = 100) {
+        if (xp <= 0) return 1;
 
-        if (it == xpToLevel.end()) {
-            return (--it)->second + 1;
+        int maxXP = xpTable[max];
+
+        if (xp >= maxXP) {
+            return max;
         }
-
-        if (it == xpToLevel.begin()) {
-            return it->second + 1;
+        else {
+            auto it = std::upper_bound(xpTable.begin(), xpTable.end(), xp);
+            int level = static_cast<int>(it - xpTable.begin()) - 1;
+            return level;
         }
-
-        if (it->first == xp) {
-            return it->second + 1;
-        }
-
-        auto prev = std::prev(it);
-        return prev->second + 1;
     }
 
     inline Hive::PlayerStats GetStats(const std::string &gameId, const std::string &username) {
@@ -491,16 +254,25 @@ namespace Hive {
             nlohmann::json jsonData = nlohmann::json::parse(jsonResponse);
 
             // Logger::info("{}", jsonResponse);
-            if(!jsonData.contains("first_played")){
+            if (!jsonData.contains("first_played")) {
                 stats.setCode(2);
                 return stats;
             }
 
-            if(gameId == "bed") {
-                if(!jsonData.contains("final_kills") || !jsonData.contains("kills") || !jsonData.contains("deaths") || !jsonData.contains("victories") || !jsonData.contains("played") || !jsonData.contains("xp") || !jsonData.contains("beds_destroyed")){
+            if (gameId == "bed") {
+                if (
+                    !jsonData.contains("final_kills") ||
+                    !jsonData.contains("kills")
+                    || !jsonData.contains("deaths")
+                    || !jsonData.contains("victories")
+                    || !jsonData.contains("played")
+                    || !jsonData.contains("xp")
+                    || !jsonData.contains("beds_destroyed")
+                ) {
                     stats.setCode(2);
                     return stats;
                 }
+
                 int finalKills = jsonData["final_kills"].get<int>();
                 int xp = jsonData["xp"].get<int>();
                 int kills = jsonData["kills"].get<int>();
@@ -510,23 +282,27 @@ namespace Hive {
 
                 int finalDeaths = played - victories;
 
-
                 stats.setFKDR(roundToSecond((float) finalKills / (float) finalDeaths));
                 stats.setKD(roundToSecond((float) kills / (float) deaths));
                 stats.setWinRate(std::round(((float) victories / (float) played) * 100.0f));
-                stats.setLevel(getLevelForXP(xp, xpToLevelBedWars));
+                stats.setLevel(getLevelFromXP(xp));
                 stats.setVictories(victories);
                 stats.setLosses(played - victories);
                 stats.setKills(kills);
                 stats.setDeaths(deaths);
+
                 // for future:
-                // if(jsonData.contains("prestige")) stats.setPrestige(jsonData["prestige"].get<int>());
+                // if (jsonData.contains("prestige")) stats.setPrestige(jsonData["prestige"].get<int>());
             }
 
-            if(gameId == "sky") {
-
-
-                if(!jsonData.contains("kills") || !jsonData.contains("deaths") || !jsonData.contains("victories") || !jsonData.contains("played") || !jsonData.contains("xp")){
+            if (gameId == "sky") {
+                if (
+                    !jsonData.contains("kills")
+                    || !jsonData.contains("deaths")
+                    || !jsonData.contains("victories")
+                    || !jsonData.contains("played")
+                    || !jsonData.contains("xp")
+                ) {
                     stats.setCode(2);
                     return stats;
                 }
@@ -537,19 +313,27 @@ namespace Hive {
                 int played = jsonData["played"].get<int>();
                 int xp = jsonData["xp"].get<int>();
 
-
                 stats.setFKDR(roundToSecond((float) -1.f));
                 stats.setKD(roundToSecond((float) kills / (float) deaths));
                 stats.setWinRate(std::round(((float) victories / (float) played) * 100.0f));
-                stats.setLevel(getLevelForXP(xp, xpToLevelSkyWars));
+                stats.setLevel(getLevelFromXP(xp));
                 stats.setVictories(victories);
                 stats.setLosses(played - victories);
                 stats.setKills(kills);
                 stats.setDeaths(deaths);
-                if(jsonData.contains("prestige")) stats.setPrestige(jsonData["prestige"].get<int>());
+
+                if (jsonData.contains("prestige")) stats.setPrestige(jsonData["prestige"].get<int>());
             }
-            if(gameId == "murder") {
-                if(!jsonData.contains("murders") || !jsonData.contains("murderer_eliminations") || !jsonData.contains("deaths") || !jsonData.contains("victories") || !jsonData.contains("played") || !jsonData.contains("xp")){
+
+            if (gameId == "murder") {
+                if (
+                    !jsonData.contains("murders") ||
+                    !jsonData.contains("murderer_eliminations") ||
+                    !jsonData.contains("deaths") ||
+                    !jsonData.contains("victories") ||
+                    !jsonData.contains("played") ||
+                    !jsonData.contains("xp")
+                ) {
                     stats.setCode(2);
                     return stats;
                 }
@@ -562,27 +346,25 @@ namespace Hive {
                 int xp = jsonData["xp"].get<int>();
 
                 stats.setFKDR(roundToSecond(-1.0f));
-
                 stats.setKD(roundToSecond((float) murders / (float) deaths));
-
                 stats.setWinRate(std::round(((float) victories / (float) played) * 100.0f));
-
-                stats.setLevel(getLevelForXP(xp, xpToLevelMurderMystery));
-
+                stats.setLevel(getLevelFromXP(xp));
                 stats.setVictories(victories);
-
                 stats.setLosses(played - victories);
-
                 stats.setKills(eliminations);
-
                 stats.setDeaths(deaths);
 
-                if(jsonData.contains("prestige")) stats.setPrestige(jsonData["prestige"].get<int>());
+                if (jsonData.contains("prestige")) stats.setPrestige(jsonData["prestige"].get<int>());
             }
 
-
-            if(gameId == "ctf") {
-                if(!jsonData.contains("kills") || !jsonData.contains("deaths") || !jsonData.contains("victories") || !jsonData.contains("played") || !jsonData.contains("xp")){
+            if (gameId == "ctf") {
+                if (
+                    !jsonData.contains("kills") ||
+                    !jsonData.contains("deaths") ||
+                    !jsonData.contains("victories") ||
+                    !jsonData.contains("played") ||
+                    !jsonData.contains("xp")
+                ) {
                     stats.setCode(2);
                     return stats;
                 }
@@ -592,24 +374,17 @@ namespace Hive {
                 int victories = jsonData["victories"].get<int>();
                 int played = jsonData["played"].get<int>();
                 int xp = jsonData["xp"].get<int>();
-//                int flagsCaptured = jsonData["flags_captured"].get<int>();
-//                int flagsReturned = jsonData["flags_returned"].get<int>();
-//                int assists = jsonData["assists"].get<int>();
+                // int flagsCaptured = jsonData["flags_captured"].get<int>();
+                // int flagsReturned = jsonData["flags_returned"].get<int>();
+                // int assists = jsonData["assists"].get<int>();
 
                 stats.setKD(roundToSecond((float) kills / (float) deaths));
-
                 stats.setFKDR(roundToSecond(-1.0f));
-
                 stats.setWinRate(std::round(((float) victories / (float) played) * 100.0f));
-
-                stats.setLevel(getLevelForXP(xp, xpToLevelCTF));
-
+                stats.setLevel(getLevelFromXP(xp, 50));
                 stats.setVictories(victories);
-
                 stats.setLosses(played - victories);
-
                 stats.setKills(kills);
-
                 stats.setDeaths(deaths);
             }
 

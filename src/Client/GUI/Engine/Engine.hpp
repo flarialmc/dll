@@ -15,6 +15,7 @@
 #include "Elements/Control/ColorPicker/ColorPicker.hpp"
 #include "Elements/Control/TextBox/TextBoxStruct.hpp"
 #include "Elements/Control/Slider/SliderRect.hpp"
+#include "Elements/Control/SliderInt/SliderIntRect.hpp"
 #include "Elements/Windows/WindowRect.hpp"
 #include "Elements/Control/Tooltip/ToolTipStruct.hpp"
 #include "Elements/Structs/HSV.hpp"
@@ -166,6 +167,7 @@ namespace FlarialGUI {
 
 	extern std::unordered_map<int, WindowRect> WindowRects;
 	extern std::unordered_map<int, SliderRect> SliderRects;
+	extern std::unordered_map<int, SliderIntRect> SliderIntRects;
 	extern std::unordered_map<int, TextBoxStruct> TextBoxes;
 	extern std::unordered_map<int, ColorPicker> ColorPickers;
 	extern std::unordered_map<int, DropdownStruct> DropDownMenus;
@@ -346,6 +348,8 @@ namespace FlarialGUI {
 	bool Toggle(int index, float x, float y, bool isEnabled, bool rgb);
 
 	float Slider(int index, float x, float y, float& value, float maxValue = 100.0f, float minValue = 0.0f, bool zerosafe = true, std::string moduleName = "", std::string settingName = "");
+
+	int SliderInt(int index, float x, float y, int& value, int maxValue = 100, int minValue = 0, std::string moduleName = "", std::string settingName = "");
 
 	void Circle(float x, float y, const D2D1_COLOR_F& color, float radius);
 

@@ -3,50 +3,35 @@
 #include "Modules/ClickGUI/ClickGUI.hpp"
 #include "Utils/Render/PositionUtils.hpp"
 
-MovableTitle::MovableTitle(): Module("Movable " + mname, "Makes the Minecraft " + mname + " movable.", IDR_MOVABLE_PNG, "")
-{
+MovableTitle::MovableTitle(): Module("Movable " + mname, "Makes the Minecraft " + mname + " movable.", IDR_MOVABLE_PNG, "") {
     Listen(this, SetupAndRenderEvent, &MovableTitle::onSetupAndRender)
-    
 }
 
-void MovableTitle::onEnable()
-{
+void MovableTitle::onEnable() {
     Listen(this, RenderEvent, &MovableTitle::onRender)
     Listen(this, UIControlGetPositionEvent, &MovableTitle::onUIControlGetPosition)
-
-    if (FlarialGUI::inMenu) {
-        FlarialGUI::Notify("To change the position of the " + mname + ", Please click " +
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
-                "editmenubind")->value + " in the settings tab.");
-    }
     Module::onEnable();
 }
 
-void MovableTitle::onDisable()
-{
+void MovableTitle::onDisable() {
+    Module::onDisable();
     Deafen(this, RenderEvent, &MovableTitle::onRender)
     Deafen(this, UIControlGetPositionEvent, &MovableTitle::onUIControlGetPosition)
-
-    Module::onDisable();
 }
 
-void MovableTitle::defaultConfig()
-{
+void MovableTitle::defaultConfig() {
     Module::defaultConfig("core");
     Module::defaultConfig("pos");
-    
 }
 
-void MovableTitle::settingsRender(float settingsOffset)
-{}
+void MovableTitle::settingsRender(float settingsOffset) {
+}
 
-void MovableTitle::onRender(RenderEvent& event)
-{
-    if (!this->isEnabled()) return;
+void MovableTitle::onRender(RenderEvent &event) {
+    if (!this->isEnabled() && !delayDisable) return;
     auto name = SDK::getCurrentScreen();
 
     if (name == "hud_screen" || name == "pause_screen") {
-
         float width = currentSize.x;
         float height = currentSize.y;
 
@@ -54,14 +39,15 @@ void MovableTitle::onRender(RenderEvent& event)
         Vec2<float> settingperc = Vec2<float>(getOps<float>("percentageX"), getOps<float>("percentageY"));
 
         if (settingperc.x != 0) currentPos = Vec2<float>(settingperc.x * (MC::windowSize.x - width), settingperc.y * (MC::windowSize.y - height));
-        else if (settingperc.x == 0 and originalPos.x != 0.0f) currentPos = Vec2<float>{ originalPos.x, originalPos.y };
+        else if (settingperc.x == 0 and originalPos.x != 0.0f) currentPos = Vec2<float>{originalPos.x, originalPos.y};
 
-        if (ClickGUI::editmenu) FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, width, height, 30, this->name);
+        if (ClickGUI::editmenu) {
+            FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, width, height, 30, this->name);
+            checkForRightClickAndOpenSettings(currentPos.x, currentPos.y, width, height);
+        }
 
-        if (currentPos.x != -120.0f)
-        {
+        if (currentPos.x != -120.0f) {
             Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(currentPos.x, currentPos.y, 30, width, height);
-
 
 
             currentPos.x = vec2.x;
@@ -79,20 +65,21 @@ void MovableTitle::onRender(RenderEvent& event)
     }
 }
 
-void MovableTitle::onUIControlGetPosition(UIControlGetPositionEvent& event)
-{ // happens when game updates control position
-    if (!this->isEnabled()) return;
+void MovableTitle::onUIControlGetPosition(UIControlGetPositionEvent &event) {
+    // happens when game updates control position
+    if (!this->isEnabled() && !delayDisable) return;
     auto control = event.getControl();
     if (control->getLayerName() == layerName) {
-        if (!isEnabled()) return;
-        if (originalPos == Vec2<float>{0, 0}) {
+        if (!isEnabled() && !delayDisable) return;
+        if ((originalPos == Vec2<float>{0, 0}) || delayDisable) {
             originalPos = PositionUtils::getScreenScaledPos(control->parentRelativePosition);
             return;
         }
         Vec2<float> scaledPos = PositionUtils::getScaledPos(currentPos);
-        if (event.getPosition() == nullptr) { // 1.21.30 and below
+        if (event.getPosition() == nullptr) {
+            // 1.21.30 and below
             control->parentRelativePosition = scaledPos;
-            control->forEachChild([](std::shared_ptr<UIControl>& child) {
+            control->forEachChild([](std::shared_ptr<UIControl> &child) {
                 child->updatePosition();
             });
             return;
@@ -103,22 +90,19 @@ void MovableTitle::onUIControlGetPosition(UIControlGetPositionEvent& event)
     }
 }
 
-void MovableTitle::onSetupAndRender(SetupAndRenderEvent& event)
-{
-    if (!this->isEnabled()) return;
+void MovableTitle::onSetupAndRender(SetupAndRenderEvent &event) {
+    if (!this->isEnabled() && !delayDisable) return;
     update();
 }
 
-void MovableTitle::update()
-{
+void MovableTitle::update() {
     if (ClickGUI::editmenu) {
-        if (!isEnabled()) return;
-    }
-    else {
+        if (!this->isEnabled() && !delayDisable) return;
+    } else {
         if (lastAppliedPos == (isEnabled() ? currentPos : originalPos)) return;
     }
     if (SDK::getCurrentScreen() != "hud_screen") return;
-    SDK::screenView->VisualTree->root->forEachControl([this](std::shared_ptr<UIControl>& control) {
+    SDK::screenView->VisualTree->root->forEachControl([this](std::shared_ptr<UIControl> &control) {
         if (control->getLayerName() == layerName) {
             updatePosition(control.get());
             return true; // dont go through other controls
@@ -127,13 +111,12 @@ void MovableTitle::update()
     });
 }
 
-void MovableTitle::updatePosition(UIControl* control)
-{
+void MovableTitle::updatePosition(UIControl *control) {
     if (!(SDK::clientInstance && SDK::clientInstance->getLocalPlayer())) return;
 
     auto pos = control->parentRelativePosition;
 
-    if (isEnabled() && originalPos == Vec2<float>{0, 0}) {
+    if ((isEnabled() && originalPos == Vec2<float>{0, 0}) || delayDisable) {
         originalPos = PositionUtils::getScreenScaledPos(pos);
     }
 
@@ -145,7 +128,7 @@ void MovableTitle::updatePosition(UIControl* control)
     if (VersionUtils::checkAboveOrEqual(21, 40)) {
         control->updatePosition(true);
     }
-    control->forEachChild([](std::shared_ptr<UIControl>& child) {
+    control->forEachChild([](std::shared_ptr<UIControl> &child) {
         child->updatePosition();
     });
 
@@ -160,11 +143,9 @@ void MovableTitle::updatePosition(UIControl* control)
 
     auto _scaledSize = PositionUtils::getScreenScaledPos(size);
 
-    if (_scaledSize.x < 10)
-        _scaledSize.x = 10;
+    if (_scaledSize.x < 10) _scaledSize.x = 10;
 
-    if (_scaledSize.y < 10)
-        _scaledSize.y = 10;
+    if (_scaledSize.y < 10) _scaledSize.y = 10;
 
     currentSize = _scaledSize;
 
