@@ -8,7 +8,7 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <imgui/stb.h>
-#include <winrt/base.h>
+
 #include <memory>
 
 
@@ -215,7 +215,7 @@ bool FlarialGUI::LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HAND
     }
 
     // Load image data and prepare upload buffer on background thread
-    auto future = std::async(std::launch::async, LoadImageDataFromResource, resourceId, type, SwapchainHook::d3d12Device5);
+    auto future = std::async(std::launch::async, LoadImageDataFromResource, resourceId, type, SwapchainHook::d3d12Device5.get());
     auto image_data_opt = future.get();
     if (!image_data_opt) return false;
     const auto& image_data = *image_data_opt;

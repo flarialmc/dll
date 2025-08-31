@@ -5,6 +5,7 @@ void FontDrawTransformedHook::FontDrawTransformedCallback(void* _this, void* scr
     float y, MCCColor* color, int angle, float s, bool centered, float maxWidth)
 {
 
+    if (!clickgui) return;
     D2D_COLOR_F primary1 = ClickGUI::getColor("primary1");
 
     if (clickgui) {

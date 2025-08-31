@@ -4,12 +4,13 @@
 #include <d3d12.h>
 #include <d3d11.h>
 #include <d3d11on12.h>
+#include <winrt/base.h>
 #include "kiero/kiero.h"
 #include "../Hook.hpp"
 
 class CommandListHook : public Hook {
 private:
-    static void listCallback(ID3D12CommandQueue *queue, UINT numCommandLists, const ID3D12CommandList **ppCommandLists);
+    static void listCallback(ID3D12CommandQueue *queue, UINT numCommandLists, ID3D12CommandList **ppCommandLists);
 
 public:
 

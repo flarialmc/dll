@@ -1,5 +1,6 @@
 #pragma once
 #include <dxgi.h>
+#include <winrt/base.h>
 #include "kiero/kiero.h"
 #include "../Hook.hpp"
 
