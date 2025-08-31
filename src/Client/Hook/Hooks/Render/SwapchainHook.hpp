@@ -81,7 +81,6 @@ public:
     static inline winrt::com_ptr<ID3D11DeviceContext> context;
     static inline winrt::com_ptr<ID3D11Device> d3d11Device;
     static inline uintptr_t bufferCount;
-    static inline winrt::com_ptr<ID3D12GraphicsCommandList> DX12CommandLists;
     static bool hasResized;
     static int currentBitmap;
     static inline winrt::com_ptr<ID3D11Texture2D> stageTex;

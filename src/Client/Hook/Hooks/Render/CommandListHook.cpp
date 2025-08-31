@@ -31,9 +31,6 @@ void CommandListHook::listCallback(ID3D12CommandQueue *queue, UINT numCommandLis
                                    ID3D12CommandList **ppCommandLists) {
 
     SwapchainHook::queue.copy_from(queue);
-    SwapchainHook::DX12CommandLists.copy_from(reinterpret_cast<ID3D12GraphicsCommandList*>(*ppCommandLists));
-
-
     return funcOriginal(queue, numCommandLists, ppCommandLists);
 
 }

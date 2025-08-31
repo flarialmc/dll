@@ -274,7 +274,7 @@ void Blur::RenderToRTV(ID3D11RenderTargetView *pRenderTargetView, ID3D11ShaderRe
     FLOAT backgroundColor[4] = {0.0f, 0.0f, 0.0f, 1.0f};
     pContext->ClearRenderTargetView(pRenderTargetView, backgroundColor);
     pContext->Draw(sizeof(quadVertices) / sizeof(quadVertices[0]), 0);
-    
+
     // Clear render target binding
     ID3D11RenderTargetView* nullRTV = nullptr;
     pContext->OMSetRenderTargets(1, &nullRTV, nullptr);

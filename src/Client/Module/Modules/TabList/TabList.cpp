@@ -83,6 +83,160 @@ static winrt::com_ptr<ID3D12Fence> g_uploadFenceDX12;
 static UINT64 g_uploadFenceValue = 0;
 static HANDLE g_uploadFenceEvent = nullptr;
 
+
+bool TabList::AllocatePlayerHeadDescriptor(const std::string& playerName, D3D12_CPU_DESCRIPTOR_HANDLE* out_cpu_handle, D3D12_GPU_DESCRIPTOR_HANDLE* out_gpu_handle, UINT* out_descriptor_id) {
+    std::lock_guard<std::mutex> lock(playerHeadDescriptorMutex);
+
+    if (!SwapchainHook::d3d12DescriptorHeapImGuiRender || !SwapchainHook::d3d12Device5) {
+        Logger::custom(fg(fmt::color::red), "PlayerHeadDescriptor", "ERROR: Descriptor heap or device not available");
+        return false;
+    }
+
+    // Check if we already have a descriptor for this player
+    for (auto& [descriptorId, info] : playerHeadDescriptors) {
+        if (info.playerName == playerName && info.inUse) {
+            info.lastUsed = std::chrono::steady_clock::now();
+
+            // Calculate descriptor handles - convert playerhead ID to heap index
+            UINT heapIndex = descriptorId - PLAYERHEAD_DESCRIPTOR_START + SwapchainHook::IMGUI_FONT_DESCRIPTORS + SwapchainHook::MAX_IMAGE_DESCRIPTORS;
+
+            UINT handle_increment = SwapchainHook::d3d12Device5->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+            D3D12_CPU_DESCRIPTOR_HANDLE cpu = SwapchainHook::d3d12DescriptorHeapImGuiRender->GetCPUDescriptorHandleForHeapStart();
+            cpu.ptr += (handle_increment * heapIndex);
+
+            D3D12_GPU_DESCRIPTOR_HANDLE gpu = SwapchainHook::d3d12DescriptorHeapImGuiRender->GetGPUDescriptorHandleForHeapStart();
+            gpu.ptr += (handle_increment * heapIndex);
+
+            *out_cpu_handle = cpu;
+            *out_gpu_handle = gpu;
+            *out_descriptor_id = descriptorId;
+
+            Logger::custom(fg(fmt::color::green), "PlayerHeadDescriptor", "Reusing descriptor {} (heap index {}) for player '{}'", descriptorId, heapIndex, playerName);
+            return true;
+        }
+    }
+
+    UINT descriptorId;
+
+    // Try to reuse a freed descriptor first
+    if (!freePlayerHeadDescriptors.empty()) {
+        descriptorId = freePlayerHeadDescriptors.front();
+        freePlayerHeadDescriptors.pop();
+        Logger::custom(fg(fmt::color::cyan), "PlayerHeadDescriptor", "Reusing freed descriptor {} for player '{}'", descriptorId, playerName);
+    } else {
+        // Allocate new descriptor
+        static bool initialized = false;
+        if (!initialized) {
+            nextPlayerHeadDescriptorId = PLAYERHEAD_DESCRIPTOR_START;
+            initialized = true;
+        }
+
+        if (nextPlayerHeadDescriptorId >= PLAYERHEAD_DESCRIPTOR_END) {
+            Logger::custom(fg(fmt::color::red), "PlayerHeadDescriptor", "ERROR: No more playerhead descriptors available (reached limit of {})", MAX_PLAYERHEAD_DESCRIPTORS);
+            return false;
+        }
+
+        descriptorId = nextPlayerHeadDescriptorId++;
+        Logger::custom(fg(fmt::color::blue), "PlayerHeadDescriptor", "Allocating new descriptor {} for player '{}'", descriptorId, playerName);
+    }
+
+    // Calculate descriptor handles - convert playerhead ID to heap index
+    UINT heapIndex = descriptorId - PLAYERHEAD_DESCRIPTOR_START + SwapchainHook::IMGUI_FONT_DESCRIPTORS + SwapchainHook::MAX_IMAGE_DESCRIPTORS;
+
+    if (heapIndex >= SwapchainHook::TOTAL_CONSOLIDATED_DESCRIPTORS) {
+        Logger::custom(fg(fmt::color::red), "PlayerHeadDescriptor", "ERROR: Calculated heap index {} exceeds total descriptors {} (descriptor ID {})", heapIndex, SwapchainHook::TOTAL_CONSOLIDATED_DESCRIPTORS, descriptorId);
+        return false;
+    }
+
+    Logger::custom(fg(fmt::color::cyan), "PlayerHeadDescriptor", "Using descriptor {} -> heap index {} for player '{}'", descriptorId, heapIndex, playerName);
+
+    UINT handle_increment = SwapchainHook::d3d12Device5->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+    D3D12_CPU_DESCRIPTOR_HANDLE cpu = SwapchainHook::d3d12DescriptorHeapImGuiRender->GetCPUDescriptorHandleForHeapStart();
+    cpu.ptr += (handle_increment * heapIndex);
+
+    D3D12_GPU_DESCRIPTOR_HANDLE gpu = SwapchainHook::d3d12DescriptorHeapImGuiRender->GetGPUDescriptorHandleForHeapStart();
+    gpu.ptr += (handle_increment * heapIndex);
+
+    // Store descriptor info
+    playerHeadDescriptors[descriptorId] = {
+        playerName,
+        std::chrono::steady_clock::now(),
+        true
+    };
+
+    *out_cpu_handle = cpu;
+    *out_gpu_handle = gpu;
+    *out_descriptor_id = descriptorId;
+
+    return true;
+}
+
+void TabList::FreePlayerHeadDescriptor(UINT descriptorId) {
+    std::lock_guard<std::mutex> lock(playerHeadDescriptorMutex);
+
+    auto it = playerHeadDescriptors.find(descriptorId);
+    if (it != playerHeadDescriptors.end()) {
+        Logger::custom(fg(fmt::color::yellow), "PlayerHeadDescriptor", "Freeing descriptor {} for player '{}'", descriptorId, it->second.playerName);
+        it->second.inUse = false;
+        freePlayerHeadDescriptors.push(descriptorId);
+        playerHeadDescriptors.erase(it);
+    }
+}
+
+void TabList::CleanupOldPlayerHeads(size_t maxCached) {
+    std::lock_guard<std::mutex> lock(playerHeadDescriptorMutex);
+
+    if (playerHeadDescriptors.size() <= maxCached) {
+        return; // No need to cleanup
+    }
+
+    // Collect descriptors sorted by last used time
+    std::vector<std::pair<UINT, std::chrono::steady_clock::time_point>> descriptorAges;
+    for (const auto& [descriptorId, info] : playerHeadDescriptors) {
+        if (info.inUse) {
+            descriptorAges.emplace_back(descriptorId, info.lastUsed);
+        }
+    }
+
+    // Sort by oldest first
+    std::sort(descriptorAges.begin(), descriptorAges.end(),
+        [](const auto& a, const auto& b) {
+            return a.second < b.second;
+        });
+
+    // Free oldest descriptors to get under the limit
+    size_t toRemove = playerHeadDescriptors.size() - maxCached;
+    size_t removed = 0;
+
+    for (const auto& [descriptorId, _] : descriptorAges) {
+        if (removed >= toRemove) break;
+
+        auto it = playerHeadDescriptors.find(descriptorId);
+        if (it != playerHeadDescriptors.end()) {
+            Logger::custom(fg(fmt::color::orange), "PlayerHeadDescriptor", "Cleaning up old descriptor {} for player '{}'", descriptorId, it->second.playerName);
+            freePlayerHeadDescriptors.push(descriptorId);
+            playerHeadDescriptors.erase(it);
+            removed++;
+        }
+    }
+
+    Logger::custom(fg(fmt::color::green), "PlayerHeadDescriptor", "Cleaned up {} old playerhead descriptors, {} remaining", removed, playerHeadDescriptors.size());
+}
+
+void TabList::ResetPlayerHeadDescriptors() {
+    std::lock_guard<std::mutex> lock(playerHeadDescriptorMutex);
+
+    playerHeadDescriptors.clear();
+    while (!freePlayerHeadDescriptors.empty()) {
+        freePlayerHeadDescriptors.pop();
+    }
+    nextPlayerHeadDescriptorId = PLAYERHEAD_DESCRIPTOR_START;
+
+    Logger::custom(fg(fmt::color::cyan), "PlayerHeadDescriptor", "Reset all playerhead descriptors");
+}
+
 void InitializeDX12Uploader() {
     if (g_uploadQueueDX12 || !SwapchainHook::d3d12Device5) {
         return;
@@ -237,7 +391,7 @@ void CleanupPlayerHeadTextures() {
         std::lock_guard<std::mutex> lock(g_playerHeadMutex);
         for (auto &pair: g_playerHeadTextures) {
             if (pair.second.valid && pair.second.descriptorId != UINT_MAX) {
-                SwapchainHook::FreePlayerHeadDescriptor(pair.second.descriptorId);
+                TabList::FreePlayerHeadDescriptor(pair.second.descriptorId);
             }
         }
         g_playerHeadTextures.clear();
@@ -247,7 +401,7 @@ void CleanupPlayerHeadTextures() {
     g_playerHeadTexturesDX11.clear();
 
     // Reset the playerhead descriptor system
-    SwapchainHook::ResetPlayerHeadDescriptors();
+    TabList::ResetPlayerHeadDescriptors();
 }
 
 // Worker thread function for processing image data (no D3D operations)
@@ -360,7 +514,7 @@ void ProcessReadyPlayerHeadTextures() {
 void CleanupUnusedPlayerHeadDescriptors() {
     // The new system automatically handles cleanup in SwapchainHook::CleanupOldPlayerHeads
     // We call it with a reasonable limit to keep memory usage under control
-    SwapchainHook::CleanupOldPlayerHeads(500); // Keep at most 500 cached playerheads
+    TabList::CleanupOldPlayerHeads(500); // Keep at most 500 cached playerheads
 }
 
 void TabList::onEnable() {
@@ -639,7 +793,7 @@ PlayerHeadTexture *CreateTextureFromBytesDX12Sync(
     playerTex.loadState = PlayerHeadLoadState::Loading;
 
     // Allocate descriptor using new system
-    if (!SwapchainHook::AllocatePlayerHeadDescriptor(playerName,
+    if (!TabList::AllocatePlayerHeadDescriptor(playerName,
                                                      &playerTex.srvCpuHandle,
                                                      &playerTex.srvGpuHandle,
                                                      &playerTex.descriptorId)) {

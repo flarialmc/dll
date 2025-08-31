@@ -194,7 +194,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
     static bool hooker = false;
 
-    if (!hooker && ((queue && DX12CommandLists) || (!queue && context))) {
+    if (!hooker && ((queue) || (!queue && context))) {
         UnderUIHooks hook;
         hook.enableHook();
         hooker = true;
@@ -650,12 +650,20 @@ void SwapchainHook::DX11Render(bool underui) {
     ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
     // Restore original render targets
+    bool allValid = true;
+    for (auto & originalRTV : originalRTVs) {
+        if (originalRTV == nullptr) {
+            allValid = false;
+        }
+    }
+
+    if (allValid)
     context->OMSetRenderTargets(D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT, originalRTVs, originalDSV);
-    
+
     // Release references
     Memory::SafeRelease(originalDSV);
-    for (UINT i = 0; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; ++i) {
-        Memory::SafeRelease(originalRTVs[i]);
+    for (auto & originalRTV : originalRTVs) {
+        Memory::SafeRelease(originalRTV);
     }
 }
 
@@ -804,6 +812,7 @@ void SwapchainHook::DX12Render(bool underui) {
 }
 
 void SwapchainHook::DX11Blur() {
+
 
     /* Blur Stuff */
     prepareBlur();

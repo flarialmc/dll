@@ -317,6 +317,7 @@ void ResizeHook::cleanShit(bool isResize) {
             SwapchainHook::imguiCleanupInProgress = false;
         }
 
+        Blur::ReleaseIntermediateTextures();
         // Clean up static image upload resources
         FlarialGUI::CleanupImageResources();
 
@@ -333,9 +334,7 @@ void ResizeHook::cleanShit(bool isResize) {
         // Release fence - it will be recreated
         Memory::SafeRelease(SwapchainHook::cachedDX12Fence);
         SwapchainHook::cachedDX12FenceValue = 0;
-        
-        // Release swapchain reference
-        Memory::SafeRelease(SwapchainHook::swapchain);
+
     }
     //ImGui::DestroyContext();
 }
