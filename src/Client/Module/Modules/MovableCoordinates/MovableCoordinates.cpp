@@ -12,12 +12,6 @@ void MovableCoordinates::onEnable() {
     Listen(this, SetupAndRenderEvent, &MovableCoordinates::onSetupAndRender)
     Listen(this, RenderEvent, &MovableCoordinates::onRender)
     Listen(this, UIControlGetPositionEvent, &MovableCoordinates::onUIControlGetPosition)
-
-    if (FlarialGUI::inMenu) {
-        FlarialGUI::Notify("To change the position of the " + mname + ", Please click " +
-                           ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
-                               "editmenubind")->value + " in the settings tab.");
-    }
     Module::onEnable();
 }
 

@@ -15,11 +15,6 @@ void PotionHUD::onEnable()
     Listen(this, RenderEvent, &PotionHUD::onRender)
     Listen(this, RenderPotionHUDEvent, &PotionHUD::onRenderPotionHUD)
     Listen(this, SetupAndRenderEvent, &PotionHUD::onSetupAndRender)
-    if (FlarialGUI::inMenu) {
-        FlarialGUI::Notify("To change the position of PotionHUD, Please click " +
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
-                "editmenubind")->value + " in the settings tab.");
-    }
     Module::onEnable();
 }
 

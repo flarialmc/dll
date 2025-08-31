@@ -83,6 +83,22 @@ void ClickGUI::onPacketReceive(PacketEvent& event) {
         return;
     }
 
+    std::string e;
+    for (auto i : APIUtils::onlineUsers) e += i + ", ";
+    Logger::debug(e);
+
+    bool foundPlayer = false;
+    for (const auto &pair : SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap()) {
+        if (pair.second.name.empty()) continue;
+        std::string name = String::removeColorCodes(pair.second.name);
+        if (name == data->first) {
+            foundPlayer = true;
+            break;
+        }
+    }
+
+    if (!foundPlayer) return;
+
     for (const auto& [role, color] : roleColors) {
         if (APIUtils::hasRole(role, data->first)) {
             prefix.emplace(std::format("{}{}{}", "§f[", color, "FLARIAL§f]§r "));

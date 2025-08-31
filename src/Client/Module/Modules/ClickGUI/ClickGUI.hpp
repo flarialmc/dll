@@ -270,7 +270,7 @@ public:
 			else {
 #endif
             if (!editmenu) {
-                if (!Client::settings.getSettingByName<bool>("nochaticon")->value and false)
+                if (!Client::settings.getSettingByName<bool>("nochaticon")->value)
                     Listen(this, PacketEvent, &ClickGUI::onPacketReceive)
                 else
                     Deafen(this, PacketEvent, &ClickGUI::onPacketReceive);

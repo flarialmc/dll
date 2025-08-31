@@ -13,12 +13,6 @@ void MovableChat::onEnable() {
     Listen(this, RenderEvent, &MovableChat::onRender)
     Listen(this, UIControlGetPositionEvent, &MovableChat::onUIControlGetPosition)
     Listen(this, PacketEvent, &MovableChat::onPacket)
-
-    if (FlarialGUI::inMenu) {
-        FlarialGUI::Notify("To change the position of the " + name + ", Please click " +
-                           ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
-                               "editmenubind")->value + " in the settings tab.");
-    }
     Module::onEnable();
 }
 
