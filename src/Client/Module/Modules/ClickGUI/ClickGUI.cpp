@@ -64,6 +64,11 @@ std::string& ClickGUI::getMutableTextForWatermark(TextPacket& pkt) {
     return ((pkt.type == TextPacketType::CHAT) && !pkt.name.empty()) ? pkt.name : pkt.message;
 }
 
+/*
+ * Todo:
+        Modify both, pkt->name and pkt->message (mainly for local worlds and realms)
+        Add toggle to disable multiple watermarks
+ */
 void ClickGUI::onPacketReceive(PacketEvent& event) {
     if (event.getPacket()->getId() != MinecraftPacketIds::Text) return;
     auto* pkt = reinterpret_cast<TextPacket*>(event.getPacket());
@@ -71,60 +76,76 @@ void ClickGUI::onPacketReceive(PacketEvent& event) {
     if (Client::settings.getSettingByName<bool>("nochaticon")->value) return;
 
     auto& txt = getMutableTextForWatermark(*pkt);
+    const auto sanitized = String::removeColorCodes(txt);
 
-    std::optional<std::string> prefix{};
-    const auto sanitizedMsg = String::removeColorCodes(txt);
-    auto data = findFirstOf(sanitizedMsg, std::views::keys(APIUtils::vipUserToRole)); // std::views::concat with APIUtils::onlineUsers
-    if (!data) {
-        data = findFirstOf(sanitizedMsg, APIUtils::onlineUsers);
+    std::vector<std::pair<std::string, size_t>> hits;
+    for (auto& user : APIUtils::onlineUsers) {
+        size_t pos = 0;
+        while ((pos = sanitized.find(user, pos)) != std::string_view::npos) {
+            hits.emplace_back(user, pos);
+            pos += user.size();
+        }
     }
+    if (hits.empty()) return;
 
-    if (!data) {
-        return;
-    }
-
-    std::string e;
-    for (auto i : APIUtils::onlineUsers) e += i + ", ";
-    Logger::debug(e);
-
-    bool foundPlayer = false;
-    for (const auto &pair : SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap()) {
-        if (pair.second.name.empty()) continue;
-        std::string name = String::removeColorCodes(pair.second.name);
-        if (name == data->first) {
-            foundPlayer = true;
-            break;
+    std::unordered_set<std::string> onlinePlayers;
+    for (auto& pair : SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap()) {
+        if (!pair.second.name.empty()) {
+            onlinePlayers.insert(String::removeColorCodes(pair.second.name));
         }
     }
 
-    if (!foundPlayer) return;
+    std::unordered_set<std::string> seen;
+    std::vector<std::pair<size_t,std::string>> ins;
 
-    for (const auto& [role, color] : roleColors) {
-        if (APIUtils::hasRole(role, data->first)) {
-            prefix.emplace(std::format("{}{}{}", "§f[", color, "FLARIAL§f]§r "));
-            break;
-        }
-    }
+    auto getPrefix = [&](const std::string& name)->std::optional<std::string> {
+        for (const auto& [role, color] : roleColors)
+            if (APIUtils::hasRole(role, name))
+                return std::format("{}{}{}", "§f[", color, "FLARIAL§f]§r ");
+        return std::nullopt;
+    };
 
-    if (prefix) {
-        const auto rawIdx = sanitizedToRawIndex(txt, data->second);
-        std::string formats{};
+    auto originalFormat = [&](size_t rawIndex){
+        std::string res;
+        const size_t N = std::min(rawIndex, txt.size());
 
-        for (size_t i = 0; ((i + 2) <= rawIdx) && ((i + 2) <= txt.length()); ++i) {
+        for (size_t i = 0; i + 2 <= N && i + 2 <= txt.size(); ++i) {
             if (
-                (static_cast<uint8_t>(txt[i]) == section1stPart) &&
-                (static_cast<uint8_t>(txt[i + 1]) == section2ndPart)
-                ) {
-                if ((i + 2) < txt.length()) {
-                    formats.append(txt, i, 3);
+                static_cast<uint8_t>(txt[i]) == section1stPart &&
+                static_cast<uint8_t>(txt[i+1]) == section2ndPart
+            ) {
+                if (i + 2 < txt.size()) {
+                    res.append(txt, i, 3);
                     i += 2;
                 }
             }
         }
+        return res;
+    };
 
-        txt.insert(rawIdx, *prefix + formats);
+    for (auto& [name, sanitizedIndex] : hits) {
+        if (seen.contains(name)) continue;
+        if (!onlinePlayers.contains(name)) continue;
+
+        auto prefix = getPrefix(name);
+        if (!prefix) continue;
+
+        const size_t rawIndex = sanitizedToRawIndex(txt, sanitizedIndex);
+        ins.emplace_back(rawIndex, *prefix + originalFormat(rawIndex));
+        seen.insert(name);
+    }
+
+    if (ins.empty()) return;
+
+    std::ranges::sort(ins, [](auto& a, auto& b) {
+        return a.first > b.first;
+    });
+
+    for (auto& t : ins) {
+        txt.insert(std::min(t.first, txt.size()), t.second);
     }
 }
+
 
 void ClickGUI::onRender(RenderEvent &event) {
     float allahu = Constraints::RelativeConstraint(0.65);
@@ -853,6 +874,8 @@ void ClickGUI::onRender(RenderEvent &event) {
                              Client::settings.getSettingByName<bool>("nologoicon")->value);
                 c->addToggle("No Flarial Chat Icon", "No [FLARIAL] in chat </3",
                              Client::settings.getSettingByName<bool>("nochaticon")->value);
+                c->addConditionalToggle(!Client::settings.getSettingByName<bool>("nochaticon")->value, "Single watermark", "The [FLARIAL] tag will only apply to the first user found in each message. This will be the player sending the messages in a local world.",
+                             Client::settings.getSettingByName<bool>("singlewatermark")->value);
                 c->addToggle("Clear Text Box When Clicked", "",
                              Client::settings.getSettingByName<bool>("clearTextBoxWhenClicked")->value);
 
