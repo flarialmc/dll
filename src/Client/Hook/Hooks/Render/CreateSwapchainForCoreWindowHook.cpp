@@ -280,7 +280,7 @@ HRESULT CreateSwapchainForCoreWindowHook::CreateSwapChainForCoreWindowCallback(
     auto vsync = Client::settings.getSettingByName<bool>("vsync")->value;
     SwapchainHook::currentVsyncState = vsync;
 
-    if (vsync) pDesc->Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
+    if (vsync) pDesc->Flags |= DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
 
     // Try to get the command queue from the device for DX12
     if (!SwapchainHook::queue.get()) {
