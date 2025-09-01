@@ -43,14 +43,14 @@ public:
         }
 
         if (id == MinecraftPacketIds::Text) {
-            auto *pkt = reinterpret_cast<TextPacket *>(event.getPacket());
+            auto *pkt = reinterpret_cast<TextPacketProxy *>(event.getPacket());
 
             std::string textToCheck = "You are connected to server name ";
             std::string textToCheckToSilence = "You are connected";
 
 
-            if (pkt->message.find(textToCheck) != std::string::npos && listenForServer) {
-                std::string server = pkt->message.replace(0, textToCheck.length(), "");
+            if (pkt->getMessage().find(textToCheck) != std::string::npos && listenForServer) {
+                std::string server = pkt->getMessage().replace(0, textToCheck.length(), "");
                 std::regex pattern("\\d+");
                 HiveModeCatcherListener::currentGame = std::regex_replace(server, pattern, "");
                 event.cancel();
@@ -247,7 +247,7 @@ public:
                 {
                     fullgamemodename = "Mob Game";
                 }
-            } else if (pkt->message.find(textToCheckToSilence) != std::string::npos) {
+            } else if (pkt->getMessage().find(textToCheckToSilence) != std::string::npos) {
                 event.cancel();
             }
 
