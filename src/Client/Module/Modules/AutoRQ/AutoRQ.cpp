@@ -4,12 +4,14 @@
 #include "SDK/Client/Network/Packet/SetTitlePacket.hpp"
 
 void AutoRQ::onEnable() {
-    Listen(this, PacketEvent, &AutoRQ::onPacketReceive)
+    Listen(this, PacketEvent, &AutoRQ::onPacketReceive);
+    Listen(this, KeyEvent, &AutoRQ::onKey);
     Module::onEnable();
 }
 
 void AutoRQ::onDisable() {
-    Deafen(this, PacketEvent, &AutoRQ::onPacketReceive)
+    Deafen(this, PacketEvent, &AutoRQ::onPacketReceive);
+    Deafen(this, KeyEvent, &AutoRQ::onKey);
     Module::onDisable();
 }
 
@@ -39,11 +41,23 @@ void AutoRQ::defaultConfig() {
     setDef("noteaming", false);
     setDef("friendaccept", false);
     setDef("partyaccept", false);
-    
+    setDef("bind", (std::string) "R");
+    setDef("deathcountenabled", true);
+    setDef("deathcount", 3);
+
 }
 
 void AutoRQ::settingsRender(float settingsOffset) {
-    initSettingsPage();
+    float x = Constraints::PercentageConstraint(0.019, "left");
+    float y = Constraints::PercentageConstraint(0.10, "top");
+
+    const float scrollviewWidth = Constraints::RelativeConstraint(0.5, "height", true);
+
+
+    FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
+    FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
+                              Constraints::RelativeConstraint(1.0, "width"),
+                              Constraints::RelativeConstraint(0.88f, "height"));
     addHeader("General");
     addToggle("Use /hub instead of /q", "", "hub");
     // this->addDropdown("Command to use", "Command to execute when somthing gets triggered",  std::vector<std::string>{"Re-Q same game", "Q a Random game", "Go back to the hub"}, getOps<std::string>("commandtouse"));
@@ -52,6 +66,7 @@ void AutoRQ::settingsRender(float settingsOffset) {
     addToggle("Auto re-queue ", "Find a new game when the current game is over", "ReQ");
     addToggle("Solo mode ", "Re-Q when you finish a game or die and can't respawn.\nNot recomended while in a party.", "solo");
     addToggle("Team Elimination", "Re-Q when the team your on is fully ELIMINATED.", "eliminated");
+    addKeybind("Requeue Keybind", "When setting, hold the new bind for 2 seconds.", "bind", true);
 
     addHeader("Map avoider");
 
@@ -64,9 +79,6 @@ void AutoRQ::settingsRender(float settingsOffset) {
 
         // this->settings.addSetting(keybindName, (std::string)"");
         this->settings.addSetting(commandName, (std::string)"");
-
-
-        int i = totalmaps;
 
         Client::SaveSettings();
         FlarialGUI::Notify("New textbox created, input a map to avoid!");
@@ -85,7 +97,7 @@ void AutoRQ::settingsRender(float settingsOffset) {
         }
     }
 
-    addHeader("Role Avoider");
+    addHeader("Game Specifics");
 
     addHeader("Murder Mystery");
     addToggle("Murderer", "Re Q when you get murderer", "murderer");
@@ -96,7 +108,9 @@ void AutoRQ::settingsRender(float settingsOffset) {
     addToggle("Hider", "Re Q when you get hider", "hider");
     addToggle("Seeker", "Re Q when you get seeker", "seeker");
 
-    addHeader("Deathrun");
+    addHeader("DeathRun");
+    addToggle("Death Limiter", "Re Q after specified amount of deaths", "deathcountenabled");
+    addConditionalSliderInt(getOps<bool>("deathcountenabled"), "Death Limiter: Amount of Deaths", "Configure the amount of deaths required here.", "deathcount", 100, 1);
     addToggle("Death", "Re Q when you get death", "death");
     addToggle("Runner", "Re Q when you get runner", "runner");
 
@@ -156,6 +170,19 @@ void AutoRQ::onPacketReceive(PacketEvent &event) {
     }
     if (id == MinecraftPacketIds::Text) {
         auto* pkt = reinterpret_cast<TextPacket*>(event.getPacket());
+        // made absolutely sure the counter wouldn't set off in other games
+        if (getOps<bool>("deathcountenabled") and HiveModeCatcherListener::currentGame == "DR" and pkt->message == "§c§l» §r§cYou died!")
+        {
+            deaths++;
+            // what's the > even for :3c
+            if (deaths >= getOps<int>("deathcount"))
+            {
+                reQ();
+                FlarialGUI::Notify("Death count limit reached.");
+                deaths = 0;
+            }
+        }
+
         if (getOps<bool>("ReQ")) {
             //if(!module->getOps<bool>("solo")) {
             if (pkt->message == "§c§l» §r§c§lGame OVER!") {
@@ -334,9 +361,10 @@ void AutoRQ::onPacketReceive(PacketEvent &event) {
 }
 
 void AutoRQ::reQ() {
-    if (!this->isEnabled()) return;
+    std::string gm = HiveModeCatcherListener::fullgamemodename;
+    if (!this->isEnabled() or gm.empty() or gm.find("Hub") != std::string::npos) return;
     if (!getOps<bool>("hub")) {
-        FlarialGUI::Notify("Finding a new game of " + HiveModeCatcherListener::fullgamemodename);
+        FlarialGUI::Notify("Finding a new game of " + gm);
 
         std::shared_ptr<Packet> packet = SDK::createPacket(77);
         auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
@@ -360,4 +388,10 @@ void AutoRQ::reQ() {
 
         SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
     }
+}
+
+void AutoRQ::onKey(KeyEvent& event)
+{
+    if (!this->isEnabled()) return;
+    if (event.getKey() == Utils::getStringAsKey(getOps<std::string>("bind")) && static_cast<ActionType>(event.getAction()) == ActionType::Pressed) reQ();
 }
