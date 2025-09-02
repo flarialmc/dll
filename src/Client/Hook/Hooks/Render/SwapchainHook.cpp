@@ -183,9 +183,9 @@ bool SwapchainHook::currentVsyncState;
 
 
 HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags) {
-    isDX12 = GraphicsAPI::D3D12 == DetectSwapchainAPI(pSwapChain);
-
     if (Client::disable || !Client::init) return funcOriginal(pSwapChain, syncInterval, flags);
+
+    isDX12 = GraphicsAPI::D3D12 == DetectSwapchainAPI(pSwapChain);
 
     if (currentVsyncState != Client::settings.getSettingByName<bool>("vsync")->value) {
         queueReset = true;
@@ -195,7 +195,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
         init = false;
         initImgui = false;
         Logger::debug("Resetting SwapChain");
-        ResizeHook::cleanShit(false);
+        ResizeHook::cleanShit(true);
         queueReset = false;
         return DXGI_ERROR_DEVICE_RESET;
     }

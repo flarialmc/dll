@@ -39,7 +39,7 @@ void
 ResizeHook::resizeCallback(IDXGISwapChain* pSwapChain, UINT bufferCount, UINT width, UINT height, DXGI_FORMAT newFormat,
     UINT flags) {
 
-    ResizeHook::cleanShit(true);
+    ResizeHook::cleanShit(false);
 
     SwapchainHook::init = false;
     // F11 on loading screen fix?//
@@ -56,7 +56,7 @@ ResizeHook::resizeCallback(IDXGISwapChain* pSwapChain, UINT bufferCount, UINT wi
 }
 
 // TODO: get back to this to check
-void ResizeHook::cleanShit(bool isResize) {
+void ResizeHook::cleanShit(bool fullReset) {
     
     // CRITICAL: Clear all render target bindings FIRST to prevent access denied errors
     if (SwapchainHook::context.get()) {
@@ -66,7 +66,7 @@ void ResizeHook::cleanShit(bool isResize) {
     }
     
     // For swapchain reset, we need to preserve certain resources
-    bool isSwapchainReset = !isResize && SwapchainHook::queueReset;
+    bool isSwapchainReset = !fullReset && SwapchainHook::queueReset;
 
     // Crude release for swapchain reset - using SafeRelease for proper COM cleanup
     Memory::SafeRelease(SwapchainHook::stageTex);
@@ -94,7 +94,7 @@ void ResizeHook::cleanShit(bool isResize) {
     Memory::SafeRelease(D2D::context);
     
     // For DX11 path, release the device here
-    if (!isDX12) {
+    if (!SwapchainHook::isDX12) {
         Memory::SafeRelease(SwapchainHook::d3d11Device);
     }
 
@@ -279,7 +279,7 @@ void ResizeHook::cleanShit(bool isResize) {
     FlarialGUI::scrollposmodifier = 0;
 
 
-    if (!isResize) {
+    if (!fullReset) {
         // Shutdown ImGui FIRST before releasing any D3D resources
         if (ImGui::GetCurrentContext()) {
             // Set cleanup flag to prevent reinitialization race condition

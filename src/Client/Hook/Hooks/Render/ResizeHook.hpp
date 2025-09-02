@@ -20,7 +20,7 @@ public:
 
     void enableHook() override;
 
-    static void cleanShit(bool isResize = false);
+    static void cleanShit(bool fullReset = false);
 
     static void call();
 };
