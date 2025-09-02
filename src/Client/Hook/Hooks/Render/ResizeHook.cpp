@@ -57,9 +57,6 @@ ResizeHook::resizeCallback(IDXGISwapChain* pSwapChain, UINT bufferCount, UINT wi
 
 // TODO: get back to this to check
 void ResizeHook::cleanShit(bool isResize) {
-
-    bool isDX12 = false;
-    if (SwapchainHook::queue.get()) isDX12 = true;
     
     // CRITICAL: Clear all render target bindings FIRST to prevent access denied errors
     if (SwapchainHook::context.get()) {
@@ -97,7 +94,7 @@ void ResizeHook::cleanShit(bool isResize) {
     Memory::SafeRelease(D2D::context);
     
     // For DX11 path, release the device here
-    if (!SwapchainHook::queue.get()) {
+    if (!isDX12) {
         Memory::SafeRelease(SwapchainHook::d3d11Device);
     }
 
@@ -222,7 +219,7 @@ void ResizeHook::cleanShit(bool isResize) {
             }
             
             // For DX12, we MUST wait for GPU to complete all work with these resources
-            if (SwapchainHook::cachedDX12Fence.get() && SwapchainHook::queue.get()) {
+            if (SwapchainHook::cachedDX12Fence.get() && SwapchainHook::isDX12) {
                 // Signal and wait for fence to ensure GPU is done
                 const UINT64 fenceValueForSignal = ++SwapchainHook::cachedDX12FenceValue;
                 SwapchainHook::queue->Signal(SwapchainHook::cachedDX12Fence.get(), fenceValueForSignal);
@@ -304,7 +301,7 @@ void ResizeHook::cleanShit(bool isResize) {
             
             // Shutdown renderer backend if initialized
             if (io.BackendRendererUserData) {
-                if (!isDX12)
+                if (!SwapchainHook::isDX12)
                     ImGui_ImplDX11_Shutdown();
                 else 
                     ImGui_ImplDX12_Shutdown();

@@ -15,7 +15,7 @@ public:
         if (event.getKey() ==
             Utils::getStringAsKey(Client::settings.getSettingByName<std::string>("ejectKeybind")->value) &&
             static_cast<ActionType>(event.getAction()) == ActionType::Released) {
-            Client::disable = true;
+            SwapchainHook::queueReset = true;
         }
     }
 

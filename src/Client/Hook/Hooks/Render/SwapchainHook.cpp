@@ -99,7 +99,23 @@ HWND FindWindowByTitle(const std::string &titlePart) {
     }, reinterpret_cast<LPARAM>(titlePart.c_str()));
     return hwnd;
 }
+enum class GraphicsAPI { Unknown, D3D11, D3D12 };
 
+GraphicsAPI DetectSwapchainAPI(IDXGISwapChain* swapchain) {
+    if (!swapchain) return GraphicsAPI::Unknown;
+
+    winrt::com_ptr<IUnknown> device;
+    if (SUCCEEDED(swapchain->GetDevice(IID_PPV_ARGS(device.put())))) {
+        if (auto d3d12Device = device.try_as<ID3D12Device>()) {
+            return GraphicsAPI::D3D12;
+        }
+        if (auto d3d11Device = device.try_as<ID3D11Device>()) {
+            return GraphicsAPI::D3D11;
+        }
+    }
+
+    return GraphicsAPI::Unknown;
+}
 void SwapchainHook::enableHook() {
 
     queueReset = Client::settings.getSettingByName<bool>("recreateAtStart")->value;
@@ -167,7 +183,9 @@ bool SwapchainHook::currentVsyncState;
 
 
 HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags) {
-    if (Client::disable) return funcOriginal(pSwapChain, syncInterval, flags);
+    isDX12 = GraphicsAPI::D3D12 == DetectSwapchainAPI(pSwapChain);
+
+    if (Client::disable || !Client::init) return funcOriginal(pSwapChain, syncInterval, flags);
 
     if (currentVsyncState != Client::settings.getSettingByName<bool>("vsync")->value) {
         queueReset = true;
@@ -948,7 +966,7 @@ void SwapchainHook::SaveBackbuffer(bool underui) {
 
     SavedD3D11BackBuffer = nullptr;
     ExtraSavedD3D11BackBuffer = nullptr;
-    if (!SwapchainHook::queue.get()) {
+    if (!isDX12) {
 
         SwapchainHook::swapchain->GetBuffer(0, IID_PPV_ARGS(SavedD3D11BackBuffer.put()));
 
