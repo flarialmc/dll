@@ -42,7 +42,7 @@ void AutoRQ::defaultConfig() {
     setDef("friendaccept", false);
     setDef("partyaccept", false);
     setDef("bind", (std::string) "R");
-    setDef("deathcountenabled", true);
+    setDef("deathcountenabled", false);
     setDef("deathcount", 3);
 
 }
