@@ -25,9 +25,20 @@ private:
     
     std::string itemName = "";
     
+    // textures/ui/hunger_... system
+    TexturePtr hungerFullTexture;
+    TexturePtr hungerHalfTexture;
+    TexturePtr hungerEffectFullTexture;
+    TexturePtr hungerEffectHalfTexture;
+    TexturePtr hungerBlinkTexture;
+    TexturePtr hungerBackgroundTexture;
+    TexturePtr hungerEffectBackgroundTexture;
+    
+    void loadTextures(MinecraftUIRenderContext* muirc);
+    
 public:
 
-    BetterHungerBar() : Module("Better Hunger Bar", "Adds a hunger and saturation overlay similar to AppleSkin.",
+    BetterHungerBar() : Module("Better Hunger Bar", "Adds a hunger and saturation overlay similar to AppleSkin.\nLimited Texture Pack support.",
         IDR_BETTERHUNGERBAR_PNG, "") {
         
     };

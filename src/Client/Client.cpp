@@ -280,6 +280,7 @@ void Client::initialize() {
 	ADD_SETTING("fontWeight", std::string("Normal"));
 	ADD_SETTING("nologoicon", false);
 	ADD_SETTING("nochaticon", false);
+	ADD_SETTING("singlewatermark", false);
 	ADD_SETTING("currentConfig", std::string("default.json"));
 	ADD_SETTING("resettableSettings", true);
 	ADD_SETTING("clearTextBoxWhenClicked", true);

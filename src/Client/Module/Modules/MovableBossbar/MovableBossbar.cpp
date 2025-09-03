@@ -8,12 +8,6 @@ void MovableBossbar::onEnable() {
     Listen(this, SetupAndRenderEvent, &MovableBossbar::onSetupAndRender)
     Listen(this, RenderEvent, &MovableBossbar::onRender)
     Listen(this, UIControlGetPositionEvent, &MovableBossbar::onUIControlGetPosition)
-
-    if (FlarialGUI::inMenu) {
-        FlarialGUI::Notify("To change the position of the " + mname + ", Please click " +
-                           ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
-                               "editmenubind")->value + " in the settings tab.");
-    }
     Module::onEnable();
 }
 

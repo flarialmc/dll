@@ -5,11 +5,6 @@
 #include "Modules/ClickGUI/ClickGUI.hpp"
 
 void ArmorHUD::onEnable() {
-	if (FlarialGUI::inMenu) {
-		std::string s = "To change the position of ArmorHUD, Please click " + ModuleManager::getModule("ClickGUI")->getOps<std::string>("editmenubind") + " in the settings tab.";
-		std::cout << s << std::endl;
-		FlarialGUI::Notify(s);
-	}
 	Listen(this, RenderEvent, &ArmorHUD::onRender)
 		Listen(this, SetupAndRenderEvent, &ArmorHUD::onSetupAndRender)
 		Module::onEnable();

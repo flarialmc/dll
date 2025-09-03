@@ -12,11 +12,6 @@ void PaperDoll::onEnable() {
     restored = false;
     Listen(this, RenderEvent, &PaperDoll::onRender)
     Listen(this, SetupAndRenderEvent, &PaperDoll::onSetupAndRender)
-    if (FlarialGUI::inMenu) {
-        FlarialGUI::Notify("To change the position of the Paperdoll, Please click " +
-                           ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
-                               "editmenubind")->value + " in the settings tab.");
-    }
     Module::onEnable();
 }
 
