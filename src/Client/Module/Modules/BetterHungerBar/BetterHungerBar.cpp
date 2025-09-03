@@ -53,7 +53,7 @@ void BetterHungerBar::settingsRender(float settingsOffset) {
     
     addHeader("Manual Fix");
     // quirky solution but honestly i give up trying to make this auto-detect
-    addToggle("New Texture System", "Enable this if you experience overlapping issues with texture packs!", "newTextureSystem");
+    addToggle("New Texture System", "Enable/Disable this if you experience overlapping/issues\nwith texture packs!!", "newTextureSystem");
 
     // not really necessary but eh you never know
     addSlider("xOffset", "", "xOffset", 500.0f);
