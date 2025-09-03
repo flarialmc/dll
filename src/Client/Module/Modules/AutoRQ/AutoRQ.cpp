@@ -384,5 +384,5 @@ void AutoRQ::reQ() {
 void AutoRQ::onKey(KeyEvent& event)
 {
     if (!this->isEnabled()) return;
-    if (event.getKey() == Utils::getStringAsKey(getOps<std::string>("bind")) && static_cast<ActionType>(event.getAction()) == ActionType::Pressed) reQ();
+    if (event.getKey() == Utils::getStringAsKey(getOps<std::string>("bind")) && static_cast<ActionType>(event.getAction()) == ActionType::Pressed && (SDK::getCurrentScreen() == "hud_screen" || SDK::getCurrentScreen() == "f3_screen" || SDK::getCurrentScreen() == "zoom_screen")) reQ();
 }
