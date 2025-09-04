@@ -36,6 +36,8 @@ private:
     std::string searchBarString;
     Module *ghostMainModule;
 
+    std::string lastmesg; // Using this to prevent double watermarks in messages
+
 public:
     static inline float baseHeightActual = 0.00001f;
     static inline float modcardOpacity = 1.f;
@@ -83,7 +85,7 @@ private:
     }
 
     static size_t sanitizedToRawIndex(std::string_view raw, size_t sanIdx);
-    static std::string& getMutableTextForWatermark(TextPacket& pkt);
+    // static std::string& getMutableTextForWatermark(TextPacket& pkt);
 
 public:
     void onPacketReceive(PacketEvent& event);

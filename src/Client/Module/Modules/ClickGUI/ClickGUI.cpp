@@ -60,43 +60,17 @@ size_t ClickGUI::sanitizedToRawIndex(std::string_view raw, size_t sanIdx) {
     return rawIdx; // raw insertion point corresponding to sanitized index
 }
 
+/*
 std::string& ClickGUI::getMutableTextForWatermark(TextPacket& pkt) {
     return ((pkt.type == TextPacketType::CHAT) && !pkt.name.empty()) ? pkt.name : pkt.message;
 }
+*/
 
-/*
- * Todo:
-        Modify both, pkt->name and pkt->message (mainly for local worlds and realms)
-        Add toggle to disable multiple watermarks
- */
 void ClickGUI::onPacketReceive(PacketEvent& event) {
     if (event.getPacket()->getId() != MinecraftPacketIds::Text) return;
     auto* pkt = reinterpret_cast<TextPacket*>(event.getPacket());
-    if (pkt->message == " ") event.cancel(); //remove onix promotion on zeqa
+    if (pkt->message == " ") event.cancel(); // remove onix promotion on zeqa
     if (Client::settings.getSettingByName<bool>("nochaticon")->value) return;
-
-    auto& txt = getMutableTextForWatermark(*pkt);
-    const auto sanitized = String::removeColorCodes(txt);
-
-    std::vector<std::pair<std::string, size_t>> hits;
-    for (auto& user : APIUtils::onlineUsers) {
-        size_t pos = 0;
-        while ((pos = sanitized.find(user, pos)) != std::string_view::npos) {
-            hits.emplace_back(user, pos);
-            pos += user.size();
-        }
-    }
-    if (hits.empty()) return;
-
-    std::unordered_set<std::string> onlinePlayers;
-    for (auto& pair : SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap()) {
-        if (!pair.second.name.empty()) {
-            onlinePlayers.insert(String::removeColorCodes(pair.second.name));
-        }
-    }
-
-    std::unordered_set<std::string> seen;
-    std::vector<std::pair<size_t,std::string>> ins;
 
     auto getPrefix = [&](const std::string& name)->std::optional<std::string> {
         for (const auto& [role, color] : roleColors)
@@ -105,45 +79,99 @@ void ClickGUI::onPacketReceive(PacketEvent& event) {
         return std::nullopt;
     };
 
-    auto originalFormat = [&](size_t rawIndex){
-        std::string res;
-        const size_t N = std::min(rawIndex, txt.size());
+    std::unordered_set<std::string> onlinePlayers;
+    for (auto& pair : SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap()) {
+        if (!pair.second.name.empty()) {
+            onlinePlayers.insert(String::removeColorCodes(pair.second.name));
+        }
+    }
 
-        for (size_t i = 0; i + 2 <= N && i + 2 <= txt.size(); ++i) {
-            if (
-                static_cast<uint8_t>(txt[i]) == section1stPart &&
-                static_cast<uint8_t>(txt[i+1]) == section2ndPart
-            ) {
-                if (i + 2 < txt.size()) {
-                    res.append(txt, i, 3);
-                    i += 2;
-                }
+    std::string& txt1 = pkt->name;
+    if (!txt1.empty()) {
+        bool found = false;
+        for (std::string username : APIUtils::onlineUsers) {
+            if (username == txt1) {
+                found = true;
+                break;
             }
         }
-        return res;
-    };
-
-    for (auto& [name, sanitizedIndex] : hits) {
-        if (seen.contains(name)) continue;
-        if (!onlinePlayers.contains(name)) continue;
-
-        auto prefix = getPrefix(name);
-        if (!prefix) continue;
-
-        const size_t rawIndex = sanitizedToRawIndex(txt, sanitizedIndex);
-        ins.emplace_back(rawIndex, *prefix + originalFormat(rawIndex));
-        seen.insert(name);
+        if (found) {
+            auto prefix = getPrefix(txt1);
+            if (prefix) txt1.insert(0, *prefix);
+        }
     }
 
-    if (ins.empty()) return;
+    std::string& txt2 = pkt->message;
+    if (lastmesg != pkt->message) {
+        const auto sanitized = String::removeColorCodes(txt2);
 
-    std::ranges::sort(ins, [](auto& a, auto& b) {
-        return a.first > b.first;
-    });
+        std::vector<std::pair<std::string, size_t>> hits;
+        bool breakloop = false;
+        for (auto& user : APIUtils::onlineUsers) {
+            if (breakloop) break;
+            size_t pos = 0;
+            while ((pos = sanitized.find(user, pos)) != std::string_view::npos) {
 
-    for (auto& t : ins) {
-        txt.insert(std::min(t.first, txt.size()), t.second);
+                if (sanitized[pos - 1] == '\"' && sanitized[pos - 2] == '@') pos -= 2;
+                else if (sanitized[pos - 1] == '@' || sanitized[pos - 1] == '\"') pos -= 1;
+
+                hits.emplace_back(user, pos);
+
+                if (Client::settings.getSettingByName<bool>("singlewatermark")->value) {
+                    breakloop = true;
+                    break;
+                };
+
+                pos += user.length();
+            }
+        }
+        if (hits.empty()) return;
+
+        auto originalFormat = [&](size_t rawIndex){
+            std::string res;
+            const size_t N = std::min(rawIndex, txt2.size());
+
+            for (size_t i = 0; i + 2 <= N && i + 2 <= txt2.size(); ++i) {
+                if (
+                    static_cast<uint8_t>(txt2[i]) == section1stPart &&
+                    static_cast<uint8_t>(txt2[i+1]) == section2ndPart
+                ) {
+                    if (i + 2 < txt2.size()) {
+                        res.append(txt2, i, 3);
+                        i += 2;
+                    }
+                }
+            }
+            return res;
+        };
+
+        std::unordered_set<std::string> seen;
+        std::vector<std::pair<size_t,std::string>> ins;
+
+        for (auto& [name, sanitizedIndex] : hits) {
+            if (!Client::settings.getSettingByName<bool>("watermarkduplicates")->value && seen.contains(name)) continue;
+            if (!onlinePlayers.contains(name)) continue;
+
+            auto prefix = getPrefix(name);
+            if (!prefix) continue;
+
+            const size_t rawIndex = sanitizedToRawIndex(txt2, sanitizedIndex);
+            ins.emplace_back(rawIndex, *prefix + originalFormat(rawIndex));
+            seen.insert(name);
+        }
+
+        if (ins.empty()) return;
+
+        std::ranges::sort(ins, [](auto& a, auto& b) {
+            return a.first > b.first;
+        });
+
+        for (auto& t : ins) {
+            txt2.insert(std::min(t.first, txt2.size()), t.second);
+        }
+        lastmesg = pkt->message;
     }
+
 }
 
 
@@ -874,8 +902,19 @@ void ClickGUI::onRender(RenderEvent &event) {
                              Client::settings.getSettingByName<bool>("nologoicon")->value);
                 c->addToggle("No Flarial Chat Icon", "No [FLARIAL] in chat </3",
                              Client::settings.getSettingByName<bool>("nochaticon")->value);
-                c->addConditionalToggle(!Client::settings.getSettingByName<bool>("nochaticon")->value, "Single watermark", "The [FLARIAL] tag will only apply to the first user found in each message. This will be the player sending the messages in a local world.",
-                             Client::settings.getSettingByName<bool>("singlewatermark")->value);
+                c->addConditionalToggle(
+                        !Client::settings.getSettingByName<bool>("nochaticon")->value,
+                        "Single watermark",
+                        "The [FLARIAL] tag will only apply to the first user found in each message.\nThis will be the player sending the messages in a local world.",
+                        Client::settings.getSettingByName<bool>("singlewatermark")->value
+                );
+                c->addConditionalToggle(
+                        !Client::settings.getSettingByName<bool>("nochaticon")->value &&
+                        !Client::settings.getSettingByName<bool>("singlewatermark")->value,
+                        "Watermark duplicate usernames",
+                        "Turning this off watermarks only the first instance of each username.",
+                        Client::settings.getSettingByName<bool>("watermarkduplicates")->value
+                );
                 c->addToggle("Clear Text Box When Clicked", "",
                              Client::settings.getSettingByName<bool>("clearTextBoxWhenClicked")->value);
 
