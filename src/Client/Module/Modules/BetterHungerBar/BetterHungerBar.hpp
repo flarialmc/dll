@@ -9,6 +9,8 @@
 #include "../../../../SDK/Client/Block/Block.hpp"
 
 #include <string>
+#include <chrono>
+#include <filesystem>
 
 class BetterHungerBar : public Module {
 private:
@@ -22,6 +24,7 @@ private:
     double getCurrentTime();
     
     bool hasHungerEffect = false;
+    bool useNewTextures = false;
     
     std::string itemName = "";
     
@@ -58,5 +61,25 @@ public:
     int getPredictedHunger();
     
     double getPredictedSaturation();
+
+	// "U" stands for the location: textures/ui/hunger_... 
+	ResourceLocation getOutlineU(ResourceLocation& originalOutlineTexture);
+
+	// "G" stands for the location: textures/gui/icons
+	ResourceLocation getOutlineG(ResourceLocation& originalOutlineTexture);
+
+};
+
+// recycled code from CustomCrosshair //
+
+class OutlineImage {
+public:
+
+	std::vector<Vec4<int>> PixelData = std::vector<Vec4<int>>(256, Vec4<int>(0, 0, 0, 0));
+	int Size = 9;
+	OutlineImage(std::string Path);
+	OutlineImage() {};
+	const unsigned char* getImageData();
+	void SaveImage(std::string name);
 
 };
