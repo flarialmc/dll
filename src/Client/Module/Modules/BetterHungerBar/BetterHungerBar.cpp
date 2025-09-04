@@ -413,8 +413,6 @@ void BetterHungerBar::onSetupAndRender(const SetupAndRenderEvent &event) {
 			TexturePtr satTexture = getTexture("saturation");
 			Vec2<float> satUVSize = getUVSize(satType);
             Vec2<float> satUV = getUV(satType);
-
-            adjustedPosition.y -= 100.0f; // debugging
             
             muirc->drawImage(satTexture, adjustedPosition, adjustedSize, satUV, satUVSize);
             muirc->flushImages(satColorSolid, 1.0f, flushLayer);
@@ -452,8 +450,6 @@ void BetterHungerBar::onSetupAndRender(const SetupAndRenderEvent &event) {
 			TexturePtr satTexture = getTexture("saturation");
 			Vec2<float> satUVSize = getUVSize(satType);
             Vec2<float> satUV = getUV(satType);
-
-            adjustedPosition.y -= 100.0f; // debugging
             
             muirc->drawImage(satTexture, adjustedPosition, adjustedSize, satUV, satUVSize);
             muirc->flushImages(satColorTransparent, (alpha / 255.0f), flushLayer);
