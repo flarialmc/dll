@@ -79,6 +79,8 @@ public:
     static inline winrt::com_ptr<ID3D12DescriptorHeap> D3D12DescriptorHeap;
     static inline winrt::com_ptr<ID3D11On12Device> d3d11On12Device;
     static inline winrt::com_ptr<ID2D1Bitmap1> D2D1Bitmap;
+    static inline winrt::com_ptr<IDXGISurface1> backBuffer;
+
     static inline winrt::com_ptr<ID3D11DeviceContext> context;
     static inline winrt::com_ptr<ID3D11Device> d3d11Device;
     static inline uintptr_t bufferCount;

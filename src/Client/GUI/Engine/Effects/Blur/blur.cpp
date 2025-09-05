@@ -152,8 +152,6 @@ ID3D11PixelShader *dbgShader;
 
 void Blur::InitializePipeline()
 {
-    HRESULT hr;
-    ID3D11DeviceContext* pContext = SwapchainHook::context.get();
 
     // byteWidth has to be a multiple of 32, BlurInputBuffer has a size of 24
     CD3D11_BUFFER_DESC cbd(
@@ -200,7 +198,7 @@ void Blur::InitializePipeline()
     D3D11_DEPTH_STENCIL_DESC dsd{};
     dsd.DepthEnable = false;
     dsd.StencilEnable = false;
-    hr = SwapchainHook::d3d11Device->CreateDepthStencilState(&dsd, pDepthStencilState.put());
+    SwapchainHook::d3d11Device->CreateDepthStencilState(&dsd, pDepthStencilState.put());
     
     D3D11_BLEND_DESC bd{};
     bd.AlphaToCoverageEnable = false;
@@ -212,54 +210,53 @@ void Blur::InitializePipeline()
     bd.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_INV_SRC_ALPHA;
     bd.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
     bd.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-    hr = SwapchainHook::d3d11Device->CreateBlendState(&bd, pBlendState.put());
+    SwapchainHook::d3d11Device->CreateBlendState(&bd, pBlendState.put());
     
     D3D11_RASTERIZER_DESC rd{};
     rd.FillMode = D3D11_FILL_SOLID;
     rd.CullMode = D3D11_CULL_NONE;
     rd.DepthClipEnable = false;
     rd.ScissorEnable = false;
-    hr = SwapchainHook::d3d11Device->CreateRasterizerState(&rd, pRasterizerState.put());
+    SwapchainHook::d3d11Device->CreateRasterizerState(&rd, pRasterizerState.put());
 
     // Pre-allocate intermediate textures with common screen resolution to reduce first-frame lag
     EnsureIntermediateTextures(MC::windowSize.x, MC::windowSize.y);
 }
 void Blur::RenderToRTV(ID3D11RenderTargetView *pRenderTargetView, ID3D11ShaderResourceView *pShaderResourceView, XMFLOAT2 rtvSize)
 {
-    ID3D11DeviceContext* pContext = SwapchainHook::context.get();
-    if (!pContext) return;
+    if (!SwapchainHook::context) return;
 //
     // Use cached render states (no recreation overhead)
-    pContext->OMSetDepthStencilState(pDepthStencilState.get(), 0);
-    pContext->OMSetBlendState(pBlendState.get(), NULL, 0xffffffff);
-    pContext->RSSetState(pRasterizerState.get());
+    SwapchainHook::context->OMSetDepthStencilState(pDepthStencilState.get(), 0);
+    SwapchainHook::context->OMSetBlendState(pBlendState.get(), NULL, 0xffffffff);
+    SwapchainHook::context->RSSetState(pRasterizerState.get());
 
     // Clear previous shader resource binding and set render target
     ID3D11ShaderResourceView* nullSRV = nullptr;
-    pContext->PSSetShaderResources(0, 1, &nullSRV);
-    pContext->OMSetRenderTargets(1, &pRenderTargetView, nullptr);
+    SwapchainHook::context->PSSetShaderResources(0, 1, &nullSRV);
+    SwapchainHook::context->OMSetRenderTargets(1, &pRenderTargetView, nullptr);
 
     // Update constant buffer with current resolution
     constantBuffer.resolution = rtvSize;
     constantBuffer.halfpixel = XMFLOAT2(0.5f / rtvSize.x, 0.5f / rtvSize.y);
-    pContext->UpdateSubresource(pConstantBuffer.get(), 0, nullptr, &constantBuffer, 0, 0);
+    SwapchainHook::context->UpdateSubresource(pConstantBuffer.get(), 0, nullptr, &constantBuffer, 0, 0);
 
     // Set input layout and vertex buffer
-    pContext->IASetInputLayout(pInputLayout.get());
+    SwapchainHook::context->IASetInputLayout(pInputLayout.get());
     UINT stride = sizeof(XMFLOAT4);
     UINT offset = 0;
     ID3D11Buffer* vertexBufferPtr = pVertexBuffer.get();
-    pContext->IASetVertexBuffers(0, 1, &vertexBufferPtr, &stride, &offset);
-    pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    pContext->IASetIndexBuffer(nullptr, DXGI_FORMAT_UNKNOWN, 0);
+    SwapchainHook::context->IASetVertexBuffers(0, 1, &vertexBufferPtr, &stride, &offset);
+    SwapchainHook::context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    SwapchainHook::context->IASetIndexBuffer(nullptr, DXGI_FORMAT_UNKNOWN, 0);
     
     // Set shaders and resources
-    pContext->VSSetShader(pVertexShader.get(), nullptr, 0);
+    SwapchainHook::context->VSSetShader(pVertexShader.get(), nullptr, 0);
     ID3D11SamplerState* samplerPtr = pSampler.get();
-    pContext->PSSetSamplers(0, 1, &samplerPtr);
+    SwapchainHook::context->PSSetSamplers(0, 1, &samplerPtr);
     ID3D11Buffer* constantBufferPtr = pConstantBuffer.get();
-    pContext->PSSetConstantBuffers(0, 1, &constantBufferPtr);
-    pContext->PSSetShaderResources(0, 1, &pShaderResourceView);
+    SwapchainHook::context->PSSetConstantBuffers(0, 1, &constantBufferPtr);
+    SwapchainHook::context->PSSetShaderResources(0, 1, &pShaderResourceView);
     
     // Set viewport
     D3D11_VIEWPORT viewport{};
@@ -268,16 +265,16 @@ void Blur::RenderToRTV(ID3D11RenderTargetView *pRenderTargetView, ID3D11ShaderRe
     viewport.Width = rtvSize.x;
     viewport.Height = rtvSize.y;
     viewport.MaxDepth = 1.0f;
-    pContext->RSSetViewports(1, &viewport);
+    SwapchainHook::context->RSSetViewports(1, &viewport);
 
     // Clear and draw
     FLOAT backgroundColor[4] = {0.0f, 0.0f, 0.0f, 1.0f};
-    pContext->ClearRenderTargetView(pRenderTargetView, backgroundColor);
-    pContext->Draw(sizeof(quadVertices) / sizeof(quadVertices[0]), 0);
+    SwapchainHook::context->ClearRenderTargetView(pRenderTargetView, backgroundColor);
+    SwapchainHook::context->Draw(sizeof(quadVertices) / sizeof(quadVertices[0]), 0);
 
     // Clear render target binding
     ID3D11RenderTargetView* nullRTV = nullptr;
-    pContext->OMSetRenderTargets(1, &nullRTV, nullptr);
+    SwapchainHook::context->OMSetRenderTargets(1, &nullRTV, nullptr);
 }
 
 bool Blur::EnsureIntermediateTextures(UINT width, UINT height)
@@ -371,9 +368,8 @@ void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iteratio
     if (!pOrigShaderResourceView) {
         return;
     }
-
-    ID3D11DeviceContext* pContext = SwapchainHook::context.get();
-    if (!pContext) return;
+    
+    if (!SwapchainHook::context) return;
 
     D3D11_TEXTURE2D_DESC desc;
     SwapchainHook::GetBackbuffer()->GetDesc(&desc);
@@ -398,17 +394,17 @@ void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iteratio
     {
         // Clear shader resource binding to avoid conflicts
         ID3D11ShaderResourceView* nullSRV = nullptr;
-        pContext->PSSetShaderResources(0, 1, &nullSRV);
+        SwapchainHook::context->PSSetShaderResources(0, 1, &nullSRV);
         
         // Horizontal pass
-        pContext->PSSetShader(pGaussianBlurHorizontalShader.get(), nullptr, 0);
+        SwapchainHook::context->PSSetShader(pGaussianBlurHorizontalShader.get(), nullptr, 0);
         RenderToRTV(pIntermediateRTV1.get(), currentSRV, renderSize);
         
         // Clear binding again
-        pContext->PSSetShaderResources(0, 1, &nullSRV);
+        SwapchainHook::context->PSSetShaderResources(0, 1, &nullSRV);
         
         // Vertical pass
-        pContext->PSSetShader(pGaussianBlurVerticalShader.get(), nullptr, 0);
+        SwapchainHook::context->PSSetShader(pGaussianBlurVerticalShader.get(), nullptr, 0);
         if (i == actualIterations - 1) {
             // Last iteration: render to final destination
             RenderToRTV(pDstRenderTargetView, pIntermediateSRV1.get(), renderSize);
@@ -476,7 +472,7 @@ void FlarialGUI::PrepareBlur(float intensity) {
         auto isLerping = delta > 0.001 || delta < -0.1;
 
         if (isLerping || shouldUpdate || FlarialGUI::blur_bitmap_cache) {
-            if (SwapchainHook::queue != nullptr)
+            if (SwapchainHook::isDX12)
                 FlarialGUI::CopyBitmap(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap].get(),
                                        &FlarialGUI::screen_bitmap_cache);
             else FlarialGUI::CopyBitmap(SwapchainHook::D2D1Bitmap.get(), &FlarialGUI::screen_bitmap_cache);

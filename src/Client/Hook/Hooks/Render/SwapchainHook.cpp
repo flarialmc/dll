@@ -197,14 +197,11 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
         Logger::debug("Resetting SwapChain");
         ResizeHook::cleanShit(true);
         queueReset = false;
+        swapchain = nullptr;
         return DXGI_ERROR_DEVICE_RESET;
     }
 
     if(!swapchain) swapchain.copy_from(pSwapChain);
-    flagsreal = flags;
-
-    UnderUIHooks::index = 0;
-
     if (D2D::context) MC::windowSize = Vec2(D2D::context->GetSize().width, D2D::context->GetSize().height);
 
 
@@ -225,16 +222,16 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
     if (!init) {
         /* INIT START */
 
-        if (queue == nullptr) {
+        if (isDX12) {
 
 
-            DX11Init();
+            DX12Init();
 
 
         } else {
 
 
-            DX12Init();
+            DX11Init();
 
 
         }
@@ -258,7 +255,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
         if (D2D::context != nullptr && !Client::disable) {
 
-            if (queue != nullptr) {
+            if (isDX12) {
 
                 DX12Render();
 
@@ -287,14 +284,17 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
 void SwapchainHook::DX11Init() {
     Logger::debug("Initializing for DX11");
+    if (!swapchain) {
+        Logger::error("Swapchain is null");
+        return;
+    }
 
-    // Get D3D11 device from swapchain
     if (FAILED(swapchain->GetDevice(IID_PPV_ARGS(d3d11Device.put())))) {
         Logger::error("Failed to get D3D11 device from swapchain");
         return;
     }
 
-    // Get device context once
+    // Get device context
     d3d11Device->GetImmediateContext(context.put());
     if (!context.get()) {
         Logger::error("Failed to get D3D11 immediate context");
@@ -308,14 +308,13 @@ void SwapchainHook::DX11Init() {
         D2D1_DEVICE_CONTEXT_OPTIONS_ENABLE_MULTITHREADED_OPTIMIZATIONS
     };
 
-    winrt::com_ptr<IDXGISurface1> backBuffer;
     if (FAILED(swapchain->GetBuffer(0, IID_PPV_ARGS(backBuffer.put())))) {
         Logger::error("Failed to get backbuffer");
         return;
     }
 
     // Create D2D context
-    HRESULT hr = D2D1CreateDeviceContext(backBuffer.get(), properties, &D2D::context);
+    HRESULT hr = D2D1CreateDeviceContext(backBuffer.get(), properties, D2D::context.put());
     if (FAILED(hr) || !D2D::context) {
         Logger::error("Failed to create D2D1 device context: {}", Logger::getHRESULTError(hr));
         backBuffer = nullptr;
@@ -330,11 +329,10 @@ void SwapchainHook::DX11Init() {
     );
     
     D2D::context->CreateBitmapFromDxgiSurface(backBuffer.get(), bitmapProps, D2D1Bitmap.put());
-    // backBuffer is now a smart pointer, no manual release needed
 
     // Initialize ImGui once
     if (!initImgui && !imguiCleanupInProgress) {
-        // Wait for any ongoing cleanup to complete
+
         while (imguiCleanupInProgress) {
             Sleep(1);
         }
@@ -357,7 +355,6 @@ void SwapchainHook::DX11Init() {
         initImgui = true;
     }
 
-    // Initialize blur and motion blur pipelines
     Blur::InitializePipeline();
     MotionBlur::initted = AvgPixelMotionBlurHelper::Initialize() && RealMotionBlurHelper::Initialize();
 
@@ -426,7 +423,7 @@ void SwapchainHook::DX12Init() {
     
     // Create D2D device context
     D2D1_DEVICE_CONTEXT_OPTIONS deviceOptions = D2D1_DEVICE_CONTEXT_OPTIONS_ENABLE_MULTITHREADED_OPTIMIZATIONS;
-    d2dDevice->CreateDeviceContext(deviceOptions, &D2D::context);
+    d2dDevice->CreateDeviceContext(deviceOptions, D2D::context.put());
     
     // Get swapchain buffer count
     DXGI_SWAP_CHAIN_DESC1 swapChainDesc;
@@ -592,9 +589,9 @@ void SwapchainHook::DX11Render(bool underui) {
     // Use static cached RTV from header
     static UINT lastBufferWidth = 0, lastBufferHeight = 0;
     
-    // Get current backbuffer dimensions
+    // Get current backbuffer dimensions using smart pointer to ensure proper cleanup
     winrt::com_ptr<ID3D11Texture2D> backBuffer;
-    if (FAILED(swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), backBuffer.put_void()))) {
+    if (FAILED(swapchain->GetBuffer(0, IID_PPV_ARGS(backBuffer.put())))) {
         return;
     }
     
@@ -610,8 +607,6 @@ void SwapchainHook::DX11Render(bool underui) {
         lastBufferWidth = desc.Width;
         lastBufferHeight = desc.Height;
     }
-    
-    // backBuffer is now a smart pointer, no manual release needed
 
     // Save current render state
     ID3D11RenderTargetView* originalRTVs[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT] = { nullptr };
@@ -683,11 +678,12 @@ void SwapchainHook::DX11Render(bool underui) {
     for (auto & originalRTV : originalRTVs) {
         Memory::SafeRelease(originalRTV);
     }
+    // backBuffer is automatically released by winrt::com_ptr destructor
 }
 
 
 void SwapchainHook::DX12Render(bool underui) {
-    if (!D2D::context || !d3d11On12Device.get() || !queue.get()) return;
+    if (!D2D::context || !d3d11On12Device.get() || !isDX12) return;
     
     currentBitmap = swapchain->GetCurrentBackBufferIndex();
     
@@ -916,7 +912,7 @@ void SwapchainHook::Fonts() {
             // Use a static frame counter to defer expensive device object recreation
             static int frameDelay = 0;
             if (++frameDelay >= 3) { // Wait 3 frames to batch multiple font loads
-                if (!queue) {
+                if (!isDX12) {
                     ImGui_ImplDX11_InvalidateDeviceObjects();
                     ImGui_ImplDX11_CreateDeviceObjects();
                 } else {

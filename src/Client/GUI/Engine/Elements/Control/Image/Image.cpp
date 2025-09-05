@@ -320,7 +320,7 @@ void FlarialGUI::image(int resourceId, D2D1_RECT_F rect, LPCTSTR type, bool shou
         LoadImageFromResource(resourceId, &ImagesClass::images[resourceId], type);
         */
 
-    if (SwapchainHook::queue == nullptr) {
+    if (!SwapchainHook::isDX12) {
 		if (ImagesClass::ImguiDX11Images[resourceId] == nullptr) {
             LoadImageFromResource(resourceId, &ImagesClass::ImguiDX11Images[resourceId], type);
 		} else  {

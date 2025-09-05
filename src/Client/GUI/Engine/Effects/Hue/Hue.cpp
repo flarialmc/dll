@@ -11,7 +11,7 @@ void FlarialGUI::ApplyHue(float Hue) {
 
         ID2D1Bitmap *bitmap = nullptr;
 
-        if (SwapchainHook::queue != nullptr)
+        if (SwapchainHook::isDX12)
             FlarialGUI::CopyBitmap(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap].get(), &bitmap);
         else FlarialGUI::CopyBitmap(SwapchainHook::D2D1Bitmap.get(), &bitmap);
 

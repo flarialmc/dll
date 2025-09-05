@@ -124,7 +124,7 @@ public:
     };
 
     void onEnable() override {
-        if (SwapchainHook::queue != nullptr) {
+        if (SwapchainHook::isDX12) {
             FlarialGUI::Notify("Please enable Better Frames on the settings."); 
             this->setEnabled(false);
             return;

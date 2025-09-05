@@ -1075,7 +1075,7 @@ void TabList::onRender(RenderEvent &event) {
             bool alphaOrder = getOps<bool>("alphaOrder");
             bool flarialFirst = getOps<bool>("flarialFirst");
 
-            // if (SwapchainHook::queue != nullptr) showHeads = false;
+            // if (SwapchainHook::isDX12) showHeads = false;
             auto module = ModuleManager::getModule("Nick");
 
             int maxColumn = floor(getOps<int>("maxColumn"));
@@ -1303,7 +1303,7 @@ void TabList::onRender(RenderEvent &event) {
 
                         bool alrExists = false;
 
-                        if (SwapchainHook::queue != nullptr && g_playerHeadTextures.contains(uniqueTextureKey)) alrExists = true;
+                        if (SwapchainHook::isDX12 && g_playerHeadTextures.contains(uniqueTextureKey)) alrExists = true;
                         else if (g_playerHeadTexturesDX11.contains(uniqueTextureKey)) alrExists = true;
 
                         std::vector<unsigned char> head = SkinStealCommand::cropHead(skinImage, skinFormat);
@@ -1376,7 +1376,7 @@ void TabList::onRender(RenderEvent &event) {
                             vectab[i].headSize22D = ImVec2(headDisplaySize2, headDisplaySize2);
                         }
 
-                        if (SwapchainHook::queue != nullptr) {
+                        if (SwapchainHook::isDX12) {
                             // DX12 path
                             PlayerHeadTexture *playerTex = CreateTextureFromBytesDX12(uniqueTextureKey, scaledHead.data(), scaledSize, scaledSize);
                             PlayerHeadTexture *playerTex2 = CreateTextureFromBytesDX12("_" + uniqueTextureKey, scaledHead2.data(), scaledSize, scaledSize);

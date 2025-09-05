@@ -282,15 +282,6 @@ HRESULT CreateSwapchainForCoreWindowHook::CreateSwapChainForCoreWindowCallback(
 
     if (vsync) pDesc->Flags |= DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
 
-    // Try to get the command queue from the device for DX12
-    if (!SwapchainHook::isDX12) {
-        winrt::com_ptr<ID3D12CommandQueue> tempQueue;
-        if (SUCCEEDED(pDevice->QueryInterface(IID_PPV_ARGS(tempQueue.put())))) {
-            SwapchainHook::queue = tempQueue;
-            Logger::debug("Captured D3D12 command queue from device");
-        }
-    }
-
     SwapchainHook::queueReset = false;
     HRESULT hr = funcOriginal(This, pDevice, pWindow, pDesc, pRestrictToOutput, ppSwapChain);
     if (FAILED(hr)) {

@@ -52,6 +52,17 @@ void ResizeHook::cleanShit(bool fullReset) {
     for (auto& rtv : SwapchainHook::cachedDX12RTVs) if (rtv) rtv = nullptr;
     SwapchainHook::cachedDX12RTVs.clear();
 
+    // Clean up D2D resources first to release references to backbuffer
+    if (SwapchainHook::D2D1Bitmap) SwapchainHook::D2D1Bitmap = nullptr;
+
+    if (D2D::context) {
+        D2D::context->SetTarget(nullptr);
+        D2D::context->Flush();
+    }
+
+    // Clean up the backBuffer that holds a reference to the swapchain
+    if (SwapchainHook::backBuffer) SwapchainHook::backBuffer = nullptr;
+
     if (Blur::pConstantBuffer) Blur::pConstantBuffer = nullptr;
     if (Blur::pSampler) Blur::pSampler = nullptr;
     if (Blur::pGaussianBlurHorizontalShader) Blur::pGaussianBlurHorizontalShader = nullptr;
@@ -70,11 +81,6 @@ void ResizeHook::cleanShit(bool fullReset) {
     if (Blur::pIntermediateTexture1) Blur::pIntermediateTexture1 = nullptr;
     if (Blur::pIntermediateTexture2) Blur::pIntermediateTexture2 = nullptr;
 
-    if (D2D::context) {
-        D2D::context->SetTarget(nullptr);
-        D2D::context->Flush();
-    }
-
     if (fullReset) {
         if (ImGui::GetCurrentContext()) {
             SwapchainHook::imguiCleanupInProgress = true;
@@ -91,16 +97,11 @@ void ResizeHook::cleanShit(bool fullReset) {
             SwapchainHook::imguiCleanupInProgress = false;
         }
 
-        if (SwapchainHook::D2D1Bitmap) SwapchainHook::D2D1Bitmap = nullptr;
         if (D2D::context) D2D::context = nullptr;
         if (!SwapchainHook::isDX12) {
             if (SwapchainHook::d3d11Device) SwapchainHook::d3d11Device = nullptr;
         }
-    } else {
-        if (SwapchainHook::D2D1Bitmap) SwapchainHook::D2D1Bitmap = nullptr;
-    }
 
-    if (fullReset) {
         Blur::Cleanup();
         FlarialGUI::CleanupImageResources();
 
@@ -135,7 +136,6 @@ void ResizeHook::cleanShit(bool fullReset) {
         if (SwapchainHook::D3D12DescriptorHeap) SwapchainHook::D3D12DescriptorHeap = nullptr;
 
         for (auto& bitmap : SwapchainHook::D2D1Bitmaps) if (bitmap) bitmap = nullptr;
-        SwapchainHook::D2D1Bitmaps.clear();
 
         if (SwapchainHook::d3d11On12Device && !SwapchainHook::D3D11Resources.empty()) {
             std::vector<ID3D11Resource*> rawResources;
@@ -175,6 +175,10 @@ void ResizeHook::cleanShit(bool fullReset) {
 
             if (SwapchainHook::d3d11On12Device) SwapchainHook::d3d11On12Device = nullptr;
             if (SwapchainHook::d3d11Device) SwapchainHook::d3d11Device = nullptr;
+            if (SwapchainHook::swapchain) SwapchainHook::swapchain = nullptr;
+            if (SwapchainHook::backBuffer) SwapchainHook::backBuffer = nullptr;
+            SwapchainHook::SavedD3D11BackBuffer = nullptr;
+            SwapchainHook::ExtraSavedD3D11BackBuffer = nullptr;
         }
     }
 }
