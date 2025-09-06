@@ -4,7 +4,7 @@
 #include <unknwn.h>
 #include <assert.h>
 
-#include "Hook/Hooks/Render/SwapchainHook.hpp"
+#include "../../../Hook/Hooks/Render/DirectX/DXGI/SwapchainHook.hpp"
 
 
 const char* drawTextureShaderSrc = R"(

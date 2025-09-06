@@ -5,7 +5,7 @@
 #include "../Module.hpp"
 #include "Events/Render/RenderUnderUIEvent.hpp"
 #include "Events/Render/RenderEvent.hpp"
-#include "Hook/Hooks/Render/SwapchainHook.hpp"
+#include "../../../Hook/Hooks/Render/DirectX/DXGI/SwapchainHook.hpp"
 
 
 class MotionBlur : public Module {

@@ -1,8 +1,7 @@
 #include "CommandListHook.hpp"
 #include <winrt/base.h>
-#include "../../../GUI/D2D.hpp"
 #include "SwapchainHook.hpp"
-#include "../../../Client.hpp"
+#include "../../../../../Client.hpp"
 
 typedef void(__thiscall *original)(ID3D12CommandQueue *queue, UINT numCommandLists,
                                    ID3D12CommandList **ppCommandLists);

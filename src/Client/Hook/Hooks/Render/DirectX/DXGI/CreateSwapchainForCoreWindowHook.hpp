@@ -25,6 +25,10 @@ class CreateSwapchainForCoreWindowHook {
 
 public:
   static void hook(IDXGIFactory2 *pFactory);
+
+#if defined(__DEBUG__)
+  // Move DX export-hook installers into this class so definitions can be in DX11/DX12 cpp files.
+  static void HookD3D11Exports();
+  static void HookD3D12Exports();
+#endif
 };
-
-

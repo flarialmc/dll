@@ -6,15 +6,15 @@
 #include <imgui/imgui_impl_win32.h>
 #include <imgui/imgui_internal.h>
 
-#include "../../../GUI/D2D.hpp"
+#include "../../../../../GUI/D2D.hpp"
 #include "SwapchainHook.hpp"
-#include "../../../Module/Modules/ClickGUI/Elements/ClickGUIElements.hpp"
-#include "../../../Module/Manager.hpp"
-#include "../../../GUI/Engine/Elements/Structs/ImagesClass.hpp"
-#include "../../../../../lib/ImGui/imgui.h"
-#include "../../../Module/Modules/GuiScale/GuiScale.hpp"
+#include "../../../../../Module/Modules/ClickGUI/Elements/ClickGUIElements.hpp"
+#include "../../../../../Module/Manager.hpp"
+#include "../../../../../GUI/Engine/Elements/Structs/ImagesClass.hpp"
+#include "../../../../../../../lib/ImGui/imgui.h"
+#include "../../../../../Module/Modules/GuiScale/GuiScale.hpp"
 #include "Modules/MotionBlur/MotionBlur.hpp"
-#include "../../../Module/Modules/TabList/TabList.hpp"
+#include "../../../../../Module/Modules/TabList/TabList.hpp"
 
 void ResizeHook::enableHook() {
     int index;

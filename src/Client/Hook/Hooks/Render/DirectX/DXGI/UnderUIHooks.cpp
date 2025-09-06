@@ -1,6 +1,5 @@
 #include "UnderUIHooks.hpp"
 #include "SwapchainHook.hpp"
-#include "SDK/Client/Options/OptionsParser.hpp"
 
 /*
  * THIS IS HOOKED THROUGH SWAPCHAIN!

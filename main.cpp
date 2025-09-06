@@ -3,7 +3,7 @@
 
 #include "src/Client/Client.hpp"
 #include "src/Client/Events/EventManager.hpp"
-#include "src/Client/Hook/Hooks/Render/ResizeHook.hpp"
+#include "src/Client/Hook/Hooks/Render/DirectX/DXGI/ResizeHook.hpp"
 #include "src/Client/Module/Modules/ClickGUI/ClickGUI.hpp"
 // #include "src/Client/Module/Modules/Nick/NickListener.hpp"
 #include <kiero/kiero.h>

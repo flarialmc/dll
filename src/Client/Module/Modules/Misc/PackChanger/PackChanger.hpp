@@ -4,7 +4,7 @@
 
 class PackChanger : public Listener {
 private:
-    bool queueReset = false;
+    bool recreate = false;
     bool canRender = false;
     bool enableFrameQueue = false;
     int frameQueue = 0;
@@ -99,7 +99,7 @@ public:
         if(!player) return;
         // recreate swapchain
         if(userRequestedReload) {
-            queueReset = true;
+            recreate = true;
             forcePreGame = false;
             userRequestedReload = false;
         }
@@ -107,12 +107,12 @@ public:
 
     void onHandleVisibilityUpdates(HandleVisibilityUpdatesEvent &event) {
         // stops chunks from updating
-        if(!canRender || queueReset || forcePreGame) event.cancel();
+        if(!canRender || recreate || forcePreGame) event.cancel();
     }
 
     void onRenderOrderExecute(RenderOrderExecuteEvent &event) {
         // stops most 3D level rendering
-        if(!canRender || queueReset || forcePreGame) event.cancel();
+        if(!canRender || recreate || forcePreGame) event.cancel();
     }
 
     void onSetupAndRender(SetupAndRenderEvent &event) {
@@ -123,7 +123,7 @@ public:
 
         if(!canRender && enableFrameQueue) {
             if(frameQueue == 0) {
-                if(!queueReset) {
+                if(!recreate) {
                     forcePreGame = false;
                     canRender = true;
                     canUseKeys = true;
@@ -137,21 +137,21 @@ public:
         }
 
         if(name == "pause_screen") {
-            if (queueReset) {
+            if (recreate) {
                 if(!enableFrameQueue) {
                     enableFrameQueue = true;
                     frameQueue = 2;
                 }
                 if(frameQueue == 0) {
-                    queueReset = false;
+                    recreate = false;
 
                     SDK::clientInstance->getLevelRender()->getLevelRendererPlayer()->onDeviceLost();
                     SDK::clientInstance->getMinecraftGame()->_onResumeWaitReloadActors();
-                    //SwapchainHook::queueReset = true;
+                    //SwapchainHook::recreate = true;
                 }
                 return;
             }
-            if (!canRender && !SwapchainHook::queueReset && SwapchainHook::init) {
+            if (!canRender && !SwapchainHook::recreate && SwapchainHook::init) {
                 if(!enableFrameQueue) {
                     enableFrameQueue = true;
                     frameQueue = 2;

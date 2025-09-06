@@ -3,8 +3,8 @@
 #include <windows.h>
 #include <unknwn.h>
 #include <assert.h>
-#include "Hook/Hooks/Render/SwapchainHook.hpp"
-#include "Hook/Hooks/Render/UnderUIHooks.hpp"
+#include "../../../Hook/Hooks/Render/DirectX/DXGI/SwapchainHook.hpp"
+#include "../../../Hook/Hooks/Render/DirectX/DXGI/UnderUIHooks.hpp"
 
 const char* realMotionBlurPixelShaderSrc = R"(
 cbuffer CameraData : register(b0)

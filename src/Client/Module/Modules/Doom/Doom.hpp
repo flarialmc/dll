@@ -1,7 +1,7 @@
 #pragma once  
 
 #include "../Module.hpp"  
-#include "../../../Hook/Hooks/Render/SwapchainHook.hpp"
+#include "../../../Hook/Hooks/Render/DirectX/DXGI/SwapchainHook.hpp"
 
 #define DOOMGENERIC_RESX 640
 #define DOOMGENERIC_RESY 400

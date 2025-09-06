@@ -2,7 +2,7 @@
 #include <dxgi.h>
 #include <winrt/base.h>
 #include "kiero/kiero.h"
-#include "../Hook.hpp"
+#include "../../../Hook.hpp"
 
 class ResizeHook : public Hook {
 private:

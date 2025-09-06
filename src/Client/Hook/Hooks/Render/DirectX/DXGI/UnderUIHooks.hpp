@@ -1,8 +1,8 @@
 #pragma once
-#include "../Hook.hpp"
-#include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
+#include "../../../Hook.hpp"
+#include "../../../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 #include "SDK/Client/Options/OptionsParser.hpp"
-#include "../../../GUI/Engine/bgfx.hpp"
+#include "../../../../../GUI/Engine/bgfx.hpp"
 
 class UnderUIHooks : public Hook {
     static void ClearDepthStencilViewCallbackDX11(

@@ -841,7 +841,7 @@ void ClickGUI::onRender(RenderEvent &event) {
 
                 c->addHeader("Rendering");
                 c->addButton("Force Reload Minecraft", "Forces the swapchain to recreate.", "RELOAD", []() {
-                    SwapchainHook::queueReset = true;
+                    SwapchainHook::recreate = true;
                 });
 
 

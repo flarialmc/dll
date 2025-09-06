@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Hook.hpp"
+#include "../../../Hook.hpp"
 #include <dxgi1_6.h>
 
 #include <d2d1_3.h>
@@ -8,10 +8,10 @@
 #include <d3d11.h>
 #include <d3d11on12.h>
 #include <winrt/base.h>
+#include <windows.h>
 
-#include "kiero/kiero.h"
-#include "../../../../SDK/Client/Render/FrameTransform.hpp"
-#include <atomic>
+// Expose the main window handle to DX11/DX12 implementation files
+extern HWND window2;
 
 struct FrameContext {
 	winrt::com_ptr<ID3D12CommandAllocator> commandAllocator;
@@ -54,7 +54,7 @@ public:
 
     static inline SwapchainOriginal funcOriginal = nullptr;
     static bool init;
-    static inline bool queueReset = true;
+    static inline bool recreate = true;
     static inline bool isDX12;
 
     SwapchainHook();

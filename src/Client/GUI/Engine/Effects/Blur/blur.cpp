@@ -4,7 +4,7 @@
 
 #include "Client.hpp"
 #include "../../Engine.hpp"
-#include "../../../../Hook/Hooks/Render/SwapchainHook.hpp"
+#include "../../../../Hook/Hooks/Render/DirectX/DXGI/SwapchainHook.hpp"
 #include "../../../../Module/Modules/MotionBlur/MotionBlur.hpp"
 
 // CREDITS @MR CHIPS (@chyves)
