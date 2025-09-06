@@ -282,6 +282,40 @@ HRESULT CreateSwapchainForCoreWindowHook::CreateSwapChainForCoreWindowCallback(
 
     if (vsync) pDesc->Flags |= DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
 
+    /* EXTRA RELEASING PRECAUTIONS */
+
+    if (SwapchainHook::d3d11On12Device && !SwapchainHook::D3D11Resources.empty()) {
+        std::vector<ID3D11Resource*> toRelease;
+        toRelease.reserve(SwapchainHook::D3D11Resources.size());
+        for (auto& res : SwapchainHook::D3D11Resources) if (res) toRelease.push_back(res.get());
+        if (!toRelease.empty()) SwapchainHook::d3d11On12Device->ReleaseWrappedResources(toRelease.data(), static_cast<UINT>(toRelease.size()));
+    }
+    if (SwapchainHook::context) {
+        SwapchainHook::context->ClearState();
+        SwapchainHook::context->Flush();
+    }
+    if (D2D::context) {
+        D2D::context->SetTarget(nullptr);
+        D2D::context->Flush();
+    }
+    if (SwapchainHook::d3d12Device5 && SwapchainHook::queue) {
+        winrt::com_ptr<ID3D12Fence> fence;
+        if (SUCCEEDED(SwapchainHook::d3d12Device5->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(fence.put())))) {
+            const UINT64 value = 1;
+            HANDLE evt = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+            if (evt) {
+                SwapchainHook::queue->Signal(fence.get(), value);
+                if (fence->GetCompletedValue() < value) {
+                    fence->SetEventOnCompletion(value, evt);
+                    WaitForSingleObject(evt, 1000);
+                }
+                CloseHandle(evt);
+            }
+        }
+    }
+
+    /* EXTRA RELEASING PRECAUTIONS */
+
     SwapchainHook::queueReset = false;
     HRESULT hr = funcOriginal(This, pDevice, pWindow, pDesc, pRestrictToOutput, ppSwapChain);
     if (FAILED(hr)) {

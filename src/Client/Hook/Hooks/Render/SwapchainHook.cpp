@@ -722,9 +722,11 @@ void SwapchainHook::DX12Render(bool underui) {
     }
     
     if (!cachedDX12RTVs[currentBitmap].get()) {
-        winrt::com_ptr<ID3D11Texture2D> buffer2D;
-        D3D11Resources[currentBitmap]->QueryInterface(IID_PPV_ARGS(buffer2D.put()));
-        d3d11Device->CreateRenderTargetView(buffer2D.get(), nullptr, cachedDX12RTVs[currentBitmap].put());
+        {
+            winrt::com_ptr<ID3D11Texture2D> buffer2D;
+            D3D11Resources[currentBitmap]->QueryInterface(IID_PPV_ARGS(buffer2D.put()));
+            d3d11Device->CreateRenderTargetView(buffer2D.get(), nullptr, cachedDX12RTVs[currentBitmap].put());
+        }
     }
     
     // Trigger render events
@@ -994,11 +996,16 @@ void SwapchainHook::SaveBackbuffer(bool underui) {
 
     }
     else {
-        HRESULT hr;
-
-        hr = D3D11Resources[currentBitmap]->QueryInterface(IID_PPV_ARGS(SavedD3D11BackBuffer.put()));
-        if (FAILED(hr)) std::cout << "Failed to query interface: " << std::hex << hr << std::endl;
-    }
+        {
+            winrt::com_ptr<ID3D11Texture2D> tempBackBuffer;
+            HRESULT hr = D3D11Resources[currentBitmap]->QueryInterface(IID_PPV_ARGS(tempBackBuffer.put()));
+            if (SUCCEEDED(hr)) {
+                SavedD3D11BackBuffer = tempBackBuffer;
+            } else {
+                std::cout << "Failed to query interface: " << std::hex << hr << std::endl;
+            }
+        }
+       }
 }
 
 // Consolidated descriptor heap management functions
