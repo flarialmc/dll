@@ -74,6 +74,7 @@ std::vector<std::string> Client::getPlayersVector(const nlohmann::json& data) {
 
 
 bool Client::disable = false;
+bool Client::init = false;
 
 winrt::event_token activationToken;
 
@@ -323,6 +324,7 @@ void Client::initialize() {
 	ScriptManager::initialize();
 
 	Client::PerformPostLegacySetup();
+	Client::init = true;
 }
 
 std::string window = "Minecraft";

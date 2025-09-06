@@ -16,6 +16,7 @@
 class ClientInstance {
 public:
     MinecraftGame* getMinecraftGame() {
+        // if (!SDK::clientInstance) return nullptr;
         return hat::member_at<MinecraftGame*>(this, GET_OFFSET("ClientInstance::minecraftGame"));
     };
 

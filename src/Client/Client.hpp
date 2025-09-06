@@ -21,6 +21,7 @@ public:
 	static uint64_t start;
 	static std::vector<std::string> availableConfigs;
 	static std::vector<std::string> getPlayersVector(const nlohmann::json& data);
+	static bool init;
 
 	static void UnregisterActivationHandler();
 

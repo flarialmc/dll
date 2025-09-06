@@ -1,5 +1,6 @@
 #pragma once
 #include <dxgi.h>
+#include <winrt/base.h>
 #include "kiero/kiero.h"
 #include "../Hook.hpp"
 
@@ -19,7 +20,7 @@ public:
 
     void enableHook() override;
 
-    static void cleanShit(bool isResize = false);
+    static void cleanShit(bool fullReset = false);
 
     static void call();
 };

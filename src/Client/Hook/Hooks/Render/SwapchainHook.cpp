@@ -1,4 +1,5 @@
 #include "SwapchainHook.hpp"
+#include <winrt/base.h>
 #include "../../../GUI/D2D.hpp"
 #include "../../../Events/Render/RenderEvent.hpp"
 #include "../../../Events/Render/RenderUnderUIEvent.hpp"
@@ -29,10 +30,10 @@ using ::IUnknown;
 
 SwapchainHook::SwapchainHook() : Hook("swapchain_hook", 0) {}
 
-ID3D12CommandQueue *SwapchainHook::queue = nullptr;
+winrt::com_ptr<ID3D12CommandQueue> SwapchainHook::queue = nullptr;
 HANDLE SwapchainHook::fenceEvent = nullptr;
 
-bool initImgui = false;
+bool SwapchainHook::initImgui = false;
 bool allfontloaded = false;
 bool first = false;
 bool imguiWindowInit = false;
@@ -98,7 +99,23 @@ HWND FindWindowByTitle(const std::string &titlePart) {
     }, reinterpret_cast<LPARAM>(titlePart.c_str()));
     return hwnd;
 }
+enum class GraphicsAPI { Unknown, D3D11, D3D12 };
 
+GraphicsAPI DetectSwapchainAPI(IDXGISwapChain* swapchain) {
+    if (!swapchain) return GraphicsAPI::Unknown;
+
+    winrt::com_ptr<IUnknown> device;
+    if (SUCCEEDED(swapchain->GetDevice(IID_PPV_ARGS(device.put())))) {
+        if (auto d3d12Device = device.try_as<ID3D12Device>()) {
+            return GraphicsAPI::D3D12;
+        }
+        if (auto d3d11Device = device.try_as<ID3D11Device>()) {
+            return GraphicsAPI::D3D11;
+        }
+    }
+
+    return GraphicsAPI::Unknown;
+}
 void SwapchainHook::enableHook() {
 
     queueReset = Client::settings.getSettingByName<bool>("recreateAtStart")->value;
@@ -120,11 +137,11 @@ void SwapchainHook::enableHook() {
 
     /* CREATE SWAPCHAIN FOR CORE WINDOW HOOK */
 
-    IDXGIFactory2 *pFactory = NULL;
-    CreateDXGIFactory(IID_PPV_ARGS(&pFactory));
-    if (!pFactory) LOG_ERROR("Factory not created");
+    winrt::com_ptr<IDXGIFactory2> pFactory;
+    CreateDXGIFactory(IID_PPV_ARGS(pFactory.put()));
+    if (!pFactory.get()) LOG_ERROR("Factory not created");
 
-    CreateSwapchainForCoreWindowHook::hook(pFactory);
+    CreateSwapchainForCoreWindowHook::hook(pFactory.get());
 
     /* CREATE SWAPCHAIN FOR CORE WINDOW HOOK */
 
@@ -142,7 +159,7 @@ void SwapchainHook::enableHook() {
     Logger::info("GPU name: {}", gpuName.c_str());
 
 
-    Memory::SafeRelease(pFactory);
+    // pFactory is now a smart pointer, no manual release needed
 
     /* OVERLAYS CHECK */
 
@@ -166,7 +183,9 @@ bool SwapchainHook::currentVsyncState;
 
 
 HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags) {
-    if (Client::disable) return funcOriginal(pSwapChain, syncInterval, flags);
+    if (Client::disable || !Client::init) return funcOriginal(pSwapChain, syncInterval, flags);
+
+    isDX12 = GraphicsAPI::D3D12 == DetectSwapchainAPI(pSwapChain);
 
     if (currentVsyncState != Client::settings.getSettingByName<bool>("vsync")->value) {
         queueReset = true;
@@ -176,15 +195,13 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
         init = false;
         initImgui = false;
         Logger::debug("Resetting SwapChain");
-        ResizeHook::cleanShit(false);
+        ResizeHook::cleanShit(true);
+        queueReset = false;
+        swapchain = nullptr;
         return DXGI_ERROR_DEVICE_RESET;
     }
 
-    swapchain = pSwapChain;
-    flagsreal = flags;
-
-    UnderUIHooks::index = 0;
-
+    if(!swapchain) swapchain.copy_from(pSwapChain);
     if (D2D::context) MC::windowSize = Vec2(D2D::context->GetSize().width, D2D::context->GetSize().height);
 
 
@@ -192,7 +209,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
     static bool hooker = false;
 
-    if (!hooker && ((queue && DX12CommandLists) || (!queue && context))) {
+    if (!hooker && ((queue) || (!queue && context))) {
         UnderUIHooks hook;
         hook.enableHook();
         hooker = true;
@@ -205,16 +222,16 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
     if (!init) {
         /* INIT START */
 
-        if (queue == nullptr) {
+        if (isDX12) {
 
 
-            DX11Init();
+            DX12Init();
 
 
         } else {
 
 
-            DX12Init();
+            DX11Init();
 
 
         }
@@ -238,7 +255,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
         if (D2D::context != nullptr && !Client::disable) {
 
-            if (queue != nullptr) {
+            if (isDX12) {
 
                 DX12Render();
 
@@ -267,472 +284,551 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
 void SwapchainHook::DX11Init() {
     Logger::debug("Initializing for DX11");
-
-    const D2D1_CREATION_PROPERTIES properties
-            {
-                    D2D1_THREADING_MODE_MULTI_THREADED,
-                    D2D1_DEBUG_LEVEL_NONE,
-                    D2D1_DEVICE_CONTEXT_OPTIONS_ENABLE_MULTITHREADED_OPTIMIZATIONS
-            };
-
-    swapchain->GetDevice(IID_PPV_ARGS(&d3d11Device));
-    IDXGISurface1 *eBackBuffer;
-    swapchain->GetBuffer(0, IID_PPV_ARGS(&eBackBuffer));
-
-    if(!eBackBuffer) return;
-
-    D2D1CreateDeviceContext(eBackBuffer, properties, &D2D::context);
-
-    D2D1_BITMAP_PROPERTIES1 props = D2D1::BitmapProperties1(
-            D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW,
-            D2D1::PixelFormat(DXGI_FORMAT_R8G8B8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED), 96.0, 96.0);
-    D2D::context->CreateBitmapFromDxgiSurface(eBackBuffer, props, &D2D1Bitmap);
-    //ImGui Init
-
-    if (!initImgui) {
-        ImGui::CreateContext();
-
-        d3d11Device->GetImmediateContext(&context);
-        ImGui_ImplWin32_Init(window2);
-        ImGui_ImplDX11_Init(d3d11Device, context);
-        initImgui = true;
-
+    if (!swapchain) {
+        Logger::error("Swapchain is null");
+        return;
     }
 
-    SaveBackbuffer();
+    if (FAILED(swapchain->GetDevice(IID_PPV_ARGS(d3d11Device.put())))) {
+        Logger::error("Failed to get D3D11 device from swapchain");
+        return;
+    }
+
+    // Get device context
+    d3d11Device->GetImmediateContext(context.put());
+    if (!context.get()) {
+        Logger::error("Failed to get D3D11 immediate context");
+        return;
+    }
+
+    // Initialize D2D1
+    const D2D1_CREATION_PROPERTIES properties = {
+        D2D1_THREADING_MODE_MULTI_THREADED,
+        D2D1_DEBUG_LEVEL_NONE,
+        D2D1_DEVICE_CONTEXT_OPTIONS_ENABLE_MULTITHREADED_OPTIMIZATIONS
+    };
+
+    if (FAILED(swapchain->GetBuffer(0, IID_PPV_ARGS(backBuffer.put())))) {
+        Logger::error("Failed to get backbuffer");
+        return;
+    }
+
+    // Create D2D context
+    HRESULT hr = D2D1CreateDeviceContext(backBuffer.get(), properties, D2D::context.put());
+    if (FAILED(hr) || !D2D::context) {
+        Logger::error("Failed to create D2D1 device context: {}", Logger::getHRESULTError(hr));
+        backBuffer = nullptr;
+        return;
+    }
+
+    // Create D2D1 bitmap for render target
+    D2D1_BITMAP_PROPERTIES1 bitmapProps = D2D1::BitmapProperties1(
+        D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW,
+        D2D1::PixelFormat(DXGI_FORMAT_R8G8B8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED),
+        96.0f, 96.0f
+    );
+    
+    D2D::context->CreateBitmapFromDxgiSurface(backBuffer.get(), bitmapProps, D2D1Bitmap.put());
+
+    // Initialize ImGui once
+    if (!initImgui && !imguiCleanupInProgress) {
+
+        while (imguiCleanupInProgress) {
+            Sleep(1);
+        }
+        
+        if (!ImGui::GetCurrentContext()) {
+            ImGui::CreateContext();
+        }
+        
+        // Check if Win32 backend is already initialized
+        auto& io = ImGui::GetIO();
+        if (!io.BackendPlatformUserData) {
+            ImGui_ImplWin32_Init(window2);
+        }
+        
+        // Check if DX11 backend is already initialized
+        if (!io.BackendRendererUserData) {
+            ImGui_ImplDX11_Init(d3d11Device.get(), context.get());
+        }
+        
+        initImgui = true;
+    }
 
     Blur::InitializePipeline();
-    MotionBlur::initted = AvgPixelMotionBlurHelper::Initialize();
-    MotionBlur::initted = RealMotionBlurHelper::Initialize();
+    MotionBlur::initted = AvgPixelMotionBlurHelper::Initialize() && RealMotionBlurHelper::Initialize();
 
-    Memory::SafeRelease(eBackBuffer);
+    SaveBackbuffer();
     init = true;
 }
 
 
 void SwapchainHook::DX12Init() {
-
-
     Logger::debug("Initializing for DX12");
-    ID3D12Device5 *device;
-    swapchain->GetDevice(IID_PPV_ARGS(&d3d12Device5));
-
-    if (SUCCEEDED(swapchain->GetDevice(IID_PPV_ARGS(&device))) &&
-        kiero::getRenderType() == kiero::RenderType::D3D12) {
-
-        fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-
-        D3D11On12CreateDevice(device,
-                              D3D11_CREATE_DEVICE_BGRA_SUPPORT, nullptr, 0,
-                              (IUnknown **) &queue, 1, 0, &SwapchainHook::d3d11Device, &context,
-                              nullptr);
-
-        if(!d3d11Device) return;
-
-        d3d11Device->QueryInterface(IID_PPV_ARGS(&d3d11On12Device));
-
-        D2D1_DEVICE_CONTEXT_OPTIONS deviceOptions = D2D1_DEVICE_CONTEXT_OPTIONS_ENABLE_MULTITHREADED_OPTIMIZATIONS;
-        ID2D1Factory7 *d2dFactory;
-        D2D1_FACTORY_OPTIONS factoryOptions{};
-        D2D1CreateFactory(D2D1_FACTORY_TYPE_MULTI_THREADED, __uuidof(ID2D1Factory7), &factoryOptions,
-                          (void **) &d2dFactory);
-
-        IDXGIDevice *dxgiDevice;
-        d3d11On12Device->QueryInterface(__uuidof(IDXGIDevice), (void **) &dxgiDevice);
-
-        ID2D1Device6 *device2;
-        d2dFactory->CreateDevice(dxgiDevice, &device2);
-
-        device2->CreateDeviceContext(deviceOptions, &D2D::context);
-
-        DXGI_SWAP_CHAIN_DESC1 swapChainDescription;
-        swapchain->GetDesc1(&swapChainDescription);
-
-        bufferCount = swapChainDescription.BufferCount;
-
-        DXGISurfaces.resize(bufferCount, nullptr);
-        D3D11Resources.resize(bufferCount, nullptr);
-        D2D1Bitmaps.resize(bufferCount, nullptr);
-
-        auto dpi = (float) GetDpiForSystem();
-
-        D2D1_BITMAP_PROPERTIES1 props = D2D1::BitmapProperties1(
-                D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW,
-                D2D1::PixelFormat(DXGI_FORMAT_R8G8B8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED), dpi, dpi);
-
-        D3D12_DESCRIPTOR_HEAP_DESC heapDescriptorBackBuffers = {};
-        heapDescriptorBackBuffers.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
-        heapDescriptorBackBuffers.NumDescriptors = bufferCount;
-        heapDescriptorBackBuffers.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-        heapDescriptorBackBuffers.NodeMask = 1;
-
-        device->CreateDescriptorHeap(&heapDescriptorBackBuffers,
-                                     IID_PPV_ARGS(&D3D12DescriptorHeap));
-
-        uintptr_t rtvDescriptorSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-        D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = D3D12DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-
-        for (int i = 0; i < bufferCount; i++) {
-
-            ID3D12Resource *backBufferPtr;
-            swapchain->GetBuffer(i, IID_PPV_ARGS(&backBufferPtr));
-            device->CreateRenderTargetView(backBufferPtr, nullptr, rtvHandle);
-            rtvHandle.ptr += rtvDescriptorSize;
-
-
-            D3D11_RESOURCE_FLAGS d3d11_flags = {D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE};
-
-            d3d11On12Device->CreateWrappedResource(backBufferPtr, &d3d11_flags,
-                                                   D3D12_RESOURCE_STATE_RENDER_TARGET,
-                                                   D3D12_RESOURCE_STATE_PRESENT, IID_PPV_ARGS(
-                                                           &D3D11Resources[i]));
-            D3D11Resources[i]->QueryInterface(&DXGISurfaces[i]);
-
-            D2D1Bitmaps[i] = nullptr; // Initialize to nullptr
-
-            D2D::context->CreateBitmapFromDxgiSurface(DXGISurfaces[i], props,
-                                                      &(D2D1Bitmaps[i]));
-            Memory::SafeRelease(backBufferPtr);
-
-        }
-
-        Memory::SafeRelease(device);
-        Memory::SafeRelease(device2);
-        Memory::SafeRelease(dxgiDevice);
-        Memory::SafeRelease(d2dFactory);
-
-        Blur::InitializePipeline();
-        init = true;
+    
+    // Get D3D12 device
+    if (FAILED(swapchain->GetDevice(IID_PPV_ARGS(d3d12Device5.put())))) {
+        Logger::error("Failed to get D3D12 device from swapchain");
+        return;
     }
+    
+    // Create fence event for synchronization
+    if (!fenceEvent) {
+        fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+        if (!fenceEvent) {
+            Logger::error("Failed to create fence event");
+            return;
+        }
+    }
+    
+    // Create D3D11on12 device for compatibility
+    IUnknown* queueAsUnknown = queue.get();
+    HRESULT hr = D3D11On12CreateDevice(
+        d3d12Device5.get(),
+        D3D11_CREATE_DEVICE_BGRA_SUPPORT,
+        nullptr, 0,
+        &queueAsUnknown, 1, 0,
+        d3d11Device.put(), context.put(), nullptr
+    );
+    
+    if (FAILED(hr) || !d3d11Device.get()) {
+        Logger::error("Failed to create D3D11on12 device: {}", Logger::getHRESULTError(hr));
+        return;
+    }
+    
+    // Get D3D11on12 interface
+    d3d11Device->QueryInterface(IID_PPV_ARGS(d3d11On12Device.put()));
+    
+    // Create D2D resources
+    ID2D1Factory7* d2dFactory = nullptr;
+    D2D1_FACTORY_OPTIONS factoryOptions = {};
+    hr = D2D1CreateFactory(
+        D2D1_FACTORY_TYPE_MULTI_THREADED,
+        __uuidof(ID2D1Factory7),
+        &factoryOptions,
+        (void**)&d2dFactory
+    );
+    
+    if (FAILED(hr) || !d2dFactory) {
+        Logger::error("Failed to create D2D1 factory: {}", Logger::getHRESULTError(hr));
+        return;
+    }
+    
+    // Create D2D device
+    IDXGIDevice* dxgiDevice = nullptr;
+    d3d11On12Device->QueryInterface(__uuidof(IDXGIDevice), (void**)&dxgiDevice);
+    
+    ID2D1Device6* d2dDevice = nullptr;
+    d2dFactory->CreateDevice(dxgiDevice, &d2dDevice);
+    
+    // Create D2D device context
+    D2D1_DEVICE_CONTEXT_OPTIONS deviceOptions = D2D1_DEVICE_CONTEXT_OPTIONS_ENABLE_MULTITHREADED_OPTIMIZATIONS;
+    d2dDevice->CreateDeviceContext(deviceOptions, D2D::context.put());
+    
+    // Get swapchain buffer count
+    DXGI_SWAP_CHAIN_DESC1 swapChainDesc;
+    swapchain->GetDesc1(&swapChainDesc);
+    bufferCount = swapChainDesc.BufferCount;
+    
+    // Resize resource arrays
+    DXGISurfaces.resize(bufferCount, nullptr);
+    D3D11Resources.resize(bufferCount, nullptr);
+    D2D1Bitmaps.resize(bufferCount, nullptr);
+    frameContexts.resize(bufferCount);
+    
+    // Create persistent descriptor heaps
+    if (!D3D12DescriptorHeap.get()) {
+        D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc = {};
+        rtvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+        rtvHeapDesc.NumDescriptors = bufferCount;
+        rtvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+        rtvHeapDesc.NodeMask = 0;
+        
+        d3d12Device5->CreateDescriptorHeap(&rtvHeapDesc, IID_PPV_ARGS(D3D12DescriptorHeap.put()));
+    }
+    
+    // Create consolidated descriptor heap for ImGui and images
+    if (!d3d12DescriptorHeapImGuiRender.get()) {
+        D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
+        srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+        srvHeapDesc.NumDescriptors = TOTAL_CONSOLIDATED_DESCRIPTORS;
+        srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+        srvHeapDesc.NodeMask = 0;
+        
+        d3d12Device5->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(d3d12DescriptorHeapImGuiRender.put()));
+    }
+    
+    // Create command allocator
+    if (!allocator.get()) {
+        d3d12Device5->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(allocator.put()));
+    }
+    
+    // Create command list
+    if (!d3d12CommandList.get()) {
+        d3d12Device5->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, allocator.get(), nullptr, IID_PPV_ARGS(d3d12CommandList.put()));
+        d3d12CommandList->Close(); // Close it immediately as it starts in recording state
+    }
+    
+    // Setup render targets and wrapped resources
+    const UINT rtvDescriptorSize = d3d12Device5->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+    D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = D3D12DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+    
+    const float dpi = static_cast<float>(GetDpiForSystem());
+    D2D1_BITMAP_PROPERTIES1 bitmapProps = D2D1::BitmapProperties1(
+        D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW,
+        D2D1::PixelFormat(DXGI_FORMAT_R8G8B8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED),
+        dpi, dpi
+    );
+
+
+    for (UINT i = 0; i < bufferCount; i++) {
+        winrt::com_ptr<ID3D12Resource> backBuffer;
+        swapchain->GetBuffer(i, IID_PPV_ARGS(backBuffer.put()));
+        
+        // Create RTV
+        d3d12Device5->CreateRenderTargetView(backBuffer.get(), nullptr, rtvHandle);
+        frameContexts[i].main_render_target_descriptor = rtvHandle;
+        frameContexts[i].main_render_target_resource = backBuffer;
+        frameContexts[i].commandAllocator = allocator; // Share allocator
+        rtvHandle.ptr += rtvDescriptorSize;
+        
+        // Create wrapped D3D11 resource
+        D3D11_RESOURCE_FLAGS d3d11Flags = { D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE };
+        d3d11On12Device->CreateWrappedResource(
+            backBuffer.get(), &d3d11Flags,
+            D3D12_RESOURCE_STATE_RENDER_TARGET,
+            D3D12_RESOURCE_STATE_PRESENT,
+            IID_PPV_ARGS(D3D11Resources[i].put())
+        );
+        
+        // Get DXGI surface
+        D3D11Resources[i]->QueryInterface(IID_PPV_ARGS(DXGISurfaces[i].put()));
+        
+        // Create D2D bitmap
+        D2D::context->CreateBitmapFromDxgiSurface(DXGISurfaces[i].get(), bitmapProps, D2D1Bitmaps[i].put());
+        
+        // Note: We don't release backBuffer here because frameContexts[i].main_render_target_resource holds a reference
+    }
+    
+    // Initialize ImGui for DX12
+    if (!initImgui && !imguiCleanupInProgress) {
+        // Wait for any ongoing cleanup to complete
+        while (imguiCleanupInProgress) {
+            Sleep(1);
+        }
+        
+        if (!ImGui::GetCurrentContext()) {
+            ImGui::CreateContext();
+        }
+        
+        // Check if Win32 backend is already initialized
+        auto& io = ImGui::GetIO();
+        if (!io.BackendPlatformUserData) {
+            ImGui_ImplWin32_Init(window2);
+        }
+        
+        // Modern ImGui D3D12 initialization
+        ImGui_ImplDX12_InitInfo initInfo = {};
+        initInfo.Device = d3d12Device5.get();
+        initInfo.CommandQueue = queue.get();
+        initInfo.NumFramesInFlight = bufferCount;
+        initInfo.RTVFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+        initInfo.DSVFormat = DXGI_FORMAT_UNKNOWN;
+        initInfo.SrvDescriptorHeap = d3d12DescriptorHeapImGuiRender.get();
+        
+        // Set up descriptor allocation callbacks
+        initInfo.SrvDescriptorAllocFn = [](ImGui_ImplDX12_InitInfo* info, D3D12_CPU_DESCRIPTOR_HANDLE* out_cpu, D3D12_GPU_DESCRIPTOR_HANDLE* out_gpu) {
+            std::lock_guard<std::mutex> lock(descriptorAllocationMutex);
+            
+            UINT handle_increment = d3d12Device5->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+            
+            D3D12_CPU_DESCRIPTOR_HANDLE cpu = d3d12DescriptorHeapImGuiRender->GetCPUDescriptorHandleForHeapStart();
+            D3D12_GPU_DESCRIPTOR_HANDLE gpu = d3d12DescriptorHeapImGuiRender->GetGPUDescriptorHandleForHeapStart();
+            
+            *out_cpu = cpu;
+            *out_gpu = gpu;
+        };
+        
+        initInfo.SrvDescriptorFreeFn = [](ImGui_ImplDX12_InitInfo* info, D3D12_CPU_DESCRIPTOR_HANDLE cpu, D3D12_GPU_DESCRIPTOR_HANDLE gpu) {
+            // No-op for persistent font descriptor
+        };
+        
+        // Check if DX12 backend is already initialized
+        if (!io.BackendRendererUserData) {
+            if (!ImGui_ImplDX12_Init(&initInfo)) {
+                Logger::error("Failed to initialize ImGui DX12 backend");
+                return;
+            }
+        }
+        initImgui = true;
+    }
+    
+    // Cleanup temporary resources
+    Memory::SafeRelease(d2dDevice);
+    Memory::SafeRelease(dxgiDevice);
+    Memory::SafeRelease(d2dFactory);
+    
+    // Initialize blur and motion blur
+    Blur::InitializePipeline();
+    
+    // Reset frame counter for clearing
+    dx12FrameCount = 0;
+    
+    init = true;
 }
 
 void SwapchainHook::DX11Render(bool underui) {
+    if (!D2D::context || !context.get()) return;
 
+    // Handle blur if needed
     DX11Blur();
-
+    
+    // Save backbuffer for effects
     SaveBackbuffer(underui);
 
-    if (!D2D::context) return;
+    // Use static cached RTV from header
+    static UINT lastBufferWidth = 0, lastBufferHeight = 0;
+    
+    // Get current backbuffer dimensions using smart pointer to ensure proper cleanup
+    winrt::com_ptr<ID3D11Texture2D> backBuffer;
+    if (FAILED(swapchain->GetBuffer(0, IID_PPV_ARGS(backBuffer.put())))) {
+        return;
+    }
+    
+    D3D11_TEXTURE2D_DESC desc;
+    backBuffer->GetDesc(&desc);
+    
+    // Only recreate RTV if dimensions changed
+    if (!cachedDX11RTV.get() || desc.Width != lastBufferWidth || desc.Height != lastBufferHeight) {
+        cachedDX11RTV = nullptr;
+        if (FAILED(d3d11Device->CreateRenderTargetView(backBuffer.get(), nullptr, cachedDX11RTV.put()))) {
+            return;
+        }
+        lastBufferWidth = desc.Width;
+        lastBufferHeight = desc.Height;
+    }
 
+    // Save current render state
+    ID3D11RenderTargetView* originalRTVs[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT] = { nullptr };
+    ID3D11DepthStencilView* originalDSV = nullptr;
+    context->OMGetRenderTargets(D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT, originalRTVs, &originalDSV);
+
+    // Begin D2D drawing
     D2D::context->BeginDraw();
 
-    ID3D11RenderTargetView *mainRenderTargetView = nullptr;
-    ID3D11Texture2D *pBackBuffer = nullptr;
+    // ImGui frame
+    ImGui_ImplDX11_NewFrame();
+    ImGui_ImplWin32_NewFrame();
+    ImGui::NewFrame();
+    
+    ImGui::Begin("t", nullptr, 
+        ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | 
+        ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground | 
+        ImGuiWindowFlags_NoDecoration);
 
-    ID3D11RenderTargetView* originalRenderTargetViews[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT] = { nullptr };
-    UINT numRenderTargets = D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT;
-    ID3D11DepthStencilView* originalDepthStencilView = nullptr;
-    context->OMGetRenderTargets(numRenderTargets, originalRenderTargetViews, &originalDepthStencilView);
+    // Trigger render events
+    if (!underui) {
+        auto event = nes::make_holder<RenderEvent>();
+        event->RTV = cachedDX11RTV.get();
+        eventMgr.trigger(event);
+    } else {
+        auto event = nes::make_holder<RenderUnderUIEvent>();
+        event->RTV = cachedDX11RTV.get();
+        eventMgr.trigger(event);
+    }
 
-
-
-
-    if (context) {
-
-        if (SUCCEEDED(swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID *) &pBackBuffer))) {
-
-            if (SUCCEEDED(d3d11Device->CreateRenderTargetView(pBackBuffer, nullptr, &mainRenderTargetView))) {
-
-                ImGui_ImplDX11_NewFrame();
-                ImGui_ImplWin32_NewFrame();
-
-                ImGui::NewFrame();
-                ImGui::Begin("t", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration);
-
-
-
-                if (!underui) {
-
-                    auto event = nes::make_holder<RenderEvent>();
-                    event->RTV = mainRenderTargetView;
-                    eventMgr.trigger(event);
-                } else {
-
-                    auto event = nes::make_holder<RenderUnderUIEvent>();
-                    event->RTV = mainRenderTargetView;
-                    eventMgr.trigger(event);
-
-                }
-
-
-                if (!first && SwapchainHook::init && ModuleManager::getModule("ClickGUI")) {
-                    FlarialGUI::Notify(
-                            "Click " + ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
-                                    "keybind")->value + " to open the menu in-game.");
-
-                    FlarialGUI::Notify("Join our discord! https://flarial.xyz/discord");
-                    first = true;
-                }
-
-                D2D::context->EndDraw();
-
-                ImGui::End();
-                ImGui::EndFrame();
-                SDK::drawTextQueue2 = SDK::drawTextQueue;
-                SDK::drawTextQueue.clear();
-                ImGui::Render();
-
-                context->OMSetRenderTargets(1, &mainRenderTargetView, originalDepthStencilView);
-                ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-                //context->Flush();
-            }
+    // First-time notifications
+    static bool notificationsShown = false;
+    if (!notificationsShown && SwapchainHook::init) {
+        if (auto clickGUI = ModuleManager::getModule("ClickGUI")) {
+            FlarialGUI::Notify("Click " + 
+                clickGUI->settings.getSettingByName<std::string>("keybind")->value + 
+                " to open the menu in-game.");
+            FlarialGUI::Notify("Join our discord! https://flarial.xyz/discord");
+            notificationsShown = true;
         }
     }
 
-    if (pBackBuffer) pBackBuffer->Release();
+    // End D2D drawing
+    D2D::context->EndDraw();
 
-    if (mainRenderTargetView) mainRenderTargetView->Release();
+    // End ImGui frame
+    ImGui::End();
+    ImGui::EndFrame();
+    ImGui::Render();
 
-    context->OMSetRenderTargets(numRenderTargets, originalRenderTargetViews, originalDepthStencilView);
+    // Render ImGui draw data
+    ID3D11RenderTargetView* rtvPtr = cachedDX11RTV.get();
+    context->OMSetRenderTargets(1, &rtvPtr, originalDSV);
+    ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
-    if (originalDepthStencilView) originalDepthStencilView->Release();
-    for (UINT i = 0; i < numRenderTargets; ++i) {
-        if (originalRenderTargetViews[i]) originalRenderTargetViews[i]->Release();
+    // Restore original render targets
+    bool allValid = true;
+    for (auto & originalRTV : originalRTVs) {
+        if (originalRTV == nullptr) {
+            allValid = false;
+        }
     }
 
+    if (allValid)
+    context->OMSetRenderTargets(D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT, originalRTVs, originalDSV);
+
+    // Release references
+    Memory::SafeRelease(originalDSV);
+    for (auto & originalRTV : originalRTVs) {
+        Memory::SafeRelease(originalRTV);
+    }
+    // backBuffer is automatically released by winrt::com_ptr destructor
 }
 
 
 void SwapchainHook::DX12Render(bool underui) {
-    currentBitmap = (int) swapchain->GetCurrentBackBufferIndex();
-
-
-    ID3D12Fence* fence;
-
-    UINT64 fenceValue = 0;
-    d3d12Device5->CreateFence(fenceValue, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
-
-    ID3D11Resource *resource = D3D11Resources[currentBitmap];
+    if (!D2D::context || !d3d11On12Device.get() || !isDX12) return;
+    
+    currentBitmap = swapchain->GetCurrentBackBufferIndex();
+    
+    // Acquire wrapped resources
+    ID3D11Resource* resource = D3D11Resources[currentBitmap].get();
     d3d11On12Device->AcquireWrappedResources(&resource, 1);
-    if (!D2D::context) return;
-    SaveBackbuffer();
-    D2D::context->SetTarget(D2D1Bitmaps[currentBitmap]);
+    
+    // Set D2D render target
+    D2D::context->SetTarget(D2D1Bitmaps[currentBitmap].get());
     MC::windowSize = Vec2(D2D::context->GetSize().width, D2D::context->GetSize().height);
-
+    
+    // Save backbuffer and handle blur
+    SaveBackbuffer();
     DX12Blur();
-
-
+    
+    // Begin D2D drawing
     D2D::context->BeginDraw();
+    
+    // Begin ImGui frame
+    ImGui_ImplDX12_NewFrame();
+    ImGui_ImplWin32_NewFrame();
+    ImGui::NewFrame();
+    
+    ImGui::Begin("t", nullptr, 
+        ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | 
+        ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground | 
+        ImGuiWindowFlags_NoDecoration);
+    
+    // Create RTV for events (cache per buffer)
+    if (cachedDX12RTVs.size() != bufferCount) {
 
-
-    DXGI_SWAP_CHAIN_DESC sdesc;
-    swapchain->GetDesc(&sdesc);
-
-    buffersCounts = sdesc.BufferCount;
-    frameContexts.resize(buffersCounts);
-
-    D3D12_DESCRIPTOR_HEAP_DESC descriptorImGuiRender = {};
-    descriptorImGuiRender.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-    descriptorImGuiRender.NumDescriptors = TOTAL_CONSOLIDATED_DESCRIPTORS; // Consolidated heap for ImGui + Images
-    descriptorImGuiRender.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-
-    if (d3d12DescriptorHeapImGuiRender or SUCCEEDED(d3d12Device5->CreateDescriptorHeap(&descriptorImGuiRender,
-                                                                                       IID_PPV_ARGS(
-                                                                                               &d3d12DescriptorHeapImGuiRender)))) {
-
-        if (!allocator) d3d12Device5->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&allocator));
-
-        for (size_t i = 0; i < buffersCounts; i++) {
-            frameContexts[i].commandAllocator = allocator;
-        };
-
-        if (!d3d12CommandList)
-            d3d12Device5->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, allocator, NULL,
-                                            IID_PPV_ARGS(&d3d12CommandList));
-        if (d3d12CommandList) {
-
-            D3D12_DESCRIPTOR_HEAP_DESC descriptorBackBuffers;
-            descriptorBackBuffers.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
-            descriptorBackBuffers.NumDescriptors = buffersCounts;
-            descriptorBackBuffers.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-            descriptorBackBuffers.NodeMask = 1;
-
-            if (SUCCEEDED(d3d12Device5->CreateDescriptorHeap(&descriptorBackBuffers,
-                                                             IID_PPV_ARGS(&d3d12DescriptorHeapBackBuffers)))) {
-
-                const auto rtvDescriptorSize = d3d12Device5->GetDescriptorHandleIncrementSize(
-                        D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-                D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = d3d12DescriptorHeapBackBuffers->GetCPUDescriptorHandleForHeapStart();
-
-                for (size_t i = 0; i < buffersCounts; i++) {
-                    ID3D12Resource *pBackBuffer = nullptr;
-
-                    frameContexts[i].main_render_target_descriptor = rtvHandle;
-                    swapchain->GetBuffer(i, IID_PPV_ARGS(&pBackBuffer));
-                    d3d12Device5->CreateRenderTargetView(pBackBuffer, nullptr, rtvHandle);
-                    frameContexts[i].main_render_target_resource = pBackBuffer;
-                    rtvHandle.ptr += rtvDescriptorSize;
-
-                    pBackBuffer->Release();
-                };
-
-                if (!initImgui) {
-                    initImgui = true;
-
-                    ImGui::CreateContext();
-
-                    ImGui_ImplWin32_Init(window2);
-
-                    // Set up modern ImGui D3D12 initialization with consolidated descriptor heap
-                    ImGui_ImplDX12_InitInfo init_info = {};
-                    init_info.Device = d3d12Device5;
-                    init_info.CommandQueue = queue;
-                    init_info.NumFramesInFlight = buffersCounts;
-                    init_info.RTVFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
-                    init_info.DSVFormat = DXGI_FORMAT_UNKNOWN;
-                    init_info.SrvDescriptorHeap = d3d12DescriptorHeapImGuiRender;
-                    
-                    // Set up descriptor allocation callbacks for consolidated heap
-                    init_info.SrvDescriptorAllocFn = [](ImGui_ImplDX12_InitInfo* info, D3D12_CPU_DESCRIPTOR_HANDLE* out_cpu_handle, D3D12_GPU_DESCRIPTOR_HANDLE* out_gpu_handle) {
-                        std::lock_guard<std::mutex> lock(descriptorAllocationMutex);
-                        
-                        // ImGui font descriptor is always allocated at index 0 (reserved)
-                        UINT fontDescriptorIndex = 0;
-                        UINT handle_increment = d3d12Device5->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-                        
-                        D3D12_CPU_DESCRIPTOR_HANDLE cpu = d3d12DescriptorHeapImGuiRender->GetCPUDescriptorHandleForHeapStart();
-                        cpu.ptr += (handle_increment * fontDescriptorIndex);
-                        
-                        D3D12_GPU_DESCRIPTOR_HANDLE gpu = d3d12DescriptorHeapImGuiRender->GetGPUDescriptorHandleForHeapStart();
-                        gpu.ptr += (handle_increment * fontDescriptorIndex);
-                        
-                        *out_cpu_handle = cpu;
-                        *out_gpu_handle = gpu;
-                        
-                        Logger::custom(fg(fmt::color::green), "DescriptorAlloc", "Allocated ImGui font descriptor at reserved index {}", fontDescriptorIndex);
-                    };
-                    
-                    init_info.SrvDescriptorFreeFn = [](ImGui_ImplDX12_InitInfo* info, D3D12_CPU_DESCRIPTOR_HANDLE cpu_handle, D3D12_GPU_DESCRIPTOR_HANDLE gpu_handle) {
-                        // ImGui font descriptor is persistent, no need to free
-                        Logger::custom(fg(fmt::color::cyan), "DescriptorFree", "ImGui font descriptor freed (no-op)");
-                    };
-
-                    if (!ImGui_ImplDX12_Init(&init_info)) {
-                        Logger::custom(fg(fmt::color::red), "ImGui", "ERROR: Failed to initialize ImGui DX12 backend with consolidated heap");
-                    } else {
-                        Logger::custom(fg(fmt::color::green), "ImGui", "ImGui DX12 backend initialized successfully with consolidated heap");
-                    }
-                }
-
-                ImGui_ImplDX12_NewFrame();
-                ImGui_ImplWin32_NewFrame();
-                ImGui::NewFrame();
-
-                ImGui::Begin("t", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration);
-
-                ID3D11Texture2D *buffer2D = nullptr;
-                D3D11Resources[currentBitmap]->QueryInterface(IID_PPV_ARGS(&buffer2D));
-
-                ID3D11RenderTargetView *mainRenderTargetView;
-                d3d11Device->CreateRenderTargetView(buffer2D, NULL, &mainRenderTargetView);
-
-                if (!underui) {
-
-                    auto event = nes::make_holder<RenderEvent>();
-                    event->RTV = mainRenderTargetView;
-                    eventMgr.trigger(event);
-
-                } else {
-
-                    auto event = nes::make_holder<RenderUnderUIEvent>();
-                    event->RTV = mainRenderTargetView;
-                    eventMgr.trigger(event);
-
-                }
-
-                if (!first && SwapchainHook::init && ModuleManager::getModule("ClickGUI")) {
-                    FlarialGUI::Notify(
-                            "Click " + ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
-                                    "keybind")->value + " to open the menu in-game.");
-                    FlarialGUI::Notify("Join our discord! https://flarial.xyz/discord");
-                    first = true;
-                }
-
-
-                D2D::context->EndDraw();
-
-                D2D::context->SetTarget(nullptr);
-
-                d3d11On12Device->ReleaseWrappedResources(&resource, 1);
-
-                context->Flush();
-
-                frameContexts[currentBitmap].commandAllocator->Reset();;
-
-                D3D12_RESOURCE_BARRIER barrier;
-                barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-                barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-                barrier.Transition.pResource = frameContexts[currentBitmap].main_render_target_resource;
-                barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-                barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
-                barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-                d3d12CommandList->ResourceBarrier(1, &barrier);
-
-                d3d12CommandList->Reset(frameContexts[swapchain->GetCurrentBackBufferIndex()].commandAllocator,
-                                        nullptr);
-                d3d12CommandList->ResourceBarrier(1, &barrier);
-                d3d12CommandList->OMSetRenderTargets(1,
-                                                     &frameContexts[currentBitmap].main_render_target_descriptor,
-                                                     FALSE, nullptr);
-                // Bind consolidated descriptor heap (contains both ImGui and image descriptors)
-                d3d12CommandList->SetDescriptorHeaps(1, &d3d12DescriptorHeapImGuiRender);
-                
-                static bool loggedOnce = false;
-                if (!loggedOnce) {
-                    loggedOnce = true;
-                    Logger::custom(fg(fmt::color::green), "D3D12Render", "Using consolidated descriptor heap for Intel GPU compatibility");
-                    Logger::custom(fg(fmt::color::cyan), "D3D12Render", "Consolidated heap: 0x{:X}, Total descriptors: {}", 
-                                   reinterpret_cast<uintptr_t>(d3d12DescriptorHeapImGuiRender), TOTAL_CONSOLIDATED_DESCRIPTORS);
-                }
-
-                ImGui::End();
-                ImGui::EndFrame();
-                SDK::drawTextQueue2 = SDK::drawTextQueue;
-                SDK::drawTextQueue.clear();
-                ImGui::Render();
-
-                ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), d3d12CommandList);
-
-                barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-                barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
-
-                d3d12CommandList->ResourceBarrier(1, &barrier);
-                d3d12CommandList->Close();
-
-                queue->ExecuteCommandLists(1, reinterpret_cast<ID3D12CommandList *const *>(&d3d12CommandList));
-
-                UINT64 currentFenceValue = ++fenceValue;
-                queue->Signal(fence, currentFenceValue);
-                if (fence->GetCompletedValue() < currentFenceValue) {
-                    fence->SetEventOnCompletion(currentFenceValue, fenceEvent);
-                    WaitForSingleObject(fenceEvent, INFINITE);
-                }
-
-                Memory::SafeRelease(mainRenderTargetView);
-                Memory::SafeRelease(buffer2D);
-                Memory::SafeRelease(fence);
-            }
+        for (auto rtv : cachedDX12RTVs) {
+            rtv = nullptr;
+        }
+        cachedDX12RTVs.resize(bufferCount, nullptr);
+    }
+    
+    if (!cachedDX12RTVs[currentBitmap].get()) {
+        {
+            winrt::com_ptr<ID3D11Texture2D> buffer2D;
+            D3D11Resources[currentBitmap]->QueryInterface(IID_PPV_ARGS(buffer2D.put()));
+            d3d11Device->CreateRenderTargetView(buffer2D.get(), nullptr, cachedDX12RTVs[currentBitmap].put());
         }
     }
-
-    if (d3d12DescriptorHeapBackBuffers) {
-        d3d12DescriptorHeapBackBuffers->Release();
-        d3d12DescriptorHeapBackBuffers = nullptr;
+    
+    // Trigger render events
+    if (!underui) {
+        auto event = nes::make_holder<RenderEvent>();
+        event->RTV = cachedDX12RTVs[currentBitmap].get();
+        eventMgr.trigger(event);
+    } else {
+        auto event = nes::make_holder<RenderUnderUIEvent>();
+        event->RTV = cachedDX12RTVs[currentBitmap].get();
+        eventMgr.trigger(event);
     }
-
-    if (!frameContexts.empty() && frameContexts.front().commandAllocator != nullptr) {
-        frameContexts.front().commandAllocator = nullptr;
+    
+    // First-time notifications
+    static bool notificationsShown = false;
+    if (!notificationsShown && SwapchainHook::init) {
+        if (auto clickGUI = ModuleManager::getModule("ClickGUI")) {
+            FlarialGUI::Notify("Click " + 
+                clickGUI->settings.getSettingByName<std::string>("keybind")->value + 
+                " to open the menu in-game.");
+            FlarialGUI::Notify("Join our discord! https://flarial.xyz/discord");
+            notificationsShown = true;
+        }
     }
-
-    if (!frameContexts.empty() && frameContexts.front().main_render_target_resource != nullptr) {
-        frameContexts.front().main_render_target_resource->Release();
-        frameContexts.front().main_render_target_resource = nullptr;
+    
+    // End D2D drawing
+    D2D::context->EndDraw();
+    D2D::context->SetTarget(nullptr);
+    
+    // Release wrapped resources
+    d3d11On12Device->ReleaseWrappedResources(&resource, 1);
+    context->Flush();
+    
+    // Reset command allocator
+    frameContexts[currentBitmap].commandAllocator->Reset();
+    
+    // Reset command list
+    d3d12CommandList->Reset(frameContexts[currentBitmap].commandAllocator.get(), nullptr);
+    
+    // Transition resource to render target
+    D3D12_RESOURCE_BARRIER barrier = {};
+    barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+    barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+    barrier.Transition.pResource = frameContexts[currentBitmap].main_render_target_resource.get();
+    barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+    barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+    barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+    
+    d3d12CommandList->ResourceBarrier(1, &barrier);
+    
+    // Set render target
+    d3d12CommandList->OMSetRenderTargets(1, 
+        &frameContexts[currentBitmap].main_render_target_descriptor,
+        FALSE, nullptr);
+    
+    // Clear render target on first few frames to avoid garbage data
+    if (dx12FrameCount < 5) {
+        const float clearColor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+        d3d12CommandList->ClearRenderTargetView(
+            frameContexts[currentBitmap].main_render_target_descriptor,
+            clearColor, 0, nullptr);
+        dx12FrameCount++;
     }
-
-    frameContexts.resize(0);
+    
+    // Set descriptor heap
+    ID3D12DescriptorHeap* heapPtr = d3d12DescriptorHeapImGuiRender.get();
+    d3d12CommandList->SetDescriptorHeaps(1, &heapPtr);
+    
+    // End ImGui frame and render
+    ImGui::End();
+    ImGui::EndFrame();
+    ImGui::Render();
+    
+    ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), d3d12CommandList.get());
+    
+    // Transition back to present
+    barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+    barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+    d3d12CommandList->ResourceBarrier(1, &barrier);
+    
+    // Close and execute command list
+    d3d12CommandList->Close();
+    ID3D12CommandList* cmdListPtr = d3d12CommandList.get();
+    queue->ExecuteCommandLists(1, &cmdListPtr);
+    
+    // Use cached fence for synchronization
+    if (!cachedDX12Fence.get()) {
+        d3d12Device5->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(cachedDX12Fence.put()));
+    }
+    
+    const UINT64 currentFenceValue = ++cachedDX12FenceValue;
+    queue->Signal(cachedDX12Fence.get(), currentFenceValue);
+    
+    // Wait if necessary
+    if (cachedDX12Fence->GetCompletedValue() < currentFenceValue) {
+        cachedDX12Fence->SetEventOnCompletion(currentFenceValue, fenceEvent);
+        WaitForSingleObject(fenceEvent, INFINITE);
+    }
 }
 
 void SwapchainHook::DX11Blur() {
+
 
     /* Blur Stuff */
     prepareBlur();
@@ -818,7 +914,7 @@ void SwapchainHook::Fonts() {
             // Use a static frame counter to defer expensive device object recreation
             static int frameDelay = 0;
             if (++frameDelay >= 3) { // Wait 3 frames to batch multiple font loads
-                if (!queue) {
+                if (!isDX12) {
                     ImGui_ImplDX11_InvalidateDeviceObjects();
                     ImGui_ImplDX11_CreateDeviceObjects();
                 } else {
@@ -860,58 +956,63 @@ void SwapchainHook::FPSMeasure() {
 }
 
 
-ID3D11Texture2D *SwapchainHook::GetBackbuffer() {
+winrt::com_ptr<ID3D11Texture2D> SwapchainHook::GetBackbuffer() {
     return SavedD3D11BackBuffer;
 }
 
 void SwapchainHook::SaveBackbuffer(bool underui) {
 
-    Memory::SafeRelease(SavedD3D11BackBuffer);
-    Memory::SafeRelease(ExtraSavedD3D11BackBuffer);
-    if (!SwapchainHook::queue) {
+    SavedD3D11BackBuffer = nullptr;
+    ExtraSavedD3D11BackBuffer = nullptr;
+    if (!isDX12) {
 
-        SwapchainHook::swapchain->GetBuffer(0, IID_PPV_ARGS(&SavedD3D11BackBuffer));
+        SwapchainHook::swapchain->GetBuffer(0, IID_PPV_ARGS(SavedD3D11BackBuffer.put()));
 
         if (FlarialGUI::needsBackBuffer) {
 
-            if (!ExtraSavedD3D11BackBuffer) {
+            if (!ExtraSavedD3D11BackBuffer.get()) {
                 D3D11_TEXTURE2D_DESC textureDesc = {};
                 SavedD3D11BackBuffer->GetDesc(&textureDesc);
                 textureDesc.Usage = D3D11_USAGE_DEFAULT;
                 textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
                 textureDesc.CPUAccessFlags = 0;
 
-                SwapchainHook::d3d11Device->CreateTexture2D(&textureDesc, nullptr, &ExtraSavedD3D11BackBuffer);
+                SwapchainHook::d3d11Device->CreateTexture2D(&textureDesc, nullptr, ExtraSavedD3D11BackBuffer.put());
             }
 
             if (underui) {
 
                 if (UnderUIHooks::bgfxCtx->m_msaart) {
-                    context->ResolveSubresource(ExtraSavedD3D11BackBuffer, 0, UnderUIHooks::bgfxCtx->m_msaart, 0, DXGI_FORMAT_R8G8B8A8_UNORM);
+                    context->ResolveSubresource(ExtraSavedD3D11BackBuffer.get(), 0, UnderUIHooks::bgfxCtx->m_msaart, 0, DXGI_FORMAT_R8G8B8A8_UNORM);
                 } else {
-                    context->CopyResource(ExtraSavedD3D11BackBuffer, SavedD3D11BackBuffer);
+                    context->CopyResource(ExtraSavedD3D11BackBuffer.get(), SavedD3D11BackBuffer.get());
                 }
 
             } else {
-                context->CopyResource(ExtraSavedD3D11BackBuffer, SavedD3D11BackBuffer);
+                context->CopyResource(ExtraSavedD3D11BackBuffer.get(), SavedD3D11BackBuffer.get());
             }
         }
 
 
     }
     else {
-        HRESULT hr;
-
-        hr = D3D11Resources[currentBitmap]->QueryInterface(IID_PPV_ARGS(&SavedD3D11BackBuffer));
-        if (FAILED(hr)) std::cout << "Failed to query interface: " << std::hex << hr << std::endl;
-    }
+        {
+            winrt::com_ptr<ID3D11Texture2D> tempBackBuffer;
+            HRESULT hr = D3D11Resources[currentBitmap]->QueryInterface(IID_PPV_ARGS(tempBackBuffer.put()));
+            if (SUCCEEDED(hr)) {
+                SavedD3D11BackBuffer = tempBackBuffer;
+            } else {
+                std::cout << "Failed to query interface: " << std::hex << hr << std::endl;
+            }
+        }
+       }
 }
 
 // Consolidated descriptor heap management functions
 bool SwapchainHook::AllocateImageDescriptor(UINT imageId, D3D12_CPU_DESCRIPTOR_HANDLE* out_cpu_handle, D3D12_GPU_DESCRIPTOR_HANDLE* out_gpu_handle) {
     std::lock_guard<std::mutex> lock(descriptorAllocationMutex);
     
-    if (!d3d12DescriptorHeapImGuiRender || !d3d12Device5) {
+    if (!d3d12DescriptorHeapImGuiRender.get() || !d3d12Device5.get()) {
         Logger::custom(fg(fmt::color::red), "DescriptorAlloc", "ERROR: Consolidated descriptor heap or device not available");
         return false;
     }
@@ -958,159 +1059,4 @@ void SwapchainHook::ResetDescriptorAllocation() {
     
     nextAvailableDescriptorIndex = IMGUI_FONT_DESCRIPTORS; // Reset to start after ImGui font
     Logger::custom(fg(fmt::color::yellow), "DescriptorAlloc", "Reset descriptor allocation, next available index: {}", nextAvailableDescriptorIndex);
-}
-
-// PlayerHead Descriptor Management Functions
-
-bool SwapchainHook::AllocatePlayerHeadDescriptor(const std::string& playerName, D3D12_CPU_DESCRIPTOR_HANDLE* out_cpu_handle, D3D12_GPU_DESCRIPTOR_HANDLE* out_gpu_handle, UINT* out_descriptor_id) {
-    std::lock_guard<std::mutex> lock(playerHeadDescriptorMutex);
-    
-    if (!d3d12DescriptorHeapImGuiRender || !d3d12Device5) {
-        Logger::custom(fg(fmt::color::red), "PlayerHeadDescriptor", "ERROR: Descriptor heap or device not available");
-        return false;
-    }
-    
-    // Check if we already have a descriptor for this player
-    for (auto& [descriptorId, info] : playerHeadDescriptors) {
-        if (info.playerName == playerName && info.inUse) {
-            info.lastUsed = std::chrono::steady_clock::now();
-            
-            // Calculate descriptor handles - convert playerhead ID to heap index
-            UINT heapIndex = descriptorId - PLAYERHEAD_DESCRIPTOR_START + IMGUI_FONT_DESCRIPTORS + MAX_IMAGE_DESCRIPTORS;
-            
-            UINT handle_increment = d3d12Device5->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-            
-            D3D12_CPU_DESCRIPTOR_HANDLE cpu = d3d12DescriptorHeapImGuiRender->GetCPUDescriptorHandleForHeapStart();
-            cpu.ptr += (handle_increment * heapIndex);
-            
-            D3D12_GPU_DESCRIPTOR_HANDLE gpu = d3d12DescriptorHeapImGuiRender->GetGPUDescriptorHandleForHeapStart();
-            gpu.ptr += (handle_increment * heapIndex);
-            
-            *out_cpu_handle = cpu;
-            *out_gpu_handle = gpu;
-            *out_descriptor_id = descriptorId;
-            
-            Logger::custom(fg(fmt::color::green), "PlayerHeadDescriptor", "Reusing descriptor {} (heap index {}) for player '{}'", descriptorId, heapIndex, playerName);
-            return true;
-        }
-    }
-    
-    UINT descriptorId;
-    
-    // Try to reuse a freed descriptor first
-    if (!freePlayerHeadDescriptors.empty()) {
-        descriptorId = freePlayerHeadDescriptors.front();
-        freePlayerHeadDescriptors.pop();
-        Logger::custom(fg(fmt::color::cyan), "PlayerHeadDescriptor", "Reusing freed descriptor {} for player '{}'", descriptorId, playerName);
-    } else {
-        // Allocate new descriptor
-        static bool initialized = false;
-        if (!initialized) {
-            nextPlayerHeadDescriptorId = PLAYERHEAD_DESCRIPTOR_START;
-            initialized = true;
-        }
-        
-        if (nextPlayerHeadDescriptorId >= PLAYERHEAD_DESCRIPTOR_END) {
-            Logger::custom(fg(fmt::color::red), "PlayerHeadDescriptor", "ERROR: No more playerhead descriptors available (reached limit of {})", MAX_PLAYERHEAD_DESCRIPTORS);
-            return false;
-        }
-        
-        descriptorId = nextPlayerHeadDescriptorId++;
-        Logger::custom(fg(fmt::color::blue), "PlayerHeadDescriptor", "Allocating new descriptor {} for player '{}'", descriptorId, playerName);
-    }
-    
-    // Calculate descriptor handles - convert playerhead ID to heap index
-    UINT heapIndex = descriptorId - PLAYERHEAD_DESCRIPTOR_START + IMGUI_FONT_DESCRIPTORS + MAX_IMAGE_DESCRIPTORS;
-    
-    if (heapIndex >= TOTAL_CONSOLIDATED_DESCRIPTORS) {
-        Logger::custom(fg(fmt::color::red), "PlayerHeadDescriptor", "ERROR: Calculated heap index {} exceeds total descriptors {} (descriptor ID {})", heapIndex, TOTAL_CONSOLIDATED_DESCRIPTORS, descriptorId);
-        return false;
-    }
-    
-    Logger::custom(fg(fmt::color::cyan), "PlayerHeadDescriptor", "Using descriptor {} -> heap index {} for player '{}'", descriptorId, heapIndex, playerName);
-    
-    UINT handle_increment = d3d12Device5->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-    
-    D3D12_CPU_DESCRIPTOR_HANDLE cpu = d3d12DescriptorHeapImGuiRender->GetCPUDescriptorHandleForHeapStart();
-    cpu.ptr += (handle_increment * heapIndex);
-    
-    D3D12_GPU_DESCRIPTOR_HANDLE gpu = d3d12DescriptorHeapImGuiRender->GetGPUDescriptorHandleForHeapStart();
-    gpu.ptr += (handle_increment * heapIndex);
-    
-    // Store descriptor info
-    playerHeadDescriptors[descriptorId] = {
-        playerName,
-        std::chrono::steady_clock::now(),
-        true
-    };
-    
-    *out_cpu_handle = cpu;
-    *out_gpu_handle = gpu;
-    *out_descriptor_id = descriptorId;
-    
-    return true;
-}
-
-void SwapchainHook::FreePlayerHeadDescriptor(UINT descriptorId) {
-    std::lock_guard<std::mutex> lock(playerHeadDescriptorMutex);
-    
-    auto it = playerHeadDescriptors.find(descriptorId);
-    if (it != playerHeadDescriptors.end()) {
-        Logger::custom(fg(fmt::color::yellow), "PlayerHeadDescriptor", "Freeing descriptor {} for player '{}'", descriptorId, it->second.playerName);
-        it->second.inUse = false;
-        freePlayerHeadDescriptors.push(descriptorId);
-        playerHeadDescriptors.erase(it);
-    }
-}
-
-void SwapchainHook::CleanupOldPlayerHeads(size_t maxCached) {
-    std::lock_guard<std::mutex> lock(playerHeadDescriptorMutex);
-    
-    if (playerHeadDescriptors.size() <= maxCached) {
-        return; // No need to cleanup
-    }
-    
-    // Collect descriptors sorted by last used time
-    std::vector<std::pair<UINT, std::chrono::steady_clock::time_point>> descriptorAges;
-    for (const auto& [descriptorId, info] : playerHeadDescriptors) {
-        if (info.inUse) {
-            descriptorAges.emplace_back(descriptorId, info.lastUsed);
-        }
-    }
-    
-    // Sort by oldest first
-    std::sort(descriptorAges.begin(), descriptorAges.end(),
-        [](const auto& a, const auto& b) {
-            return a.second < b.second;
-        });
-    
-    // Free oldest descriptors to get under the limit
-    size_t toRemove = playerHeadDescriptors.size() - maxCached;
-    size_t removed = 0;
-    
-    for (const auto& [descriptorId, _] : descriptorAges) {
-        if (removed >= toRemove) break;
-        
-        auto it = playerHeadDescriptors.find(descriptorId);
-        if (it != playerHeadDescriptors.end()) {
-            Logger::custom(fg(fmt::color::orange), "PlayerHeadDescriptor", "Cleaning up old descriptor {} for player '{}'", descriptorId, it->second.playerName);
-            freePlayerHeadDescriptors.push(descriptorId);
-            playerHeadDescriptors.erase(it);
-            removed++;
-        }
-    }
-    
-    Logger::custom(fg(fmt::color::green), "PlayerHeadDescriptor", "Cleaned up {} old playerhead descriptors, {} remaining", removed, playerHeadDescriptors.size());
-}
-
-void SwapchainHook::ResetPlayerHeadDescriptors() {
-    std::lock_guard<std::mutex> lock(playerHeadDescriptorMutex);
-    
-    playerHeadDescriptors.clear();
-    while (!freePlayerHeadDescriptors.empty()) {
-        freePlayerHeadDescriptors.pop();
-    }
-    nextPlayerHeadDescriptorId = PLAYERHEAD_DESCRIPTOR_START;
-    
-    Logger::custom(fg(fmt::color::cyan), "PlayerHeadDescriptor", "Reset all playerhead descriptors");
 }
