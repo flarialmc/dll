@@ -225,18 +225,6 @@ void TabList::CleanupOldPlayerHeads(size_t maxCached) {
     Logger::custom(fg(fmt::color::green), "PlayerHeadDescriptor", "Cleaned up {} old playerhead descriptors, {} remaining", removed, playerHeadDescriptors.size());
 }
 
-void TabList::ResetPlayerHeadDescriptors() {
-    std::lock_guard<std::mutex> lock(playerHeadDescriptorMutex);
-
-    playerHeadDescriptors.clear();
-    while (!freePlayerHeadDescriptors.empty()) {
-        freePlayerHeadDescriptors.pop();
-    }
-    nextPlayerHeadDescriptorId = PLAYERHEAD_DESCRIPTOR_START;
-
-    Logger::custom(fg(fmt::color::cyan), "PlayerHeadDescriptor", "Reset all playerhead descriptors");
-}
-
 void InitializeDX12Uploader() {
     if (g_uploadQueueDX12 || !SwapchainHook::d3d12Device5) {
         return;
@@ -399,12 +387,35 @@ void CleanupPlayerHeadTextures() {
 
     // Clear DX11 textures
     g_playerHeadTexturesDX11.clear();
-
-    // Reset the playerhead descriptor system
-    TabList::ResetPlayerHeadDescriptors();
 }
 
-// Worker thread function for processing image data (no D3D operations)
+// Reset all TabList descriptor state - called during swapchain recreation
+void TabList::ResetDescriptorState() {
+    std::lock_guard<std::mutex> lock(playerHeadDescriptorMutex);
+
+    Logger::debug("TabList: Resetting descriptor state - clearing {} descriptors", playerHeadDescriptors.size());
+
+    // Clear all descriptor allocations
+    playerHeadDescriptors.clear();
+
+    // Clear the free descriptor queue
+    while (!freePlayerHeadDescriptors.empty()) {
+        freePlayerHeadDescriptors.pop();
+    }
+
+    // Reset the next descriptor ID to start
+    nextPlayerHeadDescriptorId = PLAYERHEAD_DESCRIPTOR_START;
+
+    // Clear all texture caches to force recreation
+    {
+        std::lock_guard<std::mutex> textureLock(g_playerHeadMutex);
+        g_playerHeadTextures.clear();
+        g_playerHeadTexturesDX11.clear();
+    }
+
+    Logger::debug("TabList: Descriptor state reset complete");
+}
+
 void PlayerHeadLoaderWorker() {
     while (!g_shouldStopLoading) {
         PlayerHeadLoadTask task;
@@ -418,33 +429,29 @@ void PlayerHeadLoaderWorker() {
 
             if (g_loadQueue.empty()) continue;
 
-            if (!g_loadQueue.front().imageData.size()) {
-                g_loadQueue.pop();
-                continue;
-            }
-
             task = std::move(g_loadQueue.front());
             g_loadQueue.pop();
         }
 
-        // Process the image data (CPU work only, no D3D operations)
-        // The data is already processed, so we just move it to the ready queue
+        if (logDebug) Logger::debug("Worker thread processing texture for player {}", task.playerName);
+
+        // Process the texture (scaling, etc.)
+        PlayerHeadReadyTexture ready;
+        ready.playerName = task.playerName;
+        ready.processedData = std::move(task.imageData);
+        ready.width = task.width;
+        ready.height = task.height;
+        ready.isDX12 = task.isDX12;
+
+        // Queue for main thread processing
         {
-            std::lock_guard<std::mutex> readyLock(g_readyQueueMutex);
-            g_readyQueue.push({
-                task.playerName,
-                std::move(task.imageData),
-                task.width,
-                task.height,
-                task.isDX12
-            });
+            std::lock_guard<std::mutex> lock(g_readyQueueMutex);
+            g_readyQueue.push(std::move(ready));
         }
-
-        if (logDebug) Logger::debug("Background thread processed playerhead data for {}", task.playerName);
     }
-}
 
-// Initialize async loading system
+    if (logDebug) Logger::debug("PlayerHead loader worker thread exiting");
+}
 void InitializeAsyncLoading() {
     if (!g_loaderThreads.empty()) return; // Already initialized
 
@@ -457,6 +464,8 @@ void InitializeAsyncLoading() {
 
     if (logDebug) Logger::debug("Initialized {} playerhead loader threads", NUM_LOADER_THREADS);
 }
+
+// Worker thread function for async loading
 
 // Process ready textures on main thread (called each frame)
 void ProcessReadyPlayerHeadTextures() {
@@ -1219,7 +1228,7 @@ void TabList::onRender(RenderEvent &event) {
                         textY + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * getOps<float>("uiscale"),
                         FlarialGUI::to_wide(SDK::clientInstance->getLocalPlayer()->getLevel()->getLevelData()->getLevelName()).c_str(), 0, keycardSize * 0.5f + Constraints::SpacingConstraint(0.70, keycardSize), DWRITE_TEXT_ALIGNMENT_CENTER, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, getColor("textShadow"), true);
 
-                FlarialGUI::FlarialTextWithFont(textX, textY, FlarialGUI::to_wide(cache_worldName).c_str(), 0, keycardSize * 0.5f + Constraints::SpacingConstraint(0.70, keycardSize), DWRITE_TEXT_ALIGNMENT_CENTER, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
+                FlarialGUI::FlarialTextWithFont(textX, textY, FlarialGUI::to_wide(SDK::clientInstance->getLocalPlayer()->getLevel()->getLevelData()->getLevelName()).c_str(), 0, keycardSize * 0.5f + Constraints::SpacingConstraint(0.70, keycardSize), DWRITE_TEXT_ALIGNMENT_CENTER, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
             }
             else realcenter.y -= keycardSize * 0.75f;
 
@@ -1590,3 +1599,4 @@ void TabList::onKey(const KeyEvent &event) {
 
     if (!getOps<bool>("togglable") && !this->isKeybind(event.keys)) this->active = false;
 }
+

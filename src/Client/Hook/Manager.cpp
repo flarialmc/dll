@@ -62,9 +62,6 @@ void HookManager::initialize() {
         Logger::debug("[Kiero] Trying d3d10");
     }
 
-    Logger::debug("Renderer: {}", dxVersion[kiero::getRenderType()]);
-
-
     addHook<KeyHook>();
     addHook<MouseHook>();
 

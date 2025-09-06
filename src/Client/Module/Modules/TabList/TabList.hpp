@@ -100,8 +100,10 @@ public:
     // PlayerHead descriptor management functions
     static bool AllocatePlayerHeadDescriptor(const std::string& playerName, D3D12_CPU_DESCRIPTOR_HANDLE* out_cpu_handle, D3D12_GPU_DESCRIPTOR_HANDLE* out_gpu_handle, UINT* out_descriptor_id);
     static void FreePlayerHeadDescriptor(UINT descriptorId);
-    static void CleanupOldPlayerHeads(size_t maxCached = 500);
-    static void ResetPlayerHeadDescriptors();
+    static void CleanupOldPlayerHeads(size_t maxCached = 50);
+
+    // Reset all TabList descriptor state - called during swapchain recreation
+    static void ResetDescriptorState();
 
     // PlayerHead descriptor management data
     struct PlayerHeadDescriptorInfo {

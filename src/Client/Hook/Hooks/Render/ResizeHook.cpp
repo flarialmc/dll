@@ -14,6 +14,7 @@
 #include "../../../../../lib/ImGui/imgui.h"
 #include "../../../Module/Modules/GuiScale/GuiScale.hpp"
 #include "Modules/MotionBlur/MotionBlur.hpp"
+#include "../../../Module/Modules/TabList/TabList.hpp"
 
 void ResizeHook::enableHook() {
     int index;
@@ -99,6 +100,18 @@ void ResizeHook::cleanShit(bool fullReset) {
     if (SwapchainHook::backBuffer) SwapchainHook::backBuffer = nullptr;
 
     // Ensure GPU has finished with work referencing old backbuffers
+    // Critical: Clean up descriptor heaps that are essential for ImGui image loading
+    if (SwapchainHook::d3d12DescriptorHeapImGuiRender) SwapchainHook::d3d12DescriptorHeapImGuiRender = nullptr;
+    if (SwapchainHook::d3d12DescriptorHeapBackBuffers) SwapchainHook::d3d12DescriptorHeapBackBuffers = nullptr;
+
+    // Reset TabList descriptor allocation state - CRITICAL for preventing image corruption
+    TabList::ResetDescriptorState();
+
+    // Clean up command allocators and command lists that can hold references
+    if (SwapchainHook::allocator) SwapchainHook::allocator = nullptr;
+    if (SwapchainHook::d3d12CommandList) SwapchainHook::d3d12CommandList = nullptr;
+    if (SwapchainHook::d3d12CommandQueue) SwapchainHook::d3d12CommandQueue = nullptr;
+
     if (SwapchainHook::d3d12Device5 && SwapchainHook::queue) {
         winrt::com_ptr<ID3D12Fence> fence;
         if (SUCCEEDED(SwapchainHook::d3d12Device5->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(fence.put())))) {
