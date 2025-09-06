@@ -2,32 +2,22 @@
 #include <winrt/base.h>
 #include <chrono>
 #include "../../../../../GUI/D2D.hpp"
-#include "../../../../../Events/Render/RenderEvent.hpp"
-#include "../../../../../Events/Render/RenderUnderUIEvent.hpp"
 #include "d2d1.h"
 #include "../../../../../Client.hpp"
-#include <d3d11on12.h>
 #include <algorithm>
-#include <codecvt>
 #include <windows.h>
 #include <unknwn.h>
 #include <iostream>
 #include <Psapi.h>
-#include <tlhelp32.h>
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_dx11.h>
 #include <imgui/imgui_impl_dx12.h>
-#include <imgui/imgui_impl_win32.h>
-#include <imgui/imgui_freetype.h>
 #include "unknwnbase.h"
 #include "UnderUIHooks.hpp"
 #include "CreateSwapchainForCoreWindowHook.hpp"
 #include "ResizeHook.hpp"
 using ::IUnknown;
-
-#include "../../../../../Module/Modules/MotionBlur/MotionBlur.hpp"
-#include "../../../../../../Assets/Assets.hpp"
 
 SwapchainHook::SwapchainHook() : Hook("swapchain_hook", 0) {}
 
