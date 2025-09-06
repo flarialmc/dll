@@ -36,6 +36,8 @@ private:
     std::string searchBarString;
     Module *ghostMainModule;
 
+    std::string lastmesg; // Using this to prevent double watermarks in messages
+
 public:
     static inline float baseHeightActual = 0.00001f;
     static inline float modcardOpacity = 1.f;
@@ -83,7 +85,7 @@ private:
     }
 
     static size_t sanitizedToRawIndex(std::string_view raw, size_t sanIdx);
-    static std::string& getMutableTextForWatermark(TextPacket& pkt);
+    // static std::string& getMutableTextForWatermark(TextPacket& pkt);
 
 public:
     void onPacketReceive(PacketEvent& event);
@@ -246,6 +248,14 @@ public:
     //void fov(FOVEvent& event);
 
     void onKey(KeyEvent &event) {
+
+        std::string& clickguiKey = getOps<std::string>("keybind");
+        if (!this->active && clickguiKey == "") {
+            clickguiKey = "k";
+            FlarialGUI::Notify("To change it to a different key, go to ClickGUI settings or use \'.bind <key>\'");
+            FlarialGUI::Notify("Your ClickGUI Keybind was unset, it has been reset to \'k\'.");
+        }
+
         //TODO: MAKE module->setActive() module->isActive() module->isRestricted()
         // #if !defined(__DEBUG__)
         if (SDK::getCurrentScreen() != "zoom_screen" &&

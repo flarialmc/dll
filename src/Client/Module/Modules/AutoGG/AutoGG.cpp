@@ -41,33 +41,30 @@ void AutoGG::onPacketReceive(PacketEvent& event) {
         auto* pkt = reinterpret_cast<SetTitlePacket*>(event.getPacket());
         static const std::regex rgxChRu(R"(Is The §6§l(Chronos|Rush) (Champion|Champions)!)");
         if (
-            //Zeqa
-            pkt->text == "§f§aYou won the game!" || //pre s8
-            pkt->text == "§f§cYou lost the game!" || //pre s8
-            pkt->text == "   " || //s8
-            pkt->text == "   " || //s8
-            //Galaxite CREDIT @1unar-Eclipse
+            // Zeqa
+            pkt->text == "§f§aYou won the game!" || // pre s8
+            pkt->text == "§f§cYou lost the game!" || // pre s8
+            pkt->text == "   " || // s8
+            pkt->text == "   " || // s8
+            // Galaxite
             pkt->text.find("Team§r§a won the game!") != std::string::npos ||
             pkt->text.find("§bHiders§r§f Win") != std::string::npos ||
             pkt->text.find("§eSeekers§r§f Win") != std::string::npos ||
             pkt->text == "Finished" ||
             pkt->text == "Out of Time!" ||
             std::regex_search(pkt->text, rgxChRu) ||
-            //Mineville
+            // Mineville
             pkt->text == "§aYou Win!" ||
-            pkt->text == "§cGame Over!") {
-
-            SendGG();
-            }
+            pkt->text == "§cGame Over!"
+        ) SendGG();
     }
 
     if (id == MinecraftPacketIds::Text) {
         auto* pkt = reinterpret_cast<TextPacket*>(event.getPacket());
-        if (pkt->message == "§c§l» §r§c§lGame OVER!" || //The Hive
-            pkt->message.find("§r§a won the game!") != std::string::npos || //CubeCraft
-            pkt->message.find("§a has won the game!") != std::string::npos) { //Lifeboat
-            SendGG();
-            }
+        if (pkt->message == "§c§l» §r§c§lGame OVER!" || // The Hive
+            pkt->message.find("§a won the game!") != std::string::npos || // CubeCraft
+            pkt->message.find("§a has won the game!") != std::string::npos // Lifeboat
+        ) SendGG();
     }
 }
 
@@ -78,7 +75,6 @@ void AutoGG::SendGG() {
         auto player = SDK::clientInstance->getLocalPlayer();
         std::shared_ptr<Packet> packet = SDK::createPacket(9);
         auto* text = reinterpret_cast<TextPacket*>(packet.get());
-
 
         text->type = TextPacketType::CHAT;
         text->message = win_message;
