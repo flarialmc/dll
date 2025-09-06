@@ -43,6 +43,8 @@ void BaseActorRendererRenderTextHook::drawLogo(ScreenContext* screenContext, con
         return;
     }
 
+    if (!SDK::clientInstance) return;
+
     if (!SDK::clientInstance->getMinecraftGame()->textureGroup) {
         return;
     }

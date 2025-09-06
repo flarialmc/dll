@@ -334,7 +334,7 @@ void CreateSwapchainForCoreWindowHook::hook(IDXGIFactory2 *pFactory) {
 
 #if defined(__DEBUG__)
     // Also hook D3D11 & D3D12 CreateDevice exports so we can enable debug layers BEFORE device creation
-    HookD3D11Exports();
-    HookD3D12Exports();
+    // HookD3D11Exports();
+    // HookD3D12Exports();
 #endif
 }
