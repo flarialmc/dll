@@ -67,6 +67,11 @@ std::string& ClickGUI::getMutableTextForWatermark(TextPacket& pkt) {
 */
 
 void ClickGUI::onPacketReceive(PacketEvent& event) {
+
+    if (!SDK::clientInstance) return;
+    if (!SDK::clientInstance->getLocalPlayer()) return;
+    if (!SDK::clientInstance->getLocalPlayer()->getLevel()) return;
+
     if (event.getPacket()->getId() != MinecraftPacketIds::Text) return;
     auto* pkt = reinterpret_cast<TextPacket*>(event.getPacket());
     if (pkt->message == " ") event.cancel(); // remove onix promotion on zeqa
