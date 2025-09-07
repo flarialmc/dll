@@ -43,7 +43,6 @@ void ResizeHook::cleanShit(bool fullReset) {
             CloseHandle(evt);
         }
     }
-
     if (fullReset || SwapchainHook::init) {
         FlarialGUI::hasLoadedAll = false;
         for (auto& [id, texture] : ImagesClass::ImguiDX12Textures) {
@@ -62,17 +61,50 @@ void ResizeHook::cleanShit(bool fullReset) {
 
         ImagesClass::ImguiDX11Images.clear();
 
+        for (auto& i : ClickGUIElements::images) {
+            Memory::SafeRelease(i.second);
+        }
+
+        for (auto& entry : FlarialGUI::cachedBitmaps) {
+            ID2D1Image* bitmap = entry.second;
+            Memory::SafeRelease(bitmap);
+        }
+
+        FlarialGUI::cachedBitmaps.clear();
+
+        ClickGUIElements::images.clear();
+
+        for (auto i : ImagesClass::eimages) {
+            Memory::SafeRelease(i.second);
+        }
+
+
+        ImagesClass::eimages.clear();
+
+        for (auto& i : ImagesClass::images) {
+            Memory::SafeRelease(i.second);
+        }
+
+        ImagesClass::images.clear();
+
+
         TabList::ResetDescriptorState();
         SwapchainHook::ResetDescriptorAllocation();
     }
 
-    SwapchainHook::context->ClearState();
-    SwapchainHook::context->Flush();
+
+    if (SwapchainHook::context)
+    {
+        SwapchainHook::context->ClearState();
+        SwapchainHook::context->Flush();
+    }
 
     std::vector<ID3D11Resource*> toRelease;
     toRelease.reserve(SwapchainHook::D3D11Resources.size());
     for (auto& res : SwapchainHook::D3D11Resources) toRelease.push_back(res.get());
     if (!toRelease.empty()) SwapchainHook::d3d11On12Device->ReleaseWrappedResources(toRelease.data(), static_cast<UINT>(toRelease.size()));
+
+    //SwapchainHook::d3d11On12Device = nullptr;
 
     SwapchainHook::swapchain = nullptr;
     SwapchainHook::SavedD3D11BackBuffer = nullptr;
@@ -109,8 +141,11 @@ void ResizeHook::cleanShit(bool fullReset) {
 
     SwapchainHook::D2D1Bitmap = nullptr;
 
-    D2D::context->SetTarget(nullptr);
-    D2D::context->Flush();
+    if (D2D::context)
+    {
+        D2D::context->SetTarget(nullptr);
+        D2D::context->Flush();
+    }
 
     SwapchainHook::backBuffer = nullptr;
     SwapchainHook::d3d12DescriptorHeapBackBuffers = nullptr;
@@ -118,27 +153,35 @@ void ResizeHook::cleanShit(bool fullReset) {
 
     SwapchainHook::dx12FrameCount = 0;
 
-    if (fullReset) {
-        Blur::pConstantBuffer = nullptr;
-        Blur::pSampler = nullptr;
-        Blur::pGaussianBlurHorizontalShader = nullptr;
-        Blur::pInputLayout = nullptr;
-        Blur::pGaussianBlurVerticalShader = nullptr;
-        Blur::pVertexBuffer = nullptr;
-        Blur::pVertexShader = nullptr;
-        Blur::pDepthStencilState = nullptr;
-        Blur::pBlendState = nullptr;
-        Blur::pRasterizerState = nullptr;
-        Blur::pIntermediateSRV1 = nullptr;
-        Blur::pIntermediateSRV2 = nullptr;
-        Blur::pIntermediateRTV1 = nullptr;
-        Blur::pIntermediateRTV2 = nullptr;
-        Blur::pIntermediateTexture1 = nullptr;
-        Blur::pIntermediateTexture2 = nullptr;
-    }
+    Blur::pConstantBuffer = nullptr;
+    Blur::pSampler = nullptr;
+    Blur::pGaussianBlurHorizontalShader = nullptr;
+    Blur::pInputLayout = nullptr;
+    Blur::pGaussianBlurVerticalShader = nullptr;
+    Blur::pVertexBuffer = nullptr;
+    Blur::pVertexShader = nullptr;
+    Blur::pDepthStencilState = nullptr;
+    Blur::pBlendState = nullptr;
+    Blur::pRasterizerState = nullptr;
+    Blur::pIntermediateSRV1 = nullptr;
+    Blur::pIntermediateSRV2 = nullptr;
+    Blur::pIntermediateRTV1 = nullptr;
+    Blur::pIntermediateRTV2 = nullptr;
+    Blur::pIntermediateTexture1 = nullptr;
+    Blur::pIntermediateTexture2 = nullptr;
 
-    SwapchainHook::context->ClearState();
-    SwapchainHook::context->Flush();
+    Memory::SafeRelease(FlarialGUI::blur);
+    Memory::SafeRelease(FlarialGUI::shadow_blur);
+    Memory::SafeRelease(FlarialGUI::blurbrush);
+    Memory::SafeRelease(FlarialGUI::screen_bitmap_cache);
+    Memory::SafeRelease(FlarialGUI::blur_bitmap_cache);
+
+    Memory::SafeRelease(SwapchainHook::D2D1Bitmap);
+
+    SwapchainHook::d3d11On12Device = nullptr;
+    SwapchainHook::context = nullptr;
+    SwapchainHook::d3d11Device = nullptr;
+    D2D::context = nullptr;
 
     if (fullReset) {
         if (ImGui::GetCurrentContext()) {
@@ -156,15 +199,11 @@ void ResizeHook::cleanShit(bool fullReset) {
             SwapchainHook::imguiCleanupInProgress = false;
         }
 
-        D2D::context = nullptr;
         SwapchainHook::d3d12CommandList = nullptr;
         SwapchainHook::allocator = nullptr;
         SwapchainHook::d3d12CommandQueue = nullptr;
         SwapchainHook::d3d12DescriptorHeapImGuiRender = nullptr;
         SwapchainHook::D3D12DescriptorHeap = nullptr;
-        SwapchainHook::d3d11On12Device = nullptr;
-        SwapchainHook::context = nullptr;
-        SwapchainHook::d3d11Device = nullptr;
         SwapchainHook::d3d12Device5 = nullptr;
 
         SwapchainHook::bufferCount = 0;

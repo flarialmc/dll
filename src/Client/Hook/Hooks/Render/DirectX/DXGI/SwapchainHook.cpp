@@ -395,17 +395,14 @@ void SwapchainHook::SaveBackbuffer(bool underui) {
 
 
     }
-    else {
+    else
         {
-            winrt::com_ptr<ID3D11Texture2D> tempBackBuffer;
-            HRESULT hr = D3D11Resources[currentBitmap]->QueryInterface(IID_PPV_ARGS(tempBackBuffer.put()));
-            if (SUCCEEDED(hr)) {
-                SavedD3D11BackBuffer = tempBackBuffer;
-            } else {
+            HRESULT hr = D3D11Resources[currentBitmap]->QueryInterface(IID_PPV_ARGS(SavedD3D11BackBuffer.put()));
+            if (FAILED(hr))
+            {
                 std::cout << "Failed to query interface: " << std::hex << hr << std::endl;
             }
         }
-       }
 }
 
 // End of SwapchainHook.cpp
