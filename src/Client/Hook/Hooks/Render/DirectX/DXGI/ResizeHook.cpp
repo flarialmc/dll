@@ -35,6 +35,55 @@ void ResizeHook::resizeCallback(IDXGISwapChain* pSwapChain, UINT bufferCount, UI
 }
 
 void ResizeHook::cleanShit(bool fullReset) {
+    // CRITICAL: Stop all rendering immediately to prevent access to resources being cleaned up
+    if (fullReset) {
+        // Force all modules to stop rendering
+        for (auto& module : ModuleManager::moduleMap) {
+            if (module.second->isEnabled()) {
+                module.second->active = false;
+            }
+        }
+        // Disable ClickGUI rendering immediately
+        auto clickGUI = ModuleManager::getModule("ClickGUI");
+        if (clickGUI && clickGUI->isEnabled()) {
+            clickGUI->active = false;
+        }
+    }
+
+    // Wait for GPU to finish ALL work before any cleanup when doing fullReset
+    if (fullReset && SwapchainHook::d3d12Device5 && SwapchainHook::queue) {
+        winrt::com_ptr<ID3D12Fence> fence;
+        if (SUCCEEDED(SwapchainHook::d3d12Device5->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(fence.put())))) {
+            const UINT64 value = 1;
+            HANDLE evt = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+            if (evt) {
+                SwapchainHook::queue->Signal(fence.get(), value);
+                if (fence->GetCompletedValue() < value) {
+                    fence->SetEventOnCompletion(value, evt);
+                    WaitForSingleObject(evt, 2000); // Increased timeout for full reset
+                }
+                CloseHandle(evt);
+            }
+        }
+    }
+
+    // CRITICAL: Clean up D2D resources FIRST before touching any other resources
+    if (D2D::context) {
+        D2D::context->SetTarget(nullptr);
+        D2D::context->Flush();
+        // Additional flush to ensure all deferred operations complete
+        D2D::context->Flush();
+    }
+
+    // Clean up D2D resources first to release references to backbuffer
+    if (SwapchainHook::D2D1Bitmap) SwapchainHook::D2D1Bitmap = nullptr;
+
+    for (auto& bitmap : SwapchainHook::D2D1Bitmaps) {
+        if (bitmap) bitmap = nullptr;
+    }
+    SwapchainHook::D2D1Bitmaps.clear();
+
+    // CRITICAL: Clear all image-related resources before D3D11On12 cleanup
     if (SwapchainHook::d3d11On12Device && !SwapchainHook::D3D11Resources.empty()) {
         std::vector<ID3D11Resource*> toRelease;
         toRelease.reserve(SwapchainHook::D3D11Resources.size());
@@ -78,19 +127,6 @@ void ResizeHook::cleanShit(bool fullReset) {
     }
     SwapchainHook::D3D11Resources.clear();
 
-    for (auto& bitmap : SwapchainHook::D2D1Bitmaps) {
-        if (bitmap) bitmap = nullptr;
-    }
-    SwapchainHook::D2D1Bitmaps.clear();
-
-    // Clean up D2D resources first to release references to backbuffer
-    if (SwapchainHook::D2D1Bitmap) SwapchainHook::D2D1Bitmap = nullptr;
-
-    if (D2D::context) {
-        D2D::context->SetTarget(nullptr);
-        D2D::context->Flush();
-    }
-
     // Clean up the backBuffer that holds a reference to the swapchain
     if (SwapchainHook::backBuffer) SwapchainHook::backBuffer = nullptr;
 
@@ -100,8 +136,8 @@ void ResizeHook::cleanShit(bool fullReset) {
     // Reset TabList descriptor allocation state - CRITICAL for preventing image corruption
     TabList::ResetDescriptorState();
 
-    // Wait for GPU to finish work before cleaning up command resources
-    if (SwapchainHook::d3d12Device5 && SwapchainHook::queue) {
+    // Wait for GPU to finish work before cleaning up command resources (for partial reset)
+    if (!fullReset && SwapchainHook::d3d12Device5 && SwapchainHook::queue) {
         winrt::com_ptr<ID3D12Fence> fence;
         if (SUCCEEDED(SwapchainHook::d3d12Device5->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(fence.put())))) {
             const UINT64 value = 1;
@@ -148,22 +184,41 @@ void ResizeHook::cleanShit(bool fullReset) {
     }
 
     if (fullReset) {
+        // CRITICAL: Clean up ImGui and image resources BEFORE cleaning up the underlying device
         if (ImGui::GetCurrentContext()) {
             SwapchainHook::imguiCleanupInProgress = true;
+
+            // Clear all ImGui fonts and textures first
             ImGui::GetIO().Fonts->Clear();
             FlarialGUI::FontMap.clear();
-            auto& ioEarly = ImGui::GetIO();
-            if (ioEarly.BackendPlatformUserData) ImGui_ImplWin32_Shutdown();
-            if (ioEarly.BackendRendererUserData) {
+
+            // Force ImGui to release all texture resources
+            auto& io = ImGui::GetIO();
+            if (io.BackendRendererUserData) {
                 if (!SwapchainHook::isDX12) ImGui_ImplDX11_Shutdown();
                 else ImGui_ImplDX12_Shutdown();
             }
+            if (io.BackendPlatformUserData) ImGui_ImplWin32_Shutdown();
+
             ImGui::DestroyContext();
             SwapchainHook::initImgui = false;
             SwapchainHook::imguiCleanupInProgress = false;
         }
 
+        // Clean up D2D context after ImGui cleanup
         if (D2D::context) D2D::context = nullptr;
+
+        // CRITICAL: Add additional GPU synchronization before cleaning up device resources
+        if (SwapchainHook::d3d12Device5) {
+            // Force all deferred releases and ensure device is idle
+            if (SwapchainHook::context.get()) {
+                SwapchainHook::context->ClearState();
+                SwapchainHook::context->Flush();
+            }
+
+            // Give the system time to process deferred releases
+            Sleep(100); // Increased delay for image resource cleanup
+        }
 
         // Additional DX12 cleanup for full reset - clean up command resources
         if (SwapchainHook::d3d12CommandList) SwapchainHook::d3d12CommandList = nullptr;
@@ -172,15 +227,24 @@ void ResizeHook::cleanShit(bool fullReset) {
         if (SwapchainHook::d3d12DescriptorHeapImGuiRender) SwapchainHook::d3d12DescriptorHeapImGuiRender = nullptr;
         if (SwapchainHook::D3D12DescriptorHeap) SwapchainHook::D3D12DescriptorHeap = nullptr;
         if (SwapchainHook::d3d11On12Device) SwapchainHook::d3d11On12Device = nullptr;
-        if (SwapchainHook::d3d12Device5) SwapchainHook::d3d12Device5 = nullptr;
 
-        // Drop D3D11 device/context explicitly to break lingering refs
+        // Drop D3D11 device/context explicitly to break lingering refs BEFORE d3d12Device5
         if (SwapchainHook::context) SwapchainHook::context = nullptr;
         if (SwapchainHook::d3d11Device) SwapchainHook::d3d11Device = nullptr;
+
+        // Clean up the DX12 device LAST to avoid access denied errors
+        if (SwapchainHook::d3d12Device5) SwapchainHook::d3d12Device5 = nullptr;
 
         // Reset buffer count and frame counter
         SwapchainHook::bufferCount = 0;
         SwapchainHook::dx12FrameCount = 0;
         SwapchainHook::cachedDX12FenceValue = 0;
+
+        // Re-enable modules after cleanup
+        for (auto& module : ModuleManager::moduleMap) {
+            if (module.second->isEnabled()) {
+                module.second->active = true;
+            }
+        }
     }
 }
