@@ -37,12 +37,7 @@ void ResizeHook::resizeCallback(IDXGISwapChain* pSwapChain, UINT bufferCount, UI
 }
 
 void ResizeHook::cleanShit(bool fullReset) {
-    if (SwapchainHook::d3d12Device5 && SwapchainHook::queue) {
-        HANDLE evt = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-        if (evt) {
-            CloseHandle(evt);
-        }
-    }
+
     if (fullReset || SwapchainHook::init) {
         FlarialGUI::hasLoadedAll = false;
         for (auto& [id, texture] : ImagesClass::ImguiDX12Textures) {
