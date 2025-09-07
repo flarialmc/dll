@@ -267,9 +267,6 @@ void Blur::RenderToRTV(ID3D11RenderTargetView *pRenderTargetView, ID3D11ShaderRe
     viewport.MaxDepth = 1.0f;
     SwapchainHook::context->RSSetViewports(1, &viewport);
 
-    // Clear and draw
-    FLOAT backgroundColor[4] = {0.0f, 0.0f, 0.0f, 1.0f};
-    SwapchainHook::context->ClearRenderTargetView(pRenderTargetView, backgroundColor);
     SwapchainHook::context->Draw(sizeof(quadVertices) / sizeof(quadVertices[0]), 0);
 
     // Clear render target binding
