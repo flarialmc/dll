@@ -68,7 +68,7 @@ public:
             {"Regular", "§4"}
         });
 
-    static inline D2D_COLOR_F getColor(const std::string& text) {
+    static inline D2D_COLOR_F getColor(std::string_view text) {
         D2D_COLOR_F col = clickgui->settings.getSettingByName<bool>(text + "RGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>(text + "Col")->value);
         col.a = clickgui->settings.getSettingByName<float>(text + "Opacity")->value;
         return col;
