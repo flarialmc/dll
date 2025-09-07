@@ -65,6 +65,15 @@ void ResizeHook::cleanShit(bool fullReset) {
         ImagesClass::ImguiDX12Textures.clear();
         ImagesClass::ImguiDX12Images.clear();
 
+        for (auto& [id, src]: ImagesClass::ImguiDX11Images) {
+            if (src) {
+                src->Release();
+                src = nullptr;
+            }
+        }
+
+        ImagesClass::ImguiDX11Images.clear();
+
         TabList::ResetDescriptorState();
         SwapchainHook::ResetDescriptorAllocation();
     }
