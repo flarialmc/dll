@@ -36,7 +36,6 @@ void ResizeHook::resizeCallback(IDXGISwapChain* pSwapChain, UINT bufferCount, UI
 }
 
 void ResizeHook::cleanShit(bool fullReset) {
-    // CRITICAL: Force immediate GPU synchronization at the start for any cleanup
     if (SwapchainHook::d3d12Device5 && SwapchainHook::queue) {
         winrt::com_ptr<ID3D12Fence> fence;
         if (SUCCEEDED(SwapchainHook::d3d12Device5->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(fence.put())))) {
@@ -46,16 +45,14 @@ void ResizeHook::cleanShit(bool fullReset) {
                 SwapchainHook::queue->Signal(fence.get(), value);
                 if (fence->GetCompletedValue() < value) {
                     fence->SetEventOnCompletion(value, evt);
-                    WaitForSingleObject(evt, fullReset ? 3000 : 2000); // Longer timeout for full reset
+                    WaitForSingleObject(evt, fullReset ? 3000 : 2000);
                 }
                 CloseHandle(evt);
             }
         }
     }
 
-    // CRITICAL: Clear all image resources FIRST to release descriptor references
     if (fullReset || SwapchainHook::init) {
-        // Force clear all loaded images and their descriptor handles
         FlarialGUI::hasLoadedAll = false;
         for (auto& [id, texture] : ImagesClass::ImguiDX12Textures) {
             if (texture) {
@@ -66,18 +63,15 @@ void ResizeHook::cleanShit(bool fullReset) {
         ImagesClass::ImguiDX12Textures.clear();
         ImagesClass::ImguiDX12Images.clear();
 
-        // Reset descriptor allocation state immediately
         TabList::ResetDescriptorState();
         SwapchainHook::ResetDescriptorAllocation();
     }
 
-    // Force DX11 context state clear early to release all GPU references
     if (SwapchainHook::context.get()) {
         SwapchainHook::context->ClearState();
         SwapchainHook::context->Flush();
     }
 
-    // Clear DX11 on DX12 resources that hold swapchain references
     if (SwapchainHook::d3d11On12Device && !SwapchainHook::D3D11Resources.empty()) {
         std::vector<ID3D11Resource*> toRelease;
         toRelease.reserve(SwapchainHook::D3D11Resources.size());
@@ -85,10 +79,8 @@ void ResizeHook::cleanShit(bool fullReset) {
         if (!toRelease.empty()) SwapchainHook::d3d11On12Device->ReleaseWrappedResources(toRelease.data(), static_cast<UINT>(toRelease.size()));
     }
 
-    // Clear swapchain reference EARLY to prevent access violations
     if (SwapchainHook::swapchain) SwapchainHook::swapchain = nullptr;
 
-    // Clean up backbuffer references that hold swapchain references
     if (SwapchainHook::SavedD3D11BackBuffer) SwapchainHook::SavedD3D11BackBuffer = nullptr;
     if (SwapchainHook::ExtraSavedD3D11BackBuffer) SwapchainHook::ExtraSavedD3D11BackBuffer = nullptr;
 
@@ -99,15 +91,12 @@ void ResizeHook::cleanShit(bool fullReset) {
     for (auto& rtv : SwapchainHook::cachedDX12RTVs) if (rtv) rtv = nullptr;
     SwapchainHook::cachedDX12RTVs.clear();
 
-    // Clean up frame contexts first to release references to backbuffers
     for (auto& frameCtx : SwapchainHook::frameContexts) {
         if (frameCtx.main_render_target_resource) frameCtx.main_render_target_resource = nullptr;
-        // Don't null the command allocator here - it's shared and still needed
         frameCtx.main_render_target_descriptor = {};
     }
     SwapchainHook::frameContexts.clear();
 
-    // Clean up DX12-specific resources that hold swapchain references
     for (auto& surface : SwapchainHook::DXGISurfaces) {
         if (surface) surface = nullptr;
     }
@@ -123,7 +112,6 @@ void ResizeHook::cleanShit(bool fullReset) {
     }
     SwapchainHook::D2D1Bitmaps.clear();
 
-    // Clean up D2D resources first to release references to backbuffer
     if (SwapchainHook::D2D1Bitmap) SwapchainHook::D2D1Bitmap = nullptr;
 
     if (D2D::context) {
@@ -131,13 +119,10 @@ void ResizeHook::cleanShit(bool fullReset) {
         D2D::context->Flush();
     }
 
-    // Clean up the backBuffer that holds a reference to the swapchain
     if (SwapchainHook::backBuffer) SwapchainHook::backBuffer = nullptr;
 
-    // Only clean up descriptor heaps for backbuffers, not ImGui render heap when fullReset=false
     if (SwapchainHook::d3d12DescriptorHeapBackBuffers) SwapchainHook::d3d12DescriptorHeapBackBuffers = nullptr;
 
-    // Additional GPU sync before cleaning command resources (critical for DX12)
     if (SwapchainHook::d3d12Device5 && SwapchainHook::queue) {
         winrt::com_ptr<ID3D12Fence> fence;
         if (SUCCEEDED(SwapchainHook::d3d12Device5->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(fence.put())))) {
@@ -154,10 +139,8 @@ void ResizeHook::cleanShit(bool fullReset) {
         }
     }
 
-    // Clean up DX12 fence resources
     if (SwapchainHook::cachedDX12Fence) SwapchainHook::cachedDX12Fence = nullptr;
 
-    // Only clean up Blur resources when doing fullReset to avoid breaking DX12 pipeline state
     if (fullReset) {
         if (Blur::pConstantBuffer) Blur::pConstantBuffer = nullptr;
         if (Blur::pSampler) Blur::pSampler = nullptr;
@@ -166,7 +149,6 @@ void ResizeHook::cleanShit(bool fullReset) {
         if (Blur::pGaussianBlurVerticalShader) Blur::pGaussianBlurVerticalShader = nullptr;
         if (Blur::pVertexBuffer) Blur::pVertexBuffer = nullptr;
         if (Blur::pVertexShader) Blur::pVertexShader = nullptr;
-        // Clear Blur pipeline cached states and intermediate resources
         if (Blur::pDepthStencilState) Blur::pDepthStencilState = nullptr;
         if (Blur::pBlendState) Blur::pBlendState = nullptr;
         if (Blur::pRasterizerState) Blur::pRasterizerState = nullptr;
@@ -178,7 +160,6 @@ void ResizeHook::cleanShit(bool fullReset) {
         if (Blur::pIntermediateTexture2) Blur::pIntermediateTexture2 = nullptr;
     }
 
-    // Final ClearState/Flush to trigger deferred releases
     if (SwapchainHook::context.get()) {
         SwapchainHook::context->ClearState();
         SwapchainHook::context->Flush();
@@ -202,9 +183,7 @@ void ResizeHook::cleanShit(bool fullReset) {
 
         if (D2D::context) D2D::context = nullptr;
 
-        // CRITICAL: Extended GPU synchronization before cleaning up device resources
         if (SwapchainHook::d3d12Device5 && SwapchainHook::queue) {
-            // Multiple sync passes to ensure all deferred operations complete
             for (int i = 0; i < 3; i++) {
                 winrt::com_ptr<ID3D12Fence> fence;
                 if (SUCCEEDED(SwapchainHook::d3d12Device5->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(fence.put())))) {
@@ -219,20 +198,17 @@ void ResizeHook::cleanShit(bool fullReset) {
                         CloseHandle(evt);
                     }
                 }
-                Sleep(20); // Small delay between sync passes
+                Sleep(20);
             }
 
-            // Force all deferred releases and ensure device is idle
             if (SwapchainHook::context.get()) {
                 SwapchainHook::context->ClearState();
                 SwapchainHook::context->Flush();
             }
 
-            // Give the system time to process deferred releases
             Sleep(100);
         }
 
-        // Additional DX12 cleanup for full reset - clean up command resources
         if (SwapchainHook::d3d12CommandList) SwapchainHook::d3d12CommandList = nullptr;
         if (SwapchainHook::allocator) SwapchainHook::allocator = nullptr;
         if (SwapchainHook::d3d12CommandQueue) SwapchainHook::d3d12CommandQueue = nullptr;
@@ -240,14 +216,11 @@ void ResizeHook::cleanShit(bool fullReset) {
         if (SwapchainHook::D3D12DescriptorHeap) SwapchainHook::D3D12DescriptorHeap = nullptr;
         if (SwapchainHook::d3d11On12Device) SwapchainHook::d3d11On12Device = nullptr;
 
-        // Drop D3D11 device/context explicitly to break lingering refs BEFORE d3d12Device5
         if (SwapchainHook::context) SwapchainHook::context = nullptr;
         if (SwapchainHook::d3d11Device) SwapchainHook::d3d11Device = nullptr;
 
-        // Clean up the DX12 device LAST to avoid access denied errors
         if (SwapchainHook::d3d12Device5) SwapchainHook::d3d12Device5 = nullptr;
 
-        // Reset buffer count and frame counter
         SwapchainHook::bufferCount = 0;
         SwapchainHook::dx12FrameCount = 0;
         SwapchainHook::cachedDX12FenceValue = 0;
