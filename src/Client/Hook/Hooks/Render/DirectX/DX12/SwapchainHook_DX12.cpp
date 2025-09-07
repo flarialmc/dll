@@ -198,8 +198,6 @@ void SwapchainHook::DX12Init() {
 
     Blur::InitializePipeline();
 
-    dx12FrameCount = 0;
-
     init = true;
 }
 
@@ -299,14 +297,6 @@ void SwapchainHook::DX12Render(bool underui) {
     d3d12CommandList->OMSetRenderTargets(1,
         &frameContexts[currentBitmap].main_render_target_descriptor,
         FALSE, nullptr);
-
-    if (dx12FrameCount < 5) {
-        const float clearColor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
-        d3d12CommandList->ClearRenderTargetView(
-            frameContexts[currentBitmap].main_render_target_descriptor,
-            clearColor, 0, nullptr);
-        dx12FrameCount++;
-    }
 
     ID3D12DescriptorHeap* heapPtr = d3d12DescriptorHeapImGuiRender.get();
     d3d12CommandList->SetDescriptorHeaps(1, &heapPtr);
