@@ -20,7 +20,7 @@ HRESULT CreateSwapchainForCoreWindowHook::CreateSwapChainForCoreWindowCallback(
     IDXGISwapChain1 **ppSwapChain)
 {
     winrt::com_ptr<ID3D12CommandQueue> pCommandQueue;
-    Logger::debug("Recreating Swapchain [CREATESWAPCHAINFORCOREWINDOW HOOK]");
+    Logger::debug("Recreating Swapchain");
     if (Client::settings.getSettingByName<bool>("killdx")->value) SwapchainHook::queue = nullptr;
     if (Client::settings.getSettingByName<bool>("killdx")->value && SUCCEEDED(pDevice->QueryInterface(IID_PPV_ARGS(pCommandQueue.put())))) {
         SwapchainHook::queue = nullptr;

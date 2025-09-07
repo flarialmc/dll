@@ -166,7 +166,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
     if (recreate) {
         init = false;
         initImgui = false;
-        Logger::debug("Recreating Swapchain [SWAPCHAINHOOK]");
+        Logger::debug("[DEBUG] Recreating Swapchain");
 
         // CRITICAL: Force GPU to complete all pending operations before cleanup
         if (isDX12 && d3d12Device5 && queue) {
@@ -184,13 +184,18 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
                 }
             }
         } else if (!isDX12 && context.get()) {
+            // For DX11, ensure all deferred operations are complete
             context->ClearState();
             context->Flush();
+            Sleep(50); // Small delay to ensure flush completes
         }
 
         ResizeHook::cleanShit(true);
         recreate = false;
         swapchain = nullptr;
+
+        // Additional safety delay before returning device reset
+        Sleep(100);
 
         return DXGI_ERROR_DEVICE_RESET;
     }
@@ -247,8 +252,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
 
     if (currentVsyncState) {
-        flags |= DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
-        return funcOriginal(pSwapChain, 0, flags);
+        return funcOriginal(pSwapChain, 0, DXGI_PRESENT_ALLOW_TEARING);
     }
 
     return funcOriginal(pSwapChain, syncInterval, flags);
