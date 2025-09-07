@@ -250,10 +250,21 @@ public:
     void onKey(KeyEvent &event) {
 
         std::string& clickguiKey = getOps<std::string>("keybind");
-        if (!this->active && clickguiKey == "") {
+        if (!this->active && clickguiKey.empty()) {
             clickguiKey = "k";
             FlarialGUI::Notify("To change it to a different key, go to ClickGUI settings or use \'.bind <key>\'");
             FlarialGUI::Notify("Your ClickGUI Keybind was unset, it has been reset to \'k\'.");
+            Client::SaveSettings();
+        }
+
+        SettingType<std::string>* ejectKey = Client::settings.getSettingByName<std::string>("ejectKeybind");
+
+        if (!clickguiKey.empty() && clickguiKey == ejectKey->value) {
+            ejectKey->value = "";
+            FlarialGUI::Notify("Your Eject key has been unset.");
+            FlarialGUI::Notify("Your ClickGUI and Eject keybind was the same.");
+            Client::SavePrivate();
+            Client::LoadPrivate();
         }
 
         //TODO: MAKE module->setActive() module->isActive() module->isRestricted()
