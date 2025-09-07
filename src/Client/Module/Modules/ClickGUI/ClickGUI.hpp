@@ -4,7 +4,7 @@
 #include "../../../Client.hpp"
 #include "Elements/ClickGUIElements.hpp"
 #include "SDK/Client/Network/Packet/TextPacket.hpp"
-#include "Utils/APIUtils.hpp"
+#include "flarial/include/api.hpp"
 #include "Utils/WinrtUtils.hpp"
 #include <chrono>
 #include <Modules/Misc/Input/GUIMouseListener.hpp>
@@ -60,7 +60,7 @@ public:
     }
 
     static bool containsAny(const std::string &str) {
-        return std::any_of(APIUtils::onlineUsers.begin(), APIUtils::onlineUsers.end(),
+        return std::any_of(api::onlineUsers.begin(), api::onlineUsers.end(),
                            [&](const std::string &user) {
                                return !user.empty() && str.find(user) != std::string::npos;
                            });
@@ -89,7 +89,7 @@ public:
         if (Client::settings.getSettingByName<bool>("nochaticon")->value) return;
         if (!message.empty() && !containsAny(String::removeNonAlphanumeric(String::removeColorCodes(message)))) return;
 
-        std::pair<std::string, size_t> name = findFirstOf(message, APIUtils::onlineUsers);
+        std::pair<std::string, size_t> name = findFirstOf(message, api::onlineUsers);
 
         static std::vector<std::pair<std::string, std::string> > roleColors = {
             {"Dev", "§b"},
@@ -103,7 +103,7 @@ public:
         std::string prefix = "§f[§4FLARIAL§f]§r ";
 
         for (const auto &[role, color]: roleColors) {
-            if (APIUtils::hasRole(role, name.first)) {
+            if (api::hasRole(role, name.first)) {
                 prefix = "§f[" + color + "FLARIAL§f]§r ";
                 break;
             }

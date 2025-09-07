@@ -16,7 +16,7 @@
 #include <winrt/Windows.Foundation.Collections.h>
 #include <winrt/Windows.Foundation.h>
 
-#include "Utils/APIUtils.hpp"
+#include "flarial/include/api.hpp"
 
 namespace winrt
 {
@@ -222,8 +222,8 @@ void Client::initialize() {
 		playersList = buffer.str();
 		file.close();
 
-		APIUtils::onlineUsers = APIUtils::ListToVector(playersList);
-		});
+		api::onlineUsers = api::listToVector(playersList);
+	});
 
 	updateThread.detach();
 
@@ -235,11 +235,11 @@ void Client::initialize() {
 		}
 	}
 
-	Client::LoadLegacySettings();
-	Client::CheckSettingsFile();
-	if (Client::privateInit) {
-		Client::LoadPrivate();
-		Client::LoadSettings();
+	LoadLegacySettings();
+	CheckSettingsFile();
+	if (privateInit) {
+		LoadPrivate();
+		LoadSettings();
 	}
 
 	Logger::success("4");

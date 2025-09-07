@@ -10,7 +10,7 @@ void BaseActorRendererRenderTextHook::drawLogo(ScreenContext* screenContext, con
     std::string clearedName = String::removeNonAlphanumeric(String::removeColorCodes(nameTag));
     if (clearedName.empty()) clearedName = String::removeColorCodes(nameTag); // nametag might contain some unclearable stuff
 
-    if (!contains(APIUtils::onlineUsers, clearedName)) return;
+    if (!contains(api::onlineUsers, clearedName)) return;
 
     if (MaterialUtils::getUITextured() == nullptr)
         MaterialUtils::update();
@@ -33,7 +33,7 @@ void BaseActorRendererRenderTextHook::drawLogo(ScreenContext* screenContext, con
         {"Regular", "red-logo.png"}
     };
     for (const auto& [role, logo] : roleLogos) {
-        if (APIUtils::hasRole(role, clearedName)) {
+        if (api::hasRole(role, clearedName)) {
             loc = { Utils::getAssetsPath() + "\\" + logo, true };
             break;
         }

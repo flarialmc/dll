@@ -5,12 +5,11 @@
 #include <HTTPRequest/HTTPRequest.hpp>
 #include <json/json.hpp>
 #include <curl/curl/curl.h>
-#include "../../../../Utils/APIUtils.hpp"
+#include "flarial/include/api.hpp"
 
 using json = nlohmann::json;
 
 class SpotifyController {
-private:
     bool isFine = false;
     std::string client_id;
     std::string client_secret;
@@ -20,14 +19,13 @@ private:
     const std::string api_url = "https://api.spotify.com/v1/me/player/";
 
     void send_request(const std::string& url, const std::string& method = "PUT", const std::string& data = "") {
-        struct curl_slist* headers = NULL;
+        /*struct curl_slist* headers = NULL;
         headers = curl_slist_append(headers, ("Authorization: Bearer " + access_token).c_str());
         headers = curl_slist_append(headers, "Content-Type: application/json");
-
-        auto [responseCode, responseBody] = APIUtils::Request(url, method, data, headers);
+        auto [responseCode, responseBody] = api::request(url, method, data, headers);
         if (responseCode < 200 && responseCode >= 300) {
             LOG_ERROR("Spotify request failed ({}) : {}", responseCode, responseBody);
-        }
+        }*/
     }
 
 
@@ -68,7 +66,7 @@ public:
         struct curl_slist* headers = NULL;
         headers = curl_slist_append(headers, "Content-Type: application/x-www-form-urlencoded");
 
-        auto [responseCode, responseBody] = APIUtils::Request("https://accounts.spotify.com/api/token", "POST", post_data, headers);
+        /*auto [responseCode, responseBody] = api::request("https://accounts.spotify.com/api/token", "POST", post_data, headers);
 
         if (responseCode == 200) {
             json jsonData = json::parse(responseBody);
@@ -82,7 +80,7 @@ public:
         }
         else {
             Logger::custom(fg(fmt::color::light_green), "SPOTIFY", "Token refresh failed with response code: {}", responseCode);
-        }
+        }*/
     }
 
     void play() { send_request(api_url + "play"); }
@@ -100,7 +98,7 @@ public:
         struct curl_slist* headers = NULL;
         headers = curl_slist_append(headers, ("Authorization: Bearer " + access_token).c_str());
         headers = curl_slist_append(headers, "Content-Type: application/json");
-        auto [responseCode, responseBody] = APIUtils::Request(search_url, "GET", "", headers);
+        /*auto [responseCode, responseBody] = api::request(search_url, "GET", "", headers);
 
         if (responseCode >= 200 && responseCode < 300) {
             try {
@@ -116,7 +114,7 @@ public:
             } catch (const json::type_error& e) {
                 LOG_ERROR("JSON Type Error: " + std::string(e.what()));
             }
-        }
+        }*/
 
         return "";
     }
@@ -128,7 +126,7 @@ public:
         headers = curl_slist_append(headers, ("Authorization: Bearer " + access_token).c_str());
         headers = curl_slist_append(headers, "Content-Type: application/json");
 
-        auto [responseCode, responseBody] = APIUtils::Request(search_url, "GET", "", headers);
+        /*auto [responseCode, responseBody] = api::request(search_url, "GET", "", headers);
 
         if (responseCode >= 200 && responseCode < 300) {
             json jsonData = json::parse(responseBody);
@@ -145,7 +143,7 @@ public:
         }
         else {
             Logger::custom(fg(fmt::color::light_green), "SPOTIFY", "Search failed with response code: {}", responseCode);
-        }
+        }*/
     }
 };
 

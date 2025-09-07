@@ -17,7 +17,7 @@
 #include "src/Client/Module/Modules/Nick/NickModule.hpp"
 #include "src/Client/Command/CommandManager.hpp"
 #include "src/SDK/Client/Options/OptionsParser.hpp"
-#include "Utils/APIUtils.hpp"
+#include "flarial/include/api.hpp"
 
 std::chrono::steady_clock::time_point lastBeatTime;
 std::chrono::steady_clock::time_point lastVipFetchTime;
@@ -27,7 +27,7 @@ static HANDLE mutex;
 
 
 void SavePlayerCache() {
-    std::string playersListString = APIUtils::VectorToList(APIUtils::onlineUsers);
+    std::string playersListString = api::vectorToList("players", api::onlineUsers);
 
     // Check if string size is greater than 15 KB (15,360 bytes)
     if (playersListString.size() > 15360) {
@@ -76,9 +76,8 @@ DWORD WINAPI init() {
         }
 
         if (elapsed >= std::chrono::seconds(60)) {
-            std::string name = SDK::clientInstance->getLocalPlayer()->getPlayerName();
-            std::string ipToSend = SDK::getServerIP();
-
+            std::string ipToSend;
+            std::string name = String::removeNonAlphanumeric(String::removeColorCodes(SDK::clientInstance->getLocalPlayer()->getPlayerName()));
             if (Client::settings.getSettingByName<bool>("anonymousApi")->value) {
                 ipToSend = "is.anonymous";
             } else if (ipToSend.find("none") != std::string::npos || ipToSend.empty()) {
@@ -87,24 +86,23 @@ DWORD WINAPI init() {
 
             auto module = ModuleManager::getModule("Nick");
             if (module && module->isEnabled()) {
-                name = String::removeNonAlphanumeric(String::removeColorCodes(NickModule::original));
-                name = String::replaceAll(name, "�", "");
+                std::string nick = String::removeNonAlphanumeric(String::removeColorCodes(NickModule::original));
+                name = String::replaceAll(nick, "�", "");
             }
 
-            std::string clearedName = String::removeNonAlphanumeric(String::removeColorCodes(name));
-            if (clearedName.empty()) clearedName = String::removeColorCodes(name);
+            api::heartbeat(name, ipToSend);
 
-            if (clearedName != "skinStandardCust") {
-                APIUtils::legacyGet(std::format("https://api.flarial.xyz/heartbeat/{}/{}", clearedName, ipToSend));
-                lastBeatTime = now;
-            }
         }
 
         if (onlineUsersFetchElapsed >= std::chrono::minutes(3) && Client::settings.getSettingByName<bool>("apiusage")->value) {
             try {
-                std::string data = APIUtils::VectorToList(APIUtils::onlineUsers);
-                std::pair<long, std::string> post = APIUtils::POST_Simple("https://api.flarial.xyz/allOnlineUsers", data);
-                APIUtils::onlineUsers = APIUtils::UpdateVector(APIUtils::onlineUsers, post.second);
+
+                std::string name = SDK::clientInstance->getLocalPlayer()->getPlayerName();
+                std::string clearedName = String::removeNonAlphanumeric(String::removeColorCodes(name));
+
+                if (clearedName.empty()) clearedName = String::removeColorCodes(name);
+
+                api::updateVector(clearedName);
                 SavePlayerCache();
                 lastOnlineUsersFetchTime = now;
             } catch (const std::exception &ex) {
@@ -112,9 +110,9 @@ DWORD WINAPI init() {
             }
         }
 
-        if (vipFetchElapsed >= std::chrono::minutes(3) && Client::settings.getSettingByName<bool>("apiusage")->value) {
+        if (vipFetchElapsed >= std::chrono::minutes(10) && Client::settings.getSettingByName<bool>("apiusage")->value) {
             try {
-                auto vipsJson = APIUtils::getVips();
+                auto vipsJson = api::fetchVips();
                 std::map<std::string, std::string> updatedVips;
 
                 for (const auto& [role, users] : vipsJson.items()) {
@@ -128,7 +126,7 @@ DWORD WINAPI init() {
                 }
 
                 if (!updatedVips.empty()) {
-                    APIUtils::onlineVips = std::move(updatedVips);
+                    api::onlineVips = std::move(updatedVips);
                 }
                 lastVipFetchTime = now;
             } catch (const std::exception& e) {

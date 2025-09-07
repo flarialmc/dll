@@ -453,15 +453,15 @@ int TabList::getRolePriority(const std::string &name) {
     std::string clearedName = String::removeNonAlphanumeric(String::removeColorCodes(name));
     if (clearedName.empty()) return 5; // Lowest priority for invalid names
 
-    auto it = std::ranges::find(APIUtils::onlineUsers, clearedName);
-    if (it == APIUtils::onlineUsers.end()) return 5; // Non-Flarial users
+    auto it = std::ranges::find(api::onlineUsers, clearedName);
+    if (it == api::onlineUsers.end()) return 5; // Non-Flarial users
 
     // Check roles in order of priority using ApiUtils
-    if (APIUtils::hasRole("Dev", clearedName)) return 0;
-    if (APIUtils::hasRole("Staff", clearedName)) return 1;
-    if (APIUtils::hasRole("Gamer", clearedName)) return 2;
-    if (APIUtils::hasRole("Supporter", clearedName)) return 3;
-    if (APIUtils::hasRole("Booster", clearedName)) return 4;
+    if (api::hasRole("Dev", clearedName)) return 0;
+    if (api::hasRole("Staff", clearedName)) return 1;
+    if (api::hasRole("Gamer", clearedName)) return 2;
+    if (api::hasRole("Supporter", clearedName)) return 3;
+    if (api::hasRole("Booster", clearedName)) return 4;
     return 5; // Default Flarial user (in onlineUsers but no specific role)
 }
 
@@ -517,10 +517,10 @@ std::vector<PlayerListEntry> TabList::copyMapInAlphabeticalOrder(
             clearedName = entry.name;
         }
 
-        auto it = std::ranges::find(APIUtils::onlineUsers, clearedName);
+        auto it = std::ranges::find(api::onlineUsers, clearedName);
 
         // 'flarialFirst' controls whether we split the list or treat everyone the same.
-        if (flarialFirst && it != APIUtils::onlineUsers.end()) {
+        if (flarialFirst && it != api::onlineUsers.end()) {
             flarialEntries.push_back(entry); // Copy the object
         } else {
             nonFlarialEntries.push_back(entry); // Copy the object
@@ -1013,8 +1013,8 @@ void TabList::onRender(RenderEvent &event) {
 
                     auto textMetric = FlarialGUI::getFlarialTextSize(String::StrToWStr(name).c_str(), keycardSize * 5, keycardSize, DWRITE_TEXT_ALIGNMENT_LEADING, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, true);
 
-                    auto it = std::ranges::find(APIUtils::onlineUsers, clearedName);
-                    if (it != APIUtils::onlineUsers.end()) textMetric.x += Constraints::SpacingConstraint(0.6, keycardSize);
+                    auto it = std::ranges::find(api::onlineUsers, clearedName);
+                    if (it != api::onlineUsers.end()) textMetric.x += Constraints::SpacingConstraint(0.6, keycardSize);
 
                     if (textMetric.x > curMax) curMax = textMetric.x;
                     if (i < maxColumn) totalHeight += keycardSize * 0.7f;
@@ -1311,10 +1311,10 @@ void TabList::onRender(RenderEvent &event) {
                     // PLAYER HEAD END
                 }
 
-                auto pit = std::ranges::find(APIUtils::onlineUsers, clearedName);
+                auto pit = std::ranges::find(api::onlineUsers, clearedName);
                 ImVec2 pNameMetrics = FlarialGUI::getFlarialTextSize(String::StrToWStr(name).c_str(), columnx[i / maxColumn] - (0.825 * keycardSize), keycardSize, alignments[getOps<std::string>("textalignment")], floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, true);
 
-                if (pit != APIUtils::onlineUsers.end()) {
+                if (pit != api::onlineUsers.end()) {
                     // FLARIAL TAG START
                     static float p1 = 0.175;
                     static float p2 = 0.196;
@@ -1323,7 +1323,7 @@ void TabList::onRender(RenderEvent &event) {
 
                     int imageResource = roleLogos["Default"];
                     for (const auto &[role, resource]: roleLogos) {
-                        if (APIUtils::hasRole(role, clearedName)) {
+                        if (api::hasRole(role, clearedName)) {
                             imageResource = resource;
                             break;
                         }
@@ -1381,7 +1381,7 @@ void TabList::onRender(RenderEvent &event) {
 
                 int imageResource = roleLogos["Default"];
                 for (const auto &[role, resource]: roleLogos) {
-                    if (APIUtils::hasRole(role, curPlayer)) {
+                    if (api::hasRole(role, curPlayer)) {
                         imageResource = resource;
                         break;
                     }

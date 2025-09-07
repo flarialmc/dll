@@ -4,7 +4,7 @@
 #include "../../Events/Events.hpp"
 #include "ClickGUI/ClickGUI.hpp"
 #include "Scripting/ScriptManager.hpp"
-#include "../../../Utils/Telemetry.hpp"
+#include <flarial/include/telemetry.hpp>
 #include <vector>
 #include <cmath>
 
@@ -799,7 +799,7 @@ void Module::onSetup() {
 
 // TODO: rename to Enable/Disable?
 void Module::onEnable() {
-    Telemetry::sendModuleEvent(this->name, "enable");
+    //telemetry::sendModuleEvent(this->name, "enable");
 
     enabledState = true;
     if (settings.getSettingByName<bool>("enabled")) getOps<bool>("enabled") = true;
@@ -807,7 +807,7 @@ void Module::onEnable() {
 }
 
 void Module::onDisable() {
-    Telemetry::sendModuleEvent(this->name, "disable");
+    //telemetry::sendModuleEvent(this->name, "disable");
 
     enabledState = false;
     active = false;

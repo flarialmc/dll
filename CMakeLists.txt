@@ -82,7 +82,11 @@ target_include_directories(Flarial PRIVATE
         "src/Client/Module"
         "lib"
         "lib/lua/lua-5.4.7/include"
+        "lib/flarial/include"
 )
+
+target_include_directories(Flarial PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/lib/flarial/include")
+target_link_libraries(Flarial PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/lib/flarial/flarial_lib.lib")
 
 add_library(miniz STATIC lib/miniz/miniz.c)
 target_include_directories(miniz PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/lib/miniz")
@@ -155,7 +159,7 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(libhat entt nes fmt magic_enum LuaBridge)
 
-target_link_libraries(Flarial PRIVATE libcurl ws2_32.lib crypt32.lib normaliz.lib wldap32.lib LuaBridge lua_static libhat fmt::fmt EnTT::EnTT NES windowscodecs.lib urlmon.lib dwrite.lib d3d12.lib dxgi.lib d3d11.lib d2d1.lib wininet.lib setupapi.lib version FreeType magic_enum runtimeobject)
+target_link_libraries(Flarial PRIVATE libcurl ws2_32.lib crypt32.lib normaliz.lib wldap32.lib LuaBridge lua_static libhat fmt::fmt EnTT::EnTT NES windowscodecs.lib urlmon.lib dwrite.lib d3d12.lib dxgi.lib d3d11.lib d2d1.lib wininet.lib setupapi.lib version FreeType magic_enum runtimeobject "${CMAKE_CURRENT_SOURCE_DIR}/lib/flarial/flarial_lib.lib")
 
 target_link_libraries(Flarial PUBLIC MinHook)
 

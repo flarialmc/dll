@@ -4,7 +4,7 @@
 #include "Module/Manager.hpp"
 #include <vector>
 #include "Scripting/ScriptManager.hpp"
-#include "Utils/APIUtils.hpp"
+#include <flarial/include/api.hpp>
 
 #define ADD_SETTING(setting, value) \
 if (Client::settings.getSettingByName<decltype(value)>(setting) == nullptr) \
