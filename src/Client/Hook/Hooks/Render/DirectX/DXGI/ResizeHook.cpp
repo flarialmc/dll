@@ -12,6 +12,7 @@
 #include "../../../../../Module/Manager.hpp"
 #include "../../../../../Module/Modules/GuiScale/GuiScale.hpp"
 #include "../../../../../Module/Modules/TabList/TabList.hpp"
+#include "GUI/Engine/Elements/Structs/ImagesClass.hpp"
 
 void ResizeHook::enableHook() {
     int index;
@@ -35,23 +36,8 @@ void ResizeHook::resizeCallback(IDXGISwapChain* pSwapChain, UINT bufferCount, UI
 }
 
 void ResizeHook::cleanShit(bool fullReset) {
-    // CRITICAL: Stop all rendering immediately to prevent access to resources being cleaned up
-    if (fullReset) {
-        // Force all modules to stop rendering
-        for (auto& module : ModuleManager::moduleMap) {
-            if (module.second->isEnabled()) {
-                module.second->active = false;
-            }
-        }
-        // Disable ClickGUI rendering immediately
-        auto clickGUI = ModuleManager::getModule("ClickGUI");
-        if (clickGUI && clickGUI->isEnabled()) {
-            clickGUI->active = false;
-        }
-    }
-
-    // Wait for GPU to finish ALL work before any cleanup when doing fullReset
-    if (fullReset && SwapchainHook::d3d12Device5 && SwapchainHook::queue) {
+    // CRITICAL: Force immediate GPU synchronization at the start for any cleanup
+    if (SwapchainHook::d3d12Device5 && SwapchainHook::queue) {
         winrt::com_ptr<ID3D12Fence> fence;
         if (SUCCEEDED(SwapchainHook::d3d12Device5->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(fence.put())))) {
             const UINT64 value = 1;
@@ -60,30 +46,38 @@ void ResizeHook::cleanShit(bool fullReset) {
                 SwapchainHook::queue->Signal(fence.get(), value);
                 if (fence->GetCompletedValue() < value) {
                     fence->SetEventOnCompletion(value, evt);
-                    WaitForSingleObject(evt, 2000); // Increased timeout for full reset
+                    WaitForSingleObject(evt, fullReset ? 3000 : 2000); // Longer timeout for full reset
                 }
                 CloseHandle(evt);
             }
         }
     }
 
-    // CRITICAL: Clean up D2D resources FIRST before touching any other resources
-    if (D2D::context) {
-        D2D::context->SetTarget(nullptr);
-        D2D::context->Flush();
-        // Additional flush to ensure all deferred operations complete
-        D2D::context->Flush();
+    // CRITICAL: Clear all image resources FIRST to release descriptor references
+    if (fullReset || SwapchainHook::init) {
+        // Force clear all loaded images and their descriptor handles
+        FlarialGUI::hasLoadedAll = false;
+        for (auto& [id, texture] : ImagesClass::ImguiDX12Textures) {
+            if (texture) {
+                texture->Release();
+                texture = nullptr;
+            }
+        }
+        ImagesClass::ImguiDX12Textures.clear();
+        ImagesClass::ImguiDX12Images.clear();
+
+        // Reset descriptor allocation state immediately
+        TabList::ResetDescriptorState();
+        SwapchainHook::ResetDescriptorAllocation();
     }
 
-    // Clean up D2D resources first to release references to backbuffer
-    if (SwapchainHook::D2D1Bitmap) SwapchainHook::D2D1Bitmap = nullptr;
-
-    for (auto& bitmap : SwapchainHook::D2D1Bitmaps) {
-        if (bitmap) bitmap = nullptr;
+    // Force DX11 context state clear early to release all GPU references
+    if (SwapchainHook::context.get()) {
+        SwapchainHook::context->ClearState();
+        SwapchainHook::context->Flush();
     }
-    SwapchainHook::D2D1Bitmaps.clear();
 
-    // CRITICAL: Clear all image-related resources before D3D11On12 cleanup
+    // Clear DX11 on DX12 resources that hold swapchain references
     if (SwapchainHook::d3d11On12Device && !SwapchainHook::D3D11Resources.empty()) {
         std::vector<ID3D11Resource*> toRelease;
         toRelease.reserve(SwapchainHook::D3D11Resources.size());
@@ -91,13 +85,10 @@ void ResizeHook::cleanShit(bool fullReset) {
         if (!toRelease.empty()) SwapchainHook::d3d11On12Device->ReleaseWrappedResources(toRelease.data(), static_cast<UINT>(toRelease.size()));
     }
 
-    if (SwapchainHook::context.get()) {
-        SwapchainHook::context->ClearState();
-        SwapchainHook::context->Flush();
-    }
-
+    // Clear swapchain reference EARLY to prevent access violations
     if (SwapchainHook::swapchain) SwapchainHook::swapchain = nullptr;
 
+    // Clean up backbuffer references that hold swapchain references
     if (SwapchainHook::SavedD3D11BackBuffer) SwapchainHook::SavedD3D11BackBuffer = nullptr;
     if (SwapchainHook::ExtraSavedD3D11BackBuffer) SwapchainHook::ExtraSavedD3D11BackBuffer = nullptr;
 
@@ -127,26 +118,36 @@ void ResizeHook::cleanShit(bool fullReset) {
     }
     SwapchainHook::D3D11Resources.clear();
 
+    for (auto& bitmap : SwapchainHook::D2D1Bitmaps) {
+        if (bitmap) bitmap = nullptr;
+    }
+    SwapchainHook::D2D1Bitmaps.clear();
+
+    // Clean up D2D resources first to release references to backbuffer
+    if (SwapchainHook::D2D1Bitmap) SwapchainHook::D2D1Bitmap = nullptr;
+
+    if (D2D::context) {
+        D2D::context->SetTarget(nullptr);
+        D2D::context->Flush();
+    }
+
     // Clean up the backBuffer that holds a reference to the swapchain
     if (SwapchainHook::backBuffer) SwapchainHook::backBuffer = nullptr;
 
     // Only clean up descriptor heaps for backbuffers, not ImGui render heap when fullReset=false
     if (SwapchainHook::d3d12DescriptorHeapBackBuffers) SwapchainHook::d3d12DescriptorHeapBackBuffers = nullptr;
 
-    // Reset TabList descriptor allocation state - CRITICAL for preventing image corruption
-    TabList::ResetDescriptorState();
-
-    // Wait for GPU to finish work before cleaning up command resources (for partial reset)
-    if (!fullReset && SwapchainHook::d3d12Device5 && SwapchainHook::queue) {
+    // Additional GPU sync before cleaning command resources (critical for DX12)
+    if (SwapchainHook::d3d12Device5 && SwapchainHook::queue) {
         winrt::com_ptr<ID3D12Fence> fence;
         if (SUCCEEDED(SwapchainHook::d3d12Device5->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(fence.put())))) {
-            const UINT64 value = 1;
+            const UINT64 value = 2;
             HANDLE evt = CreateEvent(nullptr, FALSE, FALSE, nullptr);
             if (evt) {
                 SwapchainHook::queue->Signal(fence.get(), value);
                 if (fence->GetCompletedValue() < value) {
                     fence->SetEventOnCompletion(value, evt);
-                    WaitForSingleObject(evt, 1000);
+                    WaitForSingleObject(evt, 1500);
                 }
                 CloseHandle(evt);
             }
@@ -177,39 +178,50 @@ void ResizeHook::cleanShit(bool fullReset) {
         if (Blur::pIntermediateTexture2) Blur::pIntermediateTexture2 = nullptr;
     }
 
-    // Second ClearState/Flush to trigger deferred releases
+    // Final ClearState/Flush to trigger deferred releases
     if (SwapchainHook::context.get()) {
         SwapchainHook::context->ClearState();
         SwapchainHook::context->Flush();
     }
 
     if (fullReset) {
-        // CRITICAL: Clean up ImGui and image resources BEFORE cleaning up the underlying device
         if (ImGui::GetCurrentContext()) {
             SwapchainHook::imguiCleanupInProgress = true;
-
-            // Clear all ImGui fonts and textures first
             ImGui::GetIO().Fonts->Clear();
             FlarialGUI::FontMap.clear();
-
-            // Force ImGui to release all texture resources
-            auto& io = ImGui::GetIO();
-            if (io.BackendRendererUserData) {
+            auto& ioEarly = ImGui::GetIO();
+            if (ioEarly.BackendPlatformUserData) ImGui_ImplWin32_Shutdown();
+            if (ioEarly.BackendRendererUserData) {
                 if (!SwapchainHook::isDX12) ImGui_ImplDX11_Shutdown();
                 else ImGui_ImplDX12_Shutdown();
             }
-            if (io.BackendPlatformUserData) ImGui_ImplWin32_Shutdown();
-
             ImGui::DestroyContext();
             SwapchainHook::initImgui = false;
             SwapchainHook::imguiCleanupInProgress = false;
         }
 
-        // Clean up D2D context after ImGui cleanup
         if (D2D::context) D2D::context = nullptr;
 
-        // CRITICAL: Add additional GPU synchronization before cleaning up device resources
-        if (SwapchainHook::d3d12Device5) {
+        // CRITICAL: Extended GPU synchronization before cleaning up device resources
+        if (SwapchainHook::d3d12Device5 && SwapchainHook::queue) {
+            // Multiple sync passes to ensure all deferred operations complete
+            for (int i = 0; i < 3; i++) {
+                winrt::com_ptr<ID3D12Fence> fence;
+                if (SUCCEEDED(SwapchainHook::d3d12Device5->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(fence.put())))) {
+                    const UINT64 value = i + 10;
+                    HANDLE evt = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+                    if (evt) {
+                        SwapchainHook::queue->Signal(fence.get(), value);
+                        if (fence->GetCompletedValue() < value) {
+                            fence->SetEventOnCompletion(value, evt);
+                            WaitForSingleObject(evt, 1000);
+                        }
+                        CloseHandle(evt);
+                    }
+                }
+                Sleep(20); // Small delay between sync passes
+            }
+
             // Force all deferred releases and ensure device is idle
             if (SwapchainHook::context.get()) {
                 SwapchainHook::context->ClearState();
@@ -217,7 +229,7 @@ void ResizeHook::cleanShit(bool fullReset) {
             }
 
             // Give the system time to process deferred releases
-            Sleep(100); // Increased delay for image resource cleanup
+            Sleep(100);
         }
 
         // Additional DX12 cleanup for full reset - clean up command resources
@@ -239,12 +251,5 @@ void ResizeHook::cleanShit(bool fullReset) {
         SwapchainHook::bufferCount = 0;
         SwapchainHook::dx12FrameCount = 0;
         SwapchainHook::cachedDX12FenceValue = 0;
-
-        // Re-enable modules after cleanup
-        for (auto& module : ModuleManager::moduleMap) {
-            if (module.second->isEnabled()) {
-                module.second->active = true;
-            }
-        }
     }
 }
