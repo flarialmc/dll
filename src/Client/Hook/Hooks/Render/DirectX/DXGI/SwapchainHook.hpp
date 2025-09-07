@@ -101,7 +101,9 @@ public:
     // Consolidated descriptor heap management
     static constexpr UINT IMGUI_FONT_DESCRIPTORS = 1;        // ImGui font texture
     static constexpr UINT MAX_IMAGE_DESCRIPTORS = 300;       // All image resources (257 + buffer)
-    static constexpr UINT TOTAL_CONSOLIDATED_DESCRIPTORS = IMGUI_FONT_DESCRIPTORS + MAX_IMAGE_DESCRIPTORS;
+    // Reserve space for dynamic player head descriptors used by TabList (DX12)
+    static constexpr UINT MAX_PLAYERHEAD_DESCRIPTORS = 2000; // Must match TabList::MAX_PLAYERHEAD_DESCRIPTORS
+    static constexpr UINT TOTAL_CONSOLIDATED_DESCRIPTORS = IMGUI_FONT_DESCRIPTORS + MAX_IMAGE_DESCRIPTORS + MAX_PLAYERHEAD_DESCRIPTORS;
     static inline UINT nextAvailableDescriptorIndex = IMGUI_FONT_DESCRIPTORS; // Start after ImGui font descriptor
     static inline std::mutex descriptorAllocationMutex;
 
@@ -127,3 +129,4 @@ public:
     static void FreeImageDescriptor(UINT imageId);
     static void ResetDescriptorAllocation();
 };
+

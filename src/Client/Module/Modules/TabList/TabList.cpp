@@ -112,7 +112,6 @@ bool TabList::AllocatePlayerHeadDescriptor(const std::string& playerName, D3D12_
             *out_gpu_handle = gpu;
             *out_descriptor_id = descriptorId;
 
-            Logger::custom(fg(fmt::color::green), "PlayerHeadDescriptor", "Reusing descriptor {} (heap index {}) for player '{}'", descriptorId, heapIndex, playerName);
             return true;
         }
     }
@@ -138,7 +137,6 @@ bool TabList::AllocatePlayerHeadDescriptor(const std::string& playerName, D3D12_
         }
 
         descriptorId = nextPlayerHeadDescriptorId++;
-        Logger::custom(fg(fmt::color::blue), "PlayerHeadDescriptor", "Allocating new descriptor {} for player '{}'", descriptorId, playerName);
     }
 
     // Calculate descriptor handles - convert playerhead ID to heap index
@@ -149,7 +147,6 @@ bool TabList::AllocatePlayerHeadDescriptor(const std::string& playerName, D3D12_
         return false;
     }
 
-    Logger::custom(fg(fmt::color::cyan), "PlayerHeadDescriptor", "Using descriptor {} -> heap index {} for player '{}'", descriptorId, heapIndex, playerName);
 
     UINT handle_increment = SwapchainHook::d3d12Device5->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
@@ -215,7 +212,6 @@ void TabList::CleanupOldPlayerHeads(size_t maxCached) {
 
         auto it = playerHeadDescriptors.find(descriptorId);
         if (it != playerHeadDescriptors.end()) {
-            Logger::custom(fg(fmt::color::orange), "PlayerHeadDescriptor", "Cleaning up old descriptor {} for player '{}'", descriptorId, it->second.playerName);
             freePlayerHeadDescriptors.push(descriptorId);
             playerHeadDescriptors.erase(it);
             removed++;
