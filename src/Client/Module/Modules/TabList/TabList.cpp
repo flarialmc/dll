@@ -175,7 +175,6 @@ void TabList::FreePlayerHeadDescriptor(UINT descriptorId) {
 
     auto it = playerHeadDescriptors.find(descriptorId);
     if (it != playerHeadDescriptors.end()) {
-        Logger::custom(fg(fmt::color::yellow), "PlayerHeadDescriptor", "Freeing descriptor {} for player '{}'", descriptorId, it->second.playerName);
         it->second.inUse = false;
         freePlayerHeadDescriptors.push(descriptorId);
         playerHeadDescriptors.erase(it);
