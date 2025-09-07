@@ -32,8 +32,8 @@ void ResizeHook::resizeCallback(IDXGISwapChain* pSwapChain, UINT bufferCount, UI
     if (module != nullptr && module->active && SDK::hasInstanced && SDK::clientInstance != nullptr)
         SDK::clientInstance->releaseMouse();
     GuiScale::fixResize = true;
-    //if (SwapchainHook::currentVsyncState) flags |= DXGI_PRESENT_ALLOW_TEARING;
-    return funcOriginal(pSwapChain, bufferCount, width, height, newFormat, SwapchainHook::currentVsyncState ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : flags);
+    if (SwapchainHook::currentVsyncState) flags |= DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
+    return funcOriginal(pSwapChain, bufferCount, width, height, newFormat, flags);
 }
 
 void ResizeHook::cleanShit(bool fullReset) {
