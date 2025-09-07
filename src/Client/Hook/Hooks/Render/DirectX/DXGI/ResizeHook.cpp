@@ -67,7 +67,7 @@ void ResizeHook::cleanShit(bool fullReset) {
         SwapchainHook::ResetDescriptorAllocation();
     }
 
-    if (SwapchainHook::context.get()) {
+    if (SwapchainHook::context) {
         SwapchainHook::context->ClearState();
         SwapchainHook::context->Flush();
     }
@@ -160,7 +160,7 @@ void ResizeHook::cleanShit(bool fullReset) {
         if (Blur::pIntermediateTexture2) Blur::pIntermediateTexture2 = nullptr;
     }
 
-    if (SwapchainHook::context.get()) {
+    if (SwapchainHook::context) {
         SwapchainHook::context->ClearState();
         SwapchainHook::context->Flush();
     }
@@ -201,7 +201,7 @@ void ResizeHook::cleanShit(bool fullReset) {
                 Sleep(20);
             }
 
-            if (SwapchainHook::context.get()) {
+            if (SwapchainHook::context) {
                 SwapchainHook::context->ClearState();
                 SwapchainHook::context->Flush();
             }
