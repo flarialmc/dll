@@ -211,6 +211,17 @@ void SwapchainHook::DX12Render(bool underui) {
     ID3D11Resource* resource = D3D11Resources[currentBitmap].get();
     d3d11On12Device->AcquireWrappedResources(&resource, 1);
 
+
+    if (currentBitmap >= bufferCount || currentBitmap >= frameContexts.size()) {
+        Logger::error("DX12Render: Invalid currentBitmap index {} (bufferCount: {}, frameContexts: {})",
+                     currentBitmap, bufferCount, frameContexts.size());
+        return;
+    }
+
+    if (!frameContexts[currentBitmap].commandAllocator || !frameContexts[currentBitmap].main_render_target_resource) {
+        Logger::error("DX12Render: Invalid frame context for index {}", currentBitmap);
+        return;
+    }
     D2D::context->SetTarget(D2D1Bitmaps[currentBitmap].get());
     MC::windowSize = Vec2(D2D::context->GetSize().width, D2D::context->GetSize().height);
 

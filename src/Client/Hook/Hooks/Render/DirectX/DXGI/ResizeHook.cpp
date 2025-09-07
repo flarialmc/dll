@@ -39,17 +39,19 @@ void ResizeHook::cleanShit(bool fullReset) {
     if (SwapchainHook::d3d12Device5 && SwapchainHook::queue) {
         winrt::com_ptr<ID3D12Fence> fence;
         if (SUCCEEDED(SwapchainHook::d3d12Device5->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(fence.put())))) {
-            const UINT64 value = 1;
+            const UINT64 value = 1000;
             HANDLE evt = CreateEvent(nullptr, FALSE, FALSE, nullptr);
             if (evt) {
                 SwapchainHook::queue->Signal(fence.get(), value);
                 if (fence->GetCompletedValue() < value) {
                     fence->SetEventOnCompletion(value, evt);
-                    WaitForSingleObject(evt, fullReset ? 3000 : 2000);
+                    WaitForSingleObject(evt, fullReset ? 5000 : 3000);
                 }
                 CloseHandle(evt);
             }
         }
+
+        Sleep(fullReset ? 100 : 50);
     }
 
     if (fullReset || SwapchainHook::init) {
@@ -92,7 +94,25 @@ void ResizeHook::cleanShit(bool fullReset) {
     SwapchainHook::cachedDX12RTVs.clear();
 
     for (auto& frameCtx : SwapchainHook::frameContexts) {
+
+        if (frameCtx.commandAllocator && SwapchainHook::d3d12Device5 && SwapchainHook::queue) {
+            winrt::com_ptr<ID3D12Fence> allocatorFence;
+            if (SUCCEEDED(SwapchainHook::d3d12Device5->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(allocatorFence.put())))) {
+                const UINT64 allocatorValue = 500;
+                HANDLE allocatorEvt = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+                if (allocatorEvt) {
+                    SwapchainHook::queue->Signal(allocatorFence.get(), allocatorValue);
+                    if (allocatorFence->GetCompletedValue() < allocatorValue) {
+                        allocatorFence->SetEventOnCompletion(allocatorValue, allocatorEvt);
+                        WaitForSingleObject(allocatorEvt, 2000);
+                    }
+                    CloseHandle(allocatorEvt);
+                }
+            }
+        }
+
         if (frameCtx.main_render_target_resource) frameCtx.main_render_target_resource = nullptr;
+        if (frameCtx.commandAllocator) frameCtx.commandAllocator = nullptr;
         frameCtx.main_render_target_descriptor = {};
     }
     SwapchainHook::frameContexts.clear();
@@ -123,23 +143,27 @@ void ResizeHook::cleanShit(bool fullReset) {
 
     if (SwapchainHook::d3d12DescriptorHeapBackBuffers) SwapchainHook::d3d12DescriptorHeapBackBuffers = nullptr;
 
+
     if (SwapchainHook::d3d12Device5 && SwapchainHook::queue) {
-        winrt::com_ptr<ID3D12Fence> fence;
-        if (SUCCEEDED(SwapchainHook::d3d12Device5->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(fence.put())))) {
-            const UINT64 value = 2;
-            HANDLE evt = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-            if (evt) {
-                SwapchainHook::queue->Signal(fence.get(), value);
-                if (fence->GetCompletedValue() < value) {
-                    fence->SetEventOnCompletion(value, evt);
-                    WaitForSingleObject(evt, 1500);
+        winrt::com_ptr<ID3D12Fence> finalFence;
+        if (SUCCEEDED(SwapchainHook::d3d12Device5->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(finalFence.put())))) {
+            const UINT64 finalValue = 2000;
+            HANDLE finalEvt = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+            if (finalEvt) {
+                SwapchainHook::queue->Signal(finalFence.get(), finalValue);
+                if (finalFence->GetCompletedValue() < finalValue) {
+                    finalFence->SetEventOnCompletion(finalValue, finalEvt);
+                    WaitForSingleObject(finalEvt, 2000);
                 }
-                CloseHandle(evt);
+                CloseHandle(finalEvt);
             }
         }
     }
 
     if (SwapchainHook::cachedDX12Fence) SwapchainHook::cachedDX12Fence = nullptr;
+
+
+    SwapchainHook::dx12FrameCount = 0;
 
     if (fullReset) {
         if (Blur::pConstantBuffer) Blur::pConstantBuffer = nullptr;
