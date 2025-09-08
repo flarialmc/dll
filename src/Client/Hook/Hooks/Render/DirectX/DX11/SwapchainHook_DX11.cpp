@@ -24,6 +24,7 @@
 using ::IUnknown;
 
 void SwapchainHook::DX11Init() {
+
     Logger::debug("Initializing for DX11");
     if (!swapchain) {
         Logger::error("Swapchain is null");
@@ -90,6 +91,7 @@ void SwapchainHook::DX11Init() {
     }
 
     Blur::InitializePipeline();
+    if (!MotionBlur::initted)
     MotionBlur::initted = AvgPixelMotionBlurHelper::Initialize() && RealMotionBlurHelper::Initialize();
 
     SaveBackbuffer();

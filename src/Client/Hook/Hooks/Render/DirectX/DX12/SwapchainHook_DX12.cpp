@@ -21,6 +21,7 @@
 using ::IUnknown;
 
 void SwapchainHook::DX12Init() {
+
     Logger::debug("Initializing for DX12");
 
     if (FAILED(swapchain->GetDevice(IID_PPV_ARGS(d3d12Device5.put())))) {

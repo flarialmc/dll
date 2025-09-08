@@ -19,6 +19,9 @@ HRESULT CreateSwapchainForCoreWindowHook::CreateSwapChainForCoreWindowCallback(
     IDXGIOutput *pRestrictToOutput,
     IDXGISwapChain1 **ppSwapChain)
 {
+
+    ResizeHook::cleanShit(true);
+
     winrt::com_ptr<ID3D12CommandQueue> pCommandQueue;
     Logger::debug("Recreating Swapchain");
     if (Client::settings.getSettingByName<bool>("killdx")->value) SwapchainHook::queue = nullptr;

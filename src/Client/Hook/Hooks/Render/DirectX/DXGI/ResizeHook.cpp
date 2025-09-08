@@ -13,6 +13,9 @@
 #include "../../../../../Module/Modules/GuiScale/GuiScale.hpp"
 #include "../../../../../Module/Modules/TabList/TabList.hpp"
 #include "GUI/Engine/Elements/Structs/ImagesClass.hpp"
+#include "../../../../../Module/Modules/MotionBlur/MotionBlur.hpp"
+#include "../../../../../Module/Modules/MotionBlur/AvgPixelMotionBlurHelper.hpp"
+#include "../../../../../Module/Modules/MotionBlur/RealMotionBlurHelper.hpp"
 
 void ResizeHook::enableHook() {
     int index;
@@ -37,61 +40,6 @@ void ResizeHook::resizeCallback(IDXGISwapChain* pSwapChain, UINT bufferCount, UI
 }
 
 void ResizeHook::cleanShit(bool fullReset) {
-    if (SwapchainHook::d3d12Device5 && SwapchainHook::queue) {
-        HANDLE evt = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-        if (evt) {
-            CloseHandle(evt);
-        }
-    }
-    if (fullReset || SwapchainHook::init) {
-        FlarialGUI::hasLoadedAll = false;
-        for (auto& [id, texture] : ImagesClass::ImguiDX12Textures) {
-            texture->Release();
-            texture = nullptr;
-        }
-        ImagesClass::ImguiDX12Textures.clear();
-        ImagesClass::ImguiDX12Images.clear();
-
-        for (auto& [id, src]: ImagesClass::ImguiDX11Images) {
-            if (src) {
-                src->Release();
-                src = nullptr;
-            }
-        }
-
-        ImagesClass::ImguiDX11Images.clear();
-
-        for (auto& i : ClickGUIElements::images) {
-            Memory::SafeRelease(i.second);
-        }
-
-        for (auto& entry : FlarialGUI::cachedBitmaps) {
-            ID2D1Image* bitmap = entry.second;
-            Memory::SafeRelease(bitmap);
-        }
-
-        FlarialGUI::cachedBitmaps.clear();
-
-        ClickGUIElements::images.clear();
-
-        for (auto i : ImagesClass::eimages) {
-            Memory::SafeRelease(i.second);
-        }
-
-
-        ImagesClass::eimages.clear();
-
-        for (auto& i : ImagesClass::images) {
-            Memory::SafeRelease(i.second);
-        }
-
-        ImagesClass::images.clear();
-
-
-        TabList::ResetDescriptorState();
-        SwapchainHook::ResetDescriptorAllocation();
-    }
-
 
     if (SwapchainHook::context)
     {
@@ -104,7 +52,7 @@ void ResizeHook::cleanShit(bool fullReset) {
     for (auto& res : SwapchainHook::D3D11Resources) toRelease.push_back(res.get());
     if (!toRelease.empty()) SwapchainHook::d3d11On12Device->ReleaseWrappedResources(toRelease.data(), static_cast<UINT>(toRelease.size()));
 
-    //SwapchainHook::d3d11On12Device = nullptr;
+    //SwapchainHook::d3d11Device = nullptr;
 
     SwapchainHook::swapchain = nullptr;
     SwapchainHook::SavedD3D11BackBuffer = nullptr;
@@ -184,6 +132,55 @@ void ResizeHook::cleanShit(bool fullReset) {
     D2D::context = nullptr;
 
     if (fullReset) {
+        FlarialGUI::hasLoadedAll = false;
+        for (auto& [id, texture] : ImagesClass::ImguiDX12Textures) {
+            texture->Release();
+            texture = nullptr;
+        }
+        ImagesClass::ImguiDX12Textures.clear();
+        ImagesClass::ImguiDX12Images.clear();
+
+        for (auto& [id, src]: ImagesClass::ImguiDX11Images) {
+            if (src) {
+                src->Release();
+                src = nullptr;
+            }
+        }
+
+        ImagesClass::ImguiDX11Images.clear();
+
+        for (auto& i : ClickGUIElements::images) {
+            Memory::SafeRelease(i.second);
+        }
+
+        for (auto& entry : FlarialGUI::cachedBitmaps) {
+            ID2D1Image* bitmap = entry.second;
+            Memory::SafeRelease(bitmap);
+        }
+
+        FlarialGUI::cachedBitmaps.clear();
+
+        ClickGUIElements::images.clear();
+
+        for (auto i : ImagesClass::eimages) {
+            Memory::SafeRelease(i.second);
+        }
+
+
+        ImagesClass::eimages.clear();
+
+        for (auto& i : ImagesClass::images) {
+            Memory::SafeRelease(i.second);
+        }
+
+        ImagesClass::images.clear();
+
+
+        TabList::ResetDescriptorState();
+        SwapchainHook::ResetDescriptorAllocation();
+    }
+
+    if (fullReset) {
         if (ImGui::GetCurrentContext()) {
             SwapchainHook::imguiCleanupInProgress = true;
             ImGui::GetIO().Fonts->Clear();
@@ -209,5 +206,42 @@ void ResizeHook::cleanShit(bool fullReset) {
         SwapchainHook::bufferCount = 0;
         SwapchainHook::dx12FrameCount = 0;
         SwapchainHook::cachedDX12FenceValue = 0;
+
+        SwapchainHook::d3d12CommandList = nullptr;
+        SwapchainHook::allocator = nullptr;
+        SwapchainHook::d3d12CommandQueue = nullptr;
+        SwapchainHook::d3d12DescriptorHeapImGuiRender = nullptr;
+        SwapchainHook::D3D12DescriptorHeap = nullptr;
+        SwapchainHook::d3d12Device5 = nullptr;
+        SwapchainHook::bufferCount = 0;
+        SwapchainHook::dx12FrameCount = 0;
+        SwapchainHook::cachedDX12FenceValue = 0;
+
+        // --- AvgPixelMotionBlurHelper resources ---
+        AvgPixelMotionBlurHelper::m_pixelShader = nullptr;
+        AvgPixelMotionBlurHelper::m_vertexShader = nullptr;
+        AvgPixelMotionBlurHelper::m_inputLayout = nullptr;
+        AvgPixelMotionBlurHelper::m_constantBuffer = nullptr;
+        AvgPixelMotionBlurHelper::m_vertexBuffer = nullptr;
+        AvgPixelMotionBlurHelper::m_depthStencilState = nullptr;
+        AvgPixelMotionBlurHelper::m_blendState = nullptr;
+        AvgPixelMotionBlurHelper::m_rasterizerState = nullptr;
+        AvgPixelMotionBlurHelper::m_samplerState = nullptr;
+        for (auto& srv : AvgPixelMotionBlurHelper::m_srvCache) srv = nullptr;
+        AvgPixelMotionBlurHelper::m_srvCache.clear();
+        for (auto& srv : AvgPixelMotionBlurHelper::m_nullSRVCache) srv = nullptr;
+        AvgPixelMotionBlurHelper::m_nullSRVCache.clear();
+        // --- RealMotionBlurHelper resources ---
+        RealMotionBlurHelper::m_pixelShader = nullptr;
+        RealMotionBlurHelper::m_vertexShader = nullptr;
+        RealMotionBlurHelper::m_inputLayout = nullptr;
+        RealMotionBlurHelper::m_constantBuffer = nullptr;
+        RealMotionBlurHelper::m_vertexBuffer = nullptr;
+        RealMotionBlurHelper::m_depthStencilState = nullptr;
+        RealMotionBlurHelper::m_blendState = nullptr;
+        RealMotionBlurHelper::m_rasterizerState = nullptr;
+        RealMotionBlurHelper::m_samplerState = nullptr;
+        MotionBlur::initted = false;
+        FlarialGUI::hasLoadedAll = false;
     }
 }

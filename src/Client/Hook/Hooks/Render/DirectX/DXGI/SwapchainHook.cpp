@@ -167,35 +167,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
         init = false;
         initImgui = false;
         Logger::debug("[DEBUG] Recreating Swapchain");
-
-        // CRITICAL: Force GPU to complete all pending operations before cleanup
-        if (isDX12 && d3d12Device5 && queue) {
-            winrt::com_ptr<ID3D12Fence> fence;
-            if (SUCCEEDED(d3d12Device5->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(fence.put())))) {
-                const UINT64 value = 1000;
-                HANDLE evt = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-                if (evt) {
-                    queue->Signal(fence.get(), value);
-                    if (fence->GetCompletedValue() < value) {
-                        fence->SetEventOnCompletion(value, evt);
-                        WaitForSingleObject(evt, 5000); // Extended timeout for recreation
-                    }
-                    CloseHandle(evt);
-                }
-            }
-        } else if (!isDX12 && context.get()) {
-            // For DX11, ensure all deferred operations are complete
-            context->ClearState();
-            context->Flush();
-            Sleep(50); // Small delay to ensure flush completes
-        }
-
-        ResizeHook::cleanShit(true);
-        recreate = false;
         swapchain = nullptr;
-
-        // Additional safety delay before returning device reset
-        Sleep(100);
 
         return DXGI_ERROR_DEVICE_RESET;
     }
