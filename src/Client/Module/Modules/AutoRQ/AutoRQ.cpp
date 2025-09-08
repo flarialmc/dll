@@ -323,7 +323,7 @@ void AutoRQ::onPacketReceive(PacketEvent &event) {
 
                 std::shared_ptr<Packet> packet = SDK::createPacket(77);
                 auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
-                command_packet->command = "/f accept " + pkt->message.substr(40, pkt->message.length() - 44);
+                command_packet->command = "/f accept \"" + pkt->message.substr(40, pkt->message.length() - 44) + "\"";
 
                 command_packet->origin.type = CommandOriginType::Player;
 
@@ -338,7 +338,7 @@ void AutoRQ::onPacketReceive(PacketEvent &event) {
 
                 std::shared_ptr<Packet> packet = SDK::createPacket(77);
                 auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
-                command_packet->command = "/p accept " + pkt->message.substr(6, pkt->message.length() - 40);
+                command_packet->command = "/p accept \"" + pkt->message.substr(6, pkt->message.length() - 40) + "\"";
 
                 command_packet->origin.type = CommandOriginType::Player;
 
