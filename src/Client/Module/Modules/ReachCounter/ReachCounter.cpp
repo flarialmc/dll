@@ -2,11 +2,6 @@
 
 #include "Events/EventManager.hpp"
 
-ReachCounter::ReachCounter(): Module("Reach Counter", "Displays your last hit range in blocks.", IDR_REACH_PNG,
-                                     "")
-{
-    
-}
 
 void ReachCounter::onEnable()
 {

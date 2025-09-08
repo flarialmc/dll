@@ -13,7 +13,9 @@ public:
 	static inline Vec2<float> originalPos = Vec2<float>{ 0.0f, 0.0f };
 	Vec2<float> currentSize = Vec2<float>{ 0.0f, 0.0f };
 
-	PaperDoll();
+	PaperDoll(): Module("Movable Paperdoll", "Makes the Minecraft paperdoll movable.",
+		IDR_MAN_PNG, "") {
+	}
 
 	void onEnable() override;
 

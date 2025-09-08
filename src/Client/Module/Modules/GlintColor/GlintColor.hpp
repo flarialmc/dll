@@ -8,7 +8,11 @@
 
 class GlintColor : public Module {
 public:
-	GlintColor() : Module("Glint Color", "Change the glint color of enchanted items.", IDR_SWORD_PNG, "") {};
+	GlintColor() : Module("Glint Color", "Change the glint color of enchanted items.",
+		IDR_SWORD_PNG, "", false, {"enchantment"}) {
+
+	};
+
 	void onEnable() override;
 
 	void onDisable() override;

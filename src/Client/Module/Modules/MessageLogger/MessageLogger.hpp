@@ -5,11 +5,17 @@
 
 
 class MessageLogger : public Module {
+
 private:
+
     bool update = false;
     int prevMsgVecSize = 0;
+
 public:
-    MessageLogger();
+    MessageLogger(): Module("Message Logger", "Saves chat messages into a file.",
+        IDR_COMPACTCHAT_PNG, "", false, {"chat logger"}) {
+
+    }
 
     void onEnable() override;
 

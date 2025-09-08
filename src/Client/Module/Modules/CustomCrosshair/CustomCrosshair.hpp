@@ -40,7 +40,6 @@ private:
 public:
 	CustomCrosshair() : Module("Custom Crosshair", "Allows for dynamic crosshair colors.",
 		IDR_SPEED_PNG, "") {
-
 		
 	};
 

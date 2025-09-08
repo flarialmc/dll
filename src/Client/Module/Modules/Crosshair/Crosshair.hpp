@@ -5,7 +5,8 @@
 class Crosshair : public Module {
 public:
 
-	Crosshair() : Module("Crosshair", "Allows you to change crosshair behavior.", IDR_ITEM_PHYSICS_PNG, "") {
+	Crosshair() : Module("Crosshair", "Allows you to change crosshair behavior.",
+		IDR_ITEM_PHYSICS_PNG, "") {
 		
 	}
 

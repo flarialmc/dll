@@ -26,7 +26,11 @@ public:
 	Vec3<float> Pos = Vec3<float>();
 	float yaw, pitch = 0;
 	std::string Context, PlayerName = "";
-	MumbleLink();
+
+	MumbleLink(): Module("Mumble Link", "Use proximity chat in Flarial with the help of Mumble",
+		IDR_MUMBLE_PNG, "") {
+
+	}
 
 	void onEnable() override;;
 

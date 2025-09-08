@@ -2,26 +2,6 @@
 
 #include "Events/EventManager.hpp"
 
-NoHurtCam::NoHurtCam(): Module("No Hurt Cam", "Disables hurt camera animation", IDR_REACH_PNG, "") {
-    int size;
-    if (VersionUtils::checkAboveOrEqual(21, 30)) {
-        size = 5;
-    } else {
-        size = 3;
-    }
-
-    originalCameraAngle.resize(size);
-
-    if (sigOffset == NULL) {
-        if (VersionUtils::checkAboveOrEqual(21, 30)) {
-            sigOffset = GET_SIG_ADDRESS("CameraAssignAngle");
-        } else {
-            sigOffset = GET_SIG_ADDRESS("CameraAssignAngle") + 4;
-        }
-    }
-
-    Memory::patchBytes(originalCameraAngle.data(), (LPVOID) sigOffset, size);
-}
 
 void NoHurtCam::onEnable() {
     Listen(this, RaknetTickEvent, &NoHurtCam::onRaknetTick)

@@ -20,7 +20,10 @@ private:
 	static inline Vec2<float> originalPos = Vec2<float>{ 0.0f, 0.0f };
 	Vec2<float> currentSize = Vec2<float>{ 0.0f, 0.0f };
 public:
-	MovableHUD();;
+	MovableHUD(): Module("Movable HUD", "Makes everything on screen movable!",
+		IDR_MOVABLE_PNG, "") {
+
+	}
 
 	void onEnable() override;
 

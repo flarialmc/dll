@@ -3,9 +3,6 @@
 #include "Modules/ClickGUI/ClickGUI.hpp"
 #include "Utils/Render/PositionUtils.hpp"
 
-MovableTitle::MovableTitle(): Module("Movable " + mname, "Makes the Minecraft " + mname + " movable.", IDR_MOVABLE_PNG, "") {
-    Listen(this, SetupAndRenderEvent, &MovableTitle::onSetupAndRender)
-}
 
 void MovableTitle::onEnable() {
     Listen(this, RenderEvent, &MovableTitle::onRender)

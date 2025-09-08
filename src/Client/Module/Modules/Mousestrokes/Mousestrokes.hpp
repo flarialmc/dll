@@ -6,7 +6,10 @@
 class Mousestrokes : public Module
 {
 public:
-    Mousestrokes();;
+    Mousestrokes() : Module("Mouse Strokes", "Visualizes the position of your mouse.",
+        IDR_CURSOR_PNG, "") {
+
+    }
 
     void onEnable() override;
 

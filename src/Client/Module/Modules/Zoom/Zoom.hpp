@@ -23,7 +23,11 @@ private:
 public:
 	static inline bool animationFinished = true;
 	static inline bool jdfAnimationFinished = true;
-	Zoom();
+
+	Zoom() : Module("Zoom", "Allows you to see distant places.",
+		IDR_MAGNIFY_PNG, "C") {
+		//this->setup();
+	}
 
 
 	void onEnable() override;

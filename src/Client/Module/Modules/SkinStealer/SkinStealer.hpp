@@ -10,7 +10,7 @@ public:
     bool clone = false;
 
     SkinStealer() : Module("Skin Stealer", "Equip someone else's skin",
-        IDR_SKINSTEALER_PNG, "MB_MIDDLE") {
+        IDR_SKINSTEALER_PNG, "MB_MIDDLE", false, {"skin cloner"}) {
     };
 
     void onEnable() override;

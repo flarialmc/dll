@@ -6,7 +6,8 @@
 
 class TimeChanger : public Module {
 public:
-	TimeChanger() : Module("Time Changer", "Changes the ingame time.", IDR_TIME_PNG, "") {
+	TimeChanger() : Module("Time Changer", "Changes the ingame time.",
+		IDR_TIME_PNG, "", false, {"render", "day", "night"}) {
 		
 	};
 

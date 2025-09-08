@@ -1,10 +1,5 @@
 #include "SpeedDisplay.hpp"
 
-SpeedDisplay::SpeedDisplay(): Module("Speed Display", "Displays your current travel speed in blocks/second.",
-                                     IDR_SPEED_PNG, "")
-{
-    
-}
 
 void SpeedDisplay::onEnable()
 {

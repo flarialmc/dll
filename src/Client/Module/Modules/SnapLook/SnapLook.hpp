@@ -15,7 +15,7 @@ private:
 
 public:
 	SnapLook() : Module("SnapLook", "Quickly look behind you.",
-		IDR_EYE_PNG, "V") {
+		IDR_EYE_PNG, "V", false, {"perspective", "f5", "behind"}) {
 
 	};
 

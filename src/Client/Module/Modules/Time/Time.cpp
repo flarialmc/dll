@@ -2,9 +2,6 @@
 #include "Client.hpp"
 #include "Events/EventManager.hpp"
 
-Time::Time(): Module("Clock", "Displays your current local or ingame time.", IDR_TIME_PNG, "")
-{
-}
 
 void Time::onEnable()
 {

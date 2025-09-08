@@ -5,8 +5,13 @@
 
 
 class MEM : public Module {
+
 public:
-	MEM();;
+
+	MEM(): Module("Memory", "Shows your current system RAM usage.",
+		IDR_MEMORY_PNG, "", false, {"stats"}) {
+
+	}
 
 	void onEnable() override;
 

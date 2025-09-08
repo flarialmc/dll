@@ -7,7 +7,9 @@
 #include "SDK/Client/Options/OptionsParser.hpp"
 
 class ModernKeybindHandling : public Module {
+
 private:
+
     OptionsParser parser;
     std::string lastScreen;
     std::array<bool, 256> heldKeys;
@@ -23,7 +25,16 @@ private:
     bool isInGameScreen();
     
 public:
-    ModernKeybindHandling();
+    ModernKeybindHandling() : Module("Modern Handling",
+    "Fixes the keybind issue where movement doesn't resume after exiting GUI screens while holding keys.",
+    IDR_KEYBOARD_PNG, "")
+    {
+        heldKeys.fill(false);
+        wasInGame = true;
+        lastScreen = "";
+        restoreQueued = false;
+        shouldContinueTracking = false;
+    }
     
     void onEnable() override;
     void onDisable() override;

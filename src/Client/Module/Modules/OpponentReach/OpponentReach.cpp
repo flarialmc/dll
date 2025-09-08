@@ -2,11 +2,6 @@
 
 #include "Events/EventManager.hpp"
 
-OpponentReach::OpponentReach(): Module("Opponent Reach", "Shows your opponent's last hit range!",
-                                       IDR_REACH_PNG, "")
-{
-    
-}
 
 void OpponentReach::onEnable()
 {

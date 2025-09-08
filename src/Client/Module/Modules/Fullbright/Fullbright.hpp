@@ -8,8 +8,7 @@ class Fullbright : public Module {
 public:
 	Fullbright() : Module("Fullbright",
 		"No need for torches!\nProvides consistent and constant illumination.\nEffectively removing darkness and shadows.",
-		IDR_FULLBRIGHT_PNG, "") {
-		
+		IDR_FULLBRIGHT_PNG, "", false, {"gamma"}) {
 
 	};
 

@@ -73,7 +73,10 @@ private:
 
 
 public:
-    TabList();
+
+    TabList(): Module("Tab List", "Java-like tab list.\nLists the current online players on the server.",
+        IDR_LIST_PNG, "TAB", false, {"player list"}) {
+    }
 
     void onEnable() override;
 

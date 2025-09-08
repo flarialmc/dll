@@ -3,8 +3,6 @@
 #include "Modules/ClickGUI/ClickGUI.hpp"
 #include "Utils/Render/PositionUtils.hpp"
 
-MovableDayCounter::MovableDayCounter(): Module("Movable " + mname, "Makes the Minecraft " + mname + " movable.", IDR_MOVABLE_PNG, "") {
-}
 
 void MovableDayCounter::onEnable() {
     restored = false;

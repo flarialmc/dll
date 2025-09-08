@@ -1,7 +1,5 @@
 #include "MovableBossbar.hpp"
 
-MovableBossbar::MovableBossbar(): Module("Movable " + mname, "Makes the Minecraft " + mname + " movable.", IDR_MOVABLE_PNG, "") {
-}
 
 void MovableBossbar::onEnable() {
     restored = false;

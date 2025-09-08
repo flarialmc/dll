@@ -14,7 +14,9 @@ public:
 	Vec2<float> lastAppliedPos = Vec2<float>{ 0.0f, 0.0f };
 	bool restored = false;
 
-	MovableChat();
+	MovableChat(): Module("Movable Chat", "Ability to move the chat.",
+		IDR_MOVABLE_PNG, "") {
+	}
 
 	void onEnable() override;
 

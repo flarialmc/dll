@@ -6,11 +6,18 @@
 #include "Events/Render/RenderEvent.hpp"
 
 class ReachCounter : public Module {
+
 private:
+
 	float Reach = 0.0f;
 	std::chrono::time_point<std::chrono::high_resolution_clock> last_hit;
+
 public:
-	ReachCounter();;
+
+	ReachCounter(): Module("Reach Counter", "Displays your last hit range in blocks.",
+		IDR_REACH_PNG, "") {
+
+	}
 
 	void onEnable() override;
 

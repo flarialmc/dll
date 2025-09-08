@@ -8,7 +8,9 @@ public:
 	float oldTemp;
 	Biome* oldBiome = nullptr;
 
-	WeatherChanger();
+	WeatherChanger(): Module("Weather Changer", "Changes the weather ingame.",
+		IDR_CLOUDY_PNG, "", false, {"render", "rain", "thunder"}) {
+	}
 
 	void onEnable() override;
 

@@ -1,9 +1,5 @@
 #include "RawInputBuffer.hpp"
 
-RawInputBuffer::RawInputBuffer(): Module("Raw Input Buffer", "Fixes Minecraft's default input delay", IDR_CURSOR_PNG, "")
-{
-    
-}
 
 void RawInputBuffer::onEnable()
 {

@@ -39,7 +39,37 @@ class Lewis : public Module {
 
 public:
 
-	Lewis();;
+	Lewis() : Module("Lewis", "Lewis, king of Hippos. (Brought to you by the one and only, Oblitqrated) ",
+					   IDR_SKULL_PNG, "", false, {"troll"}) {
+
+		HRSRC imageResHandle = nullptr;
+		HGLOBAL imageResDataHandle = nullptr;
+		const unsigned char* pImageFile = nullptr;
+		DWORD imageFileSize = 0;
+
+
+		imageResHandle = FindResource(Client::currentModule, MAKEINTRESOURCE(253), "MP3");
+		if (imageResHandle == nullptr) {
+			return;
+		}
+
+		imageResDataHandle = LoadResource(Client::currentModule, imageResHandle);
+		if (imageResDataHandle == nullptr) {
+			return;
+		}
+
+		pImageFile = (const unsigned char*)LockResource(imageResDataHandle);
+		if (pImageFile == nullptr) {
+			return;
+		}
+
+		imageFileSize = SizeofResource(Client::currentModule, imageResHandle);
+		if (imageFileSize == 0) {
+			return;
+		}
+
+		saveMp3File(pImageFile, imageFileSize, Utils::getAssetsPath() + "\\lewis.mp3");
+	}
 
 	void onEnable() override;
 

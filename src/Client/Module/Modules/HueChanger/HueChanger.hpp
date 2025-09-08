@@ -9,7 +9,7 @@ class HueChanger : public Module {
 public:
 
 	HueChanger() : Module("Saturation", "A filter to saturate or\ndesaturate Minecraft.",
-		IDR_FULLBRIGHT_PNG, "") {
+		IDR_FULLBRIGHT_PNG, "", false, {"render"}) {
 		
 	};
 

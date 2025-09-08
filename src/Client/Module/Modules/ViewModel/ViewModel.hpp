@@ -6,10 +6,17 @@
 #include "Events/Game/RenderItemInHandEvent.hpp"
 
 class ViewModel : public Module {
+
 private:
+
 	bool thirdperson = false;
+
 public:
-	ViewModel();;
+
+	ViewModel(): Module("View Model", "Allows you to modify how item in hand looks.",
+		IDR_EYE_PNG, "C", false, {"item", "size"}) {
+
+	}
 
 	void onEnable() override;
 

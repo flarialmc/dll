@@ -17,7 +17,9 @@ public:
 
 	static inline std::string mname = "Hotbar"; // dont use "name" var pls cuz it will override this->name so Module("name here") would be useless
 
-	MovableHotbar();;
+	MovableHotbar() : Module("Movable " + mname, "Makes the Minecraft " + mname + " movable.",
+		IDR_MOVABLE_PNG, "") {
+	}
 
 	void onEnable() override;
 

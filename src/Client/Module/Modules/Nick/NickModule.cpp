@@ -2,12 +2,6 @@
 
 #include "Events/EventManager.hpp"
 
-NickModule::NickModule(): Module("Nick",
-                                 "Hides your username and replace it with something else.\nWorks everywhere (chat, pause, third person, etc)\nOther people will not be able to see your nick.",
-                                 IDR_ICOGNITO_PNG, "")
-{
-    
-}
 
 void NickModule::onEnable()
 {

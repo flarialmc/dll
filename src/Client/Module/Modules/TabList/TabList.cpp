@@ -17,8 +17,6 @@
 
 bool logDebug = false;
 
-TabList::TabList(): Module("Tab List", "Java-like tab list.\nLists the current online players on the server.", IDR_LIST_PNG, "TAB") {
-}
 
 // DX12 texture creation from raw bytes
 enum class PlayerHeadLoadState {

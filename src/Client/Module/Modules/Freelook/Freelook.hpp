@@ -21,7 +21,7 @@ public:
 
 	FreeLook() : Module("FreeLook",
 		"Freely move your camera in 3rd person mode\nwhile keeping the player rotation the same.",
-		IDR_FREELOOK_PNG, "F") {
+		IDR_FREELOOK_PNG, "F", false, {"360"}) {
 
 		yaw1 = GET_SIG_ADDRESS("CameraYaw");
 		yaw2 = GET_SIG_ADDRESS("CameraYaw2");

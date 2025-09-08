@@ -10,9 +10,8 @@ public:
 
 
 	IPDisplay() : Module("IP Display", "Displays the current server IP you're playing on.",
-		IDR_SERVER_IP_PNG, "") {
+		IDR_SERVER_IP_PNG, "", false, {"server", "address"}) {
 
-		
 	};
 
 	void onEnable() override;

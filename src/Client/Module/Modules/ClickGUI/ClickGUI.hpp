@@ -90,7 +90,9 @@ private:
 public:
     void onPacketReceive(PacketEvent& event);
 
-    ClickGUI() : Module("ClickGUI", "What do you think it is?", IDR_CLICKGUI_PNG, "K") {
+    ClickGUI() : Module("ClickGUI", "What do you think it is?",
+        IDR_CLICKGUI_PNG, "K", false, {"theme", "key", "promotions", "watermark", "logo", "spam"}
+    ) {
         this->ghostMainModule = new Module("main", "troll", IDR_COMBO_PNG, "");
         scrollInfo["modules"] = {0, 0};
         scrollInfo["scripting"] = {0, 0};

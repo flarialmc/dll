@@ -7,7 +7,7 @@
 class MaterialBinLoader : public Module {
 public:
     MaterialBinLoader() : Module("MaterialBinLoader", "Load Shaders from ResourcePack",
-                      IDR_RENDER_DRAGON_PNG, "") {
+                      IDR_RENDER_DRAGON_PNG, "", false, {"shader", "shader loader", "render", "brd", "better render dragon", "betterrenderdragon", "matject"}) {
         Module::setup();
     };
 

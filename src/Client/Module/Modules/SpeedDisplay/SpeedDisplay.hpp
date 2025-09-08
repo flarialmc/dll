@@ -4,11 +4,18 @@
 #include "../../../Client.hpp"
 
 class SpeedDisplay : public Module {
+
 private:
+
 	Vec3<float> PrevPos{};
 	std::string speed;
+
 public:
-	SpeedDisplay();;
+
+	SpeedDisplay(): Module("Speed Display", "Displays your current travel speed in blocks/second.",
+		IDR_SPEED_PNG, "", false, {"velocity"}) {
+
+	}
 
 	void onEnable() override;
 

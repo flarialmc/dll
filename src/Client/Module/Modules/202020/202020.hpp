@@ -9,7 +9,8 @@ public:
 	std::chrono::steady_clock::time_point blackscreen;
 	std::chrono::seconds elapsed;
 
-	Module202020() : Module("Meds", "Implements the medical 202020 rule\ninto minecraft.", IDR_TIME_PNG, "") {
+	Module202020() : Module("Meds", "Implements the medical 202020 rule\ninto minecraft.",
+		IDR_TIME_PNG, "", false,{"202020", "eyesight"}) {
 		
 	};
 

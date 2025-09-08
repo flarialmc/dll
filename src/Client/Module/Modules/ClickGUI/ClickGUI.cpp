@@ -664,8 +664,23 @@ void ClickGUI::onRender(RenderEvent &event) {
                             c = (char) std::tolower(c);
                         }
 
-                        if (name.starts_with(search) ||
-                            name.find(search) != std::string::npos) {
+                        bool showMod = false;
+
+                        if (
+                            name.starts_with(search) ||
+                            name.find(search) != std::string::npos
+                        ) showMod = true;
+
+                        if (!showMod && !pModule->aliases.empty()) {
+                            for (const std::string& alias : pModule->aliases) {
+                                if (
+                                    String::toLower(alias).starts_with(search) ||
+                                    String::toLower(alias).find(search) != std::string::npos
+                                ) showMod = true;
+                            }
+                        }
+
+                        if (showMod) {
                             ClickGUIElements::ModCard(modcenter.x + xModifier + modcardOffset, modcenter.y + yModifier,
                                                       pModule.get(),
                                                       pModule->icon, i, visible);

@@ -1,19 +1,19 @@
-#include "AutoRQ.hpp"
+#include "HiveUtils.hpp"
 
 #include "Events/EventManager.hpp"
 #include "SDK/Client/Network/Packet/SetTitlePacket.hpp"
 
-void AutoRQ::onEnable() {
-    Listen(this, PacketEvent, &AutoRQ::onPacketReceive)
+void HiveUtils::onEnable() {
+    Listen(this, PacketEvent, &HiveUtils::onPacketReceive)
     Module::onEnable();
 }
 
-void AutoRQ::onDisable() {
-    Deafen(this, PacketEvent, &AutoRQ::onPacketReceive)
+void HiveUtils::onDisable() {
+    Deafen(this, PacketEvent, &HiveUtils::onPacketReceive)
     Module::onDisable();
 }
 
-void AutoRQ::defaultConfig() {
+void HiveUtils::defaultConfig() {
     Module::defaultConfig("core");
     setDef("map", (std::string)"");
     setDef("ReQ", true);
@@ -42,7 +42,7 @@ void AutoRQ::defaultConfig() {
     
 }
 
-void AutoRQ::settingsRender(float settingsOffset) {
+void HiveUtils::settingsRender(float settingsOffset) {
     initSettingsPage();
     addHeader("General");
     addToggle("Use /hub instead of /q", "", "hub");
@@ -120,7 +120,7 @@ void AutoRQ::settingsRender(float settingsOffset) {
     resetPadding();
 }
 
-void AutoRQ::onPacketReceive(PacketEvent &event) {
+void HiveUtils::onPacketReceive(PacketEvent &event) {
     if (!this->isEnabled()) return;
     MinecraftPacketIds id = event.getPacket()->getId();
 
@@ -333,7 +333,7 @@ void AutoRQ::onPacketReceive(PacketEvent &event) {
     }
 }
 
-void AutoRQ::reQ() {
+void HiveUtils::reQ() {
     if (!this->isEnabled()) return;
     if (!getOps<bool>("hub")) {
         FlarialGUI::Notify("Finding a new game of " + HiveModeCatcherListener::fullgamemodename);

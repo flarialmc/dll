@@ -13,8 +13,8 @@ private:
 	static inline std::vector<uint8_t> original_option;
 	static inline std::vector<uint8_t> patched_option;
 public:
-	ForceCoords() : Module("Coordinates", "Shows your ingame position. (XYZ)", IDR_COORDINATES_PNG,
-		"") {
+	ForceCoords() : Module("Force Coordinates", "Shows your ingame position. (XYZ)",
+		IDR_COORDINATES_PNG, "") {
 		option = GET_SIG_ADDRESS("ForceCoordsOption");
 
 		original_option.resize(4);

@@ -1,7 +1,5 @@
 #include "MovableScoreboard.hpp"
 
-MovableScoreboard::MovableScoreboard(): Module("Movable " + mname, "Makes the Minecraft " + mname + " movable.", IDR_MOVABLE_PNG, "") {
-}
 
 void MovableScoreboard::onEnable() {
     restored = false;

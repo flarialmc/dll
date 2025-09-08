@@ -8,7 +8,7 @@ class PingCounter : public Module {
 public:
 
 	PingCounter() : Module("Ping Counter", "Displays your current latency to the server.",
-					IDR_PING_PNG, ""){
+					IDR_PING_PNG, "", false, {"stats"}) {
 	};
 
 	void onEnable() override;

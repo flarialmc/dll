@@ -14,7 +14,8 @@ class BlockOutline : public Module {
 
 public:
 	OptionsParser options;
-	BlockOutline() : Module("Block Outline", "Changes the block outline color", IDR_BLOCK_PNG, "") {
+	BlockOutline() : Module("Block Outline", "Changes the block outline color",
+		IDR_BLOCK_PNG, "", false, {"overlay"}) {
 		
 		options.parseOptionsFile();
 

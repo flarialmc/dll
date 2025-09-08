@@ -14,7 +14,11 @@ private:
 
 	std::map<int64_t, Actor*> hitActors;
 public:
-	OpponentReach();;
+
+	OpponentReach(): Module("Opponent Reach", "Shows your opponent's last hit range!",
+			IDR_REACH_PNG, "") {
+
+	}
 
 	void onEnable() override;
 

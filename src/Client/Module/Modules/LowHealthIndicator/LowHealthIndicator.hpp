@@ -5,9 +5,15 @@
 #include "Events/Render/RenderEvent.hpp"
 
 class LowHealthIndicator : public Module {
+
 	int health = 20.f;
+
 public:
-	LowHealthIndicator();
+
+	LowHealthIndicator() : Module("Low Health", "Warns you when you are at low health.",
+		IDR_HEART_PNG, "", false, {"warning"}) {
+
+	}
 
 	void defaultConfig() override;
 

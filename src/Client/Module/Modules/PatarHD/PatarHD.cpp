@@ -2,10 +2,6 @@
 
 #include "Events/EventManager.hpp"
 
-PatarHD::PatarHD(): Module("PatarHD", "At this Point it should be called Staff Mod", IDR_SKULL_PNG, "")
-{
-    
-}
 
 void PatarHD::onEnable()
 {
