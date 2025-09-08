@@ -15,10 +15,10 @@ ResourceLocation BetterHungerBar::getOutlineU(ResourceLocation& originalOutlineT
 {
     auto currentTime = std::chrono::steady_clock::now();
     
-    // Check if we need to reprocess (every 6s)
+    // Check if we need to reprocess (every 10s)
     if (cacheInitialized) {
         auto timeSinceLastProcess = std::chrono::duration_cast<std::chrono::seconds>(currentTime - lastProcessTime);
-        if (timeSinceLastProcess.count() < 6) {
+        if (timeSinceLastProcess.count() < 10) {
             return cachedOutline;
         }
     }

@@ -27,14 +27,14 @@ void BetterHungerBar::onDisable() {
 }
 
 void BetterHungerBar::defaultConfig() {
-	settings.changeType<float, int>("xOffset");
-	settings.changeType<float, int>("yOffset");
+    settings.changeType<float, int>("xOffset");
+    settings.changeType<float, int>("yOffset");
     Module::defaultConfig("core");
     setDef("saturationColor", (std::string)"FFBB00", 1.f, false);
     setDef("fadeSpeed", 7.f);
     setDef("maxFadeOpacity", 185.f);
     setDef("showOnFullHunger", true);
-    setDef("newTextureSystem", false);
+    setDef("newTextureSystem", false); // wont stay for long hopefully
     setDef("xOffset", 82);
     setDef("yOffset", 41);
     setDef("scale", 1.f);
@@ -240,10 +240,12 @@ void BetterHungerBar::onSetupAndRender(const SetupAndRenderEvent &event) {
     
     loadTextures(muirc);
     
-    // Clean "icons.png" by only keeping the outline for saturation instead of the full icon
     auto fallbackLocation = ResourceLocation("textures/gui/icons", false);
+    auto fallbackTexture = muirc->createTexture(fallbackLocation, false);
+
+    // Clean "icons.png" by only keeping the outline for saturation instead of the full icon
     ResourceLocation cleanSatOutline = getOutlineG(fallbackLocation);
-    auto fallbackTexture = muirc->createTexture(cleanSatOutline, false);
+    auto fallbackSatTexture = muirc->createTexture(cleanSatOutline, false);
     
     // Used for the fade/pulse animation in 1.2, 2.2 and 3.2
     double time_seconds = getCurrentTime();
@@ -261,10 +263,23 @@ void BetterHungerBar::onSetupAndRender(const SetupAndRenderEvent &event) {
 
     float iconSize = 9.0f * manualscale;
     float iconSpacing = 8.0f * manualscale;
+
+    Vec2<float> bottomMiddle;
+    
+    std::shared_ptr<MovableHotbar> movableHotbar = std::dynamic_pointer_cast<MovableHotbar>(ModuleManager::getModule("Movable Hotbar"));
+    if (movableHotbar && movableHotbar->isEnabled()) {
+
+        // If movable hotbar is enabled, we use its position
+        Vec2<float> hotbarPos = movableHotbar->currentPos;
+        Vec2<float> hotbarSize = movableHotbar->currentSize;
+        bottomMiddle = Vec2<float>((hotbarPos.x + (hotbarSize.x / 2.0f)), (hotbarPos.y + hotbarSize.y));
+    } else {
+        bottomMiddle = Vec2<float>((MC::windowSize.x / 2), MC::windowSize.y);
+    }
     
     auto currentPos = Vec2<float>(
-        (MC::windowSize.x / 2 + (getOps<int>("xOffset") * guiscale)), 
-        (MC::windowSize.y - (getOps<int>("yOffset") * guiscale))
+        (bottomMiddle.x + (getOps<int>("xOffset") * guiscale)), 
+        (bottomMiddle.y - (getOps<int>("yOffset") * guiscale))
     );
 
     Vec2<float> scaledPos = PositionUtils::getScaledPos(currentPos);
@@ -291,6 +306,7 @@ void BetterHungerBar::onSetupAndRender(const SetupAndRenderEvent &event) {
             if (type == "rotten_half") return hungerEffectHalfTexture;
             if (type == "saturation") return hungerBlinkTexture;
         }
+        if (type == "saturation") return fallbackSatTexture;
         return fallbackTexture;
     };
 
@@ -331,9 +347,9 @@ void BetterHungerBar::onSetupAndRender(const SetupAndRenderEvent &event) {
         
         // 1.1) Render outline icons
         std::string outlineType = hasHungerEffect ? "outline_hunger" : "outline_normal";
-		TexturePtr outlineTexture = getTexture(outlineType);
+        TexturePtr outlineTexture = getTexture(outlineType);
         Vec2<float> outlineUVSize = getUVSize(outlineType);
-		Vec2<float> outlineUV = getUV(outlineType);
+        Vec2<float> outlineUV = getUV(outlineType);
         
         muirc->drawImage(outlineTexture, position, size, outlineUV, outlineUVSize);
         muirc->flushImages(defaultColor, 1.0f, flushLayer);
@@ -341,8 +357,8 @@ void BetterHungerBar::onSetupAndRender(const SetupAndRenderEvent &event) {
 
         // 1.2) Render predicted outline icons
         if (itemName == "milk_bucket") {
-			TexturePtr normalOutlineTexture = getTexture("outline_normal");
-			Vec2<float> normalOutlineUVSize = getUVSize("outline_normal");
+            TexturePtr normalOutlineTexture = getTexture("outline_normal");
+            Vec2<float> normalOutlineUVSize = getUVSize("outline_normal");
             Vec2<float> normalOutlineUV = getUV("outline_normal");
             
             muirc->drawImage(normalOutlineTexture, position, size, normalOutlineUV, normalOutlineUVSize);
@@ -362,8 +378,8 @@ void BetterHungerBar::onSetupAndRender(const SetupAndRenderEvent &event) {
                 hungerType = showFullIcon ? "hunger_full" : "hunger_half";
             }
             
-			TexturePtr hungerTexture = getTexture(hungerType);
-			Vec2<float> hungerUVSize = getUVSize(hungerType);
+            TexturePtr hungerTexture = getTexture(hungerType);
+            Vec2<float> hungerUVSize = getUVSize(hungerType);
             Vec2<float> hungerUV = getUV(hungerType);
             
             muirc->drawImage(hungerTexture, position, size, hungerUV, hungerUVSize);
@@ -387,8 +403,8 @@ void BetterHungerBar::onSetupAndRender(const SetupAndRenderEvent &event) {
                 }
             }
             
-			TexturePtr hungerTexture = getTexture(hungerType);
-			Vec2<float> hungerUVSize = getUVSize(hungerType);
+            TexturePtr hungerTexture = getTexture(hungerType);
+            Vec2<float> hungerUVSize = getUVSize(hungerType);
             Vec2<float> hungerUV = getUV(hungerType);
             
             muirc->drawImage(hungerTexture, position, size, hungerUV, hungerUVSize);
@@ -396,7 +412,7 @@ void BetterHungerBar::onSetupAndRender(const SetupAndRenderEvent &event) {
         }
 
 
-		// 3.1) Render current saturation outline icons
+        // 3.1) Render current saturation outline icons
         if (std::floor(currentSaturation) / 2 > i) {
             bool fullIcon = i != (std::floor(currentSaturation) - 1) / 2;
             std::string satType = fullIcon ? "saturation_full" : "saturation_half";
@@ -410,8 +426,8 @@ void BetterHungerBar::onSetupAndRender(const SetupAndRenderEvent &event) {
                 adjustedSize.x = (5.0f / 9.0f) * iconSize;
             }
             
-			TexturePtr satTexture = getTexture("saturation");
-			Vec2<float> satUVSize = getUVSize(satType);
+            TexturePtr satTexture = getTexture("saturation");
+            Vec2<float> satUVSize = getUVSize(satType);
             Vec2<float> satUV = getUV(satType);
             
             muirc->drawImage(satTexture, adjustedPosition, adjustedSize, satUV, satUVSize);
@@ -447,8 +463,8 @@ void BetterHungerBar::onSetupAndRender(const SetupAndRenderEvent &event) {
                 adjustedSize.x = (5.0f / 9.0f) * iconSize;
             }
             
-			TexturePtr satTexture = getTexture("saturation");
-			Vec2<float> satUVSize = getUVSize(satType);
+            TexturePtr satTexture = getTexture("saturation");
+            Vec2<float> satUVSize = getUVSize(satType);
             Vec2<float> satUV = getUV(satType);
             
             muirc->drawImage(satTexture, adjustedPosition, adjustedSize, satUV, satUVSize);
@@ -467,7 +483,7 @@ void BetterHungerBar::loadTextures(MinecraftUIRenderContext* muirc) {
     auto hungerEffectBackgroundLoc = ResourceLocation("textures/ui/hunger_effect_background", false);
 
     // Clean "hunger_blink.png" by only keeping the white non-transparent pixels (= outline)
-	auto hungerBlinkLoc = ResourceLocation("textures/ui/hunger_blink", false);
+    auto hungerBlinkLoc = ResourceLocation("textures/ui/hunger_blink", false);
     ResourceLocation cleanSatOutline2 = getOutlineU(hungerBlinkLoc);
     hungerBlinkTexture = muirc->createTexture(cleanSatOutline2, false);
 

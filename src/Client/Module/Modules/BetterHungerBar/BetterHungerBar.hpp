@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Module.hpp"
+#include "../MovableHotbar/MovableHotbar.hpp"
 #include "Events/Game/TickEvent.hpp"
 #include "Events/Render/SetupAndRenderEvent.hpp"
 #include "Utils/Render/PositionUtils.hpp"
@@ -62,11 +63,11 @@ public:
     
     double getPredictedSaturation();
 
-	// "U" stands for the location: textures/ui/hunger_... 
-	ResourceLocation getOutlineU(ResourceLocation& originalOutlineTexture);
+    // "U" stands for the location: textures/ui/hunger_... 
+    ResourceLocation getOutlineU(ResourceLocation& originalOutlineTexture);
 
-	// "G" stands for the location: textures/gui/icons
-	ResourceLocation getOutlineG(ResourceLocation& originalOutlineTexture);
+    // "G" stands for the location: textures/gui/icons
+    ResourceLocation getOutlineG(ResourceLocation& originalOutlineTexture);
 
 };
 
@@ -75,11 +76,11 @@ public:
 class OutlineImage {
 public:
 
-	std::vector<Vec4<int>> PixelData = std::vector<Vec4<int>>(256, Vec4<int>(0, 0, 0, 0));
-	int Size = 9;
-	OutlineImage(std::string Path);
-	OutlineImage() {};
-	const unsigned char* getImageData();
-	void SaveImage(std::string name);
+    std::vector<Vec4<int>> PixelData = std::vector<Vec4<int>>(256, Vec4<int>(0, 0, 0, 0));
+    int Size = 9;
+    OutlineImage(std::string Path);
+    OutlineImage() {};
+    const unsigned char* getImageData();
+    void SaveImage(std::string name);
 
 };
