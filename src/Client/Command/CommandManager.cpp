@@ -14,6 +14,7 @@
 #include "Commands/WikiCommand.hpp"
 #include "Commands/IRCChat.hpp"
 #include "../Client.hpp"
+#include "Events/Network/PacketSendEvent.hpp"
 
 std::vector<std::shared_ptr<Command>> CommandManager::Commands = std::vector<std::shared_ptr<Command>>();
 CommandManager CommandManager::instance;

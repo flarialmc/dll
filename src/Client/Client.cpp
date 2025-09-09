@@ -19,6 +19,7 @@
 #include "Utils/APIUtils.hpp"
 
 #include "../Assets/Assets.hpp"
+#include "Events/Misc/ProtocolEvent.hpp"
 
 namespace winrt
 {

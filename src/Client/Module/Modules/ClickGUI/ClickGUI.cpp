@@ -1,4 +1,4 @@
-﻿#include "ClickGUI.hpp"
+#include "ClickGUI.hpp"
 
 #include <random>
 #include <Scripting/ScriptManager.hpp>
@@ -8,6 +8,31 @@
 #include "Modules/Misc/ScriptMarketplace/ScriptMarketplace.hpp"
 
 std::chrono::time_point<std::chrono::high_resolution_clock> ClickGUI::favoriteStart;
+
+// Moved static method implementations from header for better compilation performance
+D2D_COLOR_F ClickGUI::getColor(const std::string& text) {
+    D2D_COLOR_F col = clickgui->settings.getSettingByName<bool>(text + "RGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>(text + "Col")->value);
+    col.a = clickgui->settings.getSettingByName<float>(text + "Opacity")->value;
+    return col;
+}
+
+// Moved constructor implementation from header
+ClickGUI::ClickGUI() : Module("ClickGUI", "What do you think it is?",
+    IDR_CLICKGUI_PNG, "K", false, {"theme", "key", "promotions", "watermark", "logo", "spam"}
+) {
+    this->ghostMainModule = new Module("main", "troll", IDR_COMBO_PNG, "");
+    scrollInfo["modules"] = {0, 0};
+    scrollInfo["scripting"] = {0, 0};
+    scrollInfo["settings"] = {0, 0};
+
+    Listen(this, MouseEvent, &ClickGUI::onMouse)
+    //Listen(this, FOVEvent, &ClickGUI::fov)
+    Listen(this, KeyEvent, &ClickGUI::onKey)
+    ListenOrdered(this, PacketEvent, &ClickGUI::onPacketReceive, EventOrder::IMMEDIATE)
+    ListenOrdered(this, RenderEvent, &ClickGUI::onRender, EventOrder::IMMEDIATE)
+    Listen(this, SetupAndRenderEvent, &ClickGUI::onSetupAndRender)
+    //Module::onEnable();
+}
 
 
 //random clickgui fov animation i found cool
