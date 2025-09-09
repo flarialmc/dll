@@ -4,20 +4,15 @@
 #include "../../../../../Events/Render/RenderEvent.hpp"
 #include "../../../../../Events/Render/RenderUnderUIEvent.hpp"
 #include "d2d1.h"
-#include "../../../../../Client.hpp"
 #include <d3d11on12.h>
-#include <algorithm>
-#include <codecvt>
 #include <windows.h>
 #include <unknwn.h>
-#include <iostream>
-#include <Psapi.h>
-#include <tlhelp32.h>
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_dx12.h>
 #include <imgui/imgui_impl_win32.h>
 #include "unknwnbase.h"
+#include "../DXGI/UnderUIHooks.hpp"
 using ::IUnknown;
 
 void SwapchainHook::DX12Init() {
@@ -385,4 +380,32 @@ void SwapchainHook::ResetDescriptorAllocation() {
 
     nextAvailableDescriptorIndex = IMGUI_FONT_DESCRIPTORS;
     Logger::custom(fg(fmt::color::yellow), "DescriptorAlloc", "Reset descriptor allocation, next available index: {}", nextAvailableDescriptorIndex);
+}
+
+void SwapchainHook::CreateDX12UnderUIResource() {
+    if (!DX12UnderUITexture && UnderUIHooks::bgfxCtxDX12 && d3d11On12Device) {
+        // Use bgfx DX12 MSAA render target instead of main backbuffer
+        ID3D12Resource* msaaRenderTarget = UnderUIHooks::bgfxCtxDX12->m_msaart;
+        
+        if (msaaRenderTarget) {
+            // Create D3D11 texture from bgfx DX12 MSAA render target for UnderUI
+            D3D11_RESOURCE_FLAGS d3d11Flags = { 
+                D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET 
+            };
+            
+            HRESULT hr = d3d11On12Device->CreateWrappedResource(
+                msaaRenderTarget,
+                &d3d11Flags,
+                D3D12_RESOURCE_STATE_RENDER_TARGET,
+                D3D12_RESOURCE_STATE_RENDER_TARGET,
+                IID_PPV_ARGS(DX12UnderUITexture.put())
+            );
+            
+            if (FAILED(hr)) {
+                Logger::error("Failed to create DX12 UnderUI wrapped resource from bgfx MSAA RT: {}", Logger::getHRESULTError(hr));
+            }
+        } else {
+            Logger::debug("bgfx DX12 MSAA render target is null, cannot create UnderUI resource");
+        }
+    }
 }

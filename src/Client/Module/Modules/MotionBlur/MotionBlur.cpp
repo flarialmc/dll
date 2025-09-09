@@ -4,14 +4,10 @@
 
 void MotionBlur::onEnable()
 {
-    if (SwapchainHook::queue) { if (!once) { FlarialGUI::Notify("Please turn on Better Frames in Settings!"); once = true; } }
-    else {
-
         ListenOrdered(this, RenderUnderUIEvent, &MotionBlur::onRender, EventOrder::IMMEDIATE)
         ListenOrdered(this, RenderEvent, &MotionBlur::onRenderNormal, EventOrder::IMMEDIATE)
 
         Module::onEnable();
-    }
 }
 
 void MotionBlur::onDisable()

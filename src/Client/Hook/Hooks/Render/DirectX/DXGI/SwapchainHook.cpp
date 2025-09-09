@@ -173,7 +173,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
     static bool hooker = false;
 
-    if (!hooker && ((queue) || (!queue && context))) {
+    if (!hooker && ((queue && d3d12CommandList) || (!queue && context))) {
         UnderUIHooks hook;
         hook.enableHook();
         hooker = true;
@@ -331,6 +331,7 @@ void SwapchainHook::SaveBackbuffer(bool underui) {
 
     SavedD3D11BackBuffer = nullptr;
     ExtraSavedD3D11BackBuffer = nullptr;
+    DX12UnderUITexture = nullptr;
     if (!isDX12) {
 
         SwapchainHook::swapchain->GetBuffer(0, IID_PPV_ARGS(SavedD3D11BackBuffer.put()));
@@ -364,10 +365,58 @@ void SwapchainHook::SaveBackbuffer(bool underui) {
     }
     else
         {
-            HRESULT hr = D3D11Resources[currentBitmap]->QueryInterface(IID_PPV_ARGS(SavedD3D11BackBuffer.put()));
-            if (FAILED(hr))
-            {
-                std::cout << "Failed to query interface: " << std::hex << hr << std::endl;
+            if (underui && UnderUIHooks::bgfxCtxDX12) {
+                CreateDX12UnderUIResource();
+                
+                if (DX12UnderUITexture) {
+                    // Acquire the wrapped resource for D3D11 operations
+                    ID3D11Resource* resources[] = { DX12UnderUITexture.get() };
+                    d3d11On12Device->AcquireWrappedResources(resources, 1);
+                    
+                    // Query for the ID3D11Texture2D interface
+                    HRESULT hr = DX12UnderUITexture->QueryInterface(IID_PPV_ARGS(SavedD3D11BackBuffer.put()));
+                    
+                    // Create extra buffer if needed for MotionBlur
+                    if (FlarialGUI::needsBackBuffer && !ExtraSavedD3D11BackBuffer) {
+                        D3D11_TEXTURE2D_DESC desc;
+                        SavedD3D11BackBuffer->GetDesc(&desc);
+                        desc.Usage = D3D11_USAGE_DEFAULT;
+                        desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+                        desc.CPUAccessFlags = 0;
+                        desc.SampleDesc.Count = 1;  // Make sure extra buffer is not MSAA
+                        desc.SampleDesc.Quality = 0;
+                        
+                        d3d11Device->CreateTexture2D(&desc, nullptr, ExtraSavedD3D11BackBuffer.put());
+                        
+                        // If the source is MSAA, resolve it to the non-MSAA buffer
+                        D3D11_TEXTURE2D_DESC sourceDesc;
+                        SavedD3D11BackBuffer->GetDesc(&sourceDesc);
+                        if (sourceDesc.SampleDesc.Count > 1) {
+                            context->ResolveSubresource(ExtraSavedD3D11BackBuffer.get(), 0, SavedD3D11BackBuffer.get(), 0, sourceDesc.Format);
+                        } else {
+                            context->CopyResource(ExtraSavedD3D11BackBuffer.get(), SavedD3D11BackBuffer.get());
+                        }
+                    }
+                    
+                    // Release wrapped resource
+                    d3d11On12Device->ReleaseWrappedResources(resources, 1);
+                    
+                    if (FAILED(hr)) {
+                        std::cout << "Failed to query DX12 UnderUI interface: " << std::hex << hr << std::endl;
+                    }
+                } else {
+                    // Fallback to regular DX12 backbuffer access
+                    HRESULT hr = D3D11Resources[currentBitmap]->QueryInterface(IID_PPV_ARGS(SavedD3D11BackBuffer.put()));
+                    if (FAILED(hr)) {
+                        std::cout << "Failed to query interface: " << std::hex << hr << std::endl;
+                    }
+                }
+            } else {
+                // Regular DX12 backbuffer access
+                HRESULT hr = D3D11Resources[currentBitmap]->QueryInterface(IID_PPV_ARGS(SavedD3D11BackBuffer.put()));
+                if (FAILED(hr)) {
+                    std::cout << "Failed to query interface: " << std::hex << hr << std::endl;
+                }
             }
         }
 }

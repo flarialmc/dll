@@ -33,7 +33,8 @@ void UnderUIHooks::callBackRenderContextD3D12Submit(
     void* a3,
     void* a4) {
 
-    index2++;
+
+
     bgfxCtxDX12 = a1;
     funcoriginalRenderContextD3D12Submit(a1, a2, a3, a4);
 }
@@ -66,13 +67,14 @@ void UnderUIHooks::ClearDepthStencilViewCallbackDX12(
     const D3D12_RECT            *pRects) {
 
 
+    return     funcOriginalDX12(cmdList, pDepthStencilView, ClearFlags, Depth, Stencil, NumRects, pRects);
+
     index++;
 
     if (ClearFlags == D3D12_CLEAR_FLAG_DEPTH && SwapchainHook::init){
         savedpDethStencilView = pDepthStencilView;
         SwapchainHook::DX12Render(true);
     }
-    funcOriginalDX12(cmdList, pDepthStencilView, ClearFlags, Depth, Stencil, NumRects, pRects);
 
 }
 
@@ -110,14 +112,21 @@ void UnderUIHooks::enableHook() {
 
         /* DX12 */
 
-        /*
-        void** vtable = *reinterpret_cast<void***>(SwapchainHook::DX12CommandLists);
+        void** vtable = *reinterpret_cast<void***>(SwapchainHook::d3d12CommandList.get());
         const size_t INDEX_CLEAR_DEPTH_STENCIL_VIEW = 47;
         Memory::hookFunc(
             vtable[INDEX_CLEAR_DEPTH_STENCIL_VIEW],
             ClearDepthStencilViewCallbackDX12,
             (void**)&funcOriginalDX12,
             "ClearDepthStencilViewDX12"
+        );
+
+        /*
+        Memory::hookFunc(
+            (void*)GET_SIG_ADDRESS("bgfx::rendercontextd3d12::submit"),
+            callBackRenderContextD3D12Submit,
+            (void**)&funcoriginalRenderContextD3D12Submit,
+            "Bgfx_d3d12_submit_hook"
         );*/
 
         /* DX12 */

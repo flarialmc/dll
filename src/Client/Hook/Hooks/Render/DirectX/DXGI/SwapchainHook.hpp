@@ -49,6 +49,7 @@ public:
 
     static winrt::com_ptr<ID3D11Texture2D> GetBackbuffer();
     static void SaveBackbuffer(bool underui = false);
+    static void CreateDX12UnderUIResource();
 
     typedef HRESULT(__thiscall *SwapchainOriginal)(IDXGISwapChain3 *, UINT, UINT);
 
@@ -67,6 +68,7 @@ public:
     static bool currentVsyncState;
     static inline winrt::com_ptr<ID3D11Texture2D> SavedD3D11BackBuffer;
     static inline winrt::com_ptr<ID3D11Texture2D> ExtraSavedD3D11BackBuffer;
+    static inline winrt::com_ptr<ID3D11Texture2D> DX12UnderUITexture;
     static inline UINT lastBackbufferWidth = 0;
     static inline UINT lastBackbufferHeight = 0;
 

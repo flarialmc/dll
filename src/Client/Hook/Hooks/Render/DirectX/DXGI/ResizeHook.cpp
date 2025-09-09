@@ -57,6 +57,7 @@ void ResizeHook::cleanShit(bool fullReset) {
     SwapchainHook::swapchain = nullptr;
     SwapchainHook::SavedD3D11BackBuffer = nullptr;
     SwapchainHook::ExtraSavedD3D11BackBuffer = nullptr;
+    SwapchainHook::DX12UnderUITexture = nullptr;
 
     SwapchainHook::lastBackbufferWidth = 0;
     SwapchainHook::lastBackbufferHeight = 0;
