@@ -165,6 +165,10 @@
 #define IDR_TOTEM_PNG                  271
 #define IDR_BETTERHUNGERBAR_PNG        272
 
+#define IDR_INSTANTHEALTH_PNG          273
+#define IDR_INSTANTDAMAGE_PNG          274
+#define IDR_SATURATION_PNG             275
+
 // MAKE SURE YOU ALWAYS UPDATE THIS!
 
 #define MAX_IMAGE_ID                   262

@@ -32,6 +32,8 @@ public:
 
 	void renderText();
 
+	void renderMissingTextures();
+
 	void onRender(RenderEvent& event);
 
 	void onRenderPotionHUD(RenderPotionHUDEvent& event);

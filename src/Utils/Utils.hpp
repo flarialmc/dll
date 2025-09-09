@@ -334,6 +334,8 @@ public:
     static std::string sanitizeName(const std::string &name);
 
     static void extractFromFile(const std::string &zipFilePath, const std::string &destinationFolder);
+
+    static std::string intToRoman(int n);
 };
 
 class String {

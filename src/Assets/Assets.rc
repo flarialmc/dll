@@ -94,6 +94,10 @@ IDR_SUBTITLES_PNG             PNG "Data\\subtitles.png"
 IDR_TOTEM_PNG                 PNG "Data\\totem.png"
 IDR_BETTERHUNGERBAR_PNG       PNG "Data\\betterhungerbar.png"
 
+IDR_INSTANTHEALTH_PNG         PNG "Data\\instant_health.png"
+IDR_INSTANTDAMAGE_PNG         PNG "Data\\instant_damage.png"
+IDR_SATURATION_PNG            PNG "Data\\saturation.png"
+
 IDR_FREEZEENGINE_PNG          PNG "Data\\freezeengine.png"
 IDR_STONEHUNTER_PNG           PNG "Data\\stonehunter.png"
 IDR_BEAVER_PNG                PNG "Data\\beaver.png"
