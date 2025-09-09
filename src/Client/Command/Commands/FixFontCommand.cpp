@@ -8,4 +8,6 @@ void FixFontCommand::execute(const std::vector<std::string> &args) {
 	Client::SavePrivate();
 	Client::LoadPrivate();
 
+	addCommandMessage("Successfully turned off \'Override Font Weight\' and reverted \'Font Weight\' to Normal");
+
 }
