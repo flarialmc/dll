@@ -1,6 +1,7 @@
 #include "BindCommand.hpp"
 #include "../../Module/Manager.hpp"
 #include <regex>
+#include "Client.hpp"
 
 void BindCommand::execute(const std::vector<std::string> &args) {
     if (args.empty()) {
@@ -9,21 +10,29 @@ void BindCommand::execute(const std::vector<std::string> &args) {
     }
 
     if (args[0] == "list") {
-        std::string modList;
-        int index = 1;
-        for (std::shared_ptr<Module> mod : ModuleManager::moduleMap | std::views::values) {
-            SettingType<std::string>* setting = mod->settings.getSettingByName<std::string>("keybind");
-            if (setting != nullptr && setting->value != "") {
-                modList += std::format("\n{}. {}", index, std::regex_replace(mod->name, std::regex(" "), "_"));
-                index++;
-            }
-        }
-        addCommandMessage("Keybindable Module List: (case-sensitive)" + modList);
+        std::vector<std::string> modList = {
+            "Zoom",
+            "Player_Notifier",
+            "ClickGUI",
+            "Toggle_Sprint",
+            "Toggle_Sneak",
+            "Java_Debug_Menu",
+            "FreeLook",
+            "Hive_Statistics",
+            "Waypoints",
+            "SnapLook",
+            "Skin_Stealer",
+            "Tab_List"
+        };
+        std::string modListText = "Keybindable Module List: (put _ in place of spaces)";
+        for (int i = 0; i < modList.size(); i++) modListText += std::format("\n{}. {}", i + 1, modList[i]);
+        addCommandMessage(modListText);
         return;
     }
 
     std::string keys;
     std::string modName;
+
     if (args.size() == 1) {
         keys = String::toUpper(args[0]);
         modName = "ClickGUI";
@@ -40,16 +49,19 @@ void BindCommand::execute(const std::vector<std::string> &args) {
         return;
     }
 
-    std::shared_ptr<Module> mod = ModuleManager::getModule(modName);
-
-    if (mod != nullptr) {
-        SettingType<std::string>* setting = mod->settings.getSettingByName<std::string>("keybind");
-        if (setting != nullptr) {
-            setting->value = keys;
-            addCommandMessage("Successfully set <{}>'s keybind to <{}>", modName, keys);
+    for (auto pair : ModuleManager::moduleMap) {
+        if (String::toLower(pair.second->name) == String::toLower(modName)) {
+            SettingType<std::string>* setting = pair.second->settings.getSettingByName<std::string>("keybind");
+            if (setting != nullptr) {
+                setting->value = keys;
+                Client::SaveSettings();
+                addCommandMessage("Successfully set <{}>'s keybind to <{}>", pair.second->name, keys);
+            }
+            else addCommandMessage("This module isn't keybindable. Use §c.bind list §rfor the list of keybindable modules");
+            return;
         }
-        else addCommandMessage("This module isn't keybindable. Use §c.bind list §rfor the list of keybindable modules");
     }
-    else addCommandMessage("Invalid Module Name. Use §c.bind list §rfor the list of keybindable modules");
+
+    addCommandMessage("Invalid Module Name. Use §c.bind list §rfor the list of keybindable modules");
 
 }

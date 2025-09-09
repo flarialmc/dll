@@ -12,6 +12,7 @@
 #include "Commands/SkinStealCommand.hpp"
 #include "Commands/SpotifyCommand/SpotifyCommand.hpp"
 #include "Commands/WikiCommand.hpp"
+#include "Commands/FixFontCommand.hpp"
 #include "Commands/IRCChat.hpp"
 #include "../Client.hpp"
 
@@ -32,6 +33,7 @@ void CommandManager::initialize() {
     Commands.push_back(std::make_unique<SpotifyCommand>());
     Commands.push_back(std::make_unique<BindCommand>());
     Commands.push_back(std::make_unique<WikiCommand>());
+    Commands.push_back(std::make_unique<FixFontCommand>());
     //Commands.push_back(std::make_unique<IRCChat>());
 Listen(&CommandManager::instance, PacketSendEvent, &CommandManager::onPacket);
 }
