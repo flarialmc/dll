@@ -6,6 +6,7 @@
 #include <SDK/Client/Actor/EntityContext.hpp>
 #include <Utils/VersionUtils.hpp>
 
+#include "Assets/Assets.hpp"
 #include "GUI/Engine/Engine.hpp"
 
 // LeviLamina
@@ -51,6 +52,15 @@ public:
         Infested = 35,
         RaidOmen = 36
     };
+
+    static std::pair<bool, int> hasTexture(EffectType type) {
+        switch (type) {
+            case EffectType::InstantHealth: return std::pair{false, IDR_INSTANTHEALTH_PNG};
+            case EffectType::InstantDamage: return std::pair{false, IDR_INSTANTDAMAGE_PNG};
+            case EffectType::Saturation: return std::pair{false, IDR_SATURATION_PNG};
+            default: return std::pair{true, IDR_AUTORQ_PNG};
+        }
+    }
 
     static std::string effectTypeToPath(EffectType type) {
         static const std::map<EffectType, std::string> effectToTexture = {
@@ -149,7 +159,7 @@ public:
             case 2: return "III";
             case 3: return "IV";
             case 4: return "V";
-            default: return FlarialGUI::cached_to_string(amplifier);
+            default: return FlarialGUI::cached_to_string(amplifier + 1);
         }
     }
 };
@@ -211,7 +221,7 @@ struct UnifiedMobEffectData {
     }
 
     [[nodiscard]] int getAmplifier() const {
-        return amplifier;
+        return amplifier + 1;
     }
 
     [[nodiscard]] std::string getNameAndTime() const {
@@ -234,6 +244,10 @@ struct UnifiedMobEffectData {
     [[nodiscard]] ResourceLocation getTextureLocation() const {
         auto location = ResourceLocation(getTexturePath(), false);
         return location;
+    }
+
+    [[nodiscard]] std::pair<bool, int> hasTexture() const {
+        return MobEffect::hasTexture(id);
     }
 };
 

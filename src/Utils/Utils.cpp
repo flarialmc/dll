@@ -431,6 +431,23 @@ std::string Utils::sanitizeName(const std::string &name) {
     return cleanedName;
 }
 
+std::string Utils::intToRoman(int n) {
+    static const std::array<int,13> values = {
+        1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1
+    };
+    static const std::array<std::string,13> symbols {
+        "M","CM","D","CD","C","XC","L","XL","X","IX","V","IV","I"
+    };
+    std::string res;
+    for (size_t i = 0; i < values.size(); ++i) {
+        while (n >= values[i]) {
+            n -= values[i];
+            res += symbols[i];
+        }
+    }
+    return res;
+}
+
 
 std::string String::replaceAll(std::string &string, std::string_view c1, std::string_view c2) {
     size_t pos = 0;
