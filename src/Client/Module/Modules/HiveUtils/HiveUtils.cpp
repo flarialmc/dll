@@ -1,21 +1,19 @@
-#include "AutoRQ.hpp"
+#include "HiveUtils.hpp"
 
 #include "Events/EventManager.hpp"
 #include "SDK/Client/Network/Packet/SetTitlePacket.hpp"
 
-void AutoRQ::onEnable() {
-    Listen(this, PacketEvent, &AutoRQ::onPacketReceive);
-    Listen(this, KeyEvent, &AutoRQ::onKey);
-    Module::onEnable();
+void HiveUtils::onEnable() {
+    Listen(this, PacketEvent, &HiveUtils::onPacketReceive)
+     Module::onEnable();
 }
 
-void AutoRQ::onDisable() {
-    Deafen(this, PacketEvent, &AutoRQ::onPacketReceive);
-    Deafen(this, KeyEvent, &AutoRQ::onKey);
-    Module::onDisable();
+void HiveUtils::onDisable() {
+    Deafen(this, PacketEvent, &HiveUtils::onPacketReceive)
+     Module::onDisable();
 }
 
-void AutoRQ::defaultConfig() {
+void HiveUtils::defaultConfig() {
     Module::defaultConfig("core");
     setDef("map", (std::string)"");
     setDef("ReQ", true);
@@ -47,7 +45,7 @@ void AutoRQ::defaultConfig() {
 
 }
 
-void AutoRQ::settingsRender(float settingsOffset) {
+void HiveUtils::settingsRender(float settingsOffset) {
     initSettingsPage();
     addHeader("General");
     addToggle("Use /hub instead of /q", "", "hub");
@@ -70,6 +68,9 @@ void AutoRQ::settingsRender(float settingsOffset) {
 
         // this->settings.addSetting(keybindName, (std::string)"");
         this->settings.addSetting(commandName, (std::string)"");
+
+
+        int i = totalmaps;
 
         Client::SaveSettings();
         FlarialGUI::Notify("New textbox created, input a map to avoid!");
@@ -125,7 +126,7 @@ void AutoRQ::settingsRender(float settingsOffset) {
     resetPadding();
 }
 
-void AutoRQ::onPacketReceive(PacketEvent &event) {
+void HiveUtils::onPacketReceive(PacketEvent &event) {
     if (!this->isEnabled()) return;
     MinecraftPacketIds id = event.getPacket()->getId();
 
@@ -165,8 +166,7 @@ void AutoRQ::onPacketReceive(PacketEvent &event) {
         if (getOps<bool>("deathcountenabled") and HiveModeCatcherListener::currentGame == "DR" and pkt->message == "§c§l» §r§cYou died!")
         {
             deaths++;
-            // what's the > even for :3c
-            if (deaths >= getOps<int>("deathcount"))
+            if (deaths > getOps<int>("deathcount"))
             {
                 reQ();
                 FlarialGUI::Notify("Death count limit reached.");
@@ -351,7 +351,7 @@ void AutoRQ::onPacketReceive(PacketEvent &event) {
     }
 }
 
-void AutoRQ::reQ() {
+void HiveUtils::reQ() {
     std::string gm = HiveModeCatcherListener::fullgamemodename;
     if (!this->isEnabled() or gm.empty() or gm.find("Hub") != std::string::npos) return;
     if (!getOps<bool>("hub")) {
@@ -381,7 +381,7 @@ void AutoRQ::reQ() {
     }
 }
 
-void AutoRQ::onKey(KeyEvent& event)
+void HiveUtils::onKey(KeyEvent& event)
 {
     if (!this->isEnabled()) return;
     if (event.getKey() == Utils::getStringAsKey(getOps<std::string>("bind")) && static_cast<ActionType>(event.getAction()) == ActionType::Pressed && (SDK::getCurrentScreen() == "hud_screen" || SDK::getCurrentScreen() == "f3_screen" || SDK::getCurrentScreen() == "zoom_screen")) reQ();
