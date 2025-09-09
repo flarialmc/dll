@@ -3,12 +3,6 @@
 #include "Events/EventManager.hpp"
 #include "Hook/Hooks/Input/KeyHook.hpp"
 
-NullMovement::NullMovement(): Module("Null Movement", "Only registers the latest movement key.",
-                                     IDR_SPEED_PNG, "")
-{
-
-    
-}
 
 void NullMovement::onEnable()
 {

@@ -14,7 +14,11 @@ private:
 public:
 	static inline std::string mname = "Title"; // dont use "name" var pls cuz it will override this->name so Module("name here") would be useless
 
-	MovableTitle();;
+	MovableTitle(): Module("Movable " + mname, "Makes the Minecraft " + mname + " movable.",
+		IDR_MOVABLE_PNG, ""
+	) {
+		Listen(this, SetupAndRenderEvent, &MovableTitle::onSetupAndRender)
+	}
 
 	void onEnable() override;
 

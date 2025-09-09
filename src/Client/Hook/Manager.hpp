@@ -5,7 +5,7 @@
 #include "Hooks/Hook.hpp"
 #include "Hooks/Input/KeyHook.hpp"
 #include "Hooks/Input/MouseHook.hpp"
-#include "Hooks/Render/SwapchainHook.hpp"
+#include "Hooks/Render/DirectX/DXGI/SwapchainHook.hpp"
 #include "Hooks/Visual/getFovHook.hpp"
 #include "Hooks/Game/OnSuspend.hpp"
 

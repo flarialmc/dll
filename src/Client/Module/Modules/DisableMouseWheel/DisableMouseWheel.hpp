@@ -5,7 +5,7 @@
 class DisableMouseWheel : public Module {
 public:
 	DisableMouseWheel() : Module("Disable Mouse Wheel", "Prevents you from accidentally scrolling through your hotbar",
-		IDR_CURSOR_PNG, "") {
+		IDR_CURSOR_PNG, "", false, {"antiscroll", "anti scroll", "hotbar"}) {
 		
 	};
 

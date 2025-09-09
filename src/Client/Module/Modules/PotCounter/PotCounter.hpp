@@ -5,10 +5,17 @@
 #include "Events/Render/RenderEvent.hpp"
 
 class PotCounter : public Module {
+
 private:
+
 	int pots = 0;
+
 public:
-	PotCounter();;
+
+	PotCounter(): Module("Pot Counter", "Counts how much potions are\nin your inventory.",
+		IDR_POTION_PNG, "", false, {"potion counter"}) {
+
+	}
 
 	void onEnable() override;
 

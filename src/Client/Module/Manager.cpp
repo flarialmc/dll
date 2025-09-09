@@ -58,7 +58,7 @@
 #include "Modules/NoHurtCam/NoHurtCam.hpp"
 #include "Modules/CommandHotkey/CommandHotkey.hpp"
 #include "Modules/Misc/DiscordRPC/DiscordRPCListener.hpp"
-#include "Modules/AutoRQ/AutoRQ.hpp"
+#include "Modules/HiveUtils/HiveUtils.hpp"
 #include "Modules/Misc/HiveModeCatcher/HiveModeCatcherListener.hpp"
 #include "Modules/HitPing/HitPing.hpp"
 #include "Modules/InstantHurtAnimation/InstantHurtAnimation.hpp"
@@ -219,7 +219,7 @@ void ModuleManager::initialize() {
 	addModule<CommandHotkey>();
 	addModule<NoHurtCam>();
 	addModule<InventoryHUD>();
-	addModule<AutoRQ>();
+	addModule<HiveUtils>();
 	addModule<HitPing>();
 	addModule<InstantHurtAnimation>();
 	addModule<OpponentReach>();

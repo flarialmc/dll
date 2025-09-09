@@ -10,7 +10,8 @@ private:
     std::chrono::time_point<std::chrono::steady_clock> lastTime = std::chrono::steady_clock::now();
 
 public:
-    CinematicCamera() : Module("Cinematic Camera", "Smooth Cinema-like Camera Movement", IDR_CINEMATICCAMERA_PNG, "") {
+    CinematicCamera() : Module("Cinematic Camera", "Smooth Cinema-like Camera Movement",
+        IDR_CINEMATICCAMERA_PNG, "", false, {"smooth"}) {
     };
 
     void onEnable() override;

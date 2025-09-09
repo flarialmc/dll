@@ -15,7 +15,10 @@ private:
 	std::chrono::steady_clock::time_point time;
 public:
 
-	PatarHD();;
+	PatarHD(): Module("PatarHD", "At this Point it should be called Staff Mod",
+		IDR_SKULL_PNG, "", false, {"troll"}) {
+
+	}
 
 	void onEnable() override;
 

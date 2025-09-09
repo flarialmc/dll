@@ -16,7 +16,7 @@ private:
 public:
 
     CompactChat() : Module("Compact Chat", "Stacks duplicate messages in chat.",
-        IDR_COMPACTCHAT_PNG, "") {
+        IDR_COMPACTCHAT_PNG, "", false, {"antispam", "filter", "antiflood"}) {
 
     };
 

@@ -8,7 +8,7 @@ class TextHotkey : public Module {
 	std::chrono::time_point<std::chrono::high_resolution_clock> last_used;
 public:
 	TextHotkey() : Module("Text Hotkey", "Send something in chat with a\nclick of a button!",
-		IDR_TEXT_BOX_PNG, "") {
+		IDR_TEXT_BOX_PNG, "", false, {"chat"}) {
 		
 	};
 

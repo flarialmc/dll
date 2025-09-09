@@ -4,8 +4,6 @@
 #include "SDK/Client/Core/Options.hpp"
 #include "Utils/Render/PositionUtils.hpp"
 
-MovableCoordinates::MovableCoordinates(): Module("Movable " + mname, "Makes the Minecraft " + mname + " movable.", IDR_MOVABLE_PNG, "") {
-}
 
 void MovableCoordinates::onEnable() {
     restored = false;

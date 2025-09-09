@@ -1,7 +1,5 @@
 #include "MovableHotbar.hpp"
 
-MovableHotbar::MovableHotbar() : Module("Movable " + mname, "Makes the Minecraft " + mname + " movable.", IDR_MOVABLE_PNG, "") {
-}
 
 void MovableHotbar::onEnable() {
     restored = false;

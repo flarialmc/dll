@@ -2,11 +2,6 @@
 
 #include "Events/EventManager.hpp"
 
-PotCounter::PotCounter(): Module("Pot Counter", "Counts how much potions are\nin your inventory.",
-                                 IDR_POTION_PNG, "")
-{
-    
-}
 
 void PotCounter::onEnable()
 {

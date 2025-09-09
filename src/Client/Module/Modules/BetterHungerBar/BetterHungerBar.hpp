@@ -28,7 +28,7 @@ private:
 public:
 
     BetterHungerBar() : Module("Better Hunger Bar", "Adds a hunger and saturation overlay similar to AppleSkin.",
-        IDR_BETTERHUNGERBAR_PNG, "") {
+        IDR_BETTERHUNGERBAR_PNG, "", false, {"appleskin", "saturation"}) {
         
     };
     

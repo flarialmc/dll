@@ -11,9 +11,8 @@ private:
 	std::chrono::time_point<std::chrono::high_resolution_clock> last_hit;
 public:
 
-	ComboCounter() : Module("Combo", "Keeps track of consecutive hits.", IDR_COMBO_PNG, "") {
-
-		
+	ComboCounter() : Module("Combo", "Keeps track of consecutive hits.",
+		IDR_COMBO_PNG, "") {
 
 	};
 

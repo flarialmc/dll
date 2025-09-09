@@ -4,11 +4,6 @@
 #include "Modules/ClickGUI/ClickGUI.hpp"
 #include "Utils/Render/PositionUtils.hpp"
 
-PotionHUD::PotionHUD(): Module("PotionHUD", "Displays your potion effects",
-                               IDR_POTION_PNG, "")
-{
-    
-}
 
 void PotionHUD::onEnable()
 {

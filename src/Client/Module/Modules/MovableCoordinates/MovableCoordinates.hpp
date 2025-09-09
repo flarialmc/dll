@@ -15,7 +15,9 @@ public:
 
 	static inline std::string mname = "Coordinates"; // dont use "name" var pls cuz it will override this->name so Module("name here") would be useless
 
-	MovableCoordinates();
+	MovableCoordinates(): Module("Movable " + mname, "Makes the Minecraft " + mname + " movable.",
+		IDR_MOVABLE_PNG, "") {
+	}
 
 	void onEnable() override;
 

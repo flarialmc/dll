@@ -8,8 +8,13 @@
 #include "Events/Network/PacketEvent.hpp"
 
 class ZeqaUtils : public Module {
+
 public:
-	ZeqaUtils();;
+
+	ZeqaUtils(): Module("Zeqa Utils", "Handy utilities for Zeqa",
+			IDR_ZEQA_PNG, "", false, {"auto requeue", "auto rq"}) {
+
+	}
 
 	void onEnable() override;
 

@@ -27,6 +27,7 @@ public:
 	int icon;
 	bool isScriptingModule;
 	std::string defaultKeybind;
+	std::vector<std::string> aliases;
 	Settings settings;
 	std::filesystem::path settingspath;
 	std::vector<std::function<std::any(std::vector<std::any>)>> keybindActions;
@@ -41,12 +42,13 @@ public:
 		{"Right", DWRITE_TEXT_ALIGNMENT_TRAILING}
 	};
 
-	Module(const std::string& ename, const std::string& edescription, int eicon, const std::string& ekey, bool isScripting = false) {
+	Module(const std::string& ename, const std::string& edescription, int eicon, const std::string& ekey, bool isScripting = false, const std::vector<std::string>& ealiases = {}) {
 		name = ename;
 		description = edescription;
 		icon = eicon;
 		defaultKeybind = ekey;
 		isScriptingModule = isScripting;
+		aliases = ealiases;
 		settings = Settings();
 
 		settingspath = isScripting ? Utils::getClientPath() + "\\Scripts\\Configs\\" + name + ".json" : "this is unused for non scripting modules";

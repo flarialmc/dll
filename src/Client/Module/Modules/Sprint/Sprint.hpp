@@ -8,7 +8,7 @@
 class Sprint : public Module {
 public:
 	Sprint(): Module("Toggle Sprint", "Automatically sprints for you!!!",
-		IDR_AUTO_SPRINT_PNG, "CTRL") {
+		IDR_AUTO_SPRINT_PNG, "CTRL", false, {"auto sprint", "autosprint"}) {
 	}
 
 	void onEnable() override;

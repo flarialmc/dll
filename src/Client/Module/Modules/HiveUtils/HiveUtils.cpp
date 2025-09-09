@@ -5,7 +5,7 @@
 
 void HiveUtils::onEnable() {
     Listen(this, PacketEvent, &HiveUtils::onPacketReceive)
-     Module::onEnable();
+    Module::onEnable();
 }
 
 void HiveUtils::onDisable() {
@@ -42,7 +42,6 @@ void HiveUtils::defaultConfig() {
     // setDef("bind", (std::string) "R");
     setDef("deathcountenabled", false);
     setDef("deathcount", 3);
-
 }
 
 void HiveUtils::settingsRender(float settingsOffset) {
@@ -162,7 +161,6 @@ void HiveUtils::onPacketReceive(PacketEvent &event) {
     }
     if (id == MinecraftPacketIds::Text) {
         auto* pkt = reinterpret_cast<TextPacket*>(event.getPacket());
-        // made absolutely sure the counter wouldn't set off in other games
         if (getOps<bool>("deathcountenabled") and HiveModeCatcherListener::currentGame == "DR" and pkt->message == "§c§l» §r§cYou died!")
         {
             deaths++;
@@ -173,7 +171,6 @@ void HiveUtils::onPacketReceive(PacketEvent &event) {
                 deaths = 0;
             }
         }
-
         if (getOps<bool>("ReQ")) {
             //if(!module->getOps<bool>("solo")) {
             if (pkt->message == "§c§l» §r§c§lGame OVER!") {
@@ -324,7 +321,6 @@ void HiveUtils::onPacketReceive(PacketEvent &event) {
                 std::shared_ptr<Packet> packet = SDK::createPacket(77);
                 auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
                 command_packet->command = "/f accept \"" + pkt->message.substr(40, pkt->message.length() - 44) + "\"";
-
                 command_packet->origin.type = CommandOriginType::Player;
 
                 command_packet->InternalSource = true;

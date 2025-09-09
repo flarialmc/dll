@@ -7,14 +7,20 @@
 #include "Utils/Render/PositionUtils.hpp"
 
 class PotionHUD : public Module {
+
 private:
+
 	Vec2<float> currentPos{};
 	bool enabled = false;
 
 	float testSpacing = 20;
+
 public:
 
-	PotionHUD();;
+	PotionHUD(): Module("PotionHUD", "Displays your potion effects",
+			IDR_POTION_PNG, "", false, {"effect display"}) {
+
+	}
 
 	void onEnable() override;
 

@@ -18,7 +18,8 @@ private:
 	static inline int desyncTicks = 0;
 public:
 
-	FasterInventory() : Module("Faster Inventory", "Makes inventory opening ping-independent", IDR_INVENTORY_PNG, "") {
+	FasterInventory() : Module("Faster Inventory", "Makes inventory opening ping-independent",
+		IDR_INVENTORY_PNG, "") {
 		
 	};
 

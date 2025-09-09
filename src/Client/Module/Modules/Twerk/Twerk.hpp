@@ -14,7 +14,7 @@ private:
 public:
 
     Twerk(): Module("Twerk", "yeah baby throw it back",
-        IDR_TWERK_PNG, "") {
+        IDR_TWERK_PNG, "", false, {"troll"}) {
     }
 
     void onEnable() override;

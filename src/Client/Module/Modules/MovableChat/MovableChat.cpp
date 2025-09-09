@@ -4,8 +4,6 @@
 #include "SDK/Client/Network/Packet/TextPacket.hpp"
 #include "Utils/Render/PositionUtils.hpp"
 
-MovableChat::MovableChat(): Module("Movable Chat", "Ability to move the chat.", IDR_MOVABLE_PNG, "") {
-}
 
 void MovableChat::onEnable() {
     restored = false;

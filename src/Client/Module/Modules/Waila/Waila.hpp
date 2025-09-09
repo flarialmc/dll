@@ -11,7 +11,8 @@ class Waila : public Module {
 public:
 	std::string lookingAt;
 
-	Waila() : Module("Waila", "Shows what you are looking at.", IDR_WAILA_PNG, "") {
+	Waila() : Module("Waila", "Shows what you are looking at.",
+		IDR_WAILA_PNG, "") {
 		//Module::setup();
 	};
 

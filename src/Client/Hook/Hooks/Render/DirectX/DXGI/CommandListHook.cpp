@@ -1,10 +1,10 @@
 #include "CommandListHook.hpp"
-#include "../../../GUI/D2D.hpp"
+#include <winrt/base.h>
 #include "SwapchainHook.hpp"
-#include "../../../Client.hpp"
+#include "../../../../../Client.hpp"
 
 typedef void(__thiscall *original)(ID3D12CommandQueue *queue, UINT numCommandLists,
-                                   const ID3D12CommandList **ppCommandLists);
+                                   ID3D12CommandList **ppCommandLists);
 
 original funcOriginal = nullptr;
 
@@ -27,12 +27,9 @@ void CommandListHook::enableHook() {
 CommandListHook::CommandListHook() : Hook("CommandListHook", 0) {}
 
 void CommandListHook::listCallback(ID3D12CommandQueue *queue, UINT numCommandLists,
-                                   const ID3D12CommandList **ppCommandLists) {
+                                   ID3D12CommandList **ppCommandLists) {
 
-    SwapchainHook::queue = queue;
-    SwapchainHook::DX12CommandLists = (ID3D12GraphicsCommandList*)*ppCommandLists;
-
-
+    SwapchainHook::queue.copy_from(queue);
     return funcOriginal(queue, numCommandLists, ppCommandLists);
 
 }

@@ -23,7 +23,8 @@ public:
 
 	std::unordered_map<std::string, Waypoint> WaypointList;
 
-	Waypoints() : Module("Waypoints", "Allows you to mark points in your world.", IDR_WAYPOINTS_PNG, "N") {
+	Waypoints() : Module("Waypoints", "Allows you to mark points in your world.",
+		IDR_WAYPOINTS_PNG, "N", false, {"location", "beams", "marker"}) {
 		//Module::setup();
 	};
 

@@ -4,11 +4,6 @@
 #include "SDK/Client/Network/Packet/CommandRequestPacket.hpp"
 #include "SDK/Client/Network/Packet/TextPacket.hpp"
 
-ZeqaUtils::ZeqaUtils(): Module("Zeqa Utils", "Handy utilities for Zeqa",
-                               IDR_ZEQA_PNG, "")
-{
-    
-}
 
 void ZeqaUtils::onEnable()
 {

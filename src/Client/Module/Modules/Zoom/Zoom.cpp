@@ -1,10 +1,6 @@
 #include "Zoom.hpp"
 
 
-Zoom::Zoom() : Module("Zoom", "Allows you to see distant places.", IDR_MAGNIFY_PNG, "C") {
-    //this->setup();
-}
-
 void Zoom::onEnable() {
     Listen(this, FOVEvent, &Zoom::onGetFOV)
     Listen(this, RenderEvent, &Zoom::onRender)

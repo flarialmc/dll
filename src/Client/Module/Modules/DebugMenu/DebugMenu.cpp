@@ -585,7 +585,7 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
 
         if (isOnBlock(9)) {
             right.emplace_back(std::format("Display: {}x{}", MC::windowSize.x, MC::windowSize.y));
-            right.emplace_back(std::format("Active Renderer: {}", SwapchainHook::queue == nullptr ? "DirectX11" : "DirectX12"));
+            right.emplace_back(std::format("Active Renderer: {}", !SwapchainHook::isDX12 ? "DirectX11" : "DirectX12"));
 
             if (spoof) right.emplace_back("AMD GFX 5090 Ti AI Accelerated DLSS 12.0");
             else {

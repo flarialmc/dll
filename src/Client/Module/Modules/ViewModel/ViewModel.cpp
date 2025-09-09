@@ -3,10 +3,6 @@
 #include "Events/EventManager.hpp"
 #include "glm/glm/ext/matrix_transform.hpp"
 
-ViewModel::ViewModel(): Module("View Model", "Allows you to modify how item in hand looks.", IDR_EYE_PNG, "C")
-{
-    
-}
 
 void ViewModel::onEnable()
 {

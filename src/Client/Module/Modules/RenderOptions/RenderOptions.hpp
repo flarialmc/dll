@@ -7,7 +7,10 @@ class RenderOptions : public Module {
 
 public:
 
-	RenderOptions();;
+	RenderOptions(): Module("Render Option", "Change the way how the game is rendered.",
+			IDR_RENDEROPTIONS_PNG, "", false, {"particles", "sky", "block entities", "blockentities", "disable particles", "disable sky", "disable block entities"}) {
+
+	}
 
 	void updateSetings();
 

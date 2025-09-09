@@ -3,16 +3,6 @@
 #include "Events/EventManager.hpp"
 #include "Hook/Hooks/Input/KeyHook.hpp"
 
-ModernKeybindHandling::ModernKeybindHandling() : Module("Modern Handling",
-    "Fixes the keybind issue where movement doesn't resume after exiting GUI screens while holding keys.",
-    IDR_KEYBOARD_PNG, "")
-{
-    heldKeys.fill(false);
-    wasInGame = true;
-    lastScreen = "";
-    restoreQueued = false;
-    shouldContinueTracking = false;
-}
 
 void ModernKeybindHandling::onEnable()
 {

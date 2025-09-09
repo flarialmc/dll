@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#include "Hooks/Render/ResizeHook.hpp"
-#include "Hooks/Render/CommandListHook.hpp"
+#include "Hooks/Render/DirectX/DXGI/ResizeHook.hpp"
+#include "Hooks/Render/DirectX/DXGI/CommandListHook.hpp"
 #include "Hooks/Render/SetupAndRenderHook.hpp"
 #include "Hooks/Game/ActorBaseTick.hpp"
 #include "Hooks/Visual/getGammaHook.hpp"
@@ -61,9 +61,6 @@ void HookManager::initialize() {
         kiero::init(kiero::RenderType::D3D10);
         Logger::debug("[Kiero] Trying d3d10");
     }
-
-    Logger::debug("Renderer: {}", dxVersion[kiero::getRenderType()]);
-
 
     addHook<KeyHook>();
     addHook<MouseHook>();

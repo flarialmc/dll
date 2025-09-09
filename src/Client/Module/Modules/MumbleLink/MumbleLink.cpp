@@ -1,9 +1,5 @@
 #include "MumbleLink.hpp"
 
-MumbleLink::MumbleLink(): Module("Mumble Link", "Use proximity chat in Flarial with the help of Mumble", IDR_MUMBLE_PNG, "")
-{
-    
-}
 
 void MumbleLink::onEnable()
 {

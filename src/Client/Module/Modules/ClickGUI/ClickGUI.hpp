@@ -36,6 +36,8 @@ private:
     std::string searchBarString;
     Module *ghostMainModule;
 
+    std::string lastmesg; // Using this to prevent double watermarks in messages
+
 public:
     static inline float baseHeightActual = 0.00001f;
     static inline float modcardOpacity = 1.f;
@@ -66,7 +68,7 @@ public:
             {"Regular", "§4"}
         });
 
-    static inline D2D_COLOR_F getColor(std::string text) {
+    static inline D2D_COLOR_F getColor(const std::string& text) {
         D2D_COLOR_F col = clickgui->settings.getSettingByName<bool>(text + "RGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>(text + "Col")->value);
         col.a = clickgui->settings.getSettingByName<float>(text + "Opacity")->value;
         return col;
@@ -83,12 +85,14 @@ private:
     }
 
     static size_t sanitizedToRawIndex(std::string_view raw, size_t sanIdx);
-    static std::string& getMutableTextForWatermark(TextPacket& pkt);
+    // static std::string& getMutableTextForWatermark(TextPacket& pkt);
 
 public:
     void onPacketReceive(PacketEvent& event);
 
-    ClickGUI() : Module("ClickGUI", "What do you think it is?", IDR_CLICKGUI_PNG, "K") {
+    ClickGUI() : Module("ClickGUI", "What do you think it is?",
+        IDR_CLICKGUI_PNG, "K", false, {"theme", "key", "promotions", "watermark", "logo", "spam"}
+    ) {
         this->ghostMainModule = new Module("main", "troll", IDR_COMBO_PNG, "");
         scrollInfo["modules"] = {0, 0};
         scrollInfo["scripting"] = {0, 0};
@@ -246,6 +250,25 @@ public:
     //void fov(FOVEvent& event);
 
     void onKey(KeyEvent &event) {
+
+        std::string& clickguiKey = getOps<std::string>("keybind");
+        if (!this->active && clickguiKey.empty()) {
+            clickguiKey = "k";
+            FlarialGUI::Notify("To change it to a different key, go to ClickGUI settings or use \'.bind <key>\'");
+            FlarialGUI::Notify("Your ClickGUI Keybind was unset, it has been reset to \'k\'.");
+            Client::SaveSettings();
+        }
+
+        SettingType<std::string>* ejectKey = Client::settings.getSettingByName<std::string>("ejectKeybind");
+
+        if (!clickguiKey.empty() && clickguiKey == ejectKey->value) {
+            ejectKey->value = "";
+            FlarialGUI::Notify("Your Eject key has been unset.");
+            FlarialGUI::Notify("Your ClickGUI and Eject keybind was the same.");
+            Client::SavePrivate();
+            Client::LoadPrivate();
+        }
+
         //TODO: MAKE module->setActive() module->isActive() module->isRestricted()
         // #if !defined(__DEBUG__)
         if (SDK::getCurrentScreen() != "zoom_screen" &&

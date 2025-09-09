@@ -15,7 +15,12 @@ class NullMovement : public Module {
 	bool unpresser = false;
 
 public:
-	NullMovement();;
+
+	NullMovement(): Module("Null Movement", "Only registers the latest movement key.",
+		IDR_SPEED_PNG, "") {
+
+
+	}
 
 	void onEnable() override;
 

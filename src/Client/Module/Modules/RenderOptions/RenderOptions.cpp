@@ -2,12 +2,6 @@
 
 #include "SDK/Client/Core/Options.hpp"
 
-RenderOptions::RenderOptions(): Module("Render Option", "Change the way how the game is rendered.",
-                                       IDR_RENDEROPTIONS_PNG, "")
-{
-
-    
-}
 
 void RenderOptions::updateSetings()
 {

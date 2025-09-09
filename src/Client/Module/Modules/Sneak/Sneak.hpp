@@ -9,7 +9,7 @@ public:
 
 
 	Sneak(): Module("Toggle Sneak", "No need to hold down your sneak key.",
-		IDR_SLOWLY_PNG, "SHIFT") {
+		IDR_SLOWLY_PNG, "SHIFT", false, {"toggle crouch"}) {
 	}
 
 	void onEnable() override;

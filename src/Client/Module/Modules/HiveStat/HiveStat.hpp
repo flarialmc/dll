@@ -20,7 +20,7 @@ private:
 	std::map<std::string, std::thread> playerThreads;
 public:
 	HiveStat() : Module("Hive Statistics", "Show players statistics in game",
-		IDR_HIVE_STATS_PNG, "O") {
+		IDR_HIVE_STATS_PNG, "O", false, {"stats", "kd", "overlay"}) {
 		
 	};
 

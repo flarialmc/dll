@@ -1,6 +1,5 @@
 #include "UnderUIHooks.hpp"
 #include "SwapchainHook.hpp"
-#include "SDK/Client/Options/OptionsParser.hpp"
 
 /*
  * THIS IS HOOKED THROUGH SWAPCHAIN!
@@ -89,7 +88,7 @@ void UnderUIHooks::enableHook() {
 
         /* DX11 */
 
-        void** vtable = *reinterpret_cast<void***>(SwapchainHook::context);
+        void** vtable = *reinterpret_cast<void***>(SwapchainHook::context.get());
         const size_t INDEX_CLEAR_DEPTH_STENCIL_VIEW = 53;
         Memory::hookFunc(
             vtable[INDEX_CLEAR_DEPTH_STENCIL_VIEW],

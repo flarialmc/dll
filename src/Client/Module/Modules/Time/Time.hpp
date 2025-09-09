@@ -21,7 +21,10 @@ inline std::tm localtime_xp(std::time_t timer) {
 class Time : public Module {
 
 public:
-	Time();
+
+	Time(): Module("Clock", "Displays your current local or ingame time.",
+		IDR_TIME_PNG, "", false, {"time"}) {
+	}
 
 	static inline float curTime;
 

@@ -10,7 +10,7 @@ private:
 public:
 	static inline bool fixResize = false;
 	GuiScale() : Module("MC GUI Scale", "Change your GUI Scale beyond\nMinecraft's restrictions.",
-		IDR_SCALE_PNG, "") {
+		IDR_SCALE_PNG, "", false, {"size"}) {
 		
 	};
 

@@ -1,13 +1,6 @@
 #include "MotionBlur.hpp"
 #include "Client.hpp"
 
-MotionBlur::MotionBlur(): Module("Motion Blur",
-                                 "Make fast movements appear smoother and more realistic by\nblurring the image slightly in the direction of motion.",
-                                 IDR_BLUR_PNG, "")
-{
-    //this->setup();
-
-}
 
 void MotionBlur::onEnable()
 {
@@ -37,7 +30,7 @@ void MotionBlur::defaultConfig()
     setDef("avgpixel", true);
     setDef("dynamic", false);
     setDef("samples", 64.f);
-    setDef("renderUnderUI", true);
+    setDef("renderUnderUI", false);
     
 }
 
@@ -178,7 +171,7 @@ winrt::com_ptr<ID3D11ShaderResourceView> MotionBlur::BackbufferToSRVExtraMode()
     srvDesc.Texture2D.MipLevels = d.MipLevels;
     srvDesc.Texture2D.MostDetailedMip = 0;
 
-    if (FAILED(hr = SwapchainHook::d3d11Device->CreateShaderResourceView(SwapchainHook::ExtraSavedD3D11BackBuffer, &srvDesc, outSRV.put())))
+    if (FAILED(hr = SwapchainHook::d3d11Device->CreateShaderResourceView(SwapchainHook::ExtraSavedD3D11BackBuffer.get(), &srvDesc, outSRV.put())))
     {
         std::cout << "Failed to create shader resource view: " << std::hex << hr << std::endl;
     }
@@ -201,7 +194,7 @@ winrt::com_ptr<ID3D11ShaderResourceView> MotionBlur::BackbufferToSRV()
     srvDesc.Texture2D.MipLevels = d.MipLevels;
     srvDesc.Texture2D.MostDetailedMip = 0;
 
-    if (FAILED(hr = SwapchainHook::d3d11Device->CreateShaderResourceView(SwapchainHook::SavedD3D11BackBuffer, &srvDesc, outSRV.put())))
+    if (FAILED(hr = SwapchainHook::d3d11Device->CreateShaderResourceView(SwapchainHook::SavedD3D11BackBuffer.get(), &srvDesc, outSRV.put())))
     {
         std::cout << "Failed to create shader resource view: " << std::hex << hr << std::endl;
     }

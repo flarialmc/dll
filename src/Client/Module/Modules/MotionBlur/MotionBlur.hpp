@@ -5,14 +5,20 @@
 #include "../Module.hpp"
 #include "Events/Render/RenderUnderUIEvent.hpp"
 #include "Events/Render/RenderEvent.hpp"
-#include "Hook/Hooks/Render/SwapchainHook.hpp"
+#include "../../../Hook/Hooks/Render/DirectX/DXGI/SwapchainHook.hpp"
 
 
 class MotionBlur : public Module {
 public:
 	static inline bool initted = false;
 
-	MotionBlur();;
+	MotionBlur(): Module("Motion Blur",
+		 "Make fast movements appear smoother and more realistic by\nblurring the image slightly in the direction of motion.",
+		 IDR_BLUR_PNG, "")
+	{
+		//this->setup();
+
+	}
 
 	bool once = false;
 

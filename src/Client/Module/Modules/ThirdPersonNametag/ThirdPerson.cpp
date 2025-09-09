@@ -2,13 +2,6 @@
 
 #include "Client.hpp"
 
-ThirdPerson::ThirdPerson(): Module("Nametag", "Shows your nametag for you while\nin 3rd person mode.",
-                                   IDR_NAMETAG_PNG, "") {
-    address = GET_SIG_ADDRESS("ThirdPersonNametag");
-
-    original.resize(6);
-    Memory::copyBytes((LPVOID) address, original.data(), 6);
-}
 
 void ThirdPerson::defaultConfig() {
     Module::defaultConfig("core");

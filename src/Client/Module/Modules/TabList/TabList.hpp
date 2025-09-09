@@ -71,8 +71,12 @@ private:
     float textX2;
     float textX3;
 
+
 public:
-    TabList();
+
+    TabList(): Module("Tab List", "Java-like tab list.\nLists the current online players on the server.",
+        IDR_LIST_PNG, "TAB", false, {"player list"}) {
+    }
 
     void onEnable() override;
 
@@ -95,4 +99,27 @@ public:
     void onMouse(const MouseEvent &event);
 
     void onKey(const KeyEvent &event);
+
+    // PlayerHead descriptor management functions
+    static bool AllocatePlayerHeadDescriptor(const std::string& playerName, D3D12_CPU_DESCRIPTOR_HANDLE* out_cpu_handle, D3D12_GPU_DESCRIPTOR_HANDLE* out_gpu_handle, UINT* out_descriptor_id);
+    static void FreePlayerHeadDescriptor(UINT descriptorId);
+    static void CleanupOldPlayerHeads(size_t maxCached = 50);
+
+    // Reset all TabList descriptor state - called during swapchain recreation
+    static void ResetDescriptorState();
+
+    // PlayerHead descriptor management data
+    struct PlayerHeadDescriptorInfo {
+        std::string playerName;
+        std::chrono::steady_clock::time_point lastUsed;
+        bool inUse = false;
+    };
+    static inline std::unordered_map<UINT, PlayerHeadDescriptorInfo> playerHeadDescriptors;
+    static inline std::queue<UINT> freePlayerHeadDescriptors;
+    static inline UINT nextPlayerHeadDescriptorId;
+    static inline std::mutex playerHeadDescriptorMutex;
+    static constexpr UINT PLAYERHEAD_DESCRIPTOR_START = 10000;    // Start well beyond static images
+    static constexpr UINT MAX_PLAYERHEAD_DESCRIPTORS = 2000;     // Support 2000 concurrent playerheads
+    static constexpr UINT PLAYERHEAD_DESCRIPTOR_END = PLAYERHEAD_DESCRIPTOR_START + MAX_PLAYERHEAD_DESCRIPTORS;
+
 };
