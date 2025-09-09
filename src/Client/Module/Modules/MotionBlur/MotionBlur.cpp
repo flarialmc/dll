@@ -30,7 +30,7 @@ void MotionBlur::defaultConfig()
     setDef("avgpixel", true);
     setDef("dynamic", false);
     setDef("samples", 64.f);
-    setDef("renderUnderUI", true);
+    setDef("renderUnderUI", false);
     
 }
 
