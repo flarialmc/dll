@@ -3,7 +3,7 @@
 #include <vector>
 #include <string>
 #include <filesystem>
-#include <lib/json/json.hpp>
+#include <lib/json/json_fwd.hpp>
 #include <windows.h>
 
 // Forward declarations

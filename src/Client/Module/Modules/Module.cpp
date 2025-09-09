@@ -2,6 +2,8 @@
 
 #include "../../Client.hpp"
 
+#include <lib/json/json.hpp>
+
 #include "ClickGUI/ClickGUI.hpp"
 #include "Scripting/ScriptManager.hpp"
 #include "../../../Utils/Telemetry.hpp"
