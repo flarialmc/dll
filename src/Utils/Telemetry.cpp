@@ -1,4 +1,5 @@
 #include "Telemetry.hpp"
+#include <json/json.hpp>
 #include "APIUtils.hpp"
 #include "Utils.hpp"
 #include "Logger/Logger.hpp"

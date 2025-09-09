@@ -1,6 +1,8 @@
 #include "ZeqaUtils.hpp"
 #include "Client.hpp"
 
+#include <lib/json/json.hpp>
+
 #include "SDK/Client/Network/Packet/CommandRequestPacket.hpp"
 #include "SDK/Client/Network/Packet/TextPacket.hpp"
 

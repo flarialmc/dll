@@ -1,7 +1,5 @@
 #include "WinrtUtils.hpp"
 
-#include <lib/json/json.hpp>
-
 #include <Utils/Logger/Logger.hpp>
 #include <Utils/Utils.hpp>
 #include "../Client/GUI/Engine/Engine.hpp"
