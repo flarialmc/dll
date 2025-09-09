@@ -1,6 +1,6 @@
 #include "HueChanger.hpp"
 
-#include "Events/EventManager.hpp"
+
 
 void HueChanger::onEnable() {
     Listen(this, RenderEvent, &HueChanger::onRender)

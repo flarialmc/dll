@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "Events/EventManager.hpp"
+
 #include "Events/Game/TickEvent.hpp"
 #include "Events/Network/PacketEvent.hpp"
 #include "SDK/Client/Network/Packet/LoginPacket.hpp"

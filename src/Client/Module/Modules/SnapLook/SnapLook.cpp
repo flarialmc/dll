@@ -1,6 +1,6 @@
 #include "SnapLook.hpp"
 
-#include "Events/EventManager.hpp"
+
 
 
 void SnapLook::onEnable()

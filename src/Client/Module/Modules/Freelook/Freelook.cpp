@@ -1,6 +1,6 @@
 #include "Freelook.hpp"
 
-#include "Events/EventManager.hpp"
+
 
 void FreeLook::onSetup() {
     keybindActions.clear();

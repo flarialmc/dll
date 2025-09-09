@@ -1,7 +1,7 @@
 #include "Animations.hpp"
 
 #include "Client.hpp"
-#include "Events/EventManager.hpp"
+
 
 void Animations::onEnable() {
     Listen(this, DrawImageEvent, &Animations::onDrawImage)

@@ -1,6 +1,6 @@
 #include "ComboCounter.hpp"
 
-#include "Events/EventManager.hpp"
+
 #include "Events/Game/TickEvent.hpp"
 #include "Events/Render/RenderEvent.hpp"
 

@@ -1,6 +1,6 @@
 #include "HurtColor.hpp"
 
-#include "Events/EventManager.hpp"
+
 
 void HurtColor::onEnable() {
     Listen(this, HurtColorEvent, &HurtColor::onGetHurtColor)

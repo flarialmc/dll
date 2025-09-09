@@ -1,7 +1,7 @@
 #include "HiveUtils.hpp"
 
 #include "Client.hpp"
-#include "Events/EventManager.hpp"
+
 #include "SDK/Client/Network/Packet/SetTitlePacket.hpp"
 
 void HiveUtils::onEnable() {

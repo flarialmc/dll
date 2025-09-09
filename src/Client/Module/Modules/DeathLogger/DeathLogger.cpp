@@ -1,6 +1,6 @@
 #include "DeathLogger.hpp"
 
-#include "Events/EventManager.hpp"
+
 #include "Modules/Waypoints/Waypoints.hpp"
 
 void DeathLogger::onEnable() {

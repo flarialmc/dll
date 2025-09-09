@@ -1,6 +1,5 @@
 #include <format>
 #include "../../../../Events/Input/KeyEvent.hpp"
-#include "../../../../Events/EventManager.hpp"
 #include "../../../../../Utils/Logger/Logger.hpp"
 #include "../../../../Client.hpp"
 #include <windows.h>

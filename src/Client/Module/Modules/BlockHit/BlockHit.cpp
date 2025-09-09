@@ -1,6 +1,6 @@
 #include "BlockHit.hpp"
 
-#include "Events/EventManager.hpp"
+
 #include "glm/glm/ext/matrix_transform.hpp"
 
 void BlockHit::onEnable() {

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "Events/EventManager.hpp"
+
 #include "../../../../Assets/Assets.hpp"
 
 class CPSCounter : public Module {

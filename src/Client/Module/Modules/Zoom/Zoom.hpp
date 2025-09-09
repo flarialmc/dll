@@ -1,5 +1,4 @@
 #pragma once
-#include "../../../Events/Events.hpp"
 #include "../Module.hpp"
 #include "../../../../SDK/Client/Core/Options.hpp"
 

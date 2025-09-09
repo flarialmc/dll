@@ -4,7 +4,7 @@
 #include "Assets/Assets.hpp"
 #include "Events/Game/PerspectiveEvent.hpp"
 #include "Events/Game/UpdatePlayerEvent.hpp"
-#include <Events/Events.hpp>
+
 class FreeLook : public Module {
 private:
 	static inline uintptr_t yaw1;

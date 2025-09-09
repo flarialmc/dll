@@ -1,6 +1,6 @@
 #include "ModernKeybindHandling.hpp"
 
-#include "Events/EventManager.hpp"
+
 #include "Hook/Hooks/Input/KeyHook.hpp"
 
 

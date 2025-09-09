@@ -1,6 +1,6 @@
 #include "InventoryHUD.hpp"
 
-#include "Events/EventManager.hpp"
+
 #include "Modules/ClickGUI/ClickGUI.hpp"
 #include "SDK/Client/Render/BaseActorRenderContext.hpp"
 #include "Utils/Render/PositionUtils.hpp"

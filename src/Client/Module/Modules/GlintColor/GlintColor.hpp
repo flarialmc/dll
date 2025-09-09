@@ -5,7 +5,7 @@
 #include "GlintColor.hpp"
 #include "Assets/Assets.hpp"
 
-#include "Events/EventManager.hpp"
+
 
 class GlintColor : public Module {
 public:

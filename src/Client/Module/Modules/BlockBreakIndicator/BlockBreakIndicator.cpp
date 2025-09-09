@@ -1,6 +1,6 @@
 #include "BlockBreakIndicator.hpp"
 
-#include "Events/EventManager.hpp"
+
 #include "Events/Render/RenderEvent.hpp"
 #include "Modules/ClickGUI/ClickGUI.hpp"
 #include "Modules/CPS/CPSCounter.hpp"

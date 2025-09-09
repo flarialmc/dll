@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include <minhook/MinHook.h>
-#include <Client/Events/EventManager.hpp>
 
 class Hook {
 public:

@@ -1,6 +1,6 @@
 #include "ArrowCounter.hpp"
 
-#include "Events/EventManager.hpp"
+
 #include "Events/Game/TickEvent.hpp"
 
 

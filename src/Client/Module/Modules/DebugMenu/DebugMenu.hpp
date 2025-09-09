@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "../Events/Events.hpp"
 #include "../../../../SDK/Client/Level/Biome.hpp"
 #include <chrono>
 #include <vector>

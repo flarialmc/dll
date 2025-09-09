@@ -4,8 +4,6 @@
 #include <windows.h>
 #include <unknwn.h>
 #include "../../../../Client.hpp"
-#include "../../../../Events/Events.hpp"
-#include "../../../../Events/EventManager.hpp"
 #include "../../../Manager.hpp"
 
 class ClickData {

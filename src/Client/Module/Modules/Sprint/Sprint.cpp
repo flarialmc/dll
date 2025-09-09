@@ -1,6 +1,6 @@
 #include "Sprint.hpp"
 
-#include "Events/EventManager.hpp"
+
 #include "Modules/Sneak/Sneak.hpp"
 
 void Sprint::onEnable() {

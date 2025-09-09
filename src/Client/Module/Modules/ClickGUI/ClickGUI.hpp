@@ -1,8 +1,6 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "../../../Events/Events.hpp"
-#include "../../../Events/EventManager.hpp"
 #include "../../../Client.hpp"
 #include "Elements/ClickGUIElements.hpp"
 #include "SDK/Client/Network/Packet/TextPacket.hpp"

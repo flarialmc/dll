@@ -1,6 +1,6 @@
 #include "Sneak.hpp"
 
-#include "Events/EventManager.hpp"
+
 
 void Sneak::onEnable() {
     Listen(this, KeyEvent, &Sneak::onKey)

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "Events/EventManager.hpp"
+
 #include "Events/Render/RenderEvent.hpp"
 
 class LowHealthIndicator : public Module {

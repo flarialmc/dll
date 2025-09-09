@@ -1,6 +1,6 @@
 #include "CompactChat.hpp"
 
-#include "Events/EventManager.hpp"
+
 #include "SDK/Client/Render/GuiMessage.hpp"
 #include "Modules/Nick/NickModule.hpp"
 

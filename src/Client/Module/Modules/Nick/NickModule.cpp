@@ -1,6 +1,6 @@
 #include "NickModule.hpp"
 
-#include "Events/EventManager.hpp"
+
 
 
 void NickModule::onEnable()

@@ -1,7 +1,7 @@
 #include "Module.hpp"
 
 #include "../../Client.hpp"
-#include "../../Events/Events.hpp"
+
 #include "ClickGUI/ClickGUI.hpp"
 #include "Scripting/ScriptManager.hpp"
 #include "../../../Utils/Telemetry.hpp"

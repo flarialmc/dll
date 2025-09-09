@@ -1,5 +1,5 @@
 #include "CinematicCamera.hpp"
-#include "Events/EventManager.hpp"
+
 #include "SDK/Client/Core/Options.hpp"
 
 void CinematicCamera::onEnable() {

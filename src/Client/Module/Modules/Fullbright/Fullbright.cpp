@@ -1,6 +1,6 @@
 #include "Fullbright.hpp"
 
-#include "Events/EventManager.hpp"
+
 
 void Fullbright::onEnable() {
     Listen(this, GammaEvent, &Fullbright::onGetGamma)

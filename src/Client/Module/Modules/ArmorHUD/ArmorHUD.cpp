@@ -1,7 +1,7 @@
 #include "ArmorHUD.hpp"
 
 #include "Manager.hpp"
-#include "Events/EventManager.hpp"
+
 #include "Modules/ClickGUI/ClickGUI.hpp"
 
 void ArmorHUD::onEnable() {

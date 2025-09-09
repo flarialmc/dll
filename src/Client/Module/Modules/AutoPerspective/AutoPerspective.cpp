@@ -1,6 +1,6 @@
 #include "AutoPerspective.hpp"
 
-#include "Events/EventManager.hpp"
+
 
 void AutoPerspective::onEnable() {
     Listen(this, PerspectiveEvent, &AutoPerspective::onGetViewPerspective)

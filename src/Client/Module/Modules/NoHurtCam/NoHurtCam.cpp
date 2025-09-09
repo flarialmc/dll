@@ -1,6 +1,6 @@
 #include "NoHurtCam.hpp"
 
-#include "Events/EventManager.hpp"
+
 
 
 void NoHurtCam::onEnable() {

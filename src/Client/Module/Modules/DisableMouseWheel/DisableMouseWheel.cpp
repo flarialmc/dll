@@ -1,6 +1,6 @@
 #include "DisableMouseWheel.hpp"
 
-#include "Events/EventManager.hpp"
+
 
 void DisableMouseWheel::onEnable() {
     Listen(this, MouseEvent, &DisableMouseWheel::onMouse)

@@ -1,6 +1,6 @@
 #include "TotemCounter.hpp"
 
-#include "Events/EventManager.hpp"
+
 #include "Events/Game/TickEvent.hpp"
 
 

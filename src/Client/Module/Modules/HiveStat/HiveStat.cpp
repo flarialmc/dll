@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <functional>
 
-#include "Events/EventManager.hpp"
+
 #include "Events/Render/RenderEvent.hpp"
 #include "Modules/ClickGUI/ClickGUI.hpp"
 

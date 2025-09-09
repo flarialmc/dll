@@ -9,7 +9,7 @@
 #include "Events/Game/PerspectiveEvent.hpp"
 #include "Events/Render/HudCursorRendererRenderEvent.hpp"
 
-#include "Events/EventManager.hpp"
+
 #include "Events/Game/PerspectiveEvent.hpp"
 #include "Utils/Render/PositionUtils.hpp"
 #include <filesystem>
