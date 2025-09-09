@@ -42,3 +42,5 @@
 #include "Assets/Assets.hpp"
 #include "Events/EventManager.hpp"
 #include "Events/Events.hpp"
+
+#include <lib/json/json.hpp>
