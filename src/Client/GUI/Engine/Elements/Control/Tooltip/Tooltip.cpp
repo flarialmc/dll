@@ -1,6 +1,7 @@
 #include "../../../Engine.hpp"
 #include "../../../../../Module/Manager.hpp"
 #include "ToolTipParams.hpp"
+#include "../../../../../Module/Modules/ClickGUI/ClickGUI.hpp"
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 

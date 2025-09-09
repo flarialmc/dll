@@ -23,9 +23,9 @@
 #include <iterator>
 #include <regex>
 #include <stack>
-#include <windows.h>
-#include <unknwn.h>
 #include <libhat.hpp>
 #include <glm/glm/glm.hpp>
 #include <glm/glm/ext/matrix_transform.hpp>
 #include <entt/entt.hpp>
+#include "Assets/Assets.hpp"
+#include "Events/EventManager.hpp"

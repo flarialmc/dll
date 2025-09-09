@@ -2,6 +2,7 @@
 
 #include "Client.hpp"
 #include "Manager.hpp"
+#include "../../../GUI/Engine/Engine.hpp"
 
 void CPSLimiter::defaultConfig() {
     settings.changeType<float, int>("Left");

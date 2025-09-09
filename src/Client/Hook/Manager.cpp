@@ -1,4 +1,9 @@
-﻿#pragma once
+#pragma once
+
+#include "Manager.hpp"
+#include "Hooks/Input/KeyHook.hpp"
+#include "Hooks/Input/MouseHook.hpp"
+#include "Hooks/Render/DirectX/DXGI/SwapchainHook.hpp"
 
 #include "Hooks/Render/DirectX/DXGI/ResizeHook.hpp"
 #include "Hooks/Render/DirectX/DXGI/CommandListHook.hpp"

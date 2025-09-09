@@ -19,6 +19,9 @@
 
 #include "SDK/Client/Block/BlockLegacy.hpp"
 #include "Utils/WinrtUtils.hpp"
+#include "GUI/Engine/Constraints.hpp"
+#include "Hook/Hooks/Render/DirectX/DXGI/SwapchainHook.hpp"
+
 
 void JavaDebugMenu::onEnable() {
     Listen(this, SetupAndRenderEvent, &JavaDebugMenu::onSetupAndRender)
@@ -343,18 +346,18 @@ void JavaDebugMenu::onTick(TickEvent &event) {
         // Speed and Velocity
         auto stateVectorComponent = SDK::clientInstance->getLocalPlayer()->getStateVectorComponent();
         if (stateVectorComponent != nullptr) {
-            xVelo = (stateVectorComponent->Pos.x - PrevPos.x) * 20;
-            yVelo = (stateVectorComponent->Pos.y - PrevPos.y) * 20;
-            zVelo = (stateVectorComponent->Pos.z - PrevPos.z) * 20;
-            PrevPos = stateVectorComponent->Pos;
+            this->xVelo = (stateVectorComponent->Pos.x - this->PrevPos.x) * 20;
+            this->yVelo = (stateVectorComponent->Pos.y - this->PrevPos.y) * 20;
+            this->zVelo = (stateVectorComponent->Pos.z - this->PrevPos.z) * 20;
+            this->PrevPos = stateVectorComponent->Pos;
         }
     }
 
     if (isOnBlock(6)) {
         // TPS
         TimedObj tick{};
-        tick.timestamp = Microtime();
-        tickList.insert(tickList.begin(), tick);
+        tick.timestamp = this->Microtime();
+        this->tickList.insert(this->tickList.begin(), tick);
     }
 
     if (isOnBlock(2)) {
@@ -366,7 +369,7 @@ void JavaDebugMenu::onTick(TickEvent &event) {
             static_cast<int>(pos.z),
         };
         if (SDK::clientInstance->getBlockSource() && SDK::clientInstance->getBlockSource()->getBiome(bp)) {
-            curBiome = SDK::clientInstance->getBlockSource()->getBiome(bp);
+            this->curBiome = SDK::clientInstance->getBlockSource()->getBiome(bp);
         }
     }
 }
@@ -390,17 +393,17 @@ void JavaDebugMenu::onSetupAndRender(SetupAndRenderEvent &event) {
             BlockLegacy *block = blockSource->getBlock(pos)->getBlockLegacy();
             if (!block) return;
             try {
-                lookingAt = block->getNamespace() + ":" + block->getName();
+                this->lookingAt = block->getNamespace() + ":" + block->getName();
 
-                if (isOnSetting("showTargetedBlockTags") && lookingAt != lastLookingAt) {
-                    lastLookingAt = lookingAt;
+                if (this->isOnSetting("showTargetedBlockTags") && this->lookingAt != this->lastLookingAt) {
+                    this->lastLookingAt = this->lookingAt;
                     std::vector<std::string> tags = {};
                     for (auto i: tagMap) {
                         if (std::ranges::find(i.second, block->getName()) != i.second.end()) {
                             tags.emplace_back(i.first);
                         }
                     }
-                    lookingAtTags = tags;
+                    this->lookingAtTags = tags;
                 }
             } catch (const std::exception &e) { LOG_ERROR("Failed to get block name: {}", e.what()); }
         } catch (const std::exception &e) {
@@ -408,36 +411,36 @@ void JavaDebugMenu::onSetupAndRender(SetupAndRenderEvent &event) {
         }
     }
 
-    if (isOnBlock(4) && MC::heldLeft) {
+    if (this->isOnBlock(4) && MC::heldLeft) {
         // Break Progress
         Gamemode *gm = SDK::clientInstance->getLocalPlayer()->getGamemode();
         float breakProgress = gm->getLastBreakProgress() * 100;
-        if (lastBreakProgress != breakProgress) {
-            if (lastBreakProgress < breakProgress || breakProgress == 0.f) {
-                currentBreakProgress = breakProgress;
+        if (this->lastBreakProgress != breakProgress) {
+            if (this->lastBreakProgress < breakProgress || breakProgress == 0.f) {
+                this->currentBreakProgress = breakProgress;
             }
-            lastBreakProgress = breakProgress;
+            this->lastBreakProgress = breakProgress;
         }
     } else {
-        currentBreakProgress = 0.0f;
+        this->currentBreakProgress = 0.0f;
     }
 }
 
 void JavaDebugMenu::onRender(RenderEvent &event) {
     if (!this->isEnabled()) return;
     if (this->active && (SDK::getCurrentScreen() == "f3_screen" || SDK::getCurrentScreen() == "hud_screen")) {
-        float uiscale = getOps<float>("uiscale");
+        float uiscale = this->getOps<float>("uiscale");
         float uiscaleConst = Constraints::RelativeConstraint(0.001f * uiscale);
         float textHeight = Constraints::RelativeConstraint(0.1f * uiscale);
         float textSize = Constraints::SpacingConstraint(2.0f, textHeight);
         float yPadding = Constraints::SpacingConstraint(0.025f, textHeight);
-        float rounding = getOps<float>("rounding");
+        float rounding = this->getOps<float>("rounding");
 
-        D2D1_COLOR_F textColor = getColor("text");
-        D2D1_COLOR_F textShadowColor = getColor("textShadow");
-        D2D1_COLOR_F bgColor = getColor("bg");
+        D2D1_COLOR_F textColor = this->getColor("text");
+        D2D1_COLOR_F textShadowColor = this->getColor("textShadow");
+        D2D1_COLOR_F bgColor = this->getColor("bg");
 
-        float textShadowOffset = Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * getOps<float>("uiscale");
+        float textShadowOffset = Constraints::RelativeConstraint(this->getOps<float>("textShadowOffset")) * this->getOps<float>("uiscale");
 
         if (SDK::clientInstance == nullptr) return;
         LocalPlayer *player = SDK::clientInstance->getLocalPlayer();
@@ -445,54 +448,54 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
         ActorRotationComponent *rotComponent = player->getActorRotationComponent();
 
         if (rotComponent) {
-            if (rotComponent->rot.y != 0) lerpYaw = rotComponent->rot.y;
-            if (rotComponent->rot.x != 0) lerpPitch = rotComponent->rot.x;
+            if (rotComponent->rot.y != 0) this->lerpYaw = rotComponent->rot.y;
+            if (rotComponent->rot.x != 0) this->lerpPitch = rotComponent->rot.x;
         }
 
         std::vector<std::string> left;
         std::vector<std::string> right;
 
-        bool spoof = getOps<bool>("imPoorButIWannaLookRich");
+        bool spoof = this->getOps<bool>("imPoorButIWannaLookRich");
 
-        if (versionName.empty()) versionName = std::format("Flarial V2 Open Beta, Minecraft {}", WinrtUtils::getFormattedVersion());
-        left.emplace_back(versionName);
+        if (this->versionName.empty()) this->versionName = std::format("Flarial V2 Open Beta, Minecraft {}", WinrtUtils::getFormattedVersion());
+        left.emplace_back(this->versionName);
 
-        if (isOnBlock(1)) {
+        if (this->isOnBlock(1)) {
             if (spoof) {
                 left.emplace_back(std::format("{} FPS", static_cast<int>(MC::fps * 222.2)));
                 left.emplace_back("1% Lows: \u221E FPS");
             } else {
                 left.emplace_back(std::format("{} FPS", MC::fps));
                 auto now = std::chrono::steady_clock::now();
-                if (std::chrono::duration_cast<std::chrono::seconds>(now - last1PercLowUpdate).count() >= 1) {
-                    getOnePercLows();
-                    last1PercLowUpdate = now;
+                if (std::chrono::duration_cast<std::chrono::seconds>(now - this->last1PercLowUpdate).count() >= 1) {
+                    this->getOnePercLows();
+                    this->last1PercLowUpdate = now;
                 }
-                left.emplace_back(std::format("1% Lows: {:.0f} FPS", cached1PercLow));
+                left.emplace_back(std::format("1% Lows: {:.0f} FPS", this->cached1PercLow));
             }
             left.emplace_back(std::format("Frametime: {:.2f}ms", MC::frameTime));
         }
 
         left.emplace_back("");
 
-        if (isOnBlock(2)) {
+    if (this->isOnBlock(2)) {
             std::string temp = "Unknown";
-            if (curBiome != nullptr) temp = std::format("{:.2f}", curBiome->gettemperature());
+            if (this->curBiome != nullptr) temp = std::format("{:.2f}", this->curBiome->gettemperature());
             left.emplace_back(std::format("E: {} T: {}", player->getLevel()->getRuntimeActorList().size(), temp));
 
-            left.emplace_back(getDimensionName());
+            left.emplace_back(this->getDimensionName());
 
-            if (curBiome != nullptr) {
-                if (VersionUtils::checkAboveOrEqual(21, 100)) left.emplace_back(curBiome->getName());
-                else left.emplace_back(std::format("minecraft:{}", curBiome->getName()));
+            if (this->curBiome != nullptr) {
+                if (VersionUtils::checkAboveOrEqual(21, 100)) left.emplace_back(this->curBiome->getName());
+                else left.emplace_back(std::format("minecraft:{}", this->curBiome->getName()));
             }
             else left.emplace_back("Unknown biome");
 
             left.emplace_back("");
         }
 
-        if (isOnBlock(3)) {
-            if (isOnSetting("showCoords")) {
+        if (this->isOnBlock(3)) {
+            if (this->isOnSetting("showCoords")) {
                 Vec3<float> pos = *player->getPosition();
                 left.emplace_back(std::format("XYZ: {:.1f} / {:.1f} / {:.1f}", pos.x, pos.y, pos.z));
 
@@ -501,14 +504,14 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
                 left.emplace_back(std::format("Chunk: {} {} {}", static_cast<int>(pos.x / 16), static_cast<int>(pos.y / 16), static_cast<int>(pos.z / 16)));
                 left.emplace_back(std::format("Chunk Coordinate: {} {}", static_cast<int>(pos.x) % 16, static_cast<int>(pos.z) % 16));
 
-                left.emplace_back(getFacingDirection(player));
+                left.emplace_back(this->getFacingDirection(player));
                 HitResult target = player->getLevel()->getHitResult();
                 BlockPos targetPos = {target.blockPos.x, target.blockPos.y, target.blockPos.z};
                 left.emplace_back(std::format("Looking at block: {} {} {}", targetPos.x, targetPos.y, targetPos.z));
             }
 
-            if (isOnSetting("showWeather")) {
-                std::pair<std::string, std::vector<float> > weatherInfo = getWeatherInfo();
+            if (this->isOnSetting("showWeather")) {
+                std::pair<std::string, std::vector<float> > weatherInfo = this->getWeatherInfo();
                 if (weatherInfo.second.empty()) {
                     left.emplace_back("Weather: Unknown");
                 } else {
@@ -520,23 +523,23 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
             left.emplace_back("");
         }
 
-        if (isOnBlock(4)) {
-            left.emplace_back(std::format("Speed: {:.2f} blocks/s", sqrt(std::pow(xVelo, 2) + std::pow(yVelo, 2) + std::pow(zVelo, 2))));
-            left.emplace_back(std::format("Velocity: {:.2f} / {:.2f} / {:.2f} blocks/s", xVelo, yVelo, zVelo));
+    if (this->isOnBlock(4)) {
+            left.emplace_back(std::format("Speed: {:.2f} blocks/s", sqrt(std::pow(this->xVelo, 2) + std::pow(this->yVelo, 2) + std::pow(this->zVelo, 2))));
+            left.emplace_back(std::format("Velocity: {:.2f} / {:.2f} / {:.2f} blocks/s", this->xVelo, this->yVelo, this->zVelo));
 
-            if (isOnSetting("alwaysShowBreakProg") || currentBreakProgress != 0.0f) left.emplace_back(std::format("Break Progress: {}%", static_cast<int>(currentBreakProgress)));
+            if (this->isOnSetting("alwaysShowBreakProg") || this->currentBreakProgress != 0.0f) left.emplace_back(std::format("Break Progress: {}%", static_cast<int>(this->currentBreakProgress)));
 
             left.emplace_back("");
         }
 
-        if (isOnBlock(5)) {
+        if (this->isOnBlock(5)) {
             left.emplace_back(std::format("World Time: {}", Time::formatMCTime(Time::curTime, false)));
             left.emplace_back(std::format("World Name: {}", SDK::clientInstance->getLocalPlayer()->getLevel()->getLevelData()->getLevelName()));
 
             left.emplace_back("");
         }
 
-        if (isOnBlock(6)) {
+    if (this->isOnBlock(6)) {
             left.emplace_back("Server:");
             std::string serverIp = SDK::getServerIP();
 
@@ -548,14 +551,14 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
                 left.emplace_back(std::format("Ping: {} ms", SDK::getServerPing()));
             }
 
-            updateTimedVector(tickList, 1.0f);
-            left.emplace_back(std::format("TPS: {}", std::to_string(tickList.size())));
+            this->updateTimedVector(this->tickList, 1.0f);
+            left.emplace_back(std::format("TPS: {}", std::to_string(this->tickList.size())));
         }
 
 
         right.emplace_back("64bit");
 
-        if (isOnBlock(7)) {
+        if (this->isOnBlock(7)) {
             MEMORYSTATUSEX memory_status;
             memory_status.dwLength = sizeof(memory_status);
             GlobalMemoryStatusEx(&memory_status);
@@ -570,20 +573,20 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
 
         right.emplace_back("");
 
-        if (isOnBlock(8)) {
+        if (this->isOnBlock(8)) {
             if (spoof) right.emplace_back("CPU: 69x Intel 9 7900X3D ProMax Plus (420 Cores)");
             else {
-                if (cpuName.empty()) {
-                    std::wstring temp(std::format(L"CPU: {}x {} ({} Cores)", GetCpuThreadCount(), GetCpuName(), GetCpuCoreCount()));
-                    cpuName = std::string(temp.begin(), temp.end());
+                if (this->cpuName.empty()) {
+                    std::wstring temp(std::format(L"CPU: {}x {} ({} Cores)", this->GetCpuThreadCount(), this->GetCpuName(), this->GetCpuCoreCount()));
+                    this->cpuName = std::string(temp.begin(), temp.end());
                 }
-                right.emplace_back(cpuName);
+                right.emplace_back(this->cpuName);
             }
 
             right.emplace_back("");
         }
 
-        if (isOnBlock(9)) {
+        if (this->isOnBlock(9)) {
             right.emplace_back(std::format("Display: {}x{}", MC::windowSize.x, MC::windowSize.y));
             right.emplace_back(std::format("Active Renderer: {}", !SwapchainHook::isDX12 ? "DirectX11" : "DirectX12"));
 
@@ -598,17 +601,17 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
 
         if (isOnBlock(10)) {
             right.emplace_back(std::format("Local Time: {}", getTime()));
-            right.emplace_back(std::format("CPU Uptime: {}", getFormattedTime(static_cast<long long>(GetTickCount64() / 1000))));
-            right.emplace_back(std::format("Minecraft Uptime: {}", getFormattedTime(
+            right.emplace_back(std::format("CPU Uptime: {}", this->getFormattedTime(static_cast<long long>(GetTickCount64() / 1000))));
+            right.emplace_back(std::format("Minecraft Uptime: {}", this->getFormattedTime(
                                                static_cast<long long>(
-                                                   std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - startTime).count()
+                                                   std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - this->startTime).count()
                                                ) / 1000
                                            )));
 
             right.emplace_back("");
         }
 
-        if (isOnBlock(11)) {
+    if (this->isOnBlock(11)) {
             right.emplace_back("Targeted Block:");
             right.emplace_back(lookingAt);
             right.emplace_back("");
@@ -635,7 +638,7 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
 
         int leftYoffset = 0.0f;
         for (const auto &i: left) {
-            if (getOps<bool>("showBg") && !i.empty()) {
+            if (this->getOps<bool>("showBg") && !i.empty()) {
                 float lineWidth = FlarialGUI::getFlarialTextSize(
                     String::StrToWStr(i).c_str(),
                     30.0f, textHeight / 3.0f,
@@ -648,11 +651,11 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
                     0.0f, leftYoffset - yPadding + 0.05f,
                     bgColor,
                     lineWidth, textHeight / 3.0f + yPadding * 2 - 1.0f,
-                    rounding, rounding
+                rounding, rounding
                 );
             }
 
-            if (getOps<bool>("textShadow"))
+            if (this->getOps<bool>("textShadow"))
                 FlarialGUI::FlarialTextWithFont(
                     textShadowOffset, leftYoffset + textShadowOffset,
                     String::StrToWStr(i).c_str(),
@@ -679,7 +682,7 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
 
         int rightYoffset = 0.0f;
         for (const auto &i: right) {
-            if (getOps<bool>("showBg") && !i.empty()) {
+            if (this->getOps<bool>("showBg") && !i.empty()) {
                 float lineWidth = FlarialGUI::getFlarialTextSize(
                     String::StrToWStr(i).c_str(),
                     30.0f, textHeight / 3.0f,
@@ -696,7 +699,7 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
                 );
             }
 
-            if (getOps<bool>("textShadow"))
+            if (this->getOps<bool>("textShadow"))
                 FlarialGUI::FlarialTextWithFont(
                     (MC::windowSize.x - 30.0f) + textShadowOffset, rightYoffset + textShadowOffset,
                     String::StrToWStr(i).c_str(),
@@ -727,9 +730,9 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
 
         // frametime graph start
 
-        if (isOnSetting("showFTgraph") || isOnBlock(1)) {
-            while (prevFrameTimes.size() >= static_cast<int>(Constraints::SpacingConstraint(getOps<float>("FTgraphWidth") * 10, uiscaleConst) / Constraints::SpacingConstraint(getOps<float>("FTbarWidth"), uiscaleConst))) prevFrameTimes.pop_front();
-            prevFrameTimes.push_back(MC::frameTime);
+        if (this->isOnSetting("showFTgraph") || this->isOnBlock(1)) {
+            while (this->prevFrameTimes.size() >= static_cast<int>(Constraints::SpacingConstraint(this->getOps<float>("FTgraphWidth") * 10, uiscaleConst) / Constraints::SpacingConstraint(this->getOps<float>("FTbarWidth"), uiscaleConst))) this->prevFrameTimes.pop_front();
+            this->prevFrameTimes.push_back(MC::frameTime);
         }
 
         if (isOnSetting("showFTgraph")) {
@@ -750,7 +753,7 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
                 0, 0
             );
 
-            for (float ft: prevFrameTimes) {
+            for (float ft: this->prevFrameTimes) {
                 D2D1_COLOR_F barCol;
                 if (ft / max >= 1) barCol = D2D1_COLOR_F(1, 0, 0, 1);
                 else barCol = FlarialGUI::HSVtoColorF(120.f * (1 - ft / max), 1.f, 1.f);
@@ -771,14 +774,14 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
                 0, 0
             );
 
-            float minFT = *std::ranges::min_element(prevFrameTimes);
-            float maxFT = *std::ranges::max_element(prevFrameTimes);
-            float avgFT = std::accumulate(prevFrameTimes.begin(), prevFrameTimes.end(), 0.f) / prevFrameTimes.size();
+            float minFT = *std::ranges::min_element(this->prevFrameTimes);
+            float maxFT = *std::ranges::max_element(this->prevFrameTimes);
+            float avgFT = std::accumulate(this->prevFrameTimes.begin(), this->prevFrameTimes.end(), 0.f) / this->prevFrameTimes.size();
 
-            if (getOps<bool>("showMinMaxFT")) {
+            if (this->getOps<bool>("showMinMaxFT")) {
                 // minimum frame time
 
-                if (getOps<bool>("textShadow"))
+                if (this->getOps<bool>("textShadow"))
                     FlarialGUI::FlarialTextWithFont(
                         borderSize * 2 + textShadowOffset, (startHeight - textHeight / 3.0f) + textShadowOffset,
                         String::StrToWStr(std::format("{:.1f} ms min", minFT)).c_str(),
@@ -828,7 +831,7 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
 
                 // max frame time
 
-                if (getOps<bool>("textShadow"))
+                if (this->getOps<bool>("textShadow"))
                     FlarialGUI::FlarialTextWithFont(
                         (barWidth * graphLen) + textShadowOffset, (startHeight - textHeight / 3.0f) + textShadowOffset,
                         String::StrToWStr(std::format("{:.1f} ms max", maxFT)).c_str(),
@@ -852,7 +855,7 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
                 );
             }
 
-            if (getOps<bool>("showThreshold")) {
+            if (this->getOps<bool>("showThreshold")) {
                 drawList->AddLine(
                     ImVec2(borderSize, startHeight + maxRectHeight / 2),
                     ImVec2(barWidth * graphLen, startHeight + maxRectHeight / 2 + borderSize),
@@ -862,7 +865,7 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
 
                 // 30 fps text
 
-                if (getOps<bool>("textShadow"))
+                if (this->getOps<bool>("textShadow"))
                     FlarialGUI::FlarialTextWithFont(
                         (borderSize * 2) + textShadowOffset, startHeight + textShadowOffset,
                         String::StrToWStr(std::format("30 FPS", minFT)).c_str(),
@@ -885,7 +888,7 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
                     true
                 );
 
-                if (getOps<bool>("textShadow"))
+                if (this->getOps<bool>("textShadow"))
                     FlarialGUI::FlarialTextWithFont(
                         (borderSize * 2) + textShadowOffset, (startHeight + maxRectHeight / 2 + borderSize) + textShadowOffset,
                         String::StrToWStr(std::format("60 FPS", minFT)).c_str(),
@@ -912,7 +915,7 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
 
         // frametime graph end
 
-        if (ModuleManager::getModule("ClickGUI")->active || (!getOps<bool>("f5crosshair") && curPerspective != Perspective::FirstPerson)) return;
+        if (ModuleManager::getModule("ClickGUI")->active || (!this->getOps<bool>("f5crosshair") && this->curPerspective != Perspective::FirstPerson)) return;
 
         // debug menu crosshair start
 
@@ -943,19 +946,19 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
         );
 
         // red line (-yaw)
-        if (lerpYaw < 0.0f) drawVector(drawList, center, redPos, red, lineWidth, lineLength, guiscale);
+        if (this->lerpYaw < 0.0f) this->drawVector(drawList, center, redPos, red, lineWidth, lineLength, guiscale);
 
         // blue line (< 90abs yaw)
-        if (abs(lerpYaw) < 90.f) drawVector(drawList, center, bluePos, blue, lineWidth, lineLength, guiscale);
+        if (abs(this->lerpYaw) < 90.f) this->drawVector(drawList, center, bluePos, blue, lineWidth, lineLength, guiscale);
 
         // green line
-        drawVector(drawList, center, greenPos, green, lineWidth, lineLength, guiscale);
+        this->drawVector(drawList, center, greenPos, green, lineWidth, lineLength, guiscale);
 
         // red line (+yaw)
-        if (lerpYaw > 0.0f) drawVector(drawList, center, redPos, red, lineWidth, lineLength, guiscale);
+        if (this->lerpYaw > 0.0f) this->drawVector(drawList, center, redPos, red, lineWidth, lineLength, guiscale);
 
         // blue line (> 90abs yaw)
-        if (abs(lerpYaw) > 90.f) drawVector(drawList, center, bluePos, blue, lineWidth, lineLength, guiscale);
+        if (abs(this->lerpYaw) > 90.f) this->drawVector(drawList, center, bluePos, blue, lineWidth, lineLength, guiscale);
 
         // debug menu crosshair end
     }
@@ -988,17 +991,17 @@ void JavaDebugMenu::onKey(KeyEvent &event) {
 
 void JavaDebugMenu::onMouse(MouseEvent &event) {
     if (!this->isEnabled()) return;
-    if (Utils::getMouseAsString(event.getButton()) == getOps<std::string>("keybind") && event.getAction() == MouseAction::Press) {
+    if (Utils::getMouseAsString(event.getButton()) == this->getOps<std::string>("keybind") && event.getAction() == MouseAction::Press) {
         keybindActions[0]({});
     }
 }
 
 void JavaDebugMenu::onSetTopScreenName(SetTopScreenNameEvent &event) {
     if (!this->isEnabled()) return;
-    if (this->active && getOps<bool>("hideModules") && event.getLayer() == "hud_screen") event.setCustomLayer("f3_screen");
+    if (this->active && this->getOps<bool>("hideModules") && event.getLayer() == "hud_screen") event.setCustomLayer("f3_screen");
 }
 
 void JavaDebugMenu::onGetViewPerspective(PerspectiveEvent &event) {
     if (!this->active || !this->isEnabled() || !SDK::clientInstance->getLocalPlayer()) return;
-    curPerspective = event.getPerspective();
+    this->curPerspective = event.getPerspective();
 }

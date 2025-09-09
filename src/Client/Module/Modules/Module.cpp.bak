@@ -8,65 +8,6 @@
 #include <vector>
 #include <cmath>
 
-
-// Additional includes for moved implementations
-#include "../../../Utils/Utils.hpp"
-#include "../../GUI/Engine/Engine.hpp"
-#include "../../GUI/Engine/Constraints.hpp"
-#include "../../../SDK/SDK.hpp"
-#include "../../../Assets/Assets.hpp"
-#include "../../Events/Input/KeyEvent.hpp"
-#include <windows.h>
-#include <unknwn.h>
-
-// Constructor implementation moved from header
-Module::Module(const std::string& ename, const std::string& edescription, int eicon, const std::string& ekey, bool isScripting, const std::vector<std::string>& ealiases) {
-	name = ename;
-	description = edescription;
-	icon = eicon;
-	defaultKeybind = ekey;
-	isScriptingModule = isScripting;
-	aliases = ealiases;
-	settings = Settings();
-
-	settingspath = isScripting ? Utils::getClientPath() + "\\Scripts\\Configs\\" + name + ".json" : "this is unused for non scripting modules";
-	
-	// Initialize alignments map
-	alignments = {
-		{"Left", DWRITE_TEXT_ALIGNMENT_LEADING},
-		{"Center", DWRITE_TEXT_ALIGNMENT_CENTER},
-		{"Right", DWRITE_TEXT_ALIGNMENT_TRAILING}
-	};
-	
-	// Initialize vectors with proper constraints
-	conditionalSliderAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
-	conditionalToggleAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
-	conditionalDropdownAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
-	conditionalTextBoxAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
-	conditionalColorPickerAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
-	
-	prevAlignments = std::vector<DWRITE_TEXT_ALIGNMENT>(100, DWRITE_TEXT_ALIGNMENT_JUSTIFIED);
-}
-
-void Module::postConstructInitialize() {
-	this->loadSettings();
-}
-
-void Module::setDef(std::string setting, std::string col, float opac, bool rgb) {
-	this->settings.getOrAddSettingByName<std::string>(setting + "Col", col);
-	this->settings.getOrAddSettingByName<float>(setting + "Opacity", opac);
-	this->settings.getOrAddSettingByName<bool>(setting + "RGB", rgb);
-}
-
-void Module::forceDef(std::string setting, std::string col, float opac, bool rgb) {
-	if (this->settings.getSettingByName<std::string>(setting + "Col") != nullptr) this->settings.getSettingByName<std::string>(setting + "Col")->value = col;
-	else this->settings.addSetting(setting + "Col", col);
-	if (this->settings.getSettingByName<float>(setting + "Opacity") != nullptr)this->settings.getSettingByName<float>(setting + "Opacity")->value = opac;
-	else this->settings.addSetting(setting + "Opacity", opac);
-	if (this->settings.getSettingByName<bool>(setting + "RGB") != nullptr)this->settings.getSettingByName<bool>(setting + "RGB")->value = rgb;
-	else this->settings.addSetting(setting + "RGB", rgb);
-}
-
 #define clickgui ModuleManager::getModule("ClickGUI")
 
 static std::string Lname = "";

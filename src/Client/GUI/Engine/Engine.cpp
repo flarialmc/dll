@@ -1,4 +1,4 @@
-﻿#include "Engine.hpp"
+#include "Engine.hpp"
 #include "../../Client.hpp"
 #include <utility>
 #include <winrt/base.h>
@@ -16,14 +16,11 @@
 #include "Elements/Control/TextBox/TextBoxStruct.hpp"
 #include "Elements/Control/ColorPicker/ColorPicker.hpp"
 #include "Elements/Control/Dropdown/DropdownStruct.hpp"
-#include "../../../Assets/Assets.hpp"
 #include <string>
 #include <windows.h>
 #include <unknwn.h>
 #include <dwrite.h>
 #include <wrl.h>
-#include <iostream>
-#include <string>
 #include <vector>
 #include <fstream>
 #include <algorithm>
@@ -31,6 +28,8 @@
 #include "../../Module/Modules/ClickGUI/ClickGUI.hpp"
 #include "imgui/imgui_freetype.h"
 //#include <misc/freetype/imgui_freetype.h>
+
+#include "../../Hook/Hooks/Render/DirectX/DXGI/SwapchainHook.hpp"
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 

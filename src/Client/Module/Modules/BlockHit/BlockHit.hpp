@@ -4,6 +4,7 @@
 #include "../CPS/CPSCounter.hpp"
 #include "../../../Events/Game/RenderItemInHandEvent.hpp"
 #include "Events/Game/PerspectiveEvent.hpp"
+#include "../../../../Assets/Assets.hpp"
 
 class BlockHit : public Module {
 public:

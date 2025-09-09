@@ -1,6 +1,8 @@
 #pragma once
 
 #include "../Module.hpp"
+#include "../../../Events/Events.hpp"
+#include "../../../Events/EventManager.hpp"
 #include "../../../Client.hpp"
 #include "Elements/ClickGUIElements.hpp"
 #include "SDK/Client/Network/Packet/TextPacket.hpp"
@@ -8,6 +10,9 @@
 #include "Utils/WinrtUtils.hpp"
 #include <chrono>
 #include <Modules/Misc/Input/GUIMouseListener.hpp>
+#include "../../../GUI/Engine/Constraints.hpp"
+#include "../../../GUI/D2D.hpp"
+#include "../../../../Assets/Assets.hpp"
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 

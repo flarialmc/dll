@@ -4,6 +4,7 @@
 #include "../../../../SDK/Client/Render/Tessellator/MeshHelpers.hpp"
 #include "../../../../Utils/Render/MaterialUtils.hpp"
 #include "../../../../SDK/Client/GUI/ScreenRenderer.hpp"
+#include "../../../../Assets/Assets.hpp"
 
 #include "Events/Game/PerspectiveEvent.hpp"
 #include "Events/Render/HudCursorRendererRenderEvent.hpp"

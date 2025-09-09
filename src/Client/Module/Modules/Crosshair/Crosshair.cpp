@@ -1,4 +1,5 @@
 #include "Crosshair.hpp"
+#include "../../../GUI/Engine/Engine.hpp"
 
 void Crosshair::onEnable() {
     Module::onEnable();

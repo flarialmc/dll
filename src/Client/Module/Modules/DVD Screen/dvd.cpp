@@ -1,6 +1,7 @@
 #include "dvd.hpp"
 #include "Client.hpp"
 #include "Events/EventManager.hpp"
+#include "../../../../Assets/Assets.hpp"
 
 void DVD::onEnable() {
     Listen(this, RenderEvent, &DVD::onRender)

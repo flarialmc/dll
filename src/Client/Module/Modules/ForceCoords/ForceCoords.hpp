@@ -2,6 +2,10 @@
 
 #include "../Module.hpp"
 #include "../../../Client.hpp"
+#include <Events/Events.hpp>
+#include <Events/EventManager.hpp>
+
+#include "Assets/Assets.hpp"
 
 class ForceCoords : public Module {
 private:

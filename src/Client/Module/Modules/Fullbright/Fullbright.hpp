@@ -2,6 +2,7 @@
 
 #include "../Module.hpp"
 #include "Events/Render/GammaEvent.hpp"
+#include "../../../../Assets/Assets.hpp"
 
 
 class Fullbright : public Module {

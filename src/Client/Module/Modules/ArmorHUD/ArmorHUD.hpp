@@ -5,6 +5,7 @@
 #include "../../../../Utils/Render/PositionUtils.hpp"
 #include "Events/Render/RenderEvent.hpp"
 #include "Events/Render/SetupAndRenderEvent.hpp"
+#include "../../../../Assets/Assets.hpp"
 
 class ArmorHUD : public Module {
 private:

@@ -4,6 +4,7 @@
 #include "Events/Game/RaknetTickEvent.hpp"
 #include "Events/Game/TickEvent.hpp"
 #include "Events/Render/DrawTextEvent.hpp"
+#include "../../../../Assets/Assets.hpp"
 
 class NickModule : public Module {
 private:

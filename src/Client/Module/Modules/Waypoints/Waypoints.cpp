@@ -8,6 +8,8 @@
 #include <numbers>
 #include <random>
 
+#include "GUI/Engine/Constraints.hpp"
+
 
 void Waypoints::onEnable() {
 	Listen(this, RenderEvent, &Waypoints::onRender)

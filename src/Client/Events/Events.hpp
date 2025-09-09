@@ -1,3 +1,5 @@
+#include "EventManager.hpp"
+
 #include "Game/AttackEvent.hpp"
 #include "Game/FOVEvent.hpp"
 #include "Game/PerspectiveEvent.hpp"

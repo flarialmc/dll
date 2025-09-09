@@ -2,6 +2,7 @@
 #include <Windows.h>
 
 #include "src/Client/Client.hpp"
+#include "src/Client/Hook/Manager.hpp"
 #include "src/Client/Events/EventManager.hpp"
 #include "src/Client/Hook/Hooks/Render/DirectX/DXGI/ResizeHook.hpp"
 #include "src/Client/Module/Modules/ClickGUI/ClickGUI.hpp"

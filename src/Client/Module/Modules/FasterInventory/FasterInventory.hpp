@@ -6,6 +6,7 @@
 #include "../../../../SDK/Client/Network/Packet/ContainerClosePacket.hpp"
 #include "../../../../SDK/Client/Network/Packet/ContainerOpenPacket.hpp"
 #include "Events/EventManager.hpp"
+#include "../../../../Assets/Assets.hpp"
 
 
 class FasterInventory : public Module {

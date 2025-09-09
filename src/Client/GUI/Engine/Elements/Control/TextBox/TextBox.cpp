@@ -2,6 +2,10 @@
 #include "../../../../../Module/Manager.hpp"
 #include "../../../../../Module/Modules/ClickGUI/ClickGUI.hpp"
 
+#include <winrt/Windows.UI.Core.h>
+
+using namespace winrt::Windows::UI::Core;
+
 #define clickgui ModuleManager::getModule("ClickGUI")
 
 //TODO: this defo laggs req investigation

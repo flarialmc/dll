@@ -5,7 +5,7 @@
 
 
 void CommandHotkey::addHotkey(int index) {
-	keybindActions.push_back([this, index](std::vector<std::any> args) -> std::any {
+	this->keybindActions.push_back([this, index](std::vector<std::any> args) -> std::any {
 
 		KeyEvent event = std::any_cast<KeyEvent>(args[0]);
 		std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - last_used;
@@ -40,7 +40,7 @@ void CommandHotkey::addHotkey(int index) {
 
 void CommandHotkey::onSetup() {
 
-	for (int i = 0; i < totalKeybinds; ++i) {
+	for (int i = 0; i < this->totalKeybinds; ++i) {
 		addHotkey(i);
 	}
 }
@@ -67,23 +67,23 @@ void CommandHotkey::settingsRender(float settingsOffset) {
 	this->addHeader("Command Hotkey");
 	this->addButton("Add another Keybind", "Multi-Keybind command support!", "Add", [&] {
 
-		std::string keybindName = "keybind-" + FlarialGUI::cached_to_string(totalKeybinds);
-		std::string commandName = "command-" + FlarialGUI::cached_to_string(totalKeybinds);
+		std::string keybindName = "keybind-" + FlarialGUI::cached_to_string(this->totalKeybinds);
+		std::string commandName = "command-" + FlarialGUI::cached_to_string(this->totalKeybinds);
 
 		this->settings.addSetting(keybindName, (std::string)"");
 		this->settings.addSetting(commandName, (std::string)"");
 
 
-		int i = totalKeybinds;
+		int i = this->totalKeybinds;
 		addHotkey(i);
 
-		totalKeybinds++;
+		this->totalKeybinds++;
 		FlarialGUI::Notify("Added! Scroll down for options.");
 		
 	});
 
 
-	for (int i = 0; i < totalKeybinds; ++i) {
+	for (int i = 0; i < this->totalKeybinds; ++i) {
 
 		std::string header = (i == 0) ? "Command" : "Command " + FlarialGUI::cached_to_string(i);
 		std::string commandSettingName = (i == 0) ? "command" : "command-" + FlarialGUI::cached_to_string(i);
@@ -117,8 +117,13 @@ void CommandHotkey::onKey(KeyEvent& event) {
 		SDK::getCurrentScreen() == "zoom_screen" ||
 		SDK::getCurrentScreen() == "f3_screen"
 	)) {
-		for (int i = 0; i <= totalKeybinds; ++i) {
-			keybindActions[i]({ std::any(event) });
+		for (int i = 0; i <= this->totalKeybinds; ++i) {
+			this->keybindActions[i]({ std::any(event) });
 		}
 	}
+}
+
+
+void CommandHotkey::onMouse(MouseEvent& event) {
+	// Empty implementation - not used for command hotkeys
 }

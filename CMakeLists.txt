@@ -167,7 +167,4 @@ if (EXISTS "${CMAKE_SOURCE_DIR}/compiledoom.txt")
     target_link_libraries(Flarial PRIVATE DoomModule)
 endif ()
 
-set_property(TARGET Flarial PROPERTY UNITY_BUILD ON)
-set_property(TARGET Flarial PROPERTY UNITY_BUILD_BATCH_SIZE 32)
-
 target_precompile_headers(Flarial PRIVATE "src/PCH.hpp")

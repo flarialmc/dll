@@ -1,20 +1,21 @@
 #pragma once
 
+#include "../../../Utils/Utils.hpp"
 #include <string>
-#include <vector>
-#include <unordered_map>
-#include <functional>
-#include <any>
-#include <filesystem>
-#include <map>
-#include <array>
 #include "../../../Config/Settings.hpp"
-
-// Minimal include for D2D types
-#include <d2d1.h>
-
-// Forward declare Windows types to avoid windows.h
-enum DWRITE_TEXT_ALIGNMENT : int;
+#include <fstream>
+#include <iostream>
+#include <windows.h>
+#include <unknwn.h>
+#include <filesystem>
+#include <sstream>
+#include <utility>
+#include <vector>
+#include "../../GUI/Engine/Engine.hpp"
+#include "../../GUI/Engine/Constraints.hpp"
+#include "../../../SDK/SDK.hpp"
+#include "../../../Assets/Assets.hpp"
+#include "../../Events/Input/KeyEvent.hpp"
 
 class Module {
 
@@ -35,12 +36,27 @@ public:
 	int totalmaps = 0;
 	std::filesystem::path legacySettingsPath;
 
-	std::map<std::string, DWRITE_TEXT_ALIGNMENT> alignments;
+	std::map<std::string, DWRITE_TEXT_ALIGNMENT> alignments = {
+		{"Left", DWRITE_TEXT_ALIGNMENT_LEADING},
+		{"Center", DWRITE_TEXT_ALIGNMENT_CENTER},
+		{"Right", DWRITE_TEXT_ALIGNMENT_TRAILING}
+	};
 
-	// Constructor declaration only
-	Module(const std::string& ename, const std::string& edescription, int eicon, const std::string& ekey, bool isScripting = false, const std::vector<std::string>& ealiases = {});
+	Module(const std::string& ename, const std::string& edescription, int eicon, const std::string& ekey, bool isScripting = false, const std::vector<std::string>& ealiases = {}) {
+		name = ename;
+		description = edescription;
+		icon = eicon;
+		defaultKeybind = ekey;
+		isScriptingModule = isScripting;
+		aliases = ealiases;
+		settings = Settings();
 
-	void postConstructInitialize();
+		settingspath = isScripting ? Utils::getClientPath() + "\\Scripts\\Configs\\" + name + ".json" : "this is unused for non scripting modules";
+	}
+
+	void postConstructInitialize() {
+		this->loadSettings();
+	}
 
 	bool active = false;
 	bool enabledState = false;
@@ -52,13 +68,13 @@ public:
 	int toggleIndex = 0;
 
 	int sliderIndex = 0;
-	std::vector<float> conditionalSliderAnims;
-	std::vector<float> conditionalToggleAnims;
-	std::vector<float> conditionalDropdownAnims;
-	std::vector<float> conditionalTextBoxAnims;
-	std::vector<float> conditionalColorPickerAnims;
+	std::vector<float> conditionalSliderAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
+	std::vector<float> conditionalToggleAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
+	std::vector<float> conditionalDropdownAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
+	std::vector<float> conditionalTextBoxAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
+	std::vector<float> conditionalColorPickerAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
 
-	std::vector<DWRITE_TEXT_ALIGNMENT> prevAlignments;
+	std::vector<DWRITE_TEXT_ALIGNMENT> prevAlignments = std::vector<DWRITE_TEXT_ALIGNMENT>(100, DWRITE_TEXT_ALIGNMENT_JUSTIFIED);
 
 	int dropdownIndex = 0;
 	int textboxIndex = 300;
@@ -80,8 +96,20 @@ public:
 		this->settings.getOrAddSettingByName<T>(setting, value);
 	}
 
-	void setDef(std::string setting, std::string col, float opac, bool rgb);
-	void forceDef(std::string setting, std::string col, float opac, bool rgb);
+	void setDef(std::string setting, std::string col, float opac, bool rgb) {
+		this->settings.getOrAddSettingByName<std::string>(setting + "Col", col);
+		this->settings.getOrAddSettingByName<float>(setting + "Opacity", opac);
+		this->settings.getOrAddSettingByName<bool>(setting + "RGB", rgb);
+	}
+
+	void forceDef(std::string setting, std::string col, float opac, bool rgb) {
+		if (this->settings.getSettingByName<std::string>(setting + "Col") != nullptr) this->settings.getSettingByName<std::string>(setting + "Col")->value = col;
+		else this->settings.addSetting(setting + "Col", col);
+		if (this->settings.getSettingByName<float>(setting + "Opacity") != nullptr)this->settings.getSettingByName<float>(setting + "Opacity")->value = opac;
+		else this->settings.addSetting(setting + "Opacity", opac);
+		if (this->settings.getSettingByName<bool>(setting + "RGB") != nullptr)this->settings.getSettingByName<bool>(setting + "RGB")->value = rgb;
+		else this->settings.addSetting(setting + "RGB", rgb);
+	}
 
 	template <typename T>
 	T& getOps(std::string setting) {
@@ -105,6 +133,7 @@ public:
 
 	void addConditionalColorPicker(bool condition, std::string text, std::string subtext, std::string& value, float& opacity, bool& rgb);
 	void addConditionalColorPicker(bool condition, std::string text, std::string subtext, std::string settingName);
+
 
 	void addConditionalDropdown(bool condition, std::string text, std::string subtext, const std::vector<std::string>& options, std::string settingName, bool resettable);
 

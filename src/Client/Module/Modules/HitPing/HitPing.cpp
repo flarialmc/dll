@@ -1,6 +1,7 @@
 #include "HitPing.hpp"
 
 #include "Events/EventManager.hpp"
+#include "SDK/Client/Network/Packet/EntityEventPacket.hpp"
 
 void HitPing::onEnable() {
     Listen(this, RenderEvent, &HitPing::onRender)

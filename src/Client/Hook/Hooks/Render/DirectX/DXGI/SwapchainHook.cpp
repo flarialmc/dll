@@ -1,13 +1,8 @@
 #include "SwapchainHook.hpp"
-#include <winrt/base.h>
 #include <chrono>
 #include "../../../../../GUI/D2D.hpp"
 #include "d2d1.h"
 #include "../../../../../Client.hpp"
-#include <algorithm>
-#include <windows.h>
-#include <unknwn.h>
-#include <iostream>
 #include <Psapi.h>
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui/imgui.h>

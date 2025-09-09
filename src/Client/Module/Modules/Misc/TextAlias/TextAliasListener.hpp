@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../../../Hook/Hooks/Input/MouseHook.hpp"
+#include "../../../../Hook/Hooks/Render/DirectX/DXGI/SwapchainHook.hpp"
 #include "../../../../Client.hpp"
 
 class TextAliasListener : public Listener {
