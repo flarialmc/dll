@@ -75,6 +75,8 @@ HRESULT CreateSwapchainForCoreWindowHook::CreateSwapChainForCoreWindowCallback(
     HRESULT hr = funcOriginal(This, pDevice, pWindow, pDesc, pRestrictToOutput, ppSwapChain);
     if (FAILED(hr)) {
         Logger::error("Failed to create swapchain: {}", Logger::getHRESULTError(hr));
+        Client::settings.setValue<bool>("killdx", false);
+        Client::settings.setValue<bool>("vsync", false);
     }
 
     return hr;
