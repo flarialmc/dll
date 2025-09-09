@@ -203,7 +203,7 @@ void SwapchainHook::DX12Init() {
 }
 
 void SwapchainHook::DX12Render(bool underui) {
-    if (!D2D::context || !d3d11On12Device || !isDX12) return;
+    if (!D2D::context || !d3d11On12Device || !isDX12 || !queue) return;
 
     currentBitmap = swapchain->GetCurrentBackBufferIndex();
 

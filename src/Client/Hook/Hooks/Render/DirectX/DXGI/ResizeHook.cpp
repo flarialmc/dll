@@ -196,6 +196,7 @@ void ResizeHook::cleanShit(bool fullReset) {
             SwapchainHook::imguiCleanupInProgress = false;
         }
 
+        SwapchainHook::queue = nullptr;
         SwapchainHook::d3d12CommandList = nullptr;
         SwapchainHook::allocator = nullptr;
         SwapchainHook::d3d12CommandQueue = nullptr;
