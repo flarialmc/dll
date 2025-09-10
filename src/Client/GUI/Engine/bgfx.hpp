@@ -66,27 +66,7 @@ struct bgfx {
 	};
 
 	struct RenderContextD3D12 {
-	private:
-		char padding[338];
-	public:
-		IDXGISwapChain1* SwapChain;
-		ID3D12Resource* m_msaart;
-
-	private:
-		char paddingx2[0x118];
-	public:
-		ID3D12Device* m_device;
-		TimerQueryD3D12     m_gpuTimer;
-		OcclusionQueryD3D12 m_occlusionQuery;
-
-		uint32_t m_deviceInterfaceVersion;
-
-		ID3D12DescriptorHeap* m_rtvDescriptorHeap;
-		ID3D12DescriptorHeap* m_dsvDescriptorHeap;
-		D3D12_CPU_DESCRIPTOR_HANDLE m_rtvHandle;
-		D3D12_CPU_DESCRIPTOR_HANDLE m_dsvHandle;
-		D3D12_CPU_DESCRIPTOR_HANDLE* m_currentColor;
-		D3D12_CPU_DESCRIPTOR_HANDLE* m_currentDepthStencil;
-
+		BUILD_ACCESS(this, IDXGISwapChain1*, m_swapchain, 308);
+		BUILD_ACCESS(this, ID3D12Resource*, m_msaart, 310);
 	};
 };
