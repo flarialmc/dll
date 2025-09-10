@@ -234,6 +234,11 @@ void RealMotionBlurHelper::Render(ID3D11RenderTargetView* rtv, winrt::com_ptr<ID
 {
     ID3D11DeviceContext* context = SwapchainHook::context.get();
     ID3D11Device* device = SwapchainHook::d3d11Device.get();
+    if (!frame)
+    {
+        Logger::debug("Frame is null");
+        return;
+    }
     if (!context || !device || !rtv)
     {
         return;

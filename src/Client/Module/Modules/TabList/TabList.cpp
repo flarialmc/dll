@@ -15,6 +15,7 @@
 #include "Hook/Hooks/Render/DirectX/DXGI/SwapchainHook.hpp"
 #include "Modules/ClickGUI/ClickGUI.hpp"
 #include "Modules/Nick/NickModule.hpp"
+#include "Utils/APIUtils.hpp"
 
 bool logDebug = false;
 

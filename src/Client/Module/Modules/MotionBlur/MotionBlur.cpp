@@ -52,8 +52,6 @@ void MotionBlur::settingsRender(float settingsOffset)
 void MotionBlur::onRender(RenderUnderUIEvent& event)
 {
     if (!this->isEnabled()) return;
-    if (SwapchainHook::queue) return;
-
 
     if (!getOps<bool>("renderUnderUI")) {
         return;
@@ -80,12 +78,14 @@ void MotionBlur::onRender(RenderUnderUIEvent& event)
         }
 
         auto buffer = BackbufferToSRVExtraMode();
+
+        if (getOps<bool>("avgpixel")) AvgPixelMotionBlurHelper::Render(event.RTV, previousFrames);
+        else RealMotionBlurHelper::Render(event.RTV, buffer);
         if (buffer) {
             previousFrames.push_back(std::move(buffer));
         }
 
-        if (getOps<bool>("avgpixel")) AvgPixelMotionBlurHelper::Render(event.RTV, previousFrames);
-        else RealMotionBlurHelper::Render(event.RTV, previousFrames.back());
+
 
     }
     else {
@@ -96,7 +96,6 @@ void MotionBlur::onRender(RenderUnderUIEvent& event)
 void MotionBlur::onRenderNormal(RenderEvent& event)
 {
     if (!this->isEnabled()) return;
-    if (SwapchainHook::queue) return;
 
     if (getOps<bool>("renderUnderUI")) {
         return;
@@ -123,12 +122,15 @@ void MotionBlur::onRenderNormal(RenderEvent& event)
         }
 
         auto buffer = BackbufferToSRVExtraMode();
+
+        if (getOps<bool>("avgpixel")) AvgPixelMotionBlurHelper::Render(event.RTV, previousFrames);
+        else RealMotionBlurHelper::Render(event.RTV, buffer);
+
         if (buffer) {
             previousFrames.push_back(std::move(buffer));
         }
 
-        if (getOps<bool>("avgpixel")) AvgPixelMotionBlurHelper::Render(event.RTV, previousFrames);
-        else RealMotionBlurHelper::Render(event.RTV, previousFrames.back());
+
 
     }
     else {
@@ -155,7 +157,6 @@ winrt::com_ptr<ID3D11ShaderResourceView> MotionBlur::BackbufferToSRVExtraMode()
 {
 
     if (!FlarialGUI::needsBackBuffer) return nullptr;
-    if (SwapchainHook::queue) return BackbufferToSRV();
     HRESULT hr;
 
     D3D11_TEXTURE2D_DESC d;

@@ -13,6 +13,8 @@
 #include <imgui/imgui_impl_win32.h>
 #include "unknwnbase.h"
 #include "../DXGI/UnderUIHooks.hpp"
+#include "Modules/MotionBlur/MotionBlur.hpp"
+
 using ::IUnknown;
 
 void SwapchainHook::DX12Init() {
@@ -133,7 +135,7 @@ void SwapchainHook::DX12Init() {
         D3D11_RESOURCE_FLAGS d3d11Flags = { D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE };
         d3d11On12Device->CreateWrappedResource(
             backBuffer.get(), &d3d11Flags,
-            D3D12_RESOURCE_STATE_RENDER_TARGET,
+            D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
             D3D12_RESOURCE_STATE_PRESENT,
             IID_PPV_ARGS(D3D11Resources[i].put())
         );
@@ -193,6 +195,8 @@ void SwapchainHook::DX12Init() {
     Memory::SafeRelease(d2dFactory);
 
     Blur::InitializePipeline();
+    if (!MotionBlur::initted)
+        MotionBlur::initted = AvgPixelMotionBlurHelper::Initialize() && RealMotionBlurHelper::Initialize();
 
     init = true;
 }
@@ -328,8 +332,13 @@ void SwapchainHook::DX12Blur() {
 
     /* Blur Stuff */
     prepareBlur();
-    if (FlarialGUI::inMenu) FlarialGUI::needsBackBuffer = true;
-    else FlarialGUI::needsBackBuffer = false;
+    if (ModuleManager::initialized) {
+        auto module = ModuleManager::getModule("Motion Blur");
+        if (module) {
+            if (module->isEnabled() || FlarialGUI::inMenu) FlarialGUI::needsBackBuffer = true;
+            else FlarialGUI::needsBackBuffer = false;
+        }
+    }
     /* Blur End */
 
 }
@@ -396,8 +405,8 @@ void SwapchainHook::CreateDX12UnderUIResource() {
             HRESULT hr = d3d11On12Device->CreateWrappedResource(
                 msaaRenderTarget,
                 &d3d11Flags,
-                D3D12_RESOURCE_STATE_RENDER_TARGET,
-                D3D12_RESOURCE_STATE_RENDER_TARGET,
+                D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
+                D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
                 IID_PPV_ARGS(DX12UnderUITexture.put())
             );
             

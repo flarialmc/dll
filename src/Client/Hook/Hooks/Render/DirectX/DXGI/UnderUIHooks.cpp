@@ -76,7 +76,7 @@ void UnderUIHooks::ClearDepthStencilViewCallbackDX12(
         SwapchainHook::DX12Render(true);
     }
 
-    return     funcOriginalDX12(cmdList, pDepthStencilView, ClearFlags, Depth, Stencil, NumRects, pRects);
+    return  funcOriginalDX12(cmdList, pDepthStencilView, ClearFlags, Depth, Stencil, NumRects, pRects);
 
 
 }

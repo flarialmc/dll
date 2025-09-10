@@ -330,7 +330,6 @@ winrt::com_ptr<ID3D11Texture2D> SwapchainHook::GetBackbuffer() {
 void SwapchainHook::SaveBackbuffer(bool underui) {
 
     SavedD3D11BackBuffer = nullptr;
-    ExtraSavedD3D11BackBuffer = nullptr;
     DX12UnderUITexture = nullptr;
     if (!isDX12) {
 
@@ -417,6 +416,18 @@ void SwapchainHook::SaveBackbuffer(bool underui) {
                 if (FAILED(hr)) {
                     std::cout << "Failed to query interface: " << std::hex << hr << std::endl;
                 }
+                if (!ExtraSavedD3D11BackBuffer) {
+                    D3D11_TEXTURE2D_DESC textureDesc = {};
+                    SavedD3D11BackBuffer->GetDesc(&textureDesc);
+                    textureDesc.Usage = D3D11_USAGE_DEFAULT;
+                    textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+                    textureDesc.CPUAccessFlags = 0;
+
+                    SwapchainHook::d3d11Device->CreateTexture2D(&textureDesc, nullptr, ExtraSavedD3D11BackBuffer.put());
+                }
+
+                context->CopyResource(ExtraSavedD3D11BackBuffer.get(), SavedD3D11BackBuffer.get());
+
             }
         }
 }
