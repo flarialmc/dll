@@ -109,8 +109,7 @@ void Zoom::onRender(RenderEvent &event) {
         if (currentFov > 180) {
             currentZoomVal = disableanim ? currentFov + zoomValue : std::lerp(currentZoomVal, currentFov + zoomValue, animspeed * FlarialGUI::frameFactor);
         } else {
-            float target = currentFov - (70.0f - zoomValue);
-            currentZoomVal = disableanim ? target : std::lerp(currentZoomVal, target, animspeed * FlarialGUI::frameFactor);
+            currentZoomVal = disableanim ? zoomValue : std::lerp(currentZoomVal, zoomValue, animspeed * FlarialGUI::frameFactor);
         }
     } else {
         if ((!animationFinished || alwaysanim) && !disableanim) {
