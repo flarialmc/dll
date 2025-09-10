@@ -66,7 +66,7 @@ struct bgfx {
 	};
 
 	struct RenderContextD3D12 {
-		BUILD_ACCESS(this, IDXGISwapChain1*, m_swapchain, 308);
-		BUILD_ACCESS(this, ID3D12Resource*, m_msaart, 310);
+		BUILD_ACCESS(this, IDXGISwapChain1*, m_swapchain, 0x308);
+		BUILD_ACCESS(this, ID3D12Resource*, m_msaart, 0x310);
 	};
 };

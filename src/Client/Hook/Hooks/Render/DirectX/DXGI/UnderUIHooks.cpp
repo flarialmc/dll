@@ -36,7 +36,6 @@ void UnderUIHooks::callBackRenderContextD3D12Submit(
 
 
     bgfxCtxDX12 = a1;
-
     funcoriginalRenderContextD3D12Submit(a1, a2, a3, a4);
 }
 

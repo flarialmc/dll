@@ -223,7 +223,7 @@ void SwapchainHook::DX12Render(bool underui) {
     D2D::context->SetTarget(D2D1Bitmaps[currentBitmap].get());
     MC::windowSize = Vec2(D2D::context->GetSize().width, D2D::context->GetSize().height);
 
-    SaveBackbuffer();
+    SaveBackbuffer(underui);
     DX12Blur();
 
     D2D::context->BeginDraw();
@@ -395,7 +395,7 @@ void SwapchainHook::CreateDX12UnderUIResource() {
     if (!DX12UnderUITexture && UnderUIHooks::bgfxCtxDX12 && d3d11On12Device) {
         // Use bgfx DX12 MSAA render target instead of main backbuffer
         ID3D12Resource* msaaRenderTarget = UnderUIHooks::bgfxCtxDX12->m_msaart;
-        
+
         if (msaaRenderTarget) {
             // Create D3D11 texture from bgfx DX12 MSAA render target for UnderUI
             D3D11_RESOURCE_FLAGS d3d11Flags = { 
