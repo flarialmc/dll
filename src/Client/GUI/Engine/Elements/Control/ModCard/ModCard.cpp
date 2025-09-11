@@ -117,7 +117,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
 
     float paddingSize = Constraints::RelativeConstraint(0.28);
     if (!FlarialGUI::CursorInRect(modiconx, modicony + FlarialGUI::scrollpos, paddingSize, paddingSize) && !FlarialGUI::CursorInRect(Constraints::PercentageConstraint(0.43, "left"), Constraints::PercentageConstraint(0.15, "top") + FlarialGUI::scrollpos, paddingSize, paddingSize)) {
-        FlarialGUI::Tooltip("mod_" + FlarialGUI::cached_to_string(index), x, realY, mod->description, BottomRoundedWidth, TopRoundedHeight, true, false, std::chrono::milliseconds(3000));
+        FlarialGUI::Tooltip("mod_" + FlarialGUI::cached_to_string(index), x, realY, mod->description, BottomRoundedWidth, TopRoundedHeight, true, false, std::chrono::milliseconds(1));
     }
 
     FlarialGUI::RoundedRect(modiconx, modicony, mod3Col,
