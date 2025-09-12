@@ -123,8 +123,10 @@ void Module::initSettingsPage() {
 
 
     this->addHeader(this->name);
+#if 0
     this->addElementText(this->description, " ");
     this->extraPadding();
+#endif
 }
 
 void Module::normalRenderCore(int index, std::string &text) {
