@@ -32,8 +32,6 @@ void Sprint::defaultConfig() {
 void Sprint::settingsRender(float settingsOffset) {
     initSettingsPage();
 
-
-    addHeader("Toggle Sprint");
     addKeybind("Keybind", "Hold for 2 seconds!", "keybind", true);
     addToggle("Always Sprint", "Also known as auto sprint", "always");
     addToggle("Show Status", "", "status");

@@ -37,7 +37,6 @@ void Coordinates::defaultConfig() {
 void Coordinates::settingsRender(float settingsOffset) {
     initSettingsPage();
 
-    addHeader("Coordinates");
     defaultAddSettings("main");
     extraPadding();
 

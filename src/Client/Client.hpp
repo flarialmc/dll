@@ -16,7 +16,6 @@ Client::settings.addSetting(setting, value);
 namespace fs = std::filesystem;
 
 class Client {
-private:
 	static std::string privatePath;
 public:
 	static std::string current_commit;

@@ -26,7 +26,6 @@ void TotemCounter::defaultConfig() {
 void TotemCounter::settingsRender(float settingsOffset) {
     initSettingsPage();
 
-    addHeader("Totem Counter");
     addToggle("Only render when holding totem.", "", "onlyRenderWhenHoldingTotem");
     defaultAddSettings("main");
     extraPadding();

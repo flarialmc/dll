@@ -31,7 +31,6 @@ void OpponentReach::settingsRender(float settingsOffset)
 {
     initSettingsPage();
 
-    addHeader("Opponent Reach");
     defaultAddSettings("main");
     extraPadding();
 

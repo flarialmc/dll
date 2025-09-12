@@ -63,7 +63,6 @@ void RenderOptions::settingsRender(float settingsOffset)
 
     initSettingsPage();
 
-    addHeader("Render Options");
     addToggle("Chunk Borders", "", "chunkborders");
     addToggle("Render Sky", "", "sky");
     addToggle("Render Entities", "", "entity");

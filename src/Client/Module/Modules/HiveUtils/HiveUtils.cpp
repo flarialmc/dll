@@ -86,7 +86,6 @@ void HiveUtils::settingsRender(float settingsOffset) {
         }
     }
 
-    addHeader("Role Avoider");
 
     addHeader("Murder Mystery");
     addToggle("Murderer", "Re Q when you get murderer", "murderer");

@@ -22,7 +22,6 @@ void IPDisplay::settingsRender(float settingsOffset) {
     initSettingsPage();
 
 
-    addHeader("IP Display");
     defaultAddSettings("main");
     addToggle("Show Port", "", "port");
     extraPadding();

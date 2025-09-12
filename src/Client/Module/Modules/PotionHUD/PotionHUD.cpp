@@ -46,7 +46,6 @@ void PotionHUD::settingsRender(float settingsOffset)
 {
     initSettingsPage();
 
-    addHeader("Potion HUD");
     addSlider("UI Scale", "", "uiscale", 3.f, 0.f, true);
     addToggle("Bottom Up Mode", "New effects appear ontop instead", "bottomUp");
     addSlider("Spacing", "", "spacing", 10.f, 0.0f, true);

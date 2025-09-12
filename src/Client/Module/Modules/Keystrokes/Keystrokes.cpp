@@ -78,7 +78,6 @@ void Keystrokes::settingsRender(float settingsOffset) {
     initSettingsPage();
 
 
-    addHeader("Keystrokes");
     addSlider("UI Scale", "", "uiscale", 2.0f);
     addToggle("Translucency", "A blur effect, MAY BE PERFORMANCE HEAVY!", "BlurEffect");
     addSlider("Rounding", "Rounding of the rectangle", "rounding");

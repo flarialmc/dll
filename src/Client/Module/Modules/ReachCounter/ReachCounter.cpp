@@ -31,7 +31,6 @@ void ReachCounter::settingsRender(float settingsOffset)
 {
     initSettingsPage();
 
-    addHeader("Reach Counter");
     defaultAddSettings("main");
     extraPadding();
 

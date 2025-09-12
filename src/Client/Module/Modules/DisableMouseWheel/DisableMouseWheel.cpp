@@ -23,7 +23,6 @@ void DisableMouseWheel::defaultConfig() {
 void DisableMouseWheel::settingsRender(float settingsOffset) {
     initSettingsPage();
 
-    addHeader("Disable Mouse Wheel");
     addKeybind("Keybind", "Hold for 2 seconds!", "keybind", true);
 
     FlarialGUI::UnsetScrollView();

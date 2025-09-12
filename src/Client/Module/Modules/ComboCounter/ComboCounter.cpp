@@ -30,7 +30,6 @@ void ComboCounter::settingsRender(float settingsOffset) {
 
     initSettingsPage();
 
-    addHeader("Combo Counter");
     defaultAddSettings("main");
     extraPadding();
 

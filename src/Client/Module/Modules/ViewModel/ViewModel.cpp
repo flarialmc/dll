@@ -49,7 +49,6 @@ void ViewModel::settingsRender(float settingsOffset)
     initSettingsPage();
 
 
-    addHeader("View Model");
     addToggle("Third Person", "Transforms the item in third person perspective", "thirdperson");
     addSlider("Item FOV", "Changes the FOV appearance of the item.", "itemfov", 180);
 

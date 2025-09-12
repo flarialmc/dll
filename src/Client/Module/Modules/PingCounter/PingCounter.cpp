@@ -28,8 +28,6 @@ void PingCounter::settingsRender(float settingsOffset)
 {
     initSettingsPage();
 
-
-    addHeader("Ping Counter");
     addToggle("Spoof Ping", "", "spoof");
     addConditionalSlider(getOps<bool>("spoof"), "Spoofer", "Adjusts the displayed ping.", "pingSpoofer", 10.0f);
     extraPadding();

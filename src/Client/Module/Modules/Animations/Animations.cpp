@@ -56,7 +56,6 @@ void Animations::settingsRender(float settingsOffset) {
 
 	initSettingsPage();
 
-	addHeader("Animations");
 	addSlider("Hotbar Selected Slot Speed", "", "hotbarSpeed");
 
 	FlarialGUI::UnsetScrollView();

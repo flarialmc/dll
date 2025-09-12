@@ -24,7 +24,6 @@ void DVD::defaultConfig() {
 void DVD::settingsRender(float settingsOffset) {
     initSettingsPage();
 
-    addHeader("DVD Screensaver");
     addSlider("Scale", "", "scale");
     addSlider("X Velocity", "", "xveloc");
     addSlider("Y Velocity", "", "yveloc");

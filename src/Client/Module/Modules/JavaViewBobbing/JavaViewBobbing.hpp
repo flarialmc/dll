@@ -54,7 +54,6 @@ public:
 
     void settingsRender(float settingsOffset) override {
         initSettingsPage();
-        addHeader("Java View Bobbing");
         addSlider("Velocity Factor", "Speed of the hand moving", "velocityfactor", 10, 0.1);
         addSlider("Jump Velocity Factor", "The factor jumping has on the hand movement", "jumpvelocityfactor", 10, 0);
         FlarialGUI::UnsetScrollView();

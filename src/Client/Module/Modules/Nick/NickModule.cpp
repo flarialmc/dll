@@ -49,7 +49,6 @@ void NickModule::settingsRender(float settingsOffset)
 {
     initSettingsPage();
 
-    addHeader("Nickname");
     addTextBox("Nickname", "", 0, "nick");
     addToggle("Bold", "", "bold");
     addToggle("Obfuscated", "", "obfuscated");

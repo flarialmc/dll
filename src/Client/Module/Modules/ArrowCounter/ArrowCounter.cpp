@@ -26,7 +26,6 @@ void ArrowCounter::defaultConfig() {
 void ArrowCounter::settingsRender(float settingsOffset) {
     initSettingsPage();
 
-    addHeader("Arrow Counter");
     addToggle("Only render when holding bow or crossbow", "", "onlyRenderWhenHoldingBowOrCrossbow");
     defaultAddSettings("main");
     extraPadding();

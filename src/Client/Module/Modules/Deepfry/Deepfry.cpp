@@ -21,7 +21,6 @@ void Deepfry::defaultConfig() {
 void Deepfry::settingsRender(float settingsOffset) {
     initSettingsPage();
 
-    addHeader("Deepfry");
     addToggle("Paint Effect", "", "paint");
 
     FlarialGUI::UnsetScrollView();

@@ -26,7 +26,6 @@ void FPS::defaultConfig() {
 void FPS::settingsRender(float settingsOffset) {
     initSettingsPage();
 
-    addHeader("FPS Counter");
     addToggle("Spoof FPS", "", "spoof");
     addConditionalSlider(getOps<bool>("spoof"), "Spoofer", "Adjusts the displayed FPS.", "fpsSpoofer", 10.0f);
     extraPadding();

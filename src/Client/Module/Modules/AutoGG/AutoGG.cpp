@@ -24,7 +24,6 @@ void AutoGG::settingsRender(float settingsOffset) {
 
     initSettingsPage();
 
-    addHeader("Auto GG");
     addTextBox("Text", "The text to send.", 0, "text");
 
     FlarialGUI::UnsetScrollView();

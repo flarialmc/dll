@@ -18,7 +18,6 @@ void Crosshair::defaultConfig() {
 void Crosshair::settingsRender(float settingsOffset) {
     initSettingsPage();
 
-    addHeader("Crosshair");
     addToggle("Third Person Crosshair", "", "thirdpersoncrosshair");
 
     FlarialGUI::UnsetScrollView();

@@ -24,7 +24,6 @@ void JavaDynamicFOV::defaultConfig() {
 void JavaDynamicFOV::settingsRender(float settingsOffset) {
     initSettingsPage();
 
-    addHeader("Java Dynamic FOV");
     addSlider("Altered FOV target", "Target FOV when sprinting.", "fov_target", 175, 0, false);
     addSlider("Animation Speed", "Speed of FOV change.", "anim", 0.60);
 

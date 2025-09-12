@@ -21,46 +21,68 @@
 #include <windows.h>
 #include <unknwn.h>
 
-// Constructor implementation moved from header
-Module::Module(const std::string& ename, const std::string& edescription, int eicon, const std::string& ekey, bool isScripting, const std::vector<std::string>& ealiases) {
-	name = ename;
-	description = edescription;
-	icon = eicon;
-	defaultKeybind = ekey;
-	isScriptingModule = isScripting;
-	aliases = ealiases;
-	settings = Settings();
+Module::Module(const std::string& ename, const std::string& edescription, int eicon, const std::string& ekey, bool isScripting, const std::vector<std::string>& ealiases)
+    : name(ename), tooltip(edescription), description(edescription), icon(eicon), isScriptingModule(isScripting), defaultKeybind(ekey), aliases(ealiases), settings(Settings())
+{
+    std::ranges::replace(this->description, '\n', ' ');
 
-	settingspath = isScripting ? Utils::getClientPath() + "\\Scripts\\Configs\\" + name + ".json" : "this is unused for non scripting modules";
-	
-	// Initialize alignments map
-	alignments = {
-		{"Left", DWRITE_TEXT_ALIGNMENT_LEADING},
-		{"Center", DWRITE_TEXT_ALIGNMENT_CENTER},
-		{"Right", DWRITE_TEXT_ALIGNMENT_TRAILING}
-	};
-	
-	// Initialize vectors with proper constraints
-	conditionalSliderAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
-	conditionalToggleAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
-	conditionalDropdownAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
-	conditionalTextBoxAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
-	conditionalColorPickerAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
-	
-	prevAlignments = std::vector<DWRITE_TEXT_ALIGNMENT>(100, DWRITE_TEXT_ALIGNMENT_JUSTIFIED);
+    if (this->description.size() > 80) {
+        if (size_t pos = this->description.find(' ', 50); pos != std::string::npos) {
+            this->description[pos] = '\n';
+        }
+    }
+
+    alignments = {
+        {"Left", DWRITE_TEXT_ALIGNMENT_LEADING},
+        {"Center", DWRITE_TEXT_ALIGNMENT_CENTER},
+        {"Right", DWRITE_TEXT_ALIGNMENT_TRAILING}
+    };
+
+    settingspath = isScripting ? Utils::getClientPath() + R"(\Scripts\Configs\)" + name + ".json" : "this is unused for non scripting modules";
+
+    // Initialize vectors with proper constraints
+    conditionalSliderAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
+    conditionalToggleAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
+    conditionalDropdownAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
+    conditionalTextBoxAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
+    conditionalColorPickerAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
+
+    prevAlignments = std::vector<DWRITE_TEXT_ALIGNMENT>(100, DWRITE_TEXT_ALIGNMENT_JUSTIFIED);
 }
+
+Module::Module(const std::string& ename, const std::string& etooltip, const std::string& edescription, int eicon, const std::string& ekey, bool isScripting, const std::vector<std::string>& ealiases)
+    : name(ename), tooltip(etooltip), description(edescription), icon(eicon), isScriptingModule(isScripting), defaultKeybind(ekey), aliases(ealiases), settings(Settings())
+{
+    alignments = {
+        {"Left", DWRITE_TEXT_ALIGNMENT_LEADING},
+        {"Center", DWRITE_TEXT_ALIGNMENT_CENTER},
+        {"Right", DWRITE_TEXT_ALIGNMENT_TRAILING}
+    };
+
+    settingspath = isScripting ? Utils::getClientPath() + R"(\Scripts\Configs\)" + name + ".json" : "this is unused for non scripting modules";
+
+    // Initialize vectors with proper constraints
+    conditionalSliderAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
+    conditionalToggleAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
+    conditionalDropdownAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
+    conditionalTextBoxAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
+    conditionalColorPickerAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
+
+    prevAlignments = std::vector<DWRITE_TEXT_ALIGNMENT>(100, DWRITE_TEXT_ALIGNMENT_JUSTIFIED);
+}
+
 
 void Module::postConstructInitialize() {
 	this->loadSettings();
 }
 
-void Module::setDef(std::string setting, std::string col, float opac, bool rgb) {
+void Module::setDef(const std::string& setting, const std::string& col, float opac, bool rgb) {
 	this->settings.getOrAddSettingByName<std::string>(setting + "Col", col);
 	this->settings.getOrAddSettingByName<float>(setting + "Opacity", opac);
 	this->settings.getOrAddSettingByName<bool>(setting + "RGB", rgb);
 }
 
-void Module::forceDef(std::string setting, std::string col, float opac, bool rgb) {
+void Module::forceDef(const std::string& setting, const std::string& col, float opac, bool rgb) {
 	if (this->settings.getSettingByName<std::string>(setting + "Col") != nullptr) this->settings.getSettingByName<std::string>(setting + "Col")->value = col;
 	else this->settings.addSetting(setting + "Col", col);
 	if (this->settings.getSettingByName<float>(setting + "Opacity") != nullptr)this->settings.getSettingByName<float>(setting + "Opacity")->value = opac;
@@ -71,15 +93,16 @@ void Module::forceDef(std::string setting, std::string col, float opac, bool rgb
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 
-static std::string Lname = "";
+static std::string Lname;
 
-D2D_COLOR_F Module::getColor(std::string text) {
+D2D_COLOR_F Module::getColor(const std::string &text) {
     D2D_COLOR_F col = this->getOps<bool>(text + "RGB") ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(this->getOps<std::string>(text + "Col"));
     col.a = this->getOps<float>(text + "Opacity");
     return col;
 };
 
-D2D_COLOR_F Module::getColor(std::string text, std::string mod) {
+D2D_COLOR_F Module::getColor(const std::string& text, const std::string& mod) {
+    // ???????????????????????
     auto lol = ModuleManager::getModule(mod);
     D2D_COLOR_F col = lol->getOps<bool>(text + "RGB") ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(lol->getOps<std::string>(text + "Col"));
     col.a = lol->getOps<float>(text + "Opacity");
@@ -97,7 +120,12 @@ void Module::initSettingsPage() {
     FlarialGUI::SetScrollView(x, Constraints::PercentageConstraint(0.00, "top"),
                               Constraints::RelativeConstraint(1.0, "width"),
                               Constraints::RelativeConstraint(0.88f, "height"));
-};
+
+
+    this->addHeader(this->name);
+    this->addElementText(this->description, " ");
+    this->extraPadding();
+}
 
 void Module::normalRenderCore(int index, std::string &text) {
     if (!this->isEnabled()) return;
@@ -181,8 +209,6 @@ void Module::normalRenderCore(int index, std::string &text) {
         topleft.x = vec2.x;
         topleft.y = vec2.y;
 
-        topleft = topleft;
-
         Vec2<float> percentages = Constraints::CalculatePercentage(topleft.x, topleft.y, 0, 0);
         settings.setValue("percentageX", percentages.x);
         settings.setValue("percentageY", percentages.y);
@@ -260,7 +286,7 @@ void Module::normalRenderCore(int index, std::string &text) {
                 (topleft.y + Constraints::SpacingConstraint(paddingY, textWidth)) / guiScale,
                 0),
             MCCColor(txtCol.r, txtCol.g, txtCol.b, txtCol.a),
-            (ui::TextAlignment) alignment,
+            static_cast<ui::TextAlignment>(alignment),
             TextMeasureData(getOps<float>("textscale") * 2.f, getOps<bool>("textShadow"), false),
             CaretMeasureData{-1, 0}
         ));
@@ -324,9 +350,8 @@ void Module::resetPadding() {
     sliderIndex = 0;
     buttonIndex = 3;
 
-    int i = 100;
     for (int i = 100; i < colorPickerIndex; ++i) {
-        if (color_pickers2.count(i)) FlarialGUI::ColorPickerWindow(i, *color_pickers2[i].value, *color_pickers2[i].opacity, *color_pickers2[i].rgb);
+        if (color_pickers2.contains(i)) FlarialGUI::ColorPickerWindow(i, *color_pickers2[i].value, *color_pickers2[i].opacity, *color_pickers2[i].rgb);
         else FlarialGUI::ColorPickerWindow(i, this->name, color_pickers[i]);
     }
 
@@ -336,11 +361,11 @@ void Module::resetPadding() {
     FlarialGUI::UnSetIsInAdditionalYMode();
 }
 
-void Module::extraPadding() {
-    padding += Constraints::RelativeConstraint(0.04f, "height", true);
+void Module::extraPadding(float percent) {
+    padding += Constraints::RelativeConstraint(percent, "height", true);
 }
 
-void Module::addHeader(std::string text) {
+void Module::addHeader(const std::string& text) {
     float x = Constraints::PercentageConstraint(0.019, "left");
     float y = Constraints::PercentageConstraint(0.10, "top") + padding;
 
@@ -363,7 +388,7 @@ void Module::addHeader(std::string text) {
     padding += Constraints::RelativeConstraint(0.055f, "height", true);
 }
 
-void Module::addElementText(std::string text, std::string subtext) {
+void Module::addElementText(const std::string& text, const std::string& subtext) {
     float x = Constraints::PercentageConstraint(0.019, "left");
     float y = Constraints::PercentageConstraint(0.10, "top") + padding;
 
@@ -427,7 +452,7 @@ void Module::addButton(const std::string &text, const std::string &subtext, cons
     buttonIndex++;
 }
 
-void Module::addColorPicker(std::string text, std::string subtext, std::string settingName) {
+void Module::addColorPicker(const std::string& text, const std::string& subtext, const std::string& settingName) {
     float elementX = Constraints::PercentageConstraint(0.195f, "right");
     float y = Constraints::PercentageConstraint(0.10, "top") + padding; /*
 
@@ -445,7 +470,7 @@ void Module::addColorPicker(std::string text, std::string subtext, std::string s
     colorPickerIndex++;
 }
 
-void Module::addTextBox(std::string text, std::string subtext, std::string &value, int limit) {
+void Module::addTextBox(const std::string& text, const std::string& subtext, std::string &value, int limit) {
     float x = Constraints::PercentageConstraint(0.33f, "right");
     float y = Constraints::PercentageConstraint(0.10, "top") + padding;
 
@@ -457,7 +482,7 @@ void Module::addTextBox(std::string text, std::string subtext, std::string &valu
     textboxIndex++;
 }
 
-void Module::addTextBox(std::string text, std::string subtext, int limit, std::string settingName) {
+void Module::addTextBox(const std::string& text, const std::string& subtext, int limit, const std::string& settingName) {
     float x = Constraints::PercentageConstraint(0.33f, "right");
     float y = Constraints::PercentageConstraint(0.10, "top") + padding;
 
@@ -471,7 +496,7 @@ void Module::addTextBox(std::string text, std::string subtext, int limit, std::s
     textboxIndex++;
 }
 
-void Module::addDropdown(std::string text, std::string subtext, const std::vector<std::string> &options, std::string settingName, bool resettable) {
+void Module::addDropdown(const std::string& text, const std::string& subtext, const std::vector<std::string> &options, const std::string& settingName, bool resettable) {
     float x = Constraints::PercentageConstraint(0.33f, "right");
     float y = Constraints::PercentageConstraint(0.10, "top") + padding;
 
@@ -485,7 +510,7 @@ void Module::addDropdown(std::string text, std::string subtext, const std::vecto
     dropdownIndex++;
 }
 
-void Module::addDropdown(std::string text, std::string subtext, const std::vector<std::string> &options, std::string &value) {
+void Module::addDropdown(const std::string& text, const std::string& subtext, const std::vector<std::string> &options, std::string &value) {
     float x = Constraints::PercentageConstraint(0.33f, "right");
     float y = Constraints::PercentageConstraint(0.10, "top") + padding;
 
@@ -500,25 +525,25 @@ void Module::addDropdown(std::string text, std::string subtext, const std::vecto
     dropdownIndex++;
 }
 
-void Module::addConditionalTextBox(bool condition, std::string text, std::string subtext, std::string &value, int limit) {
+void Module::addConditionalTextBox(bool condition, const std::string& text, const std::string& subtext, std::string& value, int limit) {
     FlarialGUI::OverrideAlphaValues((Constraints::RelativeConstraint(0.05f, "height", true) - conditionalTextBoxAnims[textboxIndex]) / Constraints::RelativeConstraint(0.05f, "height", true));
 
     if (condition) {
         padding -= conditionalTextBoxAnims[textboxIndex];
         FlarialGUI::lerp(conditionalTextBoxAnims[textboxIndex], 0.0f, 0.25f * FlarialGUI::frameFactor);
-        Module::addTextBox(text, subtext, value, limit);
+        addTextBox(text, subtext, value, limit);
     } else {
         FlarialGUI::lerp(conditionalTextBoxAnims[textboxIndex], Constraints::RelativeConstraint(0.05f, "height", true), 0.25f * FlarialGUI::frameFactor);
         if (conditionalTextBoxAnims[textboxIndex] < Constraints::RelativeConstraint(0.0499f, "height", true)) {
             padding -= conditionalTextBoxAnims[textboxIndex];
-            Module::addTextBox(text, subtext, value, limit);
+            addTextBox(text, subtext, value, limit);
         } else textboxIndex++;
     }
 
     FlarialGUI::ResetOverrideAlphaValues();
 }
 
-void Module::addConditionalColorPicker(bool condition, std::string text, std::string subtext, std::string settingName) {
+void Module::addConditionalColorPicker(bool condition, const std::string& text, const std::string& subtext, const std::string& settingName) {
     FlarialGUI::OverrideAlphaValues((Constraints::RelativeConstraint(0.05f, "height", true) - conditionalColorPickerAnims[colorPickerIndex]) / Constraints::RelativeConstraint(0.05f, "height", true));
 
     if (condition) {
@@ -536,7 +561,7 @@ void Module::addConditionalColorPicker(bool condition, std::string text, std::st
     FlarialGUI::ResetOverrideAlphaValues();
 }
 
-void Module::addColorPicker(std::string text, std::string subtext, std::string &value, float &opacity, bool &rgb) {
+void Module::addColorPicker(const std::string& text, const std::string& subtext, std::string &value, float &opacity, bool &rgb) {
     float elementX = Constraints::PercentageConstraint(0.195f, "right");
     float y = Constraints::PercentageConstraint(0.10, "top") + padding;
 
@@ -551,7 +576,7 @@ void Module::addColorPicker(std::string text, std::string subtext, std::string &
     colorPickerIndex++;
 }
 
-void Module::addConditionalColorPicker(bool condition, std::string text, std::string subtext, std::string &value, float &opacity, bool &rgb) {
+void Module::addConditionalColorPicker(bool condition, const std::string& text, const std::string& subtext, std::string &value, float &opacity, bool &rgb) {
     FlarialGUI::OverrideAlphaValues((Constraints::RelativeConstraint(0.05f, "height", true) - conditionalColorPickerAnims[colorPickerIndex]) / Constraints::RelativeConstraint(0.05f, "height", true));
 
     if (condition) {
@@ -569,7 +594,7 @@ void Module::addConditionalColorPicker(bool condition, std::string text, std::st
     FlarialGUI::ResetOverrideAlphaValues();
 }
 
-void Module::addConditionalDropdown(bool condition, std::string text, std::string subtext, const std::vector<std::string> &options, std::string settingName, bool resettable) {
+void Module::addConditionalDropdown(bool condition, const std::string& text, const std::string& subtext, const std::vector<std::string> &options, const std::string& settingName, bool resettable) {
     FlarialGUI::OverrideAlphaValues((Constraints::RelativeConstraint(0.05f, "height", true) - conditionalDropdownAnims[dropdownIndex]) / Constraints::RelativeConstraint(0.05f, "height", true));
 
     if (condition) {
@@ -587,7 +612,7 @@ void Module::addConditionalDropdown(bool condition, std::string text, std::strin
     FlarialGUI::ResetOverrideAlphaValues();
 }
 
-void Module::addConditionalToggle(bool condition, std::string text, std::string subtext, std::string settingName) {
+void Module::addConditionalToggle(bool condition, const std::string& text, const std::string& subtext, const std::string& settingName) {
     FlarialGUI::OverrideAlphaValues((Constraints::RelativeConstraint(0.05f, "height", true) - conditionalToggleAnims[toggleIndex]) / Constraints::RelativeConstraint(0.05f, "height", true));
 
     if (condition) {
@@ -605,7 +630,7 @@ void Module::addConditionalToggle(bool condition, std::string text, std::string 
     FlarialGUI::ResetOverrideAlphaValues();
 }
 
-void Module::addConditionalSlider(bool condition, std::string text, std::string subtext, float &value, float maxVal, float minVal, bool zerosafe) {
+void Module::addConditionalSlider(bool condition, const std::string& text, const std::string& subtext, float &value, float maxVal, float minVal, bool zerosafe) {
     FlarialGUI::OverrideAlphaValues((Constraints::RelativeConstraint(0.05f, "height", true) - conditionalSliderAnims[sliderIndex]) / Constraints::RelativeConstraint(0.05f, "height", true));
 
     if (condition) {
@@ -623,7 +648,7 @@ void Module::addConditionalSlider(bool condition, std::string text, std::string 
     FlarialGUI::ResetOverrideAlphaValues();
 }
 
-void Module::addConditionalSlider(bool condition, std::string text, std::string subtext, std::string settingName, float maxVal, float minVal, bool zerosafe) {
+void Module::addConditionalSlider(bool condition, const std::string& text, const std::string& subtext, const std::string& settingName, float maxVal, float minVal, bool zerosafe) {
     FlarialGUI::OverrideAlphaValues((Constraints::RelativeConstraint(0.05f, "height", true) - conditionalSliderAnims[sliderIndex]) / Constraints::RelativeConstraint(0.05f, "height", true));
 
     if (condition) {
@@ -641,7 +666,7 @@ void Module::addConditionalSlider(bool condition, std::string text, std::string 
     FlarialGUI::ResetOverrideAlphaValues();
 }
 
-void Module::addConditionalSliderInt(bool condition, std::string text, std::string subtext, std::string settingName, int maxVal, int minVal) {
+void Module::addConditionalSliderInt(bool condition, const std::string& text, const std::string& subtext, const std::string& settingName, int maxVal, int minVal) {
     FlarialGUI::OverrideAlphaValues((Constraints::RelativeConstraint(0.05f, "height", true) - conditionalSliderAnims[sliderIndex]) / Constraints::RelativeConstraint(0.05f, "height", true));
 
     if (condition) {
@@ -659,7 +684,7 @@ void Module::addConditionalSliderInt(bool condition, std::string text, std::stri
     FlarialGUI::ResetOverrideAlphaValues();
 }
 
-void Module::addSliderInt(std::string text, std::string subtext, std::string settingName, int maxVal, int minVal) {
+void Module::addSliderInt(const std::string& text, const std::string& subtext, const std::string& settingName, int maxVal, int minVal) {
     float elementX = Constraints::PercentageConstraint(0.33f, "right");
     float y = Constraints::PercentageConstraint(0.10, "top") + padding;
 
@@ -675,7 +700,7 @@ void Module::addSliderInt(std::string text, std::string subtext, std::string set
     sliderIndex++;
 }
 
-void Module::addSlider(std::string text, std::string subtext, float &value, float maxVal, float minVal, bool zerosafe) {
+void Module::addSlider(const std::string& text, const std::string& subtext, float &value, float maxVal, float minVal, bool zerosafe) {
     float elementX = Constraints::PercentageConstraint(0.33f, "right");
     float y = Constraints::PercentageConstraint(0.10, "top") + padding;
 
@@ -689,7 +714,7 @@ void Module::addSlider(std::string text, std::string subtext, float &value, floa
     sliderIndex++;
 }
 
-void Module::addSlider(std::string text, std::string subtext, std::string settingName, float maxVal, float minVal, bool zerosafe) {
+void Module::addSlider(const std::string& text, const std::string& subtext, const std::string& settingName, float maxVal, float minVal, bool zerosafe) {
     float elementX = Constraints::PercentageConstraint(0.33f, "right");
     float y = Constraints::PercentageConstraint(0.10, "top") + padding;
 
@@ -705,7 +730,7 @@ void Module::addSlider(std::string text, std::string subtext, std::string settin
     sliderIndex++;
 }
 
-void Module::addConditionalToggle(bool condition, std::string text, std::string subtext, bool &value) {
+void Module::addConditionalToggle(bool condition, const std::string& text, const std::string& subtext, bool &value) {
     FlarialGUI::OverrideAlphaValues((Constraints::RelativeConstraint(0.05f, "height", true) - conditionalToggleAnims[toggleIndex]) / Constraints::RelativeConstraint(0.05f, "height", true));
 
     if (condition) {
@@ -723,7 +748,7 @@ void Module::addConditionalToggle(bool condition, std::string text, std::string 
     FlarialGUI::ResetOverrideAlphaValues();
 }
 
-void Module::addToggle(std::string text, std::string subtext, std::string settingName) {
+void Module::addToggle(const std::string& text, const std::string& subtext, const std::string& settingName) {
     float x = Constraints::PercentageConstraint(0.019, "left");
     float elementX = Constraints::PercentageConstraint(0.119f, "right");
     float y = Constraints::PercentageConstraint(0.10, "top") + padding;
@@ -736,7 +761,7 @@ void Module::addToggle(std::string text, std::string subtext, std::string settin
     toggleIndex++;
 }
 
-void Module::addToggle(std::string text, std::string subtext, bool &value) {
+void Module::addToggle(const std::string& text, const std::string& subtext, bool &value) {
     float x = Constraints::PercentageConstraint(0.019, "left");
     float elementX = Constraints::PercentageConstraint(0.119f, "right");
     float y = Constraints::PercentageConstraint(0.10, "top") + padding;
@@ -749,7 +774,7 @@ void Module::addToggle(std::string text, std::string subtext, bool &value) {
     toggleIndex++;
 }
 
-void Module::addKeybind(std::string text, std::string subtext, std::string &keybind) {
+void Module::addKeybind(const std::string& text, const std::string& subtext, std::string &keybind) {
     float elementX = Constraints::PercentageConstraint(0.134f, "right");
     float y = Constraints::PercentageConstraint(0.08, "top") + padding;
 
@@ -761,7 +786,7 @@ void Module::addKeybind(std::string text, std::string subtext, std::string &keyb
     keybindIndex++;
 }
 
-void Module::addKeybind(std::string text, std::string subtext, std::string settingName, bool resettable) {
+void Module::addKeybind(const std::string& text, const std::string& subtext, const std::string& settingName, bool resettable) {
     float elementX = Constraints::PercentageConstraint(0.134f, "right");
     float y = Constraints::PercentageConstraint(0.08, "top") + padding;
 

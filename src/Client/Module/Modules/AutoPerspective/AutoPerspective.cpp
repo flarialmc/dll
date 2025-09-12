@@ -28,8 +28,6 @@ void AutoPerspective::settingsRender(float settingsOffset) {
     initSettingsPage();
 
 
-    addHeader("Auto Perspective");
-
     addToggle("Elytra", "Toggle to change perspective while using elytra to fly.", "elytra");
     addDropdown("Elytra Perspective", "Your perspective while using elytra to fly", std::vector<std::string>{"1st Person", "3rd Person back", "3rd Person front"}, "elytraMode", true);
 

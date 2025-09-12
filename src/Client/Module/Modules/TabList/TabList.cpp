@@ -580,7 +580,6 @@ void TabList::onSetup() {
 void TabList::settingsRender(float settingsOffset) {
     initSettingsPage();
 
-    addHeader("Tab List");
     defaultAddSettings("main");
     extraPadding();
 

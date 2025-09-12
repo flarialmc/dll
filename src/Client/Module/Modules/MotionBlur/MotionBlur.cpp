@@ -38,7 +38,6 @@ void MotionBlur::settingsRender(float settingsOffset)
 {
     initSettingsPage();
 
-    addHeader("Motion Blur");
     addToggle("Render Under UI", "When enabled, renders motion blur under the UI. When disabled, renders over the UI.", "renderUnderUI");
     addToggle("Average Pixel Mode", "Disabling this will likely look better on high FPS.", "avgpixel");
 

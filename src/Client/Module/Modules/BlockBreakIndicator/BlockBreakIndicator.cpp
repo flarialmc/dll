@@ -32,7 +32,6 @@ void BlockBreakIndicator::settingsRender(float settingsOffset) {
     initSettingsPage();
 
 
-    addHeader("Block Break Indicator");
     addToggle("Progress Bar", "Whether to show a Progress Bar or text", "pbmode");
     defaultAddSettings("main");
     extraPadding();

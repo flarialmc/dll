@@ -29,7 +29,6 @@ void HitPing::defaultConfig() {
 void HitPing::settingsRender(float settingsOffset) {
     initSettingsPage();
 
-    addHeader("Hit Ping");
     defaultAddSettings("main");
     extraPadding();
 

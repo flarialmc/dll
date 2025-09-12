@@ -32,7 +32,6 @@ void Lewis::settingsRender(float settingsOffset)
 {
     initSettingsPage();
 
-    addHeader("Lewis");
     addToggle("Bouncing lewis", "", "lewisbounce");
     addSlider("Bouncing lewis size", "", "lewisbouncesize", 5);
     addSlider("Bouncing lewis speed", "", "lewisbouncespeed", 5);

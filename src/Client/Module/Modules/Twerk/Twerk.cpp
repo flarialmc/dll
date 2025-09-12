@@ -21,7 +21,6 @@ void Twerk::defaultConfig() {
 void Twerk::settingsRender(float settingsOffset) {
     initSettingsPage();
 
-    addHeader("Twerk");
     addSlider("Shift Interval", "Time in between consecutive twerks", "shiftInterval", 5.f, 0.1f);
     addSlider("Shift Speed", "Time between going up and down", "shiftSpeed", 5.f, 0.1f);
 
