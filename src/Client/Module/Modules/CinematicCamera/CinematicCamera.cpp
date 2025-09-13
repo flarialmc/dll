@@ -1,5 +1,5 @@
 #include "CinematicCamera.hpp"
-#include "Events/EventManager.hpp"
+
 #include "SDK/Client/Core/Options.hpp"
 
 void CinematicCamera::onEnable() {
@@ -27,7 +27,6 @@ void CinematicCamera::settingsRender(float settingsOffset) {
 
     initSettingsPage();
 
-    addHeader("Cinematic Camera");
     addToggle("Enable Smoothing", "", "smoothing");
     addConditionalSlider(getOps<bool>("smoothing"), "Smoothing", "", "smoothness", 10.f);
     addToggle("Cinematic Bars", "", "cinebars");

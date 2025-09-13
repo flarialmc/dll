@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "Events/EventManager.hpp"
+
 #include <SDK/Client/Network/Packet/TextPacket.hpp>
 #include "../../../Client.hpp"
 #include "../Module.hpp"

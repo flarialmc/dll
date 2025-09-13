@@ -5,7 +5,7 @@
 #include "../../../../SDK/Client/Actor/ItemActor.hpp"
 #include "../../../../Utils/Memory/CustomAllocator/Buffer.hpp"
 #include "../../../../SDK/Client/Render/ActorRenderData.hpp"
-#include "Events/EventManager.hpp"
+
 #include "SDK/Client/Render/ItemRenderer.hpp"
 
 class INeedADecentHookClassForMemory {

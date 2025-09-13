@@ -1,6 +1,7 @@
 #include <fstream>
 #include "ActorBaseTick.hpp"
 #include "../../../Client.hpp"
+#include "Events/Game/TickEvent.hpp"
 
 void ActorBaseTick::enableHook() {
 

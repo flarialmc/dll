@@ -9,6 +9,7 @@
 
 #include "Events/Render/RenderOutlineSelectionEvent.hpp"
 #include "SDK/Client/Options/OptionsParser.hpp"
+#include "../../../../Assets/Assets.hpp"
 
 class BlockOutline : public Module {
 

@@ -3,6 +3,9 @@
 #include "../Module.hpp"
 #include "../../../Client.hpp"
 
+
+#include "Assets/Assets.hpp"
+
 class FOVChanger : public Module {
 private:
 	bool notified150Fov = false;

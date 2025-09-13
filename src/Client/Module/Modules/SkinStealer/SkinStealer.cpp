@@ -3,7 +3,7 @@
 #include <utility>
 
 #include "Command/Commands/SkinStealCommand.hpp"
-#include "Events/EventManager.hpp"
+
 #include "SDK/Client/Network/Packet/PlayerSkinPacket.hpp"
 
 std::vector<std::shared_ptr<Packet> > SkinStealer::inFlightPackets;

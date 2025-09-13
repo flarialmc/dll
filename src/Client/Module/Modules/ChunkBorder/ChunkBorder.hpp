@@ -7,6 +7,7 @@
 #include <Utils/Render/MaterialUtils.hpp>
 
 #include "Events/Render/Render3DEvent.hpp"
+#include "../../../../Assets/Assets.hpp"
 
 class ChunkBorder : public Module {
 private:

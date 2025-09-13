@@ -1,7 +1,7 @@
 #include "ArmorHUD.hpp"
 
 #include "Manager.hpp"
-#include "Events/EventManager.hpp"
+
 #include "Modules/ClickGUI/ClickGUI.hpp"
 
 void ArmorHUD::onEnable() {
@@ -58,7 +58,6 @@ void ArmorHUD::defaultConfig() {
 void ArmorHUD::settingsRender(float settingsOffset) {
 	initSettingsPage();
 
-	addHeader("Armor HUD");
 	addSlider("Size", "", "uiscale", 5.f, 0.f, true);
 	addSlider("Spacing", "", "spacing", 10.f, 0.f, true);
 	addToggle("Vertical ArmorHUD", "To switch between a vertical or horizontal layout", "vertical");

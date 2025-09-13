@@ -1,6 +1,6 @@
 #include "InventoryHUD.hpp"
 
-#include "Events/EventManager.hpp"
+
 #include "Modules/ClickGUI/ClickGUI.hpp"
 #include "SDK/Client/Render/BaseActorRenderContext.hpp"
 #include "Utils/Render/PositionUtils.hpp"
@@ -56,7 +56,6 @@ void InventoryHUD::settingsRender(float settingsOffset) {
 
     initSettingsPage();
 
-    addHeader("Inventory HUD");
     addSlider("Size", "", "uiscale", 5.f, 0.f, true);
     addSlider("Text Size", "", "textscale", 0.25f, 0.0f, true);
     addSlider("Spacing", "", "spacing", 10.f, 0.0f, true);

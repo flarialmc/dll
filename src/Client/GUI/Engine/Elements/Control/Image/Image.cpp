@@ -3,6 +3,7 @@
 #include "../../Structs/ImagesClass.hpp"
 #include "../../../../../../Assets/Assets.hpp"
 #include "../../../../../Client.hpp"
+#include "../../../../../Hook/Hooks/Render/DirectX/DXGI/SwapchainHook.hpp"
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui/imgui.h>
 

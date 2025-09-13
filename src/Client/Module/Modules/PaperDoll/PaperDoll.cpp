@@ -1,6 +1,6 @@
 #include "PaperDoll.hpp"
 
-#include "Events/EventManager.hpp"
+
 #include "Modules/ClickGUI/ClickGUI.hpp"
 #include "Utils/Render/PositionUtils.hpp"
 
@@ -32,7 +32,6 @@ void PaperDoll::defaultConfig() {
 void PaperDoll::settingsRender(float settingsOffset) {
     initSettingsPage();
 
-    addHeader("Movable Paperdoll");
     addSlider("UI Scale", "", "uiscale");
     addToggle("Always Show", "", "alwaysshow");
     FlarialGUI::UnsetScrollView();

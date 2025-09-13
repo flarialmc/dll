@@ -49,7 +49,6 @@ void MumbleLink::settingsRender(float settingsOffset)
 {
     initSettingsPage();
 
-    addHeader("Mumble Link");
     addTextBox("Channel/Room", "Keep empty to use the Server IP.", getOps<std::string>("context"));
 
     FlarialGUI::UnsetScrollView();

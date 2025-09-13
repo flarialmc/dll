@@ -29,7 +29,7 @@ CommandListHook::CommandListHook() : Hook("CommandListHook", 0) {}
 void CommandListHook::listCallback(ID3D12CommandQueue *queue, UINT numCommandLists,
                                    ID3D12CommandList **ppCommandLists) {
 
-    SwapchainHook::queue.copy_from(queue);
+    if (!SwapchainHook::queue) SwapchainHook::queue.copy_from(queue);
     return funcOriginal(queue, numCommandLists, ppCommandLists);
 
 }

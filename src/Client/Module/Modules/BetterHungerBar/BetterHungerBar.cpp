@@ -2,7 +2,7 @@
 
 #include "BetterHungerBar.hpp"
 
-#include "Events/EventManager.hpp"
+
 #include "Events/Game/TickEvent.hpp"
 #include <Client.hpp>
 #include "Utils/Render/PositionUtils.hpp"

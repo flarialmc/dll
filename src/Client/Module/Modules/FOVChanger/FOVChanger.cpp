@@ -1,5 +1,4 @@
 #include "FOVChanger.hpp"
-
 void FOVChanger::onEnable() {
     Listen(this, FOVEvent, &FOVChanger::onGetFOV)
     Module::onEnable();
@@ -19,7 +18,6 @@ void FOVChanger::defaultConfig() {
 void FOVChanger::settingsRender(float settingsOffset) {
     initSettingsPage();
 
-    addHeader("FOV Changer");
     addSlider("FOV Value", "", "fovvalue", 359.0f, 0, false);
     addToggle("Affect Hand Size", "Keep normal hand size or not.", "fovaffectshand");
 

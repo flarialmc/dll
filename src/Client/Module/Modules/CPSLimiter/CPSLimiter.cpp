@@ -2,6 +2,7 @@
 
 #include "Client.hpp"
 #include "Manager.hpp"
+#include "../../../GUI/Engine/Engine.hpp"
 
 void CPSLimiter::defaultConfig() {
     settings.changeType<float, int>("Left");
@@ -14,7 +15,6 @@ void CPSLimiter::defaultConfig() {
 void CPSLimiter::settingsRender(float settingsOffset) {
     initSettingsPage();
 
-    addHeader("CPS Limiter");
     addSliderInt("Left Click", "Limit for your LMB.", "Left");
     addSliderInt("Right Click", "Right for your RMB.", "Right");
 

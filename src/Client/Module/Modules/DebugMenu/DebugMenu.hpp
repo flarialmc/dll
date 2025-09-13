@@ -1,9 +1,12 @@
 #pragma once
 
 #include "../Module.hpp"
+#include "../../../../SDK/Client/Level/Biome.hpp"
 #include <chrono>
 #include <vector>
 #include <deque>
+
+#include "Assets/Assets.hpp"
 
 
 class TimedObj {
@@ -34,7 +37,7 @@ private:
 
 	std::string versionName;
 	std::string cpuName;
-	Perspective curPerspective;
+	Perspective curPerspective = Perspective::FirstPerson;
 	float lastBreakProgress = 0.0f;
 	float currentBreakProgress = 0.0f;
 	float cached1PercLow = 0.f;

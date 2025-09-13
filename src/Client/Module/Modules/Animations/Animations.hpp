@@ -3,6 +3,7 @@
 #include "../Module.hpp"
 #include "Events/Render/DrawImageEvent.hpp"
 #include "Events/Render/GetTextureEvent.hpp"
+#include "../../../../Assets/Assets.hpp"
 
 
 class Animations : public Module {

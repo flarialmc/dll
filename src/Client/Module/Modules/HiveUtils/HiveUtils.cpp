@@ -1,6 +1,7 @@
 #include "HiveUtils.hpp"
 
-#include "Events/EventManager.hpp"
+#include "Client.hpp"
+
 #include "SDK/Client/Network/Packet/SetTitlePacket.hpp"
 
 void HiveUtils::onEnable() {
@@ -87,8 +88,6 @@ void HiveUtils::settingsRender(float settingsOffset) {
             );
         }
     }
-
-    addHeader("Game Specifics");
 
     addHeader("Murder Mystery");
     addToggle("Murderer", "Re Q when you get murderer", "murderer");

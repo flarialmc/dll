@@ -26,7 +26,6 @@ void Hitbox::settingsRender(float settingsOffset) {
 
     initSettingsPage();
 
-    addHeader("Hitbox");
     addToggle("2D Mode", "", "outline");
     addToggle("Static Thickness", "", "staticThickness");
     addSlider("Thickness", "", "thickness");

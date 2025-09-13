@@ -1,6 +1,8 @@
 #pragma once
 
 #include "../Module.hpp"
+#include "Assets/Assets.hpp"
+
 
 class DisableMouseWheel : public Module {
 public:

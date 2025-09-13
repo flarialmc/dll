@@ -1,6 +1,6 @@
 #include "ReachCounter.hpp"
 
-#include "Events/EventManager.hpp"
+
 
 
 void ReachCounter::onEnable()
@@ -31,7 +31,6 @@ void ReachCounter::settingsRender(float settingsOffset)
 {
     initSettingsPage();
 
-    addHeader("Reach Counter");
     defaultAddSettings("main");
     extraPadding();
 

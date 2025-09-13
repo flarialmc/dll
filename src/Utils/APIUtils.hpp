@@ -1,6 +1,6 @@
 #pragma once
 
-#include <json/json.hpp>
+#include <json/json_fwd.hpp>
 
 template<typename T>
 struct transparent_hash : std::hash<T> { using is_transparent = void; };

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Module.hpp"
+#include "Assets/Assets.hpp"
 #include "Events/Render/RenderEvent.hpp"
 #include "Events/Render/RenderUnderUIEvent.hpp"
 

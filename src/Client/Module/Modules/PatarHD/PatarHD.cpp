@@ -1,6 +1,7 @@
 #include "PatarHD.hpp"
 
-#include "Events/EventManager.hpp"
+
+#include "GUI/Engine/Constraints.hpp"
 
 
 void PatarHD::onEnable()
@@ -31,7 +32,6 @@ void PatarHD::settingsRender(float settingsOffset)
 {
     initSettingsPage();
 
-    addHeader("PatarHD");
     addDropdown("Mode", "", std::vector<std::string>{"Patar", "Jqms", "Chyves", "Nikita", "treegfx", "FreezeEngine", "StoneHunter", "beaver"}, "mode", true);
     addSlider("Scale", "", "scale", 5.0F);
     addToggle("DVD Mode", "See for yourself", "dvdmode");

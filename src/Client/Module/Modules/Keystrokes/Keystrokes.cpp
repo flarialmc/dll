@@ -1,6 +1,6 @@
 #include "Keystrokes.hpp"
 
-#include "Events/EventManager.hpp"
+
 #include "Modules/ClickGUI/ClickGUI.hpp"
 #include "Modules/CPS/CPSCounter.hpp"
 #include <Modules/Misc/Input/GUIMouseListener.hpp>
@@ -78,7 +78,6 @@ void Keystrokes::settingsRender(float settingsOffset) {
     initSettingsPage();
 
 
-    addHeader("Keystrokes");
     addSlider("UI Scale", "", "uiscale", 2.0f);
     addToggle("Translucency", "A blur effect, MAY BE PERFORMANCE HEAVY!", "BlurEffect");
     addSlider("Rounding", "Rounding of the rectangle", "rounding");

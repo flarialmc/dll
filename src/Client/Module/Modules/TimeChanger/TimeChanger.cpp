@@ -1,6 +1,6 @@
 #include "TimeChanger.hpp"
 #include "Client.hpp"
-#include "Events/EventManager.hpp"
+
 
 void TimeChanger::onEnable()
 {
@@ -25,7 +25,6 @@ void TimeChanger::settingsRender(float settingsOffset)
 {
     initSettingsPage();
 
-    addHeader("Time Changer");
     addSlider("Time Slider", "", "time", 1.f, 0.f, true);
 
     FlarialGUI::UnsetScrollView();

@@ -1,7 +1,7 @@
 #include "Coordinates.hpp"
 #include <cmath>
 
-#include "Events/EventManager.hpp"
+
 
 void Coordinates::onEnable() {
     Listen(this, RenderEvent, &Coordinates::onRender)
@@ -37,7 +37,6 @@ void Coordinates::defaultConfig() {
 void Coordinates::settingsRender(float settingsOffset) {
     initSettingsPage();
 
-    addHeader("Coordinates");
     defaultAddSettings("main");
     extraPadding();
 

@@ -25,7 +25,6 @@ void InstantHurtAnimation::defaultConfig() {
 void InstantHurtAnimation::settingsRender(float settingsOffset) {
     initSettingsPage();
 
-    addHeader("Instant Hurt Animation");
     addToggle("Try to exclude team", "", "tryToExcludeTeam");
     addToggle("Only with armor", "", "onlyWithArmor");
 

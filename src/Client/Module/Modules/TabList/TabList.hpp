@@ -4,7 +4,8 @@
 #include "../../../GUI/Engine/Engine.hpp"
 #include <vector>
 #include <algorithm>
-#include "Events/EventManager.hpp"
+
+#include "../../../../Assets/Assets.hpp"
 
 struct TabListEntry {
     bool valid = false;

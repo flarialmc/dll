@@ -1,5 +1,6 @@
 #pragma once
 #include "json.hpp"
+#include "../../../Utils/Utils.hpp"
 
 
 enum class ImageFormat : int {
@@ -286,7 +287,8 @@ public:
 namespace std {
     template<>
     struct hash<mcUUID> {
-        size_t operator()(const mcUUID &uuid) const {
+        size_t operator()(const mcUUID &uuid) const noexcept
+        {
             // Combine the two 64-bit values using a simple hash combination
             return hash<uint64_t>{}(uuid.mostSig) ^ (hash<uint64_t>{}(uuid.leastSig) << 1);
         }

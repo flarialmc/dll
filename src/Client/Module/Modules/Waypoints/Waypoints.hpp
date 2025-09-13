@@ -4,6 +4,8 @@
 
 #include "../Events/Render/Render3DEvent.hpp"
 
+#include "../../../../Assets/Assets.hpp"
+
 
 struct Waypoint {
 	Vec3<float> position;

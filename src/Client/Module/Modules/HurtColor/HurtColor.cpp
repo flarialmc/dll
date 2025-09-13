@@ -1,6 +1,6 @@
 #include "HurtColor.hpp"
 
-#include "Events/EventManager.hpp"
+
 
 void HurtColor::onEnable() {
     Listen(this, HurtColorEvent, &HurtColor::onGetHurtColor)
@@ -22,7 +22,6 @@ void HurtColor::defaultConfig() {
 void HurtColor::settingsRender(float settingsOffset) {
     initSettingsPage();
 
-    addHeader("Hurt Color");
     addColorPicker("Color", "", "hurt");
 
     FlarialGUI::UnsetScrollView();

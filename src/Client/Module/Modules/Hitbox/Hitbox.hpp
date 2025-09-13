@@ -3,6 +3,7 @@
 #include "../Module.hpp"
 #include "../../../Client.hpp"
 #include "../../../../Utils/Render/DrawUtils.hpp"
+#include "Assets/Assets.hpp"
 
 struct AABBInfo {
 	AABB aabb;

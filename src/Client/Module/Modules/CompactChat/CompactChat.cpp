@@ -1,6 +1,6 @@
 #include "CompactChat.hpp"
 
-#include "Events/EventManager.hpp"
+
 #include "SDK/Client/Render/GuiMessage.hpp"
 #include "Modules/Nick/NickModule.hpp"
 
@@ -30,7 +30,6 @@ void CompactChat::settingsRender(float settingsOffset) {
 
     initSettingsPage();
 
-    addHeader("Compact Chat");
     addTextBox("Format", "{msg} for message, {count} for count.", 0, "format");
     addToggle("Show Brackets", "", "showBrackets");
     addConditionalDropdown(getOps<bool>("showBrackets"), "Bracket Style", "", std::vector<std::string>{

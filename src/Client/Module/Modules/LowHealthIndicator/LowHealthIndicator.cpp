@@ -1,5 +1,7 @@
 #include "LowHealthIndicator.hpp"
 
+#include "GUI/Engine/Constraints.hpp"
+
 
 void LowHealthIndicator::defaultConfig()
 {
@@ -15,8 +17,6 @@ void LowHealthIndicator::settingsRender(float settingsOffset)
 {
     initSettingsPage();
 
-
-    addHeader("Low Health Indicator");
     addSlider("Maximum overlay opacity", "The maximum overlay opacity", "maxopacity", 1.0f, 0.0f);
     addColorPicker("Color", "", "health");
     addSlider("Health", "The health at which the overlay will be shown", "health", 20.0f, 0.0f);

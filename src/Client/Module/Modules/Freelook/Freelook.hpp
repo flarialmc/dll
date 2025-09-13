@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Module.hpp"
+#include "Assets/Assets.hpp"
 #include "Events/Game/PerspectiveEvent.hpp"
 #include "Events/Game/UpdatePlayerEvent.hpp"
 

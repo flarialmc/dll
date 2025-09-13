@@ -1,6 +1,6 @@
 #include "BlockBreakIndicator.hpp"
 
-#include "Events/EventManager.hpp"
+
 #include "Events/Render/RenderEvent.hpp"
 #include "Modules/ClickGUI/ClickGUI.hpp"
 #include "Modules/CPS/CPSCounter.hpp"
@@ -32,7 +32,6 @@ void BlockBreakIndicator::settingsRender(float settingsOffset) {
     initSettingsPage();
 
 
-    addHeader("Block Break Indicator");
     addToggle("Progress Bar", "Whether to show a Progress Bar or text", "pbmode");
     defaultAddSettings("main");
     extraPadding();

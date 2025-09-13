@@ -3,7 +3,6 @@
 #include "../Module.hpp"
 #include "../../../../SDK/Client/Network/Packet/SetTitlePacket.hpp"
 #include "../../../../SDK/Client/Network/Packet/ModalFormRequestPacket.hpp"
-#include <lib/json/json.hpp>
 
 #include "Events/Network/PacketEvent.hpp"
 

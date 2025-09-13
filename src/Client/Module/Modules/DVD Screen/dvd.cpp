@@ -1,6 +1,7 @@
 #include "dvd.hpp"
 #include "Client.hpp"
-#include "Events/EventManager.hpp"
+
+#include "../../../../Assets/Assets.hpp"
 
 void DVD::onEnable() {
     Listen(this, RenderEvent, &DVD::onRender)
@@ -23,7 +24,6 @@ void DVD::defaultConfig() {
 void DVD::settingsRender(float settingsOffset) {
     initSettingsPage();
 
-    addHeader("DVD Screensaver");
     addSlider("Scale", "", "scale");
     addSlider("X Velocity", "", "xveloc");
     addSlider("Y Velocity", "", "yveloc");

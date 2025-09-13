@@ -1,7 +1,7 @@
 #include "Animations.hpp"
 
 #include "Client.hpp"
-#include "Events/EventManager.hpp"
+
 
 void Animations::onEnable() {
     Listen(this, DrawImageEvent, &Animations::onDrawImage)
@@ -56,7 +56,6 @@ void Animations::settingsRender(float settingsOffset) {
 
 	initSettingsPage();
 
-	addHeader("Animations");
 	addSlider("Hotbar Selected Slot Speed", "", "hotbarSpeed");
 
 	FlarialGUI::UnsetScrollView();

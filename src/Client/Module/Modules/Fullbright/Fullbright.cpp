@@ -1,6 +1,6 @@
 #include "Fullbright.hpp"
 
-#include "Events/EventManager.hpp"
+
 
 void Fullbright::onEnable() {
     Listen(this, GammaEvent, &Fullbright::onGetGamma)
@@ -21,7 +21,6 @@ void Fullbright::defaultConfig() {
 void Fullbright::settingsRender(float settingsOffset) {
     initSettingsPage();
 
-    addHeader("Fullbright");
     addSlider("Brightness", "", "gamma", 25.0f);
 
     FlarialGUI::UnsetScrollView();

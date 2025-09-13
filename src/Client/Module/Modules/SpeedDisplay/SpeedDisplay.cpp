@@ -26,7 +26,6 @@ void SpeedDisplay::settingsRender(float settingsOffset)
 {
     initSettingsPage();
 
-    addHeader("Speed Display");
     defaultAddSettings("main");
     extraPadding();
 

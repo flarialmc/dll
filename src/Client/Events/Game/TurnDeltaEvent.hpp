@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Event.hpp"
+#include "../../../Utils/Utils.hpp"
 
 class TurnDeltaEvent : public Event {
 

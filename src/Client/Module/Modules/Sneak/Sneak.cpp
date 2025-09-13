@@ -1,6 +1,6 @@
 #include "Sneak.hpp"
 
-#include "Events/EventManager.hpp"
+
 
 void Sneak::onEnable() {
     Listen(this, KeyEvent, &Sneak::onKey)
@@ -28,7 +28,6 @@ void Sneak::defaultConfig() {
 void Sneak::settingsRender(float settingsOffset) {
     initSettingsPage();
 
-    addHeader("Toggle Sneak");
     addKeybind("Keybind", "Hold for 2 seconds!", "keybind", true);
 
     FlarialGUI::UnsetScrollView();

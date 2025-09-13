@@ -131,6 +131,31 @@ void ResizeHook::cleanShit(bool fullReset) {
     SwapchainHook::d3d11Device = nullptr;
     D2D::context = nullptr;
 
+    for (auto& i : ClickGUIElements::images) {
+        Memory::SafeRelease(i.second);
+    }
+
+    for (auto& entry : FlarialGUI::cachedBitmaps) {
+        ID2D1Image* bitmap = entry.second;
+        Memory::SafeRelease(bitmap);
+    }
+
+    FlarialGUI::cachedBitmaps.clear();
+
+    ClickGUIElements::images.clear();
+
+    for (auto i : ImagesClass::eimages) {
+        Memory::SafeRelease(i.second);
+    }
+
+
+    ImagesClass::eimages.clear();
+
+    for (auto& i : ImagesClass::images) {
+        Memory::SafeRelease(i.second);
+    }
+
+    ImagesClass::images.clear();
     if (fullReset) {
         FlarialGUI::hasLoadedAll = false;
         for (auto& [id, texture] : ImagesClass::ImguiDX12Textures) {
@@ -148,32 +173,6 @@ void ResizeHook::cleanShit(bool fullReset) {
         }
 
         ImagesClass::ImguiDX11Images.clear();
-
-        for (auto& i : ClickGUIElements::images) {
-            Memory::SafeRelease(i.second);
-        }
-
-        for (auto& entry : FlarialGUI::cachedBitmaps) {
-            ID2D1Image* bitmap = entry.second;
-            Memory::SafeRelease(bitmap);
-        }
-
-        FlarialGUI::cachedBitmaps.clear();
-
-        ClickGUIElements::images.clear();
-
-        for (auto i : ImagesClass::eimages) {
-            Memory::SafeRelease(i.second);
-        }
-
-
-        ImagesClass::eimages.clear();
-
-        for (auto& i : ImagesClass::images) {
-            Memory::SafeRelease(i.second);
-        }
-
-        ImagesClass::images.clear();
 
 
         TabList::ResetDescriptorState();
@@ -196,6 +195,7 @@ void ResizeHook::cleanShit(bool fullReset) {
             SwapchainHook::imguiCleanupInProgress = false;
         }
 
+        SwapchainHook::queue = nullptr;
         SwapchainHook::d3d12CommandList = nullptr;
         SwapchainHook::allocator = nullptr;
         SwapchainHook::d3d12CommandQueue = nullptr;

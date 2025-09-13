@@ -117,11 +117,13 @@ public:
         return "";
     }
 
-    void onProtocol(ProtocolEvent event) {
+    void onProtocol(ProtocolEvent& event) {
         if (event.getPath() != std::wstring(L"flarial-scripting")) return;
 
         std::wstring scriptNameW, scriptTypeW;
-        for (const auto& [key, value] : event.getProtocolArgs()) {
+        for (const auto& pair : event.getProtocolArgs()) {
+            const auto& key = pair.first;
+            const auto& value = pair.second;
             if (key == L"scriptName") scriptNameW = value;
             if (key == L"type") scriptTypeW = value;
         }
@@ -329,14 +331,14 @@ public:
     }
 
 
-    void onProtocolConfig(ProtocolEvent event) {
+    void onProtocolConfig(ProtocolEvent& event) {
         if (event.getPath() != std::wstring(L"flarial-configs")) return;
 
         for (const auto &pair : event.getProtocolArgs()) {
             if (pair.first == std::wstring(L"configName")) {
                 std::string id = String::WStrToStr(pair.second);
                 FlarialGUI::Notify("Importing config ..." + id + " this may take a while.");
-                std::thread([this, pair, id]() {
+                std::thread([this, id]() {
                     Logger::info("config name {}", id);
 
                     // Convert to lowercase for GitHub CDN compatibility  

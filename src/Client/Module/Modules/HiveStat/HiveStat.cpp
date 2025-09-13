@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <functional>
 
-#include "Events/EventManager.hpp"
+
 #include "Events/Render/RenderEvent.hpp"
 #include "Modules/ClickGUI/ClickGUI.hpp"
 
@@ -81,7 +81,6 @@ void HiveStat::defaultConfig() {
 void HiveStat::settingsRender(float settingsOffset) {
     initSettingsPage();
 
-    addHeader("Hive Statistics");
     addKeybind("Toggle Overlay Keybind", "When setting, hold the new bind for 2 seconds", "Overlay", true);
     addSlider("UI Scale", "", "uiscale", 5.f, 0.f);
     extraPadding();

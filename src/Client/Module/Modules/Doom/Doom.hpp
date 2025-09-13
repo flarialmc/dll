@@ -2,6 +2,7 @@
 
 #include "../Module.hpp"  
 #include "../../../Hook/Hooks/Render/DirectX/DXGI/SwapchainHook.hpp"
+#include "../../../../Assets/Assets.hpp"
 
 #define DOOMGENERIC_RESX 640
 #define DOOMGENERIC_RESY 400

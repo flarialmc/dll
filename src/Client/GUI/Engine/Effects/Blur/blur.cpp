@@ -47,7 +47,7 @@ float4 main(float4 screenSpace : SV_Position) : SV_TARGET
     float4 colorSum = float4(0.0, 0.0, 0.0, 0.0);
     
     // Adaptive sampling based on intensity
-    int sampleCount = clamp((int)(intensity * 4.0 + 5.0), 5, 15);
+    int sampleCount = clamp((int)(intensity * 2.0 + 3.0), 3, 7);
     float weightSum = 0.0;
     
     // Calculate gaussian weights dynamically
@@ -89,7 +89,7 @@ float4 main(float4 screenSpace : SV_Position) : SV_TARGET
     float4 colorSum = float4(0.0, 0.0, 0.0, 0.0);
     
     // Adaptive sampling based on intensity
-    int sampleCount = clamp((int)(intensity * 4.0 + 5.0), 5, 15);
+    int sampleCount = clamp((int)(intensity * 2.0 + 3.0), 3, 7);
     float weightSum = 0.0;
     
     // Calculate gaussian weights dynamically

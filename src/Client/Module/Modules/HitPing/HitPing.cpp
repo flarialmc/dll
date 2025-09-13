@@ -1,6 +1,7 @@
 #include "HitPing.hpp"
 
-#include "Events/EventManager.hpp"
+
+#include "SDK/Client/Network/Packet/EntityEventPacket.hpp"
 
 void HitPing::onEnable() {
     Listen(this, RenderEvent, &HitPing::onRender)
@@ -28,7 +29,6 @@ void HitPing::defaultConfig() {
 void HitPing::settingsRender(float settingsOffset) {
     initSettingsPage();
 
-    addHeader("Hit Ping");
     defaultAddSettings("main");
     extraPadding();
 

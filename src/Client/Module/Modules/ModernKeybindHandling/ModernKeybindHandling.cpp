@@ -1,6 +1,6 @@
 #include "ModernKeybindHandling.hpp"
 
-#include "Events/EventManager.hpp"
+
 #include "Hook/Hooks/Input/KeyHook.hpp"
 
 
@@ -39,7 +39,6 @@ void ModernKeybindHandling::settingsRender(float settingsOffset)
 {
     initSettingsPage();
 
-    addHeader("Modern Keybind Handling");
     addToggle("Fix Inventory Movement", "Restore movement and sprint input after exiting inventory screens", "fixInventoryMovement");
     addToggle("Fix Pause Movement", "Restore movement and sprint input after exiting pause menu", "fixPauseMovement");
     addToggle("Fix Chat Movement", "Restore movement and sprint input after exiting chat screen", "fixChatMovement");

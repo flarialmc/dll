@@ -2,6 +2,7 @@
 
 #include "../Module.hpp"
 #include "../Misc/HiveModeCatcher/HiveModeCatcherListener.hpp"
+#include "Assets/Assets.hpp"
 
 
 class HiveUtils : public Module {

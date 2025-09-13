@@ -126,7 +126,6 @@ void ItemPhysics::settingsRender(float settingsOffset) {
 
     initSettingsPage();
 
-    addHeader("Item Physics");
     addSlider("Speed", "", "speed", 15.f, 3.f, false);
     addSlider("X Multiplier", "", "xmul", 30.f, 7.f, false);
     addSlider("Y Multiplier", "", "ymul", 30.f, 7.f, false);

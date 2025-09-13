@@ -1,6 +1,6 @@
 #include "OpponentReach.hpp"
 
-#include "Events/EventManager.hpp"
+
 
 
 void OpponentReach::onEnable()
@@ -31,7 +31,6 @@ void OpponentReach::settingsRender(float settingsOffset)
 {
     initSettingsPage();
 
-    addHeader("Opponent Reach");
     defaultAddSettings("main");
     extraPadding();
 

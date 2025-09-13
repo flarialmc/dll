@@ -4,6 +4,7 @@
 #include <cmath>
 #include <utility>
 
+#include "Assets/Assets.hpp"
 #include "Events/Render/RenderEvent.hpp"
 
 class DirectionHUD : public Module {

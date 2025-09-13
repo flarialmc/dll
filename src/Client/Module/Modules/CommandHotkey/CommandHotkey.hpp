@@ -2,6 +2,9 @@
 
 #include "../Module.hpp"
 #include "../../../../SDK/Client/Network/Packet/CommandRequestPacket.hpp"
+#include "Assets/Assets.hpp"
+#include "../../../../Client/Events/Input/KeyEvent.hpp"
+#include "Events/Input/MouseEvent.hpp"
 
 class CommandHotkey : public Module {
 

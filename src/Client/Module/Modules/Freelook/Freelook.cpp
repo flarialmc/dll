@@ -1,6 +1,6 @@
 #include "Freelook.hpp"
 
-#include "Events/EventManager.hpp"
+
 
 void FreeLook::onSetup() {
     keybindActions.clear();
@@ -104,7 +104,6 @@ void FreeLook::settingsRender(float settingsOffset) {
 
     initSettingsPage();
 
-    addHeader("Freelook");
     addKeybind("Freelook Keybind", "Hold for 2 seconds!", "keybind", true);
     addToggle("Toggleable Mode", "Click to toggle or Hold to keep enabled", "toggle");
     addDropdown("Freelook View Mode", "",std::vector<std::string>{"1st Person", "3rd Person back", "3rd Person front"}, "mode", true);

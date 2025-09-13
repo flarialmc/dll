@@ -50,7 +50,6 @@ void Zoom::defaultConfig() {
 void Zoom::settingsRender(float settingsOffset) {
     initSettingsPage();
 
-    addHeader("Zoom");
     addKeybind("Keybind", "Hold for 2 seconds!", "keybind", true);
     addToggle("Use Scroll", "Allows to adjust zoom with scroll wheel.", "UseScroll");
     addToggle("Toggle Zoom", "No need to hold the keybind to zoom.", "toggleZoom");

@@ -1,6 +1,6 @@
 #include "FogColor.hpp"
 
-#include "Events/EventManager.hpp"
+
 
 void FogColor::onEnable() {
     Listen(this, FogColorEvent, &FogColor::onGetFogColor)

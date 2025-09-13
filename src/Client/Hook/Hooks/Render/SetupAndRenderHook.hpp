@@ -5,13 +5,13 @@
 #include "../../../../SDK/Client/Render/NineSliceData.hpp"
 #include "../../../../SDK/SDK.hpp"
 #include "../Hook.hpp"
-#include "../../../../SDK/Client/Render/ItemRenderer.hpp"
-#include "../Visual/getGammaHook.hpp"
-#include "../../../Module/Manager.hpp"
-#include "../../../../Utils/Render/DrawUtils.hpp"
+#include "../../../../SDK/Client/Render/Font.hpp"
+#include "../../../../SDK/Client/GUI/RectangleArea.hpp"
+#include "../../../../Utils/Utils.hpp"
 #include <format>
 
 #include "../../../../Utils/Render/MaterialUtils.hpp"
+#include "../../Hooks/Render/DirectX/DXGI/SwapchainHook.hpp"
 
 __int64 *oDrawImage = nullptr;
 __int64 *oDrawNineSlice = nullptr;

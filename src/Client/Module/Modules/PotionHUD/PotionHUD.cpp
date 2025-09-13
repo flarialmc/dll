@@ -1,6 +1,6 @@
 #include "PotionHUD.hpp"
 
-#include "Events/EventManager.hpp"
+
 #include "Modules/ClickGUI/ClickGUI.hpp"
 #include "Utils/Render/PositionUtils.hpp"
 
@@ -37,6 +37,8 @@ void PotionHUD::defaultConfig()
     setDef("showText", true);
     setDef("textLeft", false);
     setDef("bottomUp", false);
+    setDef("useRoman", true);
+    setDef("useRomanFull", true);
     
 }
 
@@ -44,11 +46,12 @@ void PotionHUD::settingsRender(float settingsOffset)
 {
     initSettingsPage();
 
-    addHeader("Potion HUD");
     addSlider("UI Scale", "", "uiscale", 3.f, 0.f, true);
     addToggle("Bottom Up Mode", "New effects appear ontop instead", "bottomUp");
     addSlider("Spacing", "", "spacing", 10.f, 0.0f, true);
     addToggle("Show Text", "", "showText");
+    addConditionalToggle(getOps<bool>("showText"), "Use roman numerals", "", "useRoman");
+    addConditionalToggle(getOps<bool>("showText") && getOps<bool>("useRoman"), "Use roman numerals after V", "Will convert the whole range of amplifiers to romans.", "useRomanFull");
     addConditionalSlider(getOps<bool>("showText"), "Text Size", "", "textSize", 0.25f, 0.0f, true);
     addConditionalSlider(getOps<bool>("showText"), "Text Offset X", "", "textOffsetX", 50.f, 0.0f, false);
     addConditionalToggle(getOps<bool>("showText"), "Text to the left", "", "textLeft");
@@ -78,96 +81,131 @@ void PotionHUD::renderText()
     const float uiscale = getOps<float>("uiscale");
     const float guiscale = SDK::clientInstance->getGuiData()->getGuiScale();
     const float textSize = getOps<float>("textSize") * 1080;
-    const float textWidth = Constraints::RelativeConstraint(getOps<float>("textSize"), "height", true);
-    const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
 
     if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
-        if (SDK::clientInstance->getLocalPlayer() != nullptr)
+        if (SDK::clientInstance->getLocalPlayer() != nullptr) {
             if (SDK::clientInstance->getLocalPlayer()->getSupplies() != nullptr) {
-                if (getOps<bool>("showText")) {
-                    auto scaledPos = PositionUtils::getCustomScreenScaledPos(Vec2<float>{16, 16}, uiscale);
-                    float spacing = scaledPos.y * ospacing;
+                auto scaledPos = PositionUtils::getCustomScreenScaledPos(Vec2<float>{16, 16}, uiscale);
+                float spacing = scaledPos.y * ospacing;
 
-                    float xmodifier = 0.0f;
-                    float ymodifier = 0.0f;
+                float ymodifier = 0.0f;
 
-                    float xoffset = 0.0f;
-                    float yoffset = 0.0f;
+                std::vector<UnifiedMobEffectData> effects = SDK::clientInstance->getLocalPlayer()->getMobEffects();
+                for (const auto& effect : effects) {
+                    if (!effect.isValid()) continue;
+                    float textX = currentPos.x + (toTheLeft ? 0 : (16 * uiscale * guiscale)) + (getOps<float>("textOffsetX") * guiscale * uiscale) * (toTheLeft ? -1 : 1);
+                    float textY = currentPos.y + ymodifier;
 
-                    std::vector<UnifiedMobEffectData> effects = SDK::clientInstance->getLocalPlayer()->getMobEffects();
-                    for (const auto& effect : effects) {
-                        if (!effect.isValid()) continue;
-                        float textX = currentPos.x + (toTheLeft ? 0 : (16 * uiscale * guiscale)) + (getOps<float>("textOffsetX") * guiscale * uiscale) * (toTheLeft ? -1 : 1);
-                        float textY = currentPos.y + ymodifier;
-
-                        std::string text = effect.getNameAndTime();
-                        std::stringstream ss(text);
-                        std::string effectName = effect.getName() + " " + MobEffect::amplifierToString(effect.getAmplifier()); // effect name
-                        std::string effectTImeLeft = effect.getTime(); // effect timeLeft
-
-                        std::wstring widestr1 = std::wstring(effectName.begin(), effectName.end());
-                        const wchar_t* widecstr1 = widestr1.c_str();
-
-                        std::wstring widestr2 = std::wstring(effectTImeLeft.begin(), effectTImeLeft.end());
-                        const wchar_t* widecstr2 = widestr2.c_str();
-
-                        if (getOps<bool>("textShadow")) {
-                            D2D_COLOR_F shadowCol = getColor("textShadow");
-
-                            FlarialGUI::FlarialTextWithFont(
-                                textX + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * uiscale,
-                                textY + (Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * uiscale) - FlarialGUI::getFlarialTextSize(widecstr1, 0,
-                                    16 * uiscale * guiscale, toTheLeft ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING,
-                                    textSize * guiscale * uiscale,
-                                    DWRITE_FONT_WEIGHT_BOLD, true).y / 4.f,
-                                widecstr1,
-                                0,
-                                16 * uiscale * guiscale,
-                                toTheLeft ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING,
-                                textSize * guiscale * uiscale, DWRITE_FONT_WEIGHT_BOLD,
-                                shadowCol,
-                                true
-                            );
-                            FlarialGUI::FlarialTextWithFont(
-                                textX + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * uiscale,
-                                textY + (Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * uiscale) + FlarialGUI::getFlarialTextSize(widecstr2, 0,
-                                    16 * uiscale * guiscale, toTheLeft ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING,
-                                    (textSize * guiscale * uiscale) * 0.8f,
-                                    DWRITE_FONT_WEIGHT_BOLD, true).y / 1.6f,
-                                widecstr2,
-                                0,
-                                16 * uiscale * guiscale,
-                                toTheLeft ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING,
-                                (textSize * guiscale * uiscale) * 0.8f, DWRITE_FONT_WEIGHT_NORMAL,
-                                shadowCol,
-                                true
-                            );
-                        }
-                        FlarialGUI::FlarialTextWithFont(
-                            textX,
-                            textY - FlarialGUI::getFlarialTextSize(widecstr1, 0,
-                                                                   16 * uiscale * guiscale, toTheLeft ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING,
-                                                                   textSize * guiscale * uiscale,
-                                                                   DWRITE_FONT_WEIGHT_BOLD, true).y / 4.f,
-                            widecstr1, 0,
-                            16 * uiscale * guiscale, toTheLeft ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING,
-                            textSize * guiscale * uiscale,
-                            DWRITE_FONT_WEIGHT_BOLD, effect.duration / 20 <= warning_seconds ? lowColor : mainColor, true);
-
-                        FlarialGUI::FlarialTextWithFont(
-                            textX,
-                            textY + FlarialGUI::getFlarialTextSize(widecstr2, 0,
-                                                                   16 * uiscale * guiscale, toTheLeft ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING,
-                                                                   (textSize * guiscale * uiscale) * 0.8f,
-                                                                   DWRITE_FONT_WEIGHT_BOLD, true).y / 1.6f,
-                            widecstr2, 0,
-                            16 * uiscale * guiscale, toTheLeft ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING,
-                            (textSize * guiscale * uiscale) * 0.8f,
-                            DWRITE_FONT_WEIGHT_NORMAL, effect.duration / 20 <= warning_seconds ? lowColor : mainColor, true);
-                        ymodifier += spacing * (getOps<bool>("bottomUp") ? -1 : 1);
+                    std::string text = effect.getNameAndTime();
+                    std::stringstream ss(text);
+                    std::string effectName = effect.getName() + " "; // effect name
+                    if (getOps<bool>("useRoman")) {
+                        if (getOps<bool>("useRomanFull")) effectName += Utils::intToRoman(effect.getAmplifier());
+                        else effectName += MobEffect::amplifierToString(effect.getAmplifier());
                     }
+                    else effectName += std::to_string(effect.getAmplifier());
+                    std::string effectTimeLeft = effect.getTime(); // effect timeLeft
+
+                    std::wstring widestr1 = std::wstring(effectName.begin(), effectName.end());
+                    const wchar_t* widecstr1 = widestr1.c_str();
+
+                    std::wstring widestr2 = std::wstring(effectTimeLeft.begin(), effectTimeLeft.end());
+                    const wchar_t* widecstr2 = widestr2.c_str();
+
+                    if (getOps<bool>("textShadow")) {
+                        D2D_COLOR_F shadowCol = getColor("textShadow");
+
+                        FlarialGUI::FlarialTextWithFont(
+                            textX + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * uiscale,
+                            textY + (Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * uiscale) - FlarialGUI::getFlarialTextSize(widecstr1, 0,
+                                16 * uiscale * guiscale, toTheLeft ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING,
+                                textSize * guiscale * uiscale,
+                                DWRITE_FONT_WEIGHT_BOLD, true).y / 4.f,
+                            widecstr1,
+                            0,
+                            16 * uiscale * guiscale,
+                            toTheLeft ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING,
+                            textSize * guiscale * uiscale, DWRITE_FONT_WEIGHT_BOLD,
+                            shadowCol,
+                            true
+                        );
+                        FlarialGUI::FlarialTextWithFont(
+                            textX + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * uiscale,
+                            textY + (Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * uiscale) + FlarialGUI::getFlarialTextSize(widecstr2, 0,
+                                16 * uiscale * guiscale, toTheLeft ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING,
+                                (textSize * guiscale * uiscale) * 0.8f,
+                                DWRITE_FONT_WEIGHT_BOLD, true).y / 1.6f,
+                            widecstr2,
+                            0,
+                            16 * uiscale * guiscale,
+                            toTheLeft ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING,
+                            (textSize * guiscale * uiscale) * 0.8f, DWRITE_FONT_WEIGHT_NORMAL,
+                            shadowCol,
+                            true
+                        );
+                    }
+                    FlarialGUI::FlarialTextWithFont(
+                        textX,
+                        textY - FlarialGUI::getFlarialTextSize(widecstr1, 0,
+                                                               16 * uiscale * guiscale, toTheLeft ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING,
+                                                               textSize * guiscale * uiscale,
+                                                               DWRITE_FONT_WEIGHT_BOLD, true).y / 4.f,
+                        widecstr1, 0,
+                        16 * uiscale * guiscale, toTheLeft ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING,
+                        textSize * guiscale * uiscale,
+                        DWRITE_FONT_WEIGHT_BOLD, effect.duration / 20 <= warning_seconds ? lowColor : mainColor, true);
+
+                    FlarialGUI::FlarialTextWithFont(
+                        textX,
+                        textY + FlarialGUI::getFlarialTextSize(widecstr2, 0,
+                                                               16 * uiscale * guiscale, toTheLeft ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING,
+                                                               (textSize * guiscale * uiscale) * 0.8f,
+                                                               DWRITE_FONT_WEIGHT_BOLD, true).y / 1.6f,
+                        widecstr2, 0,
+                        16 * uiscale * guiscale, toTheLeft ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING,
+                        (textSize * guiscale * uiscale) * 0.8f,
+                        DWRITE_FONT_WEIGHT_NORMAL, effect.duration / 20 <= warning_seconds ? lowColor : mainColor, true);
+                    ymodifier += spacing * (getOps<bool>("bottomUp") ? -1 : 1);
                 }
             }
+        }
+    }
+}
+
+void PotionHUD::renderMissingTextures()
+{
+    float ospacing = getOps<float>("spacing");
+
+    const float uiscale = getOps<float>("uiscale");
+    const float guiscale = SDK::clientInstance->getGuiData()->getGuiScale();
+
+    if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
+        if (SDK::clientInstance->getLocalPlayer() != nullptr) {
+            if (SDK::clientInstance->getLocalPlayer()->getSupplies() != nullptr) {
+                auto scaledPos = PositionUtils::getCustomScreenScaledPos(Vec2<float>{16, 16}, uiscale);
+                float spacing = scaledPos.y * ospacing;
+
+                float ymodifier = 0.0f;
+
+                std::vector<UnifiedMobEffectData> effects = SDK::clientInstance->getLocalPlayer()->getMobEffects();
+                for (const auto& effect : effects) {
+                    if (!effect.isValid()) continue;
+
+                    std::pair<bool, int> hasTexture = effect.hasTexture();
+                    if (!hasTexture.first) {
+                        FlarialGUI::image(
+                            hasTexture.second, D2D1_RECT_F(
+                                currentPos.x,
+                                currentPos.y + ymodifier,
+                                currentPos.x + 16.f * guiscale * uiscale,
+                                currentPos.y + ymodifier + 16.f * guiscale * uiscale
+                            )
+                        );
+                    }
+                    ymodifier += spacing * (getOps<bool>("bottomUp") ? -1 : 1);
+                }
+            }
+        }
     }
 }
 
@@ -176,7 +214,6 @@ void PotionHUD::onRender(RenderEvent& event)
     if (ClientInstance::getTopScreenName() == "hud_screen" && this->isEnabled()) {
         float guiscale = SDK::clientInstance->getGuiData()->getGuiScale();
         float uiscale = getOps<float>("uiscale");
-        float spacing = getOps<float>("spacing");
 
         Vec2<float> settingperc = Vec2<float>(getOps<float>("percentageX"), getOps<float>("percentageY"));
         float s = 16 * uiscale * guiscale;
@@ -208,7 +245,8 @@ void PotionHUD::onRender(RenderEvent& event)
 
         if (ClickGUI::editmenu) FlarialGUI::UnsetWindowRect();
 
-        renderText();
+        if (getOps<bool>("showText")) renderText();
+        renderMissingTextures();
     }
 
     if (SDK::getCurrentScreen() != "hud_screen") ClickGUI::editmenu = false;
@@ -227,7 +265,6 @@ void PotionHUD::onSetupAndRender(const SetupAndRenderEvent &event) {
             float uiscale = getOps<float>("uiscale");
 
             if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
-                auto ui_icon_scale = uiscale / 2.f;
                 float spacing = 16 * uiscale * getOps<float>("spacing");
 
                 float xmodifier = 0.0f;
@@ -237,16 +274,20 @@ void PotionHUD::onSetupAndRender(const SetupAndRenderEvent &event) {
                 auto effects = SDK::clientInstance->getLocalPlayer()->getMobEffects();
                 for (const auto& effect : effects) {
                     if (!effect.isValid()) continue;
-                    auto location = effect.getTextureLocation();
-                    auto texture = muirc->createTexture(location, false);
+
                     auto position = Vec2<float>(scaledPos.x + xmodifier, scaledPos.y + ymodifier);
                     auto size = Vec2<float>(16.0f * uiscale, 16.0f * uiscale);
-                    static auto uvPos = Vec2<float>(0.f, 0.f);
-                    static auto uvSize = Vec2<float>(1.0f, 1.0f);
-                    muirc->drawImage(texture, position, size, uvPos, uvSize);
-                    static auto color = mce::Color();
-                    static auto flushLayer = HashedString("ui_flush");
-                    muirc->flushImages(color, 1.0f, flushLayer);
+
+                    if (effect.hasTexture().first) {
+                        auto location = effect.getTextureLocation();
+                        auto texture = muirc->createTexture(location, false);
+                        static auto uvPos = Vec2<float>(0.f, 0.f);
+                        static auto uvSize = Vec2<float>(1.0f, 1.0f);
+                        muirc->drawImage(texture, position, size, uvPos, uvSize);
+                        static auto color = mce::Color();
+                        static auto flushLayer = HashedString("ui_flush");
+                        muirc->flushImages(color, 1.0f, flushLayer);
+                    }
                     ymodifier += spacing * (getOps<bool>("bottomUp") ? -1 : 1);
                 }
             }

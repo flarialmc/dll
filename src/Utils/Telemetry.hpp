@@ -2,7 +2,7 @@
 
 #include <string>
 #include <mutex>
-#include <json/json.hpp>
+#include <json/json_fwd.hpp>
 
 class Telemetry {
 public:

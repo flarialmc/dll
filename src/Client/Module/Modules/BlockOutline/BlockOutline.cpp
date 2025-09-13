@@ -1,6 +1,6 @@
 #include "BlockOutline.hpp"
 
-#include "Events/EventManager.hpp"
+
 #include "Events/Render/RenderOutlineSelectionEvent.hpp"
 
 void BlockOutline::onEnable() {

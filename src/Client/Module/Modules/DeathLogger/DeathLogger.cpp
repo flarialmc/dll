@@ -1,6 +1,6 @@
 #include "DeathLogger.hpp"
 
-#include "Events/EventManager.hpp"
+
 #include "Modules/Waypoints/Waypoints.hpp"
 
 void DeathLogger::onEnable() {
@@ -23,7 +23,6 @@ void DeathLogger::defaultConfig() {
 void DeathLogger::settingsRender(float settingsOffset) {
     initSettingsPage();
 
-    addHeader("Death Logger");
     addToggle("Death Waypoints", "waypoint settings are managed in the waypoints module.", "deathWaypoints");
 
     FlarialGUI::UnsetScrollView();

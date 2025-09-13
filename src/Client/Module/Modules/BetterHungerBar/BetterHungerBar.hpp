@@ -7,6 +7,7 @@
 #include "../../../../SDK/Client/Block/BlockLegacy.hpp"
 #include "../../../../SDK/Client/Block/BlockSource.hpp"
 #include "../../../../SDK/Client/Block/Block.hpp"
+#include "../../../../Assets/Assets.hpp"
 
 #include <string>
 

@@ -1,4 +1,4 @@
-﻿#include "Engine.hpp"
+#include "Engine.hpp"
 #include "../../Client.hpp"
 #include <utility>
 #include <winrt/base.h>
@@ -16,14 +16,11 @@
 #include "Elements/Control/TextBox/TextBoxStruct.hpp"
 #include "Elements/Control/ColorPicker/ColorPicker.hpp"
 #include "Elements/Control/Dropdown/DropdownStruct.hpp"
-#include "../../../Assets/Assets.hpp"
 #include <string>
 #include <windows.h>
 #include <unknwn.h>
 #include <dwrite.h>
 #include <wrl.h>
-#include <iostream>
-#include <string>
 #include <vector>
 #include <fstream>
 #include <algorithm>
@@ -31,6 +28,8 @@
 #include "../../Module/Modules/ClickGUI/ClickGUI.hpp"
 #include "imgui/imgui_freetype.h"
 //#include <misc/freetype/imgui_freetype.h>
+
+#include "../../Hook/Hooks/Render/DirectX/DXGI/SwapchainHook.hpp"
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 
@@ -47,6 +46,96 @@ IDWriteFactory* FlarialGUI::writeFactory;
 ID2D1ImageBrush* FlarialGUI::blurbrush;
 std::unordered_map<std::string, float> FlarialGUI::TextSizes;
 std::unordered_map<std::string, Vec2<float>> FlarialGUI::TextSizesXY;
+
+// Static variables moved from header for better compilation performance
+namespace FlarialGUI {
+    std::stack<Dimensions> dimensionStack;
+    std::vector<float> darkenAmounts(10000);
+    std::vector<float> glowAlphas(10000);
+    std::vector<float> opacityAmounts(100);
+    std::vector<float> toggleSpacings(100);
+    std::vector<float> rotationAngles(100, 0);
+    std::vector<D2D1_COLOR_F> toggleColors(100, D2D1::ColorF(D2D1::ColorF::White));
+    std::vector<D2D1_COLOR_F> buttonColors(100, D2D1::ColorF(D2D1::ColorF::Red));
+
+    D2D1_COLOR_F rgbColor;
+    float rgbHue = 0.0f;
+
+    float frameFactor = 1;
+    bool shouldAdditionalY = false;
+    int additionalIndex = 0;
+    int highestAddIndexes = 0;
+    int activeColorPickerWindows = 0;
+    int activeSliders = 0;
+
+    bool isInScrollView = false;
+    D2D1_RECT_F ScrollViewRect = D2D1::RectF();
+
+    float scrollpos = 0;
+    float scrollposmodifier = 0.f;
+    float barscrollpos = 0;
+    float barscrollposmodifier = 10.0f;
+
+    std::unordered_map<FontKey, ImFont*> FontMap = {};
+    std::unordered_map<FontKey, bool> FontsNotFound = {};
+
+    FontKey LoadFontLater;
+    bool DoLoadFontLater;
+    bool HasAFontLoaded = false;
+    std::vector<std::pair<std::vector<std::byte>, FontKey>> FontMemoryToLoad;
+
+    std::string currentKeybind;
+
+    std::vector<Notification> notifications;
+
+    bool isInWindowRect = false;
+    bool inMenu = false;
+    bool resizing = false;
+    bool needsBackBuffer = false;
+    bool hasLoadedAll = false;
+
+    ID2D1Effect* blur = nullptr;
+    ID2D1Effect* shadow_blur = nullptr;
+    ID2D1Bitmap* screen_bitmap_cache = nullptr;
+    ID2D1Image* blur_bitmap_cache = nullptr;
+
+    int maxRect = 0;
+}
+
+// Blur class static variables moved from header
+winrt::com_ptr<ID3D11PixelShader> Blur::pGaussianBlurHorizontalShader = nullptr;
+winrt::com_ptr<ID3D11PixelShader> Blur::pGaussianBlurVerticalShader = nullptr;
+winrt::com_ptr<ID3D11VertexShader> Blur::pVertexShader = nullptr;
+winrt::com_ptr<ID3D11InputLayout> Blur::pInputLayout = nullptr;
+
+winrt::com_ptr<ID3D11SamplerState> Blur::pSampler = nullptr;
+winrt::com_ptr<ID3D11Buffer> Blur::pVertexBuffer = nullptr;
+winrt::com_ptr<ID3D11Buffer> Blur::pConstantBuffer = nullptr;
+BlurInputBuffer Blur::constantBuffer;
+
+winrt::com_ptr<ID3D11Texture2D> Blur::pIntermediateTexture1 = nullptr;
+winrt::com_ptr<ID3D11Texture2D> Blur::pIntermediateTexture2 = nullptr;
+winrt::com_ptr<ID3D11RenderTargetView> Blur::pIntermediateRTV1 = nullptr;
+winrt::com_ptr<ID3D11RenderTargetView> Blur::pIntermediateRTV2 = nullptr;
+winrt::com_ptr<ID3D11ShaderResourceView> Blur::pIntermediateSRV1 = nullptr;
+winrt::com_ptr<ID3D11ShaderResourceView> Blur::pIntermediateSRV2 = nullptr;
+UINT Blur::currentTextureWidth = 0;
+UINT Blur::currentTextureHeight = 0;
+
+winrt::com_ptr<ID3D11DepthStencilState> Blur::pDepthStencilState = nullptr;
+winrt::com_ptr<ID3D11BlendState> Blur::pBlendState = nullptr;
+winrt::com_ptr<ID3D11RasterizerState> Blur::pRasterizerState = nullptr;
+
+// BlurDX12 class static variables moved from header
+winrt::com_ptr<ID3D11PixelShader> BlurDX12::pUpsampleShader = nullptr;
+winrt::com_ptr<ID3D11PixelShader> BlurDX12::pDownsampleShader = nullptr;
+winrt::com_ptr<ID3D11VertexShader> BlurDX12::pVertexShader = nullptr;
+winrt::com_ptr<ID3D11InputLayout> BlurDX12::pInputLayout = nullptr;
+
+winrt::com_ptr<ID3D11SamplerState> BlurDX12::pSampler = nullptr;
+winrt::com_ptr<ID3D11Buffer> BlurDX12::pVertexBuffer = nullptr;
+winrt::com_ptr<ID3D11Buffer> BlurDX12::pConstantBuffer = nullptr;
+BlurInputBuffer BlurDX12::constantBuffer;
 
 // todo: all use cache
 std::unordered_map<std::string, ToolTipStruct> FlarialGUI::tooltips;

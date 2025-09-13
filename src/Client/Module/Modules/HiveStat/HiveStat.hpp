@@ -3,6 +3,7 @@
 #include "../Module.hpp"
 #include "../Misc/HiveModeCatcher/HiveModeCatcherListener.hpp"
 #include "../../../../Utils/Hive.hpp"
+#include "Assets/Assets.hpp"
 #include "Events/Render/RenderEvent.hpp"
 
 

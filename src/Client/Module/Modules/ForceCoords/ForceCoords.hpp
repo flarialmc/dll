@@ -3,6 +3,9 @@
 #include "../Module.hpp"
 #include "../../../Client.hpp"
 
+
+#include "Assets/Assets.hpp"
+
 class ForceCoords : public Module {
 private:
 	// 1.20.12 - static inline uintptr_t option = Memory::findSig("80 78 ? ? 74 ? b0 ? 48 8b 5c 24 ? 48 83 c4 ? 5f c3 32 c0"); // cmp byte ptr [rax+04],00

@@ -3,6 +3,7 @@
 #include "../Module.hpp"
 #include "Events/Render/RenderEvent.hpp"
 #include "Events/Render/SetupAndRenderEvent.hpp"
+#include "../../../../Assets/Assets.hpp"
 
 class EntityCounter : public Module {
 private:

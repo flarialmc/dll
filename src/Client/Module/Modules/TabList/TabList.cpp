@@ -12,6 +12,7 @@
 #include <winrt/base.h>
 
 #include "Command/Commands/SkinStealCommand.hpp"
+#include "Hook/Hooks/Render/DirectX/DXGI/SwapchainHook.hpp"
 #include "Modules/ClickGUI/ClickGUI.hpp"
 #include "Modules/Nick/NickModule.hpp"
 
@@ -579,7 +580,6 @@ void TabList::onSetup() {
 void TabList::settingsRender(float settingsOffset) {
     initSettingsPage();
 
-    addHeader("Tab List");
     defaultAddSettings("main");
     extraPadding();
 

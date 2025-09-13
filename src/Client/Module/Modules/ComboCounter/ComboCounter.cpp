@@ -1,6 +1,6 @@
 #include "ComboCounter.hpp"
 
-#include "Events/EventManager.hpp"
+
 #include "Events/Game/TickEvent.hpp"
 #include "Events/Render/RenderEvent.hpp"
 
@@ -30,7 +30,6 @@ void ComboCounter::settingsRender(float settingsOffset) {
 
     initSettingsPage();
 
-    addHeader("Combo Counter");
     defaultAddSettings("main");
     extraPadding();
 

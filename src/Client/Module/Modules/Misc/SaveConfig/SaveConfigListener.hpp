@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Client/Client.hpp>
+#include <Client/Events/Input/KeyEvent.hpp>
 
 class SaveConfigListener : public Listener {
 public:

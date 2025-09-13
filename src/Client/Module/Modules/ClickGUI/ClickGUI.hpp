@@ -8,6 +8,9 @@
 #include "Utils/WinrtUtils.hpp"
 #include <chrono>
 #include <Modules/Misc/Input/GUIMouseListener.hpp>
+#include "../../../GUI/Engine/Constraints.hpp"
+#include "../../../GUI/D2D.hpp"
+#include "../../../../Assets/Assets.hpp"
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 
@@ -68,21 +71,11 @@ public:
             {"Regular", "§4"}
         });
 
-    static inline D2D_COLOR_F getColor(const std::string& text) {
-        D2D_COLOR_F col = clickgui->settings.getSettingByName<bool>(text + "RGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>(text + "Col")->value);
-        col.a = clickgui->settings.getSettingByName<float>(text + "Opacity")->value;
-        return col;
-    }
+    static inline D2D_COLOR_F getColor(const std::string& text);
 
 private:
-    static std::optional<std::pair<std::string_view /*first word match*/, size_t /*text index*/>> findFirstOf(std::string_view text, auto&& words) {
-        for (auto&& w : words) {
-            if (const auto pos = text.find(w); pos != std::string::npos) {
-                return std::pair{ std::string_view{ text.data() + pos, w.length() }, pos };
-            }
-        }
-        return {};
-    }
+    template<typename WordContainer>
+    static std::optional<std::pair<std::string_view /*first word match*/, size_t /*text index*/>> findFirstOf(std::string_view text, WordContainer&& words);
 
     static size_t sanitizedToRawIndex(std::string_view raw, size_t sanIdx);
     // static std::string& getMutableTextForWatermark(TextPacket& pkt);
@@ -90,22 +83,7 @@ private:
 public:
     void onPacketReceive(PacketEvent& event);
 
-    ClickGUI() : Module("ClickGUI", "What do you think it is?",
-        IDR_CLICKGUI_PNG, "K", false, {"theme", "key", "promotions", "watermark", "logo", "spam"}
-    ) {
-        this->ghostMainModule = new Module("main", "troll", IDR_COMBO_PNG, "");
-        scrollInfo["modules"] = {0, 0};
-        scrollInfo["scripting"] = {0, 0};
-        scrollInfo["settings"] = {0, 0};
-
-        Listen(this, MouseEvent, &ClickGUI::onMouse)
-        //Listen(this, FOVEvent, &ClickGUI::fov)
-        Listen(this, KeyEvent, &ClickGUI::onKey)
-        ListenOrdered(this, PacketEvent, &ClickGUI::onPacketReceive, EventOrder::IMMEDIATE)
-        ListenOrdered(this, RenderEvent, &ClickGUI::onRender, EventOrder::IMMEDIATE)
-        Listen(this, SetupAndRenderEvent, &ClickGUI::onSetupAndRender)
-        //Module::onEnable();
-    };
+    ClickGUI();
 
     void onSetup() override {
     }
@@ -117,10 +95,10 @@ public:
     }
 
     void terminate() override {
-        Deafen(this, MouseEvent, &ClickGUI::onMouse)
-        Deafen(this, KeyEvent, &ClickGUI::onKey)
-        Deafen(this, RenderEvent, &ClickGUI::onRender)
-        Deafen(this, PacketEvent, &ClickGUI::onPacketReceive)
+        Deafen(this, MouseEvent, &ClickGUI::onMouse);
+        Deafen(this, KeyEvent, &ClickGUI::onKey);
+        Deafen(this, RenderEvent, &ClickGUI::onRender);
+        Deafen(this, PacketEvent, &ClickGUI::onPacketReceive);
         Module::terminate();
         //
     }
@@ -294,9 +272,13 @@ public:
 #endif
             if (!editmenu) {
                 if (!Client::settings.getSettingByName<bool>("nochaticon")->value)
-                    Listen(this, PacketEvent, &ClickGUI::onPacketReceive)
+                {
+                    Listen(this, PacketEvent, &ClickGUI::onPacketReceive);
+                }
                 else
+                {
                     Deafen(this, PacketEvent, &ClickGUI::onPacketReceive);
+                }
                 ModuleManager::cguiRefresh = true;
                 keybindActions[0]({});
             }

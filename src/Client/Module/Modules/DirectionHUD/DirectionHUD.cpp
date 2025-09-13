@@ -62,7 +62,6 @@ void DirectionHUD::defaultConfig() {
 void DirectionHUD::settingsRender(float settingsOffset) {
     initSettingsPage();
 
-    addHeader("Direction HUD");
     defaultAddSettings("main");
     addToggle("Hide on TabList enable", "", "hideWhenTabList");
     addSlider("Pixels Per Degree", "", "pixelsPerDegree", 20.f, 0.001f);

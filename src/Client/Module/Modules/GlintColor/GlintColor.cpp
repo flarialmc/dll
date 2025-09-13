@@ -4,7 +4,7 @@
 #include "Events/Render/ActorShaderParamsEvent.hpp"
 #include "GlintColor.hpp"
 
-#include "Events/EventManager.hpp"
+
 
 void GlintColor::onEnable(){
 	Listen(this, ActorShaderParamsEvent, &GlintColor::patchCol)

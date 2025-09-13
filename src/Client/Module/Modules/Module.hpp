@@ -1,21 +1,20 @@
 #pragma once
 
-#include "../../../Utils/Utils.hpp"
 #include <string>
-#include "../../../Config/Settings.hpp"
-#include <fstream>
-#include <iostream>
-#include <windows.h>
-#include <unknwn.h>
-#include <filesystem>
-#include <sstream>
-#include <utility>
 #include <vector>
-#include "../../GUI/Engine/Engine.hpp"
-#include "../../GUI/Engine/Constraints.hpp"
-#include "../../../SDK/SDK.hpp"
-#include "../../../Assets/Assets.hpp"
-#include "../../Events/Input/KeyEvent.hpp"
+#include <unordered_map>
+#include <functional>
+#include <any>
+#include <filesystem>
+#include <map>
+#include <array>
+#include "../../../Config/Settings.hpp"
+
+// Minimal include for D2D types
+#include <d2d1.h>
+
+// Forward declare Windows types to avoid windows.h
+enum DWRITE_TEXT_ALIGNMENT : int;
 
 class Module {
 
@@ -23,6 +22,7 @@ public:
 	virtual ~Module() = default;
 
 	std::string name;
+	std::string tooltip;
 	std::string description;
 	int icon;
 	bool isScriptingModule;
@@ -36,27 +36,13 @@ public:
 	int totalmaps = 0;
 	std::filesystem::path legacySettingsPath;
 
-	std::map<std::string, DWRITE_TEXT_ALIGNMENT> alignments = {
-		{"Left", DWRITE_TEXT_ALIGNMENT_LEADING},
-		{"Center", DWRITE_TEXT_ALIGNMENT_CENTER},
-		{"Right", DWRITE_TEXT_ALIGNMENT_TRAILING}
-	};
+	std::map<std::string, DWRITE_TEXT_ALIGNMENT> alignments;
 
-	Module(const std::string& ename, const std::string& edescription, int eicon, const std::string& ekey, bool isScripting = false, const std::vector<std::string>& ealiases = {}) {
-		name = ename;
-		description = edescription;
-		icon = eicon;
-		defaultKeybind = ekey;
-		isScriptingModule = isScripting;
-		aliases = ealiases;
-		settings = Settings();
+	// Constructor declaration only
+	Module(const std::string& ename, const std::string& edescription, int eicon, const std::string& ekey, bool isScripting = false, const std::vector<std::string>& ealiases = {});
+	Module(const std::string& ename, const std::string& etooltip, const std::string& edescription, int eicon, const std::string& ekey, bool isScripting = false, const std::vector<std::string>& ealiases = {});
 
-		settingspath = isScripting ? Utils::getClientPath() + "\\Scripts\\Configs\\" + name + ".json" : "this is unused for non scripting modules";
-	}
-
-	void postConstructInitialize() {
-		this->loadSettings();
-	}
+	void postConstructInitialize();
 
 	bool active = false;
 	bool enabledState = false;
@@ -68,13 +54,13 @@ public:
 	int toggleIndex = 0;
 
 	int sliderIndex = 0;
-	std::vector<float> conditionalSliderAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
-	std::vector<float> conditionalToggleAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
-	std::vector<float> conditionalDropdownAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
-	std::vector<float> conditionalTextBoxAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
-	std::vector<float> conditionalColorPickerAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
+	std::vector<float> conditionalSliderAnims;
+	std::vector<float> conditionalToggleAnims;
+	std::vector<float> conditionalDropdownAnims;
+	std::vector<float> conditionalTextBoxAnims;
+	std::vector<float> conditionalColorPickerAnims;
 
-	std::vector<DWRITE_TEXT_ALIGNMENT> prevAlignments = std::vector<DWRITE_TEXT_ALIGNMENT>(100, DWRITE_TEXT_ALIGNMENT_JUSTIFIED);
+	std::vector<DWRITE_TEXT_ALIGNMENT> prevAlignments;
 
 	int dropdownIndex = 0;
 	int textboxIndex = 300;
@@ -96,74 +82,62 @@ public:
 		this->settings.getOrAddSettingByName<T>(setting, value);
 	}
 
-	void setDef(std::string setting, std::string col, float opac, bool rgb) {
-		this->settings.getOrAddSettingByName<std::string>(setting + "Col", col);
-		this->settings.getOrAddSettingByName<float>(setting + "Opacity", opac);
-		this->settings.getOrAddSettingByName<bool>(setting + "RGB", rgb);
-	}
-
-	void forceDef(std::string setting, std::string col, float opac, bool rgb) {
-		if (this->settings.getSettingByName<std::string>(setting + "Col") != nullptr) this->settings.getSettingByName<std::string>(setting + "Col")->value = col;
-		else this->settings.addSetting(setting + "Col", col);
-		if (this->settings.getSettingByName<float>(setting + "Opacity") != nullptr)this->settings.getSettingByName<float>(setting + "Opacity")->value = opac;
-		else this->settings.addSetting(setting + "Opacity", opac);
-		if (this->settings.getSettingByName<bool>(setting + "RGB") != nullptr)this->settings.getSettingByName<bool>(setting + "RGB")->value = rgb;
-		else this->settings.addSetting(setting + "RGB", rgb);
-	}
+	void setDef(const std::string &setting, const std::string &col, float opac, bool rgb);
+	void forceDef(const std::string& setting, const std::string& col, float opac, bool rgb);
 
 	template <typename T>
 	T& getOps(std::string setting) {
 		return this->settings.getSettingByName<T>(setting)->value;
 	}
 
-	D2D_COLOR_F getColor(std::string text);
-	D2D_COLOR_F getColor(std::string text, std::string mod);
+	D2D_COLOR_F getColor(const std::string &text);
 
-	static void initSettingsPage();
+	static D2D_COLOR_F getColor(const std::string& text, const std::string& mod);
+
+	void initSettingsPage();
 
 	void resetPadding();
-	void extraPadding();
-	void addElementText(std::string text, std::string subtext = "");
-	void addHeader(std::string text);
+	void extraPadding(float percent = 0.04f);
+	void addElementText(const std::string& text, const std::string& subtext = "");
+	void addHeader(const std::string& text);
 
 	void addButton(const std::string& text, const std::string& subtext, const std::string& buttonText,
 		std::function<void()> action);
 
-	void addConditionalTextBox(bool condition, std::string text, std::string subtext, std::string& value, int limit = 16);
+	void addConditionalTextBox(bool condition, const std::string& text, const std::string& subtext, std::string& value, int limit = 16);
 
-	void addConditionalColorPicker(bool condition, std::string text, std::string subtext, std::string& value, float& opacity, bool& rgb);
-	void addConditionalColorPicker(bool condition, std::string text, std::string subtext, std::string settingName);
+	void addConditionalColorPicker(bool condition, const std::string& text, const std::string& subtext, std::string& value, float& opacity, bool& rgb);
+	void addConditionalColorPicker(bool condition, const std::string& text, const std::string& subtext, const std::string& settingName);
 
+	void addConditionalDropdown(bool condition, const std::string& text, const std::string& subtext, const std::vector<std::string>& options, const std::string& settingName, bool resettable);
 
-	void addConditionalDropdown(bool condition, std::string text, std::string subtext, const std::vector<std::string>& options, std::string settingName, bool resettable);
+	void addConditionalToggle(bool condition, const std::string& text, const std::string& subtext, bool& value);
+	void addConditionalToggle(bool condition, const std::string& text, const std::string& subtext, const std::string& settingName);
 
-	void addConditionalToggle(bool condition, std::string text, std::string subtext, bool& value);
-	void addConditionalToggle(bool condition, std::string text, std::string subtext, std::string settingName);
+	void addConditionalSlider(bool condition, const std::string& text, const std::string& subtext, const std::string& settingName, float maxVal = 100.f, float minVal = 0.f, bool zerosafe = true);
+	void addConditionalSlider(bool condition, const std::string& text, const std::string& subtext, float& value, float maxVal = 100.0f, float minVal = 0.f, bool zerosafe = true);
 
-	void addConditionalSlider(bool condition, std::string text, std::string subtext, std::string settingName, float maxVal = 100.f, float minVal = 0.f, bool zerosafe = true);
-	void addConditionalSlider(bool condition, std::string text, std::string subtext, float& value, float maxVal = 100.0f, float minVal = 0.f, bool zerosafe = true);
+	void addConditionalSliderInt(bool condition, const std::string& text, const std::string& subtext, const std::string& settingName, int maxVal = 100, int minVal = 0);
 
-	void addConditionalSliderInt(bool condition, std::string text, std::string subtext, std::string settingName, int maxVal = 100, int minVal = 0);
+	void addSlider(const std::string& text, const std::string& subtext, float& value, float maxVal = 100.0f, float minVal = 0.f, bool zerosafe = true);
+	void addSlider(const std::string& text, const std::string& subtext, const std::string& settingName, float maxVal = 100.0f, float minVal = 0.f, bool zerosafe = true);
 
-	void addSlider(std::string text, std::string subtext, float& value, float maxVal = 100.0f, float minVal = 0.f, bool zerosafe = true);
-	void addSlider(std::string text, std::string subtext, std::string settingName, float maxVal = 100.0f, float minVal = 0.f, bool zerosafe = true);
+	void addSliderInt(const std::string& text, const std::string& subtext, const std::string& settingName, int maxVal = 100, int minVal = 0);
 
-	void addSliderInt(std::string text, std::string subtext, std::string settingName, int maxVal = 100, int minVal = 0);
+	void addToggle(const std::string& text, const std::string& subtext, bool& value);
+	void addToggle(const std::string& text, const std::string& subtext, const std::string& settingName);
 
-	void addToggle(std::string text, std::string subtext, bool& value);
-	void addToggle(std::string text, std::string subtext, std::string settingName);
+	void addKeybind(const std::string& text, const std::string& subtext, std::string& keybind);
+	void addKeybind(const std::string& text, const std::string& subtext, const std::string& settingName, bool resettable);
 
-	void addKeybind(std::string text, std::string subtext, std::string& keybind);
-	void addKeybind(std::string text, std::string subtext, std::string settingName, bool resettable);
+	void addTextBox(const std::string& text, const std::string& subtext, std::string& value, int limit = 16);
+	void addTextBox(const std::string& text, const std::string& subtext, int limit, const std::string& settingName);
 
-	void addTextBox(std::string text, std::string subtext, std::string& value, int limit = 16);
-	void addTextBox(std::string text, std::string subtext, int limit, std::string settingName);
+	void addDropdown(const std::string& text, const std::string& subtext, const std::vector<std::string>& options, std::string& value);
+	void addDropdown(const std::string& text, const std::string& subtext, const std::vector<std::string>& options, const std::string& settingName, bool resettable);
 
-	void addDropdown(std::string text, std::string subtext, const std::vector<std::string>& options, std::string& value);
-	void addDropdown(std::string text, std::string subtext, const std::vector<std::string>& options, std::string settingName, bool resettable);
-
-	void addColorPicker(std::string text, std::string subtext, std::string& value, float& opacity, bool& rgb);
-	void addColorPicker(std::string text, std::string subtext, std::string settingName);
+	void addColorPicker(const std::string& text, const std::string& subtext, std::string& value, float& opacity, bool& rgb);
+	void addColorPicker(const std::string& text, const std::string& subtext, const std::string& settingName);
 
 	virtual void postLoad(bool softLoad = false);
 
@@ -179,15 +153,15 @@ public:
 	bool isEnabled();
 	void setEnabled(bool enabled);
 	void setKeybind(const std::string& newKeybind);
-	std::string& getKeybind(const int keybindCount, bool whoCaresIfItsZeroOrNotTf);
-	std::string& getKeybind(const int keybindCount = 0);
+	std::string& getKeybind(int keybindCount, bool whoCaresIfItsZeroOrNotTf);
+	std::string& getKeybind(int keybindCount = 0);
 	virtual void defaultConfig(std::string type);
 	virtual void defaultConfig();
 	virtual void defaultAddSettings(std::string type);
 	virtual void settingsRender(float settingsOffset) {}
-	bool isKeybind(const std::array<bool, 256>& keys, const int keybindCount = 0);
+	bool isKeybind(const std::array<bool, 256>& keys, int keybindCount = 0);
 	[[nodiscard]] bool isAdditionalKeybind(const std::array<bool, 256>& keys, const std::string& bind) const;
-	bool isKeyPartOfKeybind(int keyCode, const int keybindCount = 0);
+	bool isKeyPartOfKeybind(int keyCode, int keybindCount = 0);
 	static bool isKeyPartOfAdditionalKeybind(int keyCode, const std::string& bind);
 	virtual void normalRenderCore(int index, std::string& text);
 	virtual void normalRender(int index, std::string& value);

@@ -22,7 +22,6 @@ void MessageLogger::defaultConfig() {
 void MessageLogger::settingsRender(float settingsOffset) {
     initSettingsPage();
 
-    addHeader("Message Logger");
     addToggle("Prepend Timestamp", "[timestamp] {msg} format", "prependTimestamp");
     addToggle("Save Clean Version", "Removes color codes from texts", "saveCleanVersion");
 

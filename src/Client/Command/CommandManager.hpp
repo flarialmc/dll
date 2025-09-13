@@ -2,7 +2,7 @@
 
 #include "Command.hpp"
 
-#include "../../Client/Events/EventManager.hpp"
+#include "Events/Network/PacketSendEvent.hpp"
 
 class CommandManager {
 public:

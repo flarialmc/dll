@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "Events/Events.hpp"
+#include "../../../../Assets/Assets.hpp"
 
 class SkinStealer : public Module {
 private:

@@ -2,7 +2,7 @@
 
 #include "../Module.hpp"
 #include "../../Utils/WinrtUtils.hpp"
-#include "Events/EventManager.hpp"
+
 
 class MovableChat : public Module {
 public:

@@ -19,6 +19,8 @@ build/
 .vs/
 .vscode/
 .idea/
+cmake-build-debug-ninja/
+cmake-build-release-ninja/
 cmake-build-debug-visual-studio/
 cmake-build-release-visual-studio/
 cmake-build-minsizerel-visual-studio/

@@ -1,4 +1,6 @@
-﻿#include "APIUtils.hpp"
+#include "APIUtils.hpp"
+
+#include <json/json.hpp>
 
 #include <wininet.h>
 #include <Utils/Utils.hpp>

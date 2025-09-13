@@ -24,7 +24,6 @@ void MEM::settingsRender(float settingsOffset)
 {
     initSettingsPage();
 
-    addHeader("Memory");
     defaultAddSettings("main");
     extraPadding();
 
