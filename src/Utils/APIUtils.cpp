@@ -1,4 +1,6 @@
-﻿#include "APIUtils.hpp"
+#include "APIUtils.hpp"
+
+#include <json/json.hpp>
 
 #include <wininet.h>
 #include <Utils/Utils.hpp>
@@ -9,10 +11,6 @@
 #include <curl/curl/easy.h>
 
 #include "SDK/SDK.hpp"
-
-std::vector<std::string> APIUtils::onlineUsers;
-std::map<std::string, std::string> APIUtils::onlineVips;
-
 
 size_t WriteCallback(void* contents, size_t size, size_t nmemb, std::string* output) {
     size_t totalSize = size * nmemb;
@@ -32,7 +30,7 @@ std::pair<long, std::string> APIUtils::Request(
     static bool curlInitialized = false;
     if (!curlInitialized) {
         if (curl_global_init(CURL_GLOBAL_DEFAULT) != CURLE_OK) {
-            std::cerr << "[❌] curl_global_init failed!\n";
+            LOG_ERROR("failed curl_global_init");
             return { 0, "" };
         }
         curlInitialized = true;
@@ -40,7 +38,7 @@ std::pair<long, std::string> APIUtils::Request(
 
     CURL* curl = curl_easy_init();
     if (!curl) {
-        std::cout << "[❌] curl_easy_init failed!\n";
+        LOG_ERROR("failed curl_easy_init");
         return { 0, "" };
     }
 
@@ -72,14 +70,14 @@ std::pair<long, std::string> APIUtils::Request(
         curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "DELETE");
     }
     else {
-        std::cout << "[❌] Invalid HTTP method: " << method << "\n";
+        LOG_ERROR("invalid http method: {}", method);
         curl_easy_cleanup(curl);
         return { 0, "" };
     }
 
     CURLcode res = curl_easy_perform(curl);
     if (res != CURLE_OK) {
-        std::cout << "[❌] cURL request failed: " << curl_easy_strerror(res) << "\n";
+        LOG_ERROR("failed curl request: {}", curl_easy_strerror(res));
         responseBody = "[ERROR] cURL failed";
     }
     else {
@@ -100,13 +98,13 @@ std::pair<long, std::string> APIUtils::POST_Simple(const std::string& url, const
     std::string responseBody;
 
     if (curl_global_init(CURL_GLOBAL_DEFAULT) != CURLE_OK) {
-        std::cerr << "curl_global_init failed in POST_Simple" << std::endl;
+        LOG_ERROR("curl_global_init failed in POST_SIMPLE");
         return {0, ""};
     }
 
     CURL* curl = curl_easy_init();
     if (!curl) {
-        std::cerr << "curl_easy_init failed in POST_Simple" << std::endl;
+        LOG_ERROR("curl_easy_init failed in POST_SIMPLE");
         curl_global_cleanup();
         return {0, ""};
     }
@@ -127,7 +125,7 @@ std::pair<long, std::string> APIUtils::POST_Simple(const std::string& url, const
 
     CURLcode res = curl_easy_perform(curl);
     if (res != CURLE_OK) {
-        std::cerr << "curl_easy_perform() failed in POST_Simple: " << curl_easy_strerror(res) << std::endl;
+        LOG_ERROR("curl_easy_perform failed in POST_SIMPLE: {}", curl_easy_strerror(res));
     } else {
         curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &responseCode);
     }
@@ -160,7 +158,7 @@ std::string APIUtils::legacyGet(const std::string &URL) {
         InternetCloseHandle(interwebs);
         return String::replaceAll(rtn, "|n", "\r\n");
     } catch (const std::exception &e) {
-        Logger::error(e.what());
+        LOG_ERROR(e.what());
     }
     return "";
 }
@@ -175,7 +173,7 @@ std::string APIUtils::legacyGet(const std::string &URL) {
             DWORD http_decoding = TRUE;
             if (InternetSetOption(interwebs, INTERNET_OPTION_HTTP_DECODING, &http_decoding, sizeof(http_decoding)) == FALSE) {
                 InternetCloseHandle(interwebs);
-                Logger::error("InternetSetOption(INTERNET_OPTION_HTTP_DECODING) failed");
+                LOG_ERROR("InternetSetOption(INTERNET_OPTION_HTTP_DECODING) failed");
                 return "";
             }
 
@@ -204,7 +202,7 @@ std::string APIUtils::legacyGet(const std::string &URL) {
                 } else {
                     // hi
                     DWORD lastError = GetLastError();
-                    //Logger::error("HttpQueryInfoA(HTTP_QUERY_CONTENT_ENCODING) failed, assuming no gzip or plain text. LastError: " + FlarialGUI::cached_to_string(lastError));
+                    //LOG_ERROR("HttpQueryInfoA(HTTP_QUERY_CONTENT_ENCODING) failed, assuming no gzip or plain text. LastError: " + FlarialGUI::cached_to_string(lastError));
                 }
 
 
@@ -225,7 +223,7 @@ std::string APIUtils::legacyGet(const std::string &URL) {
                         rtn = std::string(reinterpret_cast<const char*>(uncompressedBuffer.data()), finalUncompressedSize);
                     } else {
                         InternetCloseHandle(interwebs);
-                        Logger::error("mz_uncompress failed with status: " + FlarialGUI::cached_to_string(status));
+                        LOG_ERROR("mz_uncompress failed with status: " + FlarialGUI::cached_to_string(status));
                         return ""; // Decompression failed
                     }
                 } else {
@@ -241,7 +239,7 @@ std::string APIUtils::legacyGet(const std::string &URL) {
             InternetCloseHandle(interwebs);
             return String::replaceAll(rtn, "|n", "\r\n");
         } catch (const std::exception &e) {
-            Logger::error(e.what());
+            LOG_ERROR(e.what());
         }
         return "";
     }
@@ -263,11 +261,11 @@ nlohmann::json APIUtils::getVips() {
         return nlohmann::json::object();
     }
     catch (const nlohmann::json::parse_error& e) {
-        Logger::error("An error occurred while parsing vip users: {}", e.what());
+        LOG_ERROR("An error occurred while parsing vip users: {}", e.what());
         return nlohmann::json::object();
     }
     catch (const std::exception& e) {
-        Logger::error("An unexpected error occurred: {}", e.what());
+        LOG_ERROR("An unexpected error occurred: {}", e.what());
         return nlohmann::json::object();
     }
 }
@@ -289,25 +287,25 @@ nlohmann::json APIUtils::getUsers() {
         return nlohmann::json::object();
     }
     catch (const nlohmann::json::parse_error& e) {
-        Logger::error("An error occurred while parsing online users: {}", e.what());
+        LOG_ERROR("An error occurred while parsing online users: {}", e.what());
         return nlohmann::json::object();
     }
     catch (const std::exception& e) {
-        Logger::error("An unexpected error occurred: {}", e.what());
+        LOG_ERROR("An unexpected error occurred: {}", e.what());
         return nlohmann::json::object();
     }
 }
 
-bool APIUtils::hasRole(const std::string& role, const std::string& name) {
-    try {
-        auto it = onlineVips.find(name);
-        bool onlineVip = it != onlineVips.end() && it->second == role;
-        bool online = std::find(onlineUsers.begin(), onlineUsers.end(), name) != onlineUsers.end();
-        return onlineVip || (!onlineVip && online && role == "Regular");
-    } catch (const std::exception& e) {
-        Logger::error("An error occurred while checking roles: {}", e.what());
-        return false;
+bool APIUtils::hasRole(std::string_view role, std::string_view name) {
+    const auto vipIt = vipUserToRole.find(name);
+    const auto isVip = (vipIt != vipUserToRole.cend()) && (vipIt->second == role);
+
+    if (isVip) {
+        return true;
     }
+
+    const auto isOnline = onlineUsersSet.contains(name);
+    return isOnline && (role == "Regular");
 }
 
 std::vector<std::string> APIUtils::ListToVector(const std::string& commandListStr) {
@@ -410,7 +408,7 @@ std::vector<std::string> APIUtils::UpdateVector(
                 result.push_back(clearedName);
             }
         } catch (const std::exception& e) {
-            Logger::error("Error processing local player name: {}", e.what());
+            LOG_ERROR("Error processing local player name: {}", e.what());
         }
     }
 

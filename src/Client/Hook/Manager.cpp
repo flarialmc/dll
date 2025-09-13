@@ -1,7 +1,12 @@
-﻿#pragma once
+#pragma once
 
-#include "Hooks/Render/ResizeHook.hpp"
-#include "Hooks/Render/CommandListHook.hpp"
+#include "Manager.hpp"
+#include "Hooks/Input/KeyHook.hpp"
+#include "Hooks/Input/MouseHook.hpp"
+#include "Hooks/Render/DirectX/DXGI/SwapchainHook.hpp"
+
+#include "Hooks/Render/DirectX/DXGI/ResizeHook.hpp"
+#include "Hooks/Render/DirectX/DXGI/CommandListHook.hpp"
 #include "Hooks/Render/SetupAndRenderHook.hpp"
 #include "Hooks/Game/ActorBaseTick.hpp"
 #include "Hooks/Visual/getGammaHook.hpp"
@@ -34,6 +39,16 @@
 #include "Hooks/Game/ItemInHandRendererRenderItem.hpp"
 #include "Hooks/Visual/RenderOutlineSelectionHook.hpp"
 #include "Hooks/Game/displayClientMessage.hpp"
+#include "Hooks/Game/getTimeOfDayHook.hpp"
+#include "Hooks/game/ReadFileHook.hpp"
+#include "Hooks/Game/ApplyTurnDeltaHook.hpp"
+#include "Hooks/Game/ChatScreenControllerHook.hpp"
+#include "Hooks/Game/HudScreenControllerHook.hpp"
+
+#include "Hooks/Render/BobHurt.hpp"
+#include "Hooks/Render/RenderLevelHook.hpp"
+#include "Hooks/Visual/ActorShaderParams.hpp"
+#include "Hooks/Visual/TintColorHook.hpp"
 
 std::vector<std::shared_ptr<Hook>> HookManager::hooks;
 
@@ -51,9 +66,6 @@ void HookManager::initialize() {
         kiero::init(kiero::RenderType::D3D10);
         Logger::debug("[Kiero] Trying d3d10");
     }
-
-    Logger::debug("Renderer: {}", dxVersion[kiero::getRenderType()]);
-
 
     addHook<KeyHook>();
     addHook<MouseHook>();
@@ -83,7 +95,8 @@ void HookManager::initialize() {
     addHook<OverworldFogColorHook>();
     addHook<TimeChangerHook>();
     addHook<SendPacketHook>();
-    addHook<getSensHook>();
+    addHook<ApplyTurnDeltaHook>();
+    //addHook<getSensHook>();
     addHook<HudMobEffectsRendererHook>();
     if(VersionUtils::checkAboveOrEqual(20, 60)) { // due to texture group offset
         addHook<HudCursorRendererHook>();
@@ -98,22 +111,38 @@ void HookManager::initialize() {
         addHook<ContainerScreenControllerHook>();
     }
 
-    addHook<isPreGameHook>();
     addHook<_composeFullStackHook>();
-
-    addHook<RenderOrderExecuteHook>();
-    addHook<RenderChunkCoordinatorHandleVisibilityUpdatesHook>();
-
     addHook<SettingsScreenOnExitHook>();
+
+    // likely packchanger hooks, im not sure!
+    if(!VersionUtils::checkAboveOrEqual(21, 60))
+    {
+        addHook<isPreGameHook>();
+
+        addHook<RenderOrderExecuteHook>();
+        addHook<RenderChunkCoordinatorHandleVisibilityUpdatesHook>();
+//
+    }
 
     addHook<ItemInHandRendererRenderItem>();
 
     addHook<RenderOutlineSelectionHook>();
+    addHook<getTimeOfDayHook>();
+
+    addHook<BobHurtHook>();
+    addHook<RenderLevelHook>();
+    addHook<TintColorHook>();
+    addHook<ActorShaderParamsHook>();
+    addHook<ChatScreenControllerHook>();
+    addHook<HudScreenControllerHook>();
 
     if(VersionUtils::checkAboveOrEqual(21, 40)) {
         addHook<UpdatePlayerHook>();
     }
 
+    if(VersionUtils::checkAboveOrEqual(21, 50)) {
+        addHook<ReadFileHook>();
+    }
     for (const auto& hook: hooks) {
         hook->enableHook();
     }

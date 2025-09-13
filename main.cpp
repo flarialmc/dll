@@ -2,8 +2,9 @@
 #include <Windows.h>
 
 #include "src/Client/Client.hpp"
+#include "src/Client/Hook/Manager.hpp"
 #include "src/Client/Events/EventManager.hpp"
-#include "src/Client/Hook/Hooks/Render/ResizeHook.hpp"
+#include "src/Client/Hook/Hooks/Render/DirectX/DXGI/ResizeHook.hpp"
 #include "src/Client/Module/Modules/ClickGUI/ClickGUI.hpp"
 // #include "src/Client/Module/Modules/Nick/NickListener.hpp"
 #include <kiero/kiero.h>
@@ -31,7 +32,7 @@ void SavePlayerCache() {
 
     // Check if string size is greater than 15 KB (15,360 bytes)
     if (playersListString.size() > 15360) {
-        playersListString = "[]";
+        playersListString = "{\"players\":[]}";
     }
 
     std::string filePath = Utils::getRoamingPath() + "/Flarial/playerscache.txt";
@@ -41,10 +42,10 @@ void SavePlayerCache() {
         cacheFile.close();
         Logger::success("Cached player list.");
     } else {
-        Logger::error("Could not open file for writing: " + filePath);
+        LOG_ERROR("Could not open file for writing: " + filePath);
     }
 }
-
+// hi
 float Client::elapsed;
 uint64_t Client::start;
 
@@ -105,17 +106,18 @@ DWORD WINAPI init() {
                 std::string data = APIUtils::VectorToList(APIUtils::onlineUsers);
                 std::pair<long, std::string> post = APIUtils::POST_Simple("https://api.flarial.xyz/allOnlineUsers", data);
                 APIUtils::onlineUsers = APIUtils::UpdateVector(APIUtils::onlineUsers, post.second);
+                APIUtils::onlineUsersSet = APIUtils::onlineUsers | std::ranges::to<decltype(APIUtils::onlineUsersSet)>();
                 SavePlayerCache();
                 lastOnlineUsersFetchTime = now;
             } catch (const std::exception &ex) {
-                Logger::error("An error occurred while parsing online users: {}", ex.what());
+                LOG_ERROR("An error occurred while parsing online users: {}", ex.what());
             }
         }
 
         if (vipFetchElapsed >= std::chrono::minutes(3) && Client::settings.getSettingByName<bool>("apiusage")->value) {
             try {
                 auto vipsJson = APIUtils::getVips();
-                std::map<std::string, std::string> updatedVips;
+                decltype(APIUtils::vipUserToRole) updatedVips;
 
                 for (const auto& [role, users] : vipsJson.items()) {
                     if (users.is_array()) {
@@ -128,11 +130,11 @@ DWORD WINAPI init() {
                 }
 
                 if (!updatedVips.empty()) {
-                    APIUtils::onlineVips = std::move(updatedVips);
+                    APIUtils::vipUserToRole = std::move(updatedVips);
                 }
                 lastVipFetchTime = now;
             } catch (const std::exception& e) {
-                Logger::error("An error occurred while parsing VIP users: {}", e.what());
+                LOG_ERROR("An error occurred while parsing VIP users: {}", e.what());
             }
         }
 
@@ -153,14 +155,17 @@ DWORD WINAPI init() {
     while (!Client::disable) {
         ModuleManager::syncState();
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
     }
 
-    Client::SaveSettings();
-
-    Client::UnregisterActivationHandler();
-    ScriptManager::shutdown();
     ModuleManager::terminate();
     Logger::custom(fmt::fg(fmt::color::pink), "ModuleManager", "Shut down");
+
+    Client::UnregisterActivationHandler();
+    Logger::custom(fmt::fg(fmt::color::pink), "UnregisterActivationHandler", "Shut down");
+    ScriptManager::shutdown();
+    Logger::custom(fmt::fg(fmt::color::pink), "ScriptManager", "Shut down");
+
     HookManager::terminate();
     Logger::custom(fmt::fg(fmt::color::pink), "HookManager", "Shut down");
     CommandManager::terminate();
@@ -188,7 +193,6 @@ DWORD WINAPI init() {
     WinrtUtils::setWindowTitle("");
 
     Logger::shutdown();
-
     CloseHandle(mutex);
     FreeLibraryAndExitThread(Client::currentModule, 0);
 }

@@ -4,6 +4,49 @@
 #include <Utils/Logger/Logger.hpp>
 #include <Utils/Memory/Game/SignatureAndOffsetManager.hpp>
 
+void OffsetInit::init21100() {
+    Logger::custom(fg(fmt::color::golden_rod), "Offsets", "Loading offsets for 1.21.10X");
+
+    ADD_OFFSET("Level::hitResult", 0x1E8);
+    ADD_OFFSET("Level::getPlayerMap", 0x4E8);
+
+    ADD_OFFSET("NetworkSystem::remoteConnectorComposite", 0xF0);
+    ADD_OFFSET("MinecraftGame::textureGroup", 0x758);
+
+    ADD_OFFSET("Level::worldFolderName", 0x258);
+}
+
+
+void OffsetInit::init2190() {
+    Logger::custom(fg(fmt::color::golden_rod), "Offsets", "Loading offsets for 1.21.9X");
+
+    ADD_OFFSET("Actor::baseTickVft", 25);
+
+    ADD_OFFSET("Level::hitResult", 0x1E0);
+    ADD_OFFSET("Level::getPlayerMap", 0x4E0);
+
+    ADD_OFFSET("LevelRender::getLevelRendererPlayer", 0x3F0);
+    ADD_OFFSET("LevelRendererPlayer::cameraPos", 0x664);
+
+    ADD_OFFSET("MinecraftGame::textureGroup", 0x6D8);
+
+    ADD_OFFSET("RaknetConnector::JoinedIp", 0x3E0);
+    ADD_OFFSET("RaknetConnector::RawIp", 0x3C0);
+    ADD_OFFSET("RaknetConnector::port", 0x424);
+
+    ADD_OFFSET("Attribute::Health", 7);
+    ADD_OFFSET("ClientInstance::getBlockSource", 30);
+    ADD_OFFSET("Level::worldFolderName", 0x250);
+    ADD_OFFSET("Level::LevelData", 0x90);
+    ADD_OFFSET("LevelData::worldName", 0x298);
+
+    ADD_OFFSET("Biome::temperature", 0x08);
+    ADD_OFFSET("Biome::name", 0x198);
+
+    ADD_OFFSET("MinecraftGame::mouseGrabbed", 0x1B8);
+
+}
+
 void OffsetInit::init2180() {
     Logger::custom(fg(fmt::color::golden_rod), "Offsets", "Loading offsets for 1.21.8X");
     ADD_OFFSET("ClientInstance::getBlockSource", 31);
@@ -11,10 +54,13 @@ void OffsetInit::init2180() {
     ADD_OFFSET("ClientInstance::guiData", 0x5B8);
     ADD_OFFSET("ClientInstance::getFovX", 0x740);
     ADD_OFFSET("ClientInstance::getFovY", 0x754);
+
     ADD_OFFSET("RaknetConnector::getPeer", 0x48);
     ADD_OFFSET("RaknetConnector::JoinedIp", 0x3E8);
+    ADD_OFFSET("RaknetConnector::RawIp", 0x3C8);
+    ADD_OFFSET("RaknetConnector::port", 0x42C);
 
-    ADD_OFFSET("MinecraftGame::textureGroup", 0x6C8);
+    ADD_OFFSET("MinecraftGame::textureGroup", 0x6C8); // sig in 1.21.90: 49 8B 87 ? ? ? ? 48 85 C0 74 ? F0 FF 40 ? 4D 8B 87, string around: "world_loading_progress_screen"
 
     ADD_OFFSET("Player::gamemode", 0xA88);
     ADD_OFFSET("Player::playerName", 0xC08);
@@ -25,6 +71,8 @@ void OffsetInit::init2180() {
     ADD_OFFSET("Level::hitResult", 0x250);
     ADD_OFFSET("Level::getPlayerMap", 0x960);
     ADD_OFFSET("Level::worldFolderName", 0x2C0);
+
+    ADD_OFFSET("ChatScreenController::refreshChatMessages", 0xC80);
 }
 
 void OffsetInit::init2170() {
@@ -48,6 +96,13 @@ void OffsetInit::init2170() {
     ADD_OFFSET("Level::getPlayerMap", 0xB98);
 
     ADD_OFFSET("LevelRendererPlayer::cameraPos", 0x65C);
+
+    ADD_OFFSET("Level::LevelData", 0x100);
+    ADD_OFFSET("LevelData::worldName", 0x298);
+
+    ADD_OFFSET("MinecraftGame::mouseGrabbed", 0x1B0);
+
+    ADD_OFFSET("GuiData::GuiMessages", 0x150);
 }
 
 void OffsetInit::init2160() {
@@ -75,6 +130,11 @@ void OffsetInit::init2160() {
     ADD_OFFSET("MinecraftGame::textureGroup", 0x6B8);
 
     ADD_OFFSET("AttributeInstance::Value", 0x7C);
+
+    ADD_OFFSET("Level::LevelData", 0x110);
+    ADD_OFFSET("LevelData::worldName", 0x298);
+
+    ADD_OFFSET("Dimension::weather", 0x1C8);
 }
 
 void OffsetInit::init2150() {
@@ -106,6 +166,10 @@ void OffsetInit::init2150() {
 
     ADD_OFFSET("MinecraftGame::textureGroup", 0x760);
     ADD_OFFSET("Attribute::Health", 1);
+
+    ADD_OFFSET("Dimension::weather", 0x1D0);
+    ADD_OFFSET("Weather::rainLevel", 0x38);
+    ADD_OFFSET("Weather::lightningLevel", 0x40);
 }
 
 void OffsetInit::init2140() {
@@ -132,7 +196,7 @@ void OffsetInit::init2140() {
     ADD_OFFSET("RaknetConnector::getPeer", 0x2A0);
     ADD_OFFSET("RaknetConnector::JoinedIp", 0x398);
     ADD_OFFSET("RaknetConnector::port", 0x3B8);
-
+    ADD_OFFSET("RaknetConnector::rawIp", 0x378);
 
     ADD_OFFSET("LevelRender::getLevelRendererPlayer", 0x318);
     ADD_OFFSET("LevelRendererPlayer::cameraPos", 0x620);
@@ -142,6 +206,11 @@ void OffsetInit::init2140() {
     ADD_OFFSET("RemoteConnectorComposite::rakNetConnector", 0x70);
 
     ADD_OFFSET("ScreenContext::tessellator", 0xC8);
+
+    ADD_OFFSET("Level::LevelData", 0x110);
+    ADD_OFFSET("LevelData::worldName", 0x390);
+
+    ADD_OFFSET("Biome::name", 0x10);
 }
 
 void OffsetInit::init2130() {
@@ -227,7 +296,7 @@ void OffsetInit::init2100() {
     ADD_OFFSET("Player::playerName", 0x1D30);
     ADD_OFFSET("Player::gamemode", 0xEC8);
 
-    ADD_OFFSET("Weather::lightingLevel", 0x48);
+    ADD_OFFSET("Weather::lightningLevel", 0x48);
 
     ADD_OFFSET("Level::hitResult", 0xB38);
     ADD_OFFSET("Level::getPlayerMap", 0x1BC8); // getRuntimeActorList offset + B8 || Level::getPlayerList
@@ -249,7 +318,7 @@ void OffsetInit::init2080() {
     ADD_OFFSET("Player::playerName", 0x1D18);
     ADD_OFFSET("Player::gamemode", 0xEB0);
 
-    ADD_OFFSET("Biome::temparature", 0x38);
+    ADD_OFFSET("Biome::temperature", 0x38);
 
     ADD_OFFSET("Weather::rainLevel", 0x3C);
 
@@ -332,7 +401,7 @@ void OffsetInit::init2050() {
 
     ADD_OFFSET("ItemStack::count", 0x22);
 
-    ADD_OFFSET("Weather::lightingLevel", 0x44);
+    ADD_OFFSET("Weather::lightningLevel", 0x44);
     ADD_OFFSET("Weather::rainLevel", 0x38);
 
     ADD_OFFSET("NetworkSystem::remoteConnectorComposite", 0x80);
@@ -361,7 +430,7 @@ void OffsetInit::init2040() {
     ADD_OFFSET("MinecraftGame::mouseGrabbed", 0x190);
     ADD_OFFSET("MinecraftGame::textureGroup", 0x818);
 
-    ADD_OFFSET("Weather::lightingLevel",  0x48);
+    ADD_OFFSET("Weather::lightningLevel",  0x48);
     ADD_OFFSET("Weather::rainLevel", 0x3C);
 
     ADD_OFFSET("Level::hitResult", 0xA68);
@@ -443,12 +512,12 @@ void OffsetInit::init2030() {
     ADD_OFFSET("ItemStack::tag", 0x10);
     ADD_OFFSET("ItemStack::count", 0x20);
 
-    ADD_OFFSET("Biome::temparature", 0x40);
+    ADD_OFFSET("Biome::temperature", 0x40);
 
     ADD_OFFSET("Dimension::name", 0x20);
     ADD_OFFSET("Dimension::weather", 0x1A8);
 
-    ADD_OFFSET("Weather::lightingLevel", 0x44);
+    ADD_OFFSET("Weather::lightningLevel", 0x44);
     ADD_OFFSET("Weather::rainLevel", 0x38);
 
     ADD_OFFSET("LevelRender::getLevelRendererPlayer", 0x308);

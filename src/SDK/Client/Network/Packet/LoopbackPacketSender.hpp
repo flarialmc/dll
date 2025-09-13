@@ -21,5 +21,6 @@ public:
 
 class RemoteConnectorComposite {
 public:
+
     BUILD_ACCESS(this, class RaknetConnector*, rakNetConnector, GET_OFFSET("RemoteConnectorComposite::rakNetConnector"));
 };

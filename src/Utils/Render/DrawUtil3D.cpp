@@ -32,6 +32,28 @@ void MCDrawUtil3D::drawLine(Vec3<float> const& p1, Vec3<float> const& p2, D2D_CO
     if (immediate) flush();
 }
 
+void MCDrawUtil3D::drawLineList(Vec3<float> const& p1, Vec3<float> const& p2, D2D_COLOR_F const& color, bool immediate) {
+	auto scn = screenContext;
+	auto tess = scn->getTessellator();
+	*scn->getColorHolder() = {1.f,1.f,1.f,1.f};
+	tess->begin(mce::PrimitiveMode::LineList, 1);
+	tess->color(color.r, color.g, color.b, color.a);
+	auto origin = levelRenderer->getOrigin();
+	Vec3<float> a = p1;
+	Vec3<float> b = p2;
+
+	a.x -= origin.x;
+	a.y -= origin.y;
+	a.z -= origin.z;
+
+	b.x -= origin.x;
+	b.y -= origin.y;
+	b.z -= origin.z;
+	tess->vertex(a.x, a.y, a.z);
+	tess->vertex(b.x, b.y, b.z);
+	if (immediate) flush();
+}
+
 void MCDrawUtil3D::drawQuad(Vec3<float> a, Vec3<float> b, Vec3<float> c, Vec3<float> d, D2D_COLOR_F const& color) {
 	auto scn = screenContext;
 	auto tess = scn->getTessellator();
@@ -126,6 +148,45 @@ void MCDrawUtil3D::drawBox(AABB const& bb, D2D_COLOR_F const& color) {
 
 	drawQuad(Vec3<float>(bb.lower.x, bb.upper.y, bb.lower.z), Vec3<float>(bb.upper.x, bb.upper.y, bb.lower.z),
 		Vec3<float>(bb.upper.x, bb.upper.y, bb.upper.z), Vec3<float>(bb.lower.x, bb.upper.y, bb.upper.z), color);
+}
+
+void MCDrawUtil3D::TexturedQuad(Vec3<float> a, Vec3<float> b, Vec3<float> c, Vec3<float> d, BedrockTextureData& tex)
+{
+	auto scn = screenContext;
+
+	auto tess = scn->getTessellator();
+	*scn->getColorHolder() = { 1.f, 1.f, 1.f, 1.f };
+	tess->begin(mce::PrimitiveMode::QuadList, 4); // linestrip
+	auto origin = levelRenderer->getOrigin();
+
+	a.x -= origin.x;
+	a.y -= origin.y;
+	a.z -= origin.z;
+
+	b.x -= origin.x;
+	b.y -= origin.y;
+	b.z -= origin.z;
+
+	c.x -= origin.x;
+	c.y -= origin.y;
+	c.z -= origin.z;
+
+	d.x -= origin.x;
+	d.y -= origin.y;
+	d.z -= origin.z;
+
+	tess->vertexUV(a.x, a.y, a.z, 0.0f, 0.0f);
+	tess->vertexUV(b.x, b.y, b.z, 1.0f, 0.0f);
+	tess->vertexUV(c.x, c.y, c.z, 1.0f, 1.0f);
+	tess->vertexUV(d.x, d.y, d.z, 0.0f, 1.0f);
+
+	// render other side
+	tess->vertexUV(d.x, d.y, d.z, 0.0f, 0.0f);
+	tess->vertexUV(c.x, c.y, c.z, 1.0f, 0.0f);
+	tess->vertexUV(b.x, b.y, b.z, 1.0f, 1.0f);
+	tess->vertexUV(a.x, a.y, a.z, 0.0f, 1.0f);
+
+	MeshHelpers::renderMeshImmediately2(screenContext, screenContext->getTessellator(), material, tex);
 }
 
 void MCDrawUtil3D::flush() {

@@ -1,87 +1,35 @@
 #pragma once
 
 #include "../Module.hpp"
+#include "Events/Game/AttackEvent.hpp"
+#include "Events/Game/TickEvent.hpp"
+#include "Events/Render/RenderEvent.hpp"
 
 class ReachCounter : public Module {
+
 private:
+
 	float Reach = 0.0f;
 	std::chrono::time_point<std::chrono::high_resolution_clock> last_hit;
+
 public:
-	ReachCounter() : Module("Reach Counter", "Displays your last hit range in blocks.", IDR_REACH_PNG,
-		"") {
-		Module::setup();
-	};
 
-	void onEnable() override {
-		Listen(this, AttackEvent, &ReachCounter::onAttack)
-			Listen(this, TickEvent, &ReachCounter::onTick)
-			Listen(this, RenderEvent, &ReachCounter::onRender)
-			Module::onEnable();
-	}
-
-	void onDisable() override {
-
-
-		Module::onDisable();
+	ReachCounter(): Module("Reach Counter", "Displays your last hit range in blocks.",
+		IDR_REACH_PNG, "") {
 
 	}
 
-	void defaultConfig() override {
-		Module::defaultConfig();
-		if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"Reach: {value}");
-		if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.70f);
-	}
+	void onEnable() override;
 
-	void settingsRender(float settingsOffset) override {
-		float x = Constraints::PercentageConstraint(0.019, "left");
-		float y = Constraints::PercentageConstraint(0.10, "top");
+	void onDisable() override;
 
-		const float scrollviewWidth = Constraints::RelativeConstraint(0.5, "height", true);
+	void defaultConfig() override;
 
-		FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
-		FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
-			Constraints::RelativeConstraint(1.0, "width"),
-			Constraints::RelativeConstraint(0.88f, "height"));
+	void settingsRender(float settingsOffset) override;
 
-		this->addHeader("Main");
-		this->defaultAddSettings("main");
-		this->extraPadding();
+	void onAttack(AttackEvent& event);
 
-		this->addHeader("Text");
-		this->defaultAddSettings("text");
-		this->extraPadding();
+	void onTick(TickEvent& event);
 
-		this->addHeader("Colors");
-		this->defaultAddSettings("colors");
-		this->extraPadding();
-
-		this->addHeader("Misc");
-		this->defaultAddSettings("misc");
-
-		FlarialGUI::UnsetScrollView();
-		this->resetPadding();
-	}
-
-	void onAttack(AttackEvent& event) {
-		Reach = event.getActor()->getLevel()->getHitResult().distance();
-		last_hit = std::chrono::high_resolution_clock::now();
-	}
-
-	void onTick(TickEvent& event) {
-		std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - last_hit;
-		if (duration.count() >= 15) Reach = 0.0f;
-
-	}
-
-	void onRender(RenderEvent& event) {
-		if (this->isEnabled()) {
-
-			std::ostringstream oss;
-			oss << std::fixed << std::setprecision(2) << Reach;
-			std::string reachString = oss.str();
-
-			this->normalRender(9, reachString);
-
-		}
-	}
+	void onRender(RenderEvent& event);
 };

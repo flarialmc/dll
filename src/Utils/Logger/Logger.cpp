@@ -31,7 +31,7 @@ namespace Logger {
 
         glaiel::crashlogs::set_crashlog_folder(Utils::getLogsPath());
         glaiel::crashlogs::begin_monitoring();
-
+        
         if (std::filesystem::exists(path)) {
             std::ofstream ofs(path, std::ofstream::out | std::ofstream::trunc);
             ofs.close();

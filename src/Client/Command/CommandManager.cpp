@@ -11,7 +11,11 @@
 #include "Commands/TestCommand.hpp"
 #include "Commands/SkinStealCommand.hpp"
 #include "Commands/SpotifyCommand/SpotifyCommand.hpp"
+#include "Commands/WikiCommand.hpp"
+#include "Commands/FixFontCommand.hpp"
 #include "Commands/IRCChat.hpp"
+#include "../Client.hpp"
+#include "Events/Network/PacketSendEvent.hpp"
 
 std::vector<std::shared_ptr<Command>> CommandManager::Commands = std::vector<std::shared_ptr<Command>>();
 CommandManager CommandManager::instance;
@@ -19,9 +23,7 @@ CommandManager CommandManager::instance;
 void CommandManager::initialize() {
 #if defined(__DEBUG__)
     Commands.push_back(std::make_unique<TestCommand>());
-    Commands.push_back(std::make_unique<BindCommand>());
 #endif
-
     Commands.push_back(std::make_unique<HelpCommand>());
     Commands.push_back(std::make_unique<PrefixCommand>());
     Commands.push_back(std::make_unique<LuaCommand>());
@@ -30,6 +32,9 @@ void CommandManager::initialize() {
     Commands.push_back(std::make_unique<SkinStealCommand>());
     Commands.push_back(std::make_unique<ConfigCommand>());
     Commands.push_back(std::make_unique<SpotifyCommand>());
+    Commands.push_back(std::make_unique<BindCommand>());
+    Commands.push_back(std::make_unique<WikiCommand>());
+    Commands.push_back(std::make_unique<FixFontCommand>());
     //Commands.push_back(std::make_unique<IRCChat>());
 Listen(&CommandManager::instance, PacketSendEvent, &CommandManager::onPacket);
 }
@@ -39,7 +44,7 @@ void CommandManager::onPacket(PacketSendEvent &event) {
     if (id != MinecraftPacketIds::Text) return;
 
     auto pkt = reinterpret_cast<TextPacket*>(event.getPacket());
-    if (!pkt || pkt->message.empty() || pkt->message[0] != Command::prefix[0]) return;
+    if (!pkt || pkt->message.empty() || pkt->message[0] != Client::settings.getSettingByName<std::string>("dotcmdprefix")->value[0]) return;
 
     event.setCancelled(true);
 
@@ -63,7 +68,7 @@ void CommandManager::onPacket(PacketSendEvent &event) {
     });
 
     if (it == Commands.end()) {
-        SDK::clientInstance->getGuiData()->displayClientMessage("§cInvalid command. Use §b.help §cto see all available commands.");
+        SDK::clientInstance->getGuiData()->displayClientMessage("§cInvalid command. Use §b" + Client::settings.getSettingByName<std::string>("dotcmdprefix")->value + "help §cto see all available commands.");
         return;
     }
 

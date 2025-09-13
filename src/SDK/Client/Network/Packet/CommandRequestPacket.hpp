@@ -4,6 +4,8 @@
 #include "Packet.hpp"
 #include <string>
 
+#include "SDK/Client/Util/mce.hpp"
+
 enum class CommandOriginType : int8_t {
     Player = 0x0,
     CommandBlock = 0x1,
