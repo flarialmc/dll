@@ -124,7 +124,7 @@ void Module::initSettingsPage() {
 
     this->addHeader(this->name);
 //#if 0
-    this->addElementTextWithBackground(this->description, " ");
+    this->addElementTextWithBackground(this->description, "");
     this->extraPadding();
 //#endif
 }
@@ -429,7 +429,7 @@ void Module::addElementText(const std::string& text, const std::string& subtext)
             FlarialGUI::FlarialTextWithFont(x, subtextY, FlarialGUI::to_wide(t).c_str(), 200, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize2, DWRITE_FONT_WEIGHT_MEDIUM, subtextCol, false);
         }
 
-        padding += Constraints::RelativeConstraint(0.018f, "height", true) * (lines.size() - 1);
+        padding += Constraints::RelativeConstraint(0.018f, "height", true) * (lines.size() - 1.f);
     }
 }
 
@@ -458,39 +458,45 @@ void Module::addElementTextWithBackground(const std::string& text, const std::st
         subtextCol.a = ClickGUI::settingsOpacity;
     }
 
-
-
     //FlarialGUI::RoundedRect(x - Constraints::RelativeConstraint(0.005f, "width"), y - Constraints::RelativeConstraint(0.005f, "height"), clickgui->getColor("secondary6"), FlarialGUI::TextSizes[text] + Constraints::RelativeConstraint(0.01f, "width"), Constraints::RelativeConstraint(0.025f, "height", true), 3.0f, 3.0f);
 
-    float textWidth = FlarialGUI::getFlarialTextSize(FlarialGUI::to_wide(text).c_str(), 1000000, fontSize, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize, DWRITE_FONT_WEIGHT_MEDIUM, false).x;
+    float textWidth = FlarialGUI::getFlarialTextSize(FlarialGUI::to_wide(text).c_str(), 1000000, fontSize, DWRITE_TEXT_ALIGNMENT_CENTER, fontSize, DWRITE_FONT_WEIGHT_MEDIUM, false).x;
     float textHeight = fontSize;
 
     D2D1_COLOR_F bgCol = clickgui->getColor("secondary1");
+
+    std::vector<std::string> lines;
+    std::stringstream ss(text);
+    std::string line;
+
+    while (std::getline(ss, line, '\n')) lines.push_back(line);
 
     FlarialGUI::RoundedRect(
         x,
         y - Constraints::RelativeConstraint(0.03f, "height"),
         bgCol,
         textWidth * 1.01f + Constraints::RelativeConstraint(0.001f, "width"),
-        textHeight * 0.25f,
+        textHeight * (0.23f + (lines.size() - 1.f) * 0.15f),
         3.0f, 3.0f
     );
 
-    FlarialGUI::FlarialTextWithFont(x * 1.015f, y, FlarialGUI::to_wide(text).c_str(), 200, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize, DWRITE_FONT_WEIGHT_MEDIUM, textCol, false);
+    padding += textHeight * (lines.size() - 1.f) * 0.15f;
+
+    FlarialGUI::FlarialTextWithFont(x * 1.015f, y + textHeight * 0.08f * (lines.size() - 1.f), FlarialGUI::to_wide(text).c_str(), 200, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize, DWRITE_FONT_WEIGHT_MEDIUM, textCol, false);
 
     if (!subtext.empty()) {
-        std::vector<std::string> lines;
+        std::vector<std::string> subtextLines;
         std::stringstream ss(subtext);
-        std::string line;
+        std::string subtextLine;
 
-        while (std::getline(ss, line, '\n')) lines.push_back(line);
+        while (std::getline(ss, subtextLine, '\n')) subtextLines.push_back(subtextLine);
 
-        for (std::string t: lines) {
+        for (std::string t: subtextLines) {
             subtextY += Constraints::RelativeConstraint(0.017f, "height", true);
             FlarialGUI::FlarialTextWithFont(x, subtextY, FlarialGUI::to_wide(t).c_str(), 200, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize2, DWRITE_FONT_WEIGHT_MEDIUM, subtextCol, false);
         }
 
-        padding += Constraints::RelativeConstraint(0.018f, "height", true) * (lines.size() - 1);
+        padding += Constraints::RelativeConstraint(0.018f, "height", true) * (subtextLines.size() - 1.f);
     }
 }
 
