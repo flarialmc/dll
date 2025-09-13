@@ -123,10 +123,10 @@ void Module::initSettingsPage() {
 
 
     this->addHeader(this->name);
-#if 0
-    this->addElementText(this->description, " ");
+//#if 0
+    this->addElementTextWithBackground(this->description, " ");
     this->extraPadding();
-#endif
+//#endif
 }
 
 void Module::normalRenderCore(int index, std::string &text) {
@@ -416,6 +416,67 @@ void Module::addElementText(const std::string& text, const std::string& subtext)
     }
 
     FlarialGUI::FlarialTextWithFont(x, y, FlarialGUI::to_wide(text).c_str(), 200, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize, DWRITE_FONT_WEIGHT_MEDIUM, textCol, false);
+
+    if (!subtext.empty()) {
+        std::vector<std::string> lines;
+        std::stringstream ss(subtext);
+        std::string line;
+
+        while (std::getline(ss, line, '\n')) lines.push_back(line);
+
+        for (std::string t: lines) {
+            subtextY += Constraints::RelativeConstraint(0.017f, "height", true);
+            FlarialGUI::FlarialTextWithFont(x, subtextY, FlarialGUI::to_wide(t).c_str(), 200, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize2, DWRITE_FONT_WEIGHT_MEDIUM, subtextCol, false);
+        }
+
+        padding += Constraints::RelativeConstraint(0.018f, "height", true) * (lines.size() - 1);
+    }
+}
+
+void Module::addElementTextWithBackground(const std::string& text, const std::string& subtext) {
+    float x = Constraints::PercentageConstraint(0.019, "left");
+    float y = Constraints::PercentageConstraint(0.10, "top") + padding;
+
+    float subtextY;
+    float fontSize = Constraints::RelativeConstraint(0.140f, "height", true);
+    float fontSize2 = Constraints::RelativeConstraint(0.12f, "height", true);
+
+    if (!subtext.empty()) {
+        y -= Constraints::RelativeConstraint(0.009f, "height", true);
+        subtextY = y;
+    } else {
+        y += Constraints::RelativeConstraint(0.0015f, "height", true);
+    }
+
+    D2D1_COLOR_F textCol = clickgui->getColor("settingsText", "ClickGUI");
+    D2D1_COLOR_F subtextCol = clickgui->getColor("settingsSubtext", "ClickGUI");
+    textCol.a *= clickgui->getOps<float>("_overrideAlphaValues_");
+    subtextCol.a *= clickgui->getOps<float>("_overrideAlphaValues_");
+
+    if (ClickGUI::settingsOpacity != 1) {
+        textCol.a = ClickGUI::settingsOpacity;
+        subtextCol.a = ClickGUI::settingsOpacity;
+    }
+
+
+
+    //FlarialGUI::RoundedRect(x - Constraints::RelativeConstraint(0.005f, "width"), y - Constraints::RelativeConstraint(0.005f, "height"), clickgui->getColor("secondary6"), FlarialGUI::TextSizes[text] + Constraints::RelativeConstraint(0.01f, "width"), Constraints::RelativeConstraint(0.025f, "height", true), 3.0f, 3.0f);
+
+    float textWidth = FlarialGUI::getFlarialTextSize(FlarialGUI::to_wide(text).c_str(), 1000000, fontSize, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize, DWRITE_FONT_WEIGHT_MEDIUM, false).x;
+    float textHeight = fontSize;
+
+    D2D1_COLOR_F bgCol = clickgui->getColor("secondary1");
+
+    FlarialGUI::RoundedRect(
+        x,
+        y - Constraints::RelativeConstraint(0.03f, "height"),
+        bgCol,
+        textWidth * 1.01f + Constraints::RelativeConstraint(0.001f, "width"),
+        textHeight * 0.25f,
+        3.0f, 3.0f
+    );
+
+    FlarialGUI::FlarialTextWithFont(x * 1.015f, y, FlarialGUI::to_wide(text).c_str(), 200, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize, DWRITE_FONT_WEIGHT_MEDIUM, textCol, false);
 
     if (!subtext.empty()) {
         std::vector<std::string> lines;

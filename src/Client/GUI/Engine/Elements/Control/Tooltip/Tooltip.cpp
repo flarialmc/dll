@@ -71,12 +71,12 @@ void FlarialGUI::Tooltip(const std::string& id, float x, float y, const std::str
     if (tooltips[id].opac > 0.01f) { //this used to continue rendering the tooltip at a really low opacity
         Vec2<float> round = Constraints::RoundingConstraint(10, 10);
 
-        RoundedRect(tooltips[id].hoverX + offset, tooltips[id].hoverY - offset, bgCol, rectWidth, rectHeight, round.x,
+        RoundedRect(MC::mousePos.x + offset, MC::mousePos.y - offset, bgCol, rectWidth, rectHeight, round.x,
                     round.x);
-        RoundedHollowRect(tooltips[id].hoverX + offset, tooltips[id].hoverY - offset,
+        RoundedHollowRect(MC::mousePos.x + offset, MC::mousePos.y - offset,
                           Constraints::RelativeConstraint(0.001, "height", true), outlineCol, rectWidth, rectHeight,
                           round.x, round.x);
-        FlarialTextWithFont(spacing + tooltips[id].hoverX + offset, tooltips[id].hoverY - offset,
+        FlarialTextWithFont(spacing + MC::mousePos.x + offset, MC::mousePos.y - offset,
                             FlarialGUI::to_wide(text).c_str(), rectWidth * 6.9f, rectHeight,
                             DWRITE_TEXT_ALIGNMENT_LEADING, fontSize1, DWRITE_FONT_WEIGHT_REGULAR, textCol);
     }

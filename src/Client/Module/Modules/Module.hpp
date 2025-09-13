@@ -99,6 +99,7 @@ public:
 	void resetPadding();
 	void extraPadding(float percent = 0.04f);
 	void addElementText(const std::string& text, const std::string& subtext = "");
+	void addElementTextWithBackground(const std::string& text, const std::string& subtext = "");
 	void addHeader(const std::string& text);
 
 	void addButton(const std::string& text, const std::string& subtext, const std::string& buttonText,
