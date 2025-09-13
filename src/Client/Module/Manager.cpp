@@ -264,9 +264,7 @@ void ModuleManager::initialize() {
 	//addModule<ItemUseDelayFix>();
 	addModule<ZeqaUtils>();
 	addModule<MumbleLink>();
-	if(VersionUtils::checkAboveOrEqual(21, 50) && !VersionUtils::checkAboveOrEqual(21, 80)) {
-	    addModule<MaterialBinLoader>();
-	}
+	addModule<MaterialBinLoader>();
 
 	addModule<MinimalViewBobbing>();
 

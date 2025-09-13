@@ -372,4 +372,57 @@ void SwapchainHook::SaveBackbuffer(bool underui) {
         }
 }
 
+SwapchainHook::SwapchainOriginal SwapchainHook::funcOriginal = nullptr;
+bool SwapchainHook::recreate = true;
+bool SwapchainHook::isDX12;
+std::atomic<bool> SwapchainHook::imguiCleanupInProgress{false};
+int SwapchainHook::dx12FrameCount = 0;
+
+winrt::com_ptr<ID3D11Texture2D> SwapchainHook::SavedD3D11BackBuffer;
+winrt::com_ptr<ID3D11Texture2D> SwapchainHook::ExtraSavedD3D11BackBuffer;
+UINT SwapchainHook::lastBackbufferWidth = 0;
+UINT SwapchainHook::lastBackbufferHeight = 0;
+
+std::vector<winrt::com_ptr<IDXGISurface1>> SwapchainHook::DXGISurfaces;
+std::vector<winrt::com_ptr<ID2D1Bitmap1>> SwapchainHook::D2D1Bitmaps;
+std::vector<winrt::com_ptr<ID3D11Resource>> SwapchainHook::D3D11Resources;
+winrt::com_ptr<IDXGISwapChain3> SwapchainHook::swapchain;
+winrt::com_ptr<ID3D12DescriptorHeap> SwapchainHook::D3D12DescriptorHeap;
+winrt::com_ptr<ID3D11On12Device> SwapchainHook::d3d11On12Device;
+winrt::com_ptr<ID2D1Bitmap1> SwapchainHook::D2D1Bitmap;
+winrt::com_ptr<IDXGISurface1> SwapchainHook::backBuffer;
+
+winrt::com_ptr<ID3D11DeviceContext> SwapchainHook::context;
+winrt::com_ptr<ID3D11Device> SwapchainHook::d3d11Device;
+uintptr_t SwapchainHook::bufferCount;
+winrt::com_ptr<ID3D11Texture2D> SwapchainHook::stageTex;
+
+winrt::com_ptr<ID3D12Device5> SwapchainHook::d3d12Device5 = nullptr;
+
+winrt::com_ptr<ID3D12DescriptorHeap> SwapchainHook::d3d12DescriptorHeapImGuiRender = nullptr;
+winrt::com_ptr<ID3D12DescriptorHeap> SwapchainHook::d3d12DescriptorHeapBackBuffers = nullptr;
+winrt::com_ptr<ID3D12GraphicsCommandList> SwapchainHook::d3d12CommandList = nullptr;
+winrt::com_ptr<ID3D12CommandQueue> SwapchainHook::d3d12CommandQueue = nullptr;
+winrt::com_ptr<ID3D12CommandAllocator> SwapchainHook::allocator = nullptr;
+
+UINT SwapchainHook::nextAvailableDescriptorIndex = SwapchainHook::IMGUI_FONT_DESCRIPTORS;
+std::mutex SwapchainHook::descriptorAllocationMutex;
+
+uint64_t SwapchainHook::buffersCounts = 0;
+std::vector<FrameContext> SwapchainHook::frameContexts = {};
+
+std::mutex SwapchainHook::frameTransformsMtx;
+std::queue<FrameTransform> SwapchainHook::FrameTransforms;
+int SwapchainHook::transformDelay = 3;
+
+UINT SwapchainHook::flagsreal;
+
+winrt::com_ptr<ID3D11RenderTargetView> SwapchainHook::cachedDX11RTV = nullptr;
+
+std::vector<winrt::com_ptr<ID3D11RenderTargetView>> SwapchainHook::cachedDX12RTVs;
+winrt::com_ptr<ID3D12Fence> SwapchainHook::cachedDX12Fence = nullptr;
+UINT64 SwapchainHook::cachedDX12FenceValue = 0;
+
+bool SwapchainHook::hasResized;
+
 // End of SwapchainHook.cpp

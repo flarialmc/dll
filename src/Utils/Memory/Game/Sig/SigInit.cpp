@@ -31,8 +31,9 @@ void SigInit::init21100() {
     ADD_SIG("LevelRendererPlayer::renderOutlineSelection", "E8 ? ? ? ? 90 48 8D 8D ? ? ? ? E8 ? ? ? ? 48 8B 83");
 
     ADD_SIG("ClientInstance::getScreenName", "48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 41 56 48 83 EC ? 4C 8B F2 48 8B D9 33 ED 48 8B 01 48 8B 80 ? ? ? ? FF 15 ? ? ? ? 84 C0 74");
+    ADD_SIG("ResourcePackManager::_composeFullStack", "48 89 5C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 41 56 48 83 EC ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 44 24 ? 48 8B F9 40 B6");
 
-    DEPRECATE_SIG("AppPlatform::readAssetFile");
+    ADD_SIG("AppPlatform::readAssetFile", "48 89 5C 24 ? 48 89 7C 24 ? 55 48 8D 6C 24 ? 48 81 EC 60 01 00 00 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 ? 48 8B F9 48 89 4D");
 }
 
 
@@ -46,7 +47,7 @@ void SigInit::init2190() {
     ADD_SIG("CameraYaw2", "F3 0F 11 10 F3 0F 11 40 ? 48 8D 9F");
     ADD_SIG("ItemInHandRenderer::renderItem", "E8 ? ? ? ? 41 0F 11 B6 ? ? ? ? C6 47");
     ADD_SIG("LocalPlayer::applyTurnDelta", "48 8B C4 48 89 58 ? 48 89 70 ? 48 89 78 ? 55 41 56 41 57 48 8D 6C 24 ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 44 0F 29 40 ? 44 0F 29 48 ? 44 0F 29 50");
-
+    ADD_SIG("ResourcePackManager::_composeFullStack", "48 89 5C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 41 56 48 83 EC ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 44 24 ? 48 8B F9 40 B6"); // update notes in 2180
     ADD_SIG("ActorShaderManager::setupShaderParameter", "48 89 5C 24 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 0F 29 B4 24 ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 48 8B 85"); // 15 params | go to hurt color sig, go to func with 10 ish params, then go to func with 15 params (this)
     // ADD_SIG("ActorShaderManager::setupShaderParameterHelper", "48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC ? 48 8B 79 ? 45 33 D2");
     // idk how to use lol
@@ -70,8 +71,8 @@ void SigInit::init2180() {
     ADD_SIG("GameMode::attack", "48 89 ? ? ? 48 89 ? ? ? 48 89 ? ? ? 55 41 ? 41 ? 41 ? 41 ? 48 8D ? ? ? ? ? ? 48 81 EC ? ? ? ? 48 8B ? ? ? ? ? 48 33 ? 48 89 ? ? ? ? ? 45 0F ? ? 4C 8B ? 48 8B ? 45 33 ? 44 89");
     ADD_SIG("ItemInHandRenderer::renderItem", "E8 ? ? ? ? 41 0F 11 B6 80 00 00 00");
     ADD_SIG("Actor::setNametag", "48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC ? 48 8B F2 48 8B F9 48 8B 89 ? ? ? ? 48 85 C9");
-    //ADD_SIG("ResourcePackManager::_composeFullStack_Patch", "");
-    //ADD_SIG("ResourcePackManager::_composeFullStack", "");
+    ADD_SIG("ResourcePackManager::_composeFullStack_Patch", "0F 84 ? ? ? ? 48 8B CF E8 ? ? ? ? 84 C0 74 ? 0F 57 C0");
+    ADD_SIG("ResourcePackManager::_composeFullStack", "48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 48 83 EC ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 44 24 ? 48 8B F9 40 B5");// disconnectionScreen.editor.cannotUseRayTracing loo kfor this string, then func after if (var + 241)
     //ADD_SIG("GeneralSettingsScreenController::GeneralSettingsScreenController", "");
     ADD_SIG("LocalPlayer::applyTurnDelta", "48 8B C4 48 89 58 ? 48 89 70 ? 55 57 41 54 41 56 41 57 48 8D 68 ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 44 0F 29 40 ? 44 0F 29 48 ? 44 0F 29 58");
     ADD_SIG("mce::TextureGroup::getTexture", "40 53 55 56 57 41 54 41 55 41 56 41 57 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 ? ? ? ? 41 0F B6 E9");
@@ -663,6 +664,7 @@ void SigInit::init2030() {
     ADD_SIG("bgfx::rendercontextd3d11::submit", "48 8B C4 55 53 56 57 41 54 41 55 41 56 41 57 48 81 EC ? ? ? ?");
 
     ADD_SIG("bgfx::rendercontextd3d12::submit", "40 55 53 56 57 41 54 41 55 41 56 41 57 B8");
+    ADD_SIG("bgfx::rendercontextd3d12::init", "81 BF ?? ?? 00 00 86 80 00 00");
 
     ADD_SIG("LevelRenderer::renderLevel", "48 8B C4 48 89 58 20 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 0F 29 70 B8 0F 29 78 A8 44 0F 29 40 ? 44 0F 29 48 ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 4C 89 44 24 ?");
 }

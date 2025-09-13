@@ -5,11 +5,13 @@
 #include "src/Client/Hook/Hooks/Game/composeFullStack.hpp"
 
 class MaterialBinLoader : public Module {
+
+
 public:
     MaterialBinLoader() : Module("MaterialBinLoader", "Load Shaders from ResourcePack",
                       IDR_RENDER_DRAGON_PNG, "", false, {"shader", "shader loader", "render", "brd", "better render dragon", "betterrenderdragon", "matject"}) {
         Module::setup();
-    };
+};
 
     void onEnable() override {
         Listen(this, ReadFileEvent, &MaterialBinLoader::onReadFile)
@@ -50,8 +52,12 @@ public:
 
             bool success = _composeFullStackHook::resourcePackManagerLoad(_composeFullStackHook::resourcePackManager, location, out);
             if (success && !out.empty()) {
-                event.retstr->assign(out);
+                if (VersionUtils::checkAboveOrEqual(21, 100)) event.result->assign(out);
+                    else event.retstr->assign(out);
+
                 Logger::custom(fg(fmt::color::green), "MaterialBinLoader", "Successfully loaded: {}", binPath);
+            } else {
+                Logger::custom(fg(fmt::color::red), "MaterialBinLoader", "Failed to load: {}", binPath);
             }
         }
     }
