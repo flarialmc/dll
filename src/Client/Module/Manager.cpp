@@ -290,9 +290,8 @@ void ModuleManager::initialize() {
 #endif
 
 	addService<GUIKeyListener>();
-	if (!VersionUtils::checkAboveOrEqual(21, 60)) {
-		addService<PackChanger>();
-	}
+
+	addService<PackChanger>();
 	addService<DiscordRPCListener>();
 	addService<UninjectListener>();
 	addService<SaveConfigListener>();

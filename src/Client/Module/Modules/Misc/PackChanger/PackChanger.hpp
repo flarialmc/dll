@@ -35,6 +35,7 @@ public:
     }
 
     void Init() {
+        std::cout << "ayo" << std::endl;
         patchComposeFullStack();
         canRender = true;
         canUseKeys = true;
@@ -71,6 +72,7 @@ public:
     }
 
     void onGeneralSettingsScreenControllerOnCreate(GeneralSettingsScreenControllerOnCreateEvent &event) {
+
         event.unlockPackMenu();
     }
 
@@ -107,11 +109,13 @@ public:
 
     void onHandleVisibilityUpdates(HandleVisibilityUpdatesEvent &event) {
         // stops chunks from updating
+        Logger::debug("canRender: {}, recreate: {}, forcePreGame: {}", canRender, recreate, forcePreGame);
         if(!canRender || recreate || forcePreGame) event.cancel();
     }
 
     void onRenderOrderExecute(RenderOrderExecuteEvent &event) {
         // stops most 3D level rendering
+        Logger::debug("canRender: {}, recreate: {}, forcePreGame: {}", canRender, recreate, forcePreGame);
         if(!canRender || recreate || forcePreGame) event.cancel();
     }
 
@@ -121,6 +125,7 @@ public:
 
         auto name = SDK::clientInstance->getScreenName();
 
+        if (frameQueue > 0) frameQueue--;
         if(!canRender && enableFrameQueue) {
             if(frameQueue == 0) {
                 if(!recreate) {
@@ -164,10 +169,11 @@ public:
         if(!SDK::clientInstance) return;
         auto name = SDK::clientInstance->getScreenName();
         auto topScreenName = SDK::clientInstance->getTopScreenName();
+        std::cout << topScreenName << std::endl;
         if(name.find("screen_world_controls_and_settings - ") != std::string::npos) {
             last_tab = name;
         };
-        static std::string tab = "screen_world_controls_and_settings - global_texture_pack_tab";
+        static std::string tab = "screen_world_controls_and_settings";
         bool value = event.getState() || forcePreGame || name == tab || last_tab == tab && name == "screen";
         event.setState(value);
     }
@@ -187,6 +193,7 @@ public:
     void patchComposeFullStack() {
         if(!VersionUtils::checkAboveOrEqual(21,00)) return;
 
+        std::cout << "ayo2" << std::endl;
         static auto dst = VersionUtils::checkAboveOrEqual(21,20) ? GET_SIG_ADDRESS("ResourcePackManager::_composeFullStack_Patch") : GET_SIG_ADDRESS("MinecraftGame::_onActiveResourcePacksChanged_Patch");
 
         Memory::nopBytes((void*)dst, 6);

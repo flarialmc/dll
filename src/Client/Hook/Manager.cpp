@@ -115,14 +115,12 @@ void HookManager::initialize() {
     addHook<SettingsScreenOnExitHook>();
 
     // likely packchanger hooks, im not sure!
-    if(!VersionUtils::checkAboveOrEqual(21, 60))
-    {
+
         addHook<isPreGameHook>();
 
         addHook<RenderOrderExecuteHook>();
         addHook<RenderChunkCoordinatorHandleVisibilityUpdatesHook>();
 //
-    }
 
     addHook<ItemInHandRendererRenderItem>();
 
