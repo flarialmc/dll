@@ -124,7 +124,8 @@ void Module::initSettingsPage() {
 
     this->addHeader(this->name);
 //#if 0
-    this->addElementTextWithBackground(this->description, "");
+    this->addElementText(this->description, "");
+    this->extraPadding();
     this->extraPadding();
 //#endif
 }
@@ -463,7 +464,7 @@ void Module::addElementTextWithBackground(const std::string& text, const std::st
     float textWidth = FlarialGUI::getFlarialTextSize(FlarialGUI::to_wide(text).c_str(), 1000000, fontSize, DWRITE_TEXT_ALIGNMENT_CENTER, fontSize, DWRITE_FONT_WEIGHT_MEDIUM, false).x;
     float textHeight = fontSize;
 
-    D2D1_COLOR_F bgCol = clickgui->getColor("secondary1");
+    D2D1_COLOR_F bgCol = clickgui->getColor("primary4");
 
     std::vector<std::string> lines;
     std::stringstream ss(text);
