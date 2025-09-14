@@ -21,4 +21,8 @@ public:
     void settingsRender(float settingsOffset) override;
 
     void onRender(RenderEvent& event);
+
+    void onPacketReceive(PacketEvent& event);
+
+    void onAttack(AttackEvent& event);
 };
