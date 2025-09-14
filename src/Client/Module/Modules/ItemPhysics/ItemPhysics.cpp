@@ -191,13 +191,12 @@ void ItemPhysics::applyTransformation(glm::mat4x4 &mat) {
     pos.y += yMod;
 
     // Get settings
-    const auto& settings = mod->settings;
-    const auto speed = settings.getSettingByName<float>("speed")->value;
-    const auto xMul = settings.getSettingByName<float>("xmul")->value;
-    const auto yMul = settings.getSettingByName<float>("ymul")->value;
-    const auto zMul = settings.getSettingByName<float>("zmul")->value;
-    const auto smoothRotations = settings.getSettingByName<bool>("smoothrots")->value;
-    const auto preserveRotations = settings.getSettingByName<bool>("preserverots")->value;
+    const auto speed = mod->settings.getSettingByName<float>("speed")->value;
+    const auto xMul = mod->settings.getSettingByName<float>("xmul")->value;
+    const auto yMul = mod->settings.getSettingByName<float>("ymul")->value;
+    const auto zMul = mod->settings.getSettingByName<float>("zmul")->value;
+    const auto smoothRotations = mod->settings.getSettingByName<bool>("smoothrots")->value;
+    const auto preserveRotations = mod->settings.getSettingByName<bool>("preserverots")->value;
 
     // Helper lambda to wrap angles
     auto wrapAngle = [](float& angle) {
