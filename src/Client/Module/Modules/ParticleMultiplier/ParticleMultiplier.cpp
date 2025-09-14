@@ -12,7 +12,7 @@ void ParticleMultiplier::onEnable() {
     Module::onEnable();
 
 }
-
+//
 void ParticleMultiplier::onDisable() {
     Deafen(this, RenderEvent, &ParticleMultiplier::onRender)
     Deafen(this, PacketEvent, &ParticleMultiplier::onPacketReceive)
