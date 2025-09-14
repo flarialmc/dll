@@ -103,7 +103,7 @@ void TextHotkey::onSetup() {
 			if (duration.count() >= 2.5) {
 				std::string count;
 				if (i > 0) count = "-" + FlarialGUI::cached_to_string(i);
-				if (this->isKeybind(event.keys, i) && this->isKeyPartOfKeybind(event.key, i)) {
+				if (i != 0 && this->isKeybind(event.keys, i) && this->isKeyPartOfKeybind(event.key, i)) {
 					auto player = SDK::clientInstance->getLocalPlayer();
 					//std::string xuid = *player->getXuid(&xuid);
 					std::shared_ptr<Packet> packet = SDK::createPacket(9);
