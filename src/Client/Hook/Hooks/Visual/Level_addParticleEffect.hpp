@@ -8,10 +8,10 @@
 
 class Level_addParticleEffect : public Hook {
 private:
-    static void Level_addParticleEffectDetour(Level* level, HashedString const& hashed_string, Vec3<float> pos, void* molangVariable);
+    static void Level_addParticleEffectDetour(Level* level, void* id, void* pos, void* dir, void* data, void* tag, bool isGlobal);
 
 public:
-    typedef void(__thiscall *addParticleEffectOriginal)(Level* level, HashedString const& hashed_string, Vec3<float> pos, void* molangVariable);
+    typedef void(__thiscall *addParticleEffectOriginal)(Level* level, void* id, void* pos, void* dir, void* data, void* tag, bool isGlobal);
 
     static inline addParticleEffectOriginal funcOriginal = nullptr;
 
