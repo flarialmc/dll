@@ -98,8 +98,6 @@ void MotionBlur::onRender(RenderUnderUIEvent &event) {
             previousFrames.push_back(std::move(buffer));
         }
 
-        Logger::debug("{}", getOps<std::string>("blurType"));
-
         if (getOps<std::string>("blurType") == "Average Pixel Blur") AvgPixelMotionBlurHelper::Render(event.RTV, previousFrames);
         else if (getOps<std::string>("blurType") == "Ghost Frames") {
             float alpha = 0.3f;
