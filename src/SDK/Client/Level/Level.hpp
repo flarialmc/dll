@@ -60,6 +60,8 @@ public:
 
 class Level {
 public:
+    uintptr_t** vtable;
+public:
     std::unordered_map<mcUUID, PlayerListEntry> getPlayerMap() {
         if (VersionUtils::checkAboveOrEqual(21, 90)) {
             // For 1.21.90+ versions, create a temporary map on each call to avoid memory issues

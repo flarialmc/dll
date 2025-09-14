@@ -119,6 +119,7 @@
 #include "Modules/MessageLogger/MessageLogger.hpp"
 #include "Modules/TotemCounter/TotemCounter.hpp"
 #include "Modules/BetterHungerBar/BetterHungerBar.hpp"
+#include "Modules/ParticleMultiplier/ParticleMultiplier.hpp"
 
 #ifdef COMPILE_DOOM
 	#include "Modules/Doom/Doom.hpp"
@@ -284,6 +285,7 @@ void ModuleManager::initialize() {
 	addModule<MessageLogger>();
 	addModule<TotemCounter>();
 	addModule<BetterHungerBar>();
+	addModule<ParticleMultiplier>();
 
 #ifdef COMPILE_DOOM
 	addModule<DoomModule>();

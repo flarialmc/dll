@@ -7,15 +7,37 @@
 
 class PacketEvent : public Event, public Cancellable {
 
-    Packet *packet;
+    std::shared_ptr<Packet> packet;
+    void *packetHandlerDispatcher;
+    void *networkIdentifier;
+    void *netEventCallback;
 
 public:
 
     Packet *getPacket() {
+        return this->packet.get();
+    }
+
+    std::shared_ptr<Packet> getPacketShared() {
         return this->packet;
     }
 
-    explicit PacketEvent(Packet *e) {
-        this->packet = e;
+    void *getPacketHandlerDispatcher() {
+        return this->packetHandlerDispatcher;
+    }
+
+    void *getNetworkIdentifier() {
+        return this->networkIdentifier;
+    }
+
+    void *getNetEventCallback() {
+        return this->netEventCallback;
+    }
+
+    explicit PacketEvent(std::shared_ptr<Packet> pkt, void *dispatcher = nullptr, void *identifier = nullptr, void *callback = nullptr) {
+        this->packet = pkt;
+        this->packetHandlerDispatcher = dispatcher;
+        this->networkIdentifier = identifier;
+        this->netEventCallback = callback;
     }
 };

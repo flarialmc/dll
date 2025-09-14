@@ -12,6 +12,7 @@
 
 #include "../../../../Utils/Render/MaterialUtils.hpp"
 #include "../../Hooks/Render/DirectX/DXGI/SwapchainHook.hpp"
+#include "../Visual/Level_addParticleEffect.hpp"
 
 __int64 *oDrawImage = nullptr;
 __int64 *oDrawNineSlice = nullptr;
@@ -187,6 +188,8 @@ private:
 
         if (player && SDK::clientInstance->getLevelRender()) {
             origin = SDK::clientInstance->getLevelRender()->getOrigin();
+            if (Level_addParticleEffect::funcOriginal == nullptr)
+                Level_addParticleEffect::enableHookk();
         }
 
         FrameTransform transform = {SDK::clientInstance->getViewMatrix(), origin, SDK::clientInstance->getFov()};
