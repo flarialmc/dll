@@ -30,6 +30,7 @@ void ParticleMultiplier::settingsRender(float settingsOffset) {
     initSettingsPage();
 
     addSlider("Intensity", "", "intensity", 500.f);
+    addToggle("Normal Hit Crit", "Multiply crit particles on normal hits too.", "normalhitcrit");
     FlarialGUI::UnsetScrollView();
     resetPadding();
 }
@@ -54,8 +55,6 @@ void ParticleMultiplier::onPacketReceive(PacketEvent& event)
     }
     if (id == MinecraftPacketIds::Animate)
     {
-
-        auto* pkt = reinterpret_cast<AnimatePacket*>(event.getPacket());
         for (int i = 0; i < getOps<float>("intensity"); i++)
         {
             SendPacketHook::receivePacketAnimateOriginal(event.getPacketHandlerDispatcher(), event.getNetworkIdentifier(), event.getNetEventCallback(), event.getPacketShared());
@@ -67,14 +66,12 @@ void ParticleMultiplier::onPacketReceive(PacketEvent& event)
 void ParticleMultiplier::onAttack(AttackEvent& event)
 {
 
-    if (!stolenDispatcher || !isEnabled()) return;
+    if (!stolenDispatcher || !isEnabled() || !getOps<bool>("normalhitcrit")) return;
     std::shared_ptr<Packet> packet = SDK::createPacket(static_cast<int>(MinecraftPacketIds::Animate));
     std::shared_ptr<AnimatePacket> pkt = std::static_pointer_cast<AnimatePacket>(packet);
 
     pkt->mAction = AnimatePacket::Action::CriticalHit;
     pkt->mRuntimeID = event.getActor()->getRuntimeIDComponent()->runtimeID;
-
-    Logger::debug("called");
 
     for (int i = 0; i < getOps<float>("intensity"); i++)
     {
