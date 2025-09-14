@@ -5,27 +5,41 @@
 #include "../../../../SDK/Client/Actor/ItemActor.hpp"
 #include "../../../../Utils/Memory/CustomAllocator/Buffer.hpp"
 #include "../../../../SDK/Client/Render/ActorRenderData.hpp"
+#include "../../../Hook/Hooks/Hook.hpp"
 
 #include "SDK/Client/Render/ItemRenderer.hpp"
 
-class INeedADecentHookClassForMemory {
+class ItemRendererRenderHook : public Hook {
+private:
+    static void callback(ItemRenderer* _this, BaseActorRenderContext* renderCtx, ActorRenderData* renderData);
+
 public:
-	void* pointer = nullptr;
-	void* trampoline = nullptr;
-	bool valid = false;
+    typedef void(__thiscall *original)(ItemRenderer*, BaseActorRenderContext*, ActorRenderData*);
+    static inline original funcOriginal = nullptr;
 
-	INeedADecentHookClassForMemory(void* function, void* hook);
+    ItemRendererRenderHook();
+    void enableHook() override;
+};
 
-	~INeedADecentHookClassForMemory();
+class GlmRotateHook : public Hook {
+private:
+    static void callback(glm::mat4x4& mat, float angle, float x, float y, float z);
+    static glm::mat4x4 callback2(glm::mat4x4& mat, float angle, const glm::vec3& axis);
 
-	void enable() const;
+public:
+    typedef void(__fastcall *original)(glm::mat4x4&, float, float, float, float);
+    typedef glm::mat4x4(__fastcall *original2)(glm::mat4x4&, float, const glm::vec3&);
+    static inline original funcOriginal = nullptr;
+    static inline original2 funcOriginal2 = nullptr;
 
-	void disable() const;
+    GlmRotateHook();
+    void enableHook() override;
 };
 
 static char data[0x5], data2[0x5];
 
-inline std::unique_ptr<INeedADecentHookClassForMemory> ItemRenderer_renderHook, glm_rotateHook;
+inline std::unique_ptr<ItemRendererRenderHook> itemRendererHook;
+inline std::unique_ptr<GlmRotateHook> glmRotateHook;
 
 class ItemPhysics : public Module {
 private:
@@ -34,8 +48,8 @@ private:
 	bool patched = false;
 
 	std::unordered_map<Actor*, std::tuple<float, Vec3<float>, Vec3<int>>> actorData;
-	ActorRenderData* renderData = nullptr;
 public:
+	ActorRenderData* renderData = nullptr;
 	ItemPhysics() : Module("Item Physics", "Changes rotation behavior of dropped items",
 		IDR_ITEM_PHYSICS_PNG, "", false, {"animation"}) {
 		
@@ -49,13 +63,7 @@ public:
 
 	void settingsRender(float settingsOffset) override;
 
-	static void ItemRenderer_render(ItemRenderer* _this, BaseActorRenderContext* renderCtx, ActorRenderData* renderData);
-
 	static void applyTransformation(glm::mat4x4& mat);
-
-	static void glm_rotate(glm::mat4x4& mat, float angle, float x, float y, float z);
-
-	static glm::mat4x4 glm_rotate2(glm::mat4x4& mat, float angle, const glm::vec3& axis);
 
 	void onSetupAndRender(SetupAndRenderEvent& event);
 };
