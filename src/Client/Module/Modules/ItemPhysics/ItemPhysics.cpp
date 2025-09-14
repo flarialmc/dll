@@ -76,7 +76,7 @@ void ItemPhysics::onEnable() {
 
     const auto newRipRel = Memory::getRipRel(posAddr, reinterpret_cast<uintptr_t>(newPosRel));
 
-    Memory::patchBytes(reinterpret_cast<void*>(posAddr), newRipRel.data(), 4);
+    //Memory::patchBytes(reinterpret_cast<void*>(posAddr), newRipRel.data(), 4);
 
     glmRotateHook->enableHook();
 
