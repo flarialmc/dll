@@ -171,7 +171,6 @@ void Waypoints::defaultConfig() {
 void Waypoints::settingsRender(float settingsOffset) {
 	initSettingsPage();
 
-	addHeader("Waypoints");
 	addButton("Add another Waypoint", "", "Add", [this] {
 
 		int index = getNextAvailableIndex();
