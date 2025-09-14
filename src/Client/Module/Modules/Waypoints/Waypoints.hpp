@@ -38,6 +38,8 @@ public:
 
 	void addWaypoint(int index, std::string name, std::string color, Vec3<float> position, bool state, bool config, bool rgb, float opacity);
 
+	int getNextAvailableIndex();
+
 	Vec3<float> getPos(int index);
 
 	void onSetup() override;
