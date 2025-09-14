@@ -47,8 +47,8 @@ private:
 	float* newPosRel = nullptr;
 	bool patched = false;
 
-public:
 	std::unordered_map<Actor*, std::tuple<float, Vec3<float>, Vec3<int>>> actorData;
+public:
 	ActorRenderData* renderData = nullptr;
 	ItemPhysics() : Module("Item Physics", "Changes rotation behavior of dropped items",
 		IDR_ITEM_PHYSICS_PNG, "", false, {"animation"}) {
