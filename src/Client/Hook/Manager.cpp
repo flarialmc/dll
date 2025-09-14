@@ -49,6 +49,7 @@
 #include "Hooks/Render/RenderLevelHook.hpp"
 #include "Hooks/Visual/ActorShaderParams.hpp"
 #include "Hooks/Visual/TintColorHook.hpp"
+#include "Hooks/Visual/Level_addParticleEffect.hpp"
 
 std::vector<std::shared_ptr<Hook>> HookManager::hooks;
 
@@ -135,6 +136,7 @@ void HookManager::initialize() {
     addHook<ActorShaderParamsHook>();
     addHook<ChatScreenControllerHook>();
     addHook<HudScreenControllerHook>();
+    addHook<Level_addParticleEffect>();
 
     if(VersionUtils::checkAboveOrEqual(21, 40)) {
         addHook<UpdatePlayerHook>();
