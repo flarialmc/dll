@@ -236,9 +236,9 @@ void ModuleManager::initialize() {
 	addModule<MovableHotbar>();
 	addModule<MovableDayCounter>();
 	// addModule<CompactChat>();
-	if(!VersionUtils::checkAboveOrEqual(21, 100)) {
-		addModule<ItemPhysics>();
-	}
+
+	addModule<ItemPhysics>();
+
 
 	addModule<Mousestrokes>();
 

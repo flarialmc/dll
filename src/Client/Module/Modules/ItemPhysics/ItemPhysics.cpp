@@ -9,6 +9,7 @@ void ItemPhysics::onEnable() {
     Listen(this, SetupAndRenderEvent, &ItemPhysics::onSetupAndRender)
     Listen(this, ItemRendererEvent, &ItemPhysics::onItemRenderer)
 
+
     static auto posAddr = GET_SIG_ADDRESS("ItemPositionConst") + 4;
     origPosRel = *reinterpret_cast<uint32_t*>(posAddr);
     patched = true;
@@ -127,7 +128,7 @@ void ItemPhysics::onItemRenderer(ItemRendererEvent& event) {
 }
 
 void ItemPhysics::glm_rotateHook(glm::mat4x4& mat, float angle, float x, float y, float z) {
-    static auto mod = reinterpret_cast<ItemPhysics*>(ModuleManager::getModule("Item Physics").get());
+    auto mod = reinterpret_cast<ItemPhysics*>(ModuleManager::getModule("Item Physics").get());
     if (!mod || !mod->isEnabled() || mod->currentRenderData == nullptr) {
         using func_t = void(__fastcall*)(glm::mat4x4&, float, float, float, float);
         auto original = reinterpret_cast<func_t>(mod->rotateTrampoline);
@@ -139,7 +140,7 @@ void ItemPhysics::glm_rotateHook(glm::mat4x4& mat, float angle, float x, float y
 }
 
 glm::mat4x4 ItemPhysics::glm_rotateHook2(glm::mat4x4& mat, float angle, const glm::vec3& axis) {
-    static auto mod = reinterpret_cast<ItemPhysics*>(ModuleManager::getModule("Item Physics").get());
+    auto mod = reinterpret_cast<ItemPhysics*>(ModuleManager::getModule("Item Physics").get());
     if (!mod || !mod->isEnabled() || mod->currentRenderData == nullptr) {
         using func_t = glm::mat4x4(__fastcall*)(glm::mat4x4&, float, const glm::vec3&);
         auto original = reinterpret_cast<func_t>(mod->rotateTrampoline);
@@ -152,10 +153,14 @@ glm::mat4x4 ItemPhysics::glm_rotateHook2(glm::mat4x4& mat, float angle, const gl
 }
 
 void ItemPhysics::applyTransformation(glm::mat4x4& mat) {
-    if (currentRenderData == nullptr)
+    if (currentRenderData == nullptr || currentRenderData->actor == nullptr)
         return;
 
-    auto curr = reinterpret_cast<ItemActor*>(currentRenderData->actor);
+    auto actor = currentRenderData->actor;
+
+    if (!actor) return;
+    auto curr = static_cast<ItemActor*>(actor);
+    if (!curr) return;
     static float height = 0.5f;
     bool isOnGround = curr->isOnGround();
 
