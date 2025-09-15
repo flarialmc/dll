@@ -116,7 +116,6 @@ void HookManager::initialize() {
     }
 
     addHook<_composeFullStackHook>();
-    addHook<SettingsScreenOnExitHook>();
 
     // likely packchanger hooks, im not sure!
     if(!VersionUtils::checkAboveOrEqual(21, 60))
@@ -125,6 +124,7 @@ void HookManager::initialize() {
 
         addHook<RenderOrderExecuteHook>();
         addHook<RenderChunkCoordinatorHandleVisibilityUpdatesHook>();
+        addHook<SettingsScreenOnExitHook>();
 //
     }
 
