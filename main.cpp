@@ -15,6 +15,7 @@
 #include "curl/curl/curl.h"
 #include "Scripting/ScriptManager.hpp"
 #include "src/Utils/Logger/crashlogs.hpp"
+#include "src/Utils/Logger/crashhandler.hpp"
 #include "src/Client/Module/Modules/Nick/NickModule.hpp"
 #include "src/Client/Command/CommandManager.hpp"
 #include "src/SDK/Client/Options/OptionsParser.hpp"
@@ -187,6 +188,7 @@ DWORD WINAPI init() {
     MH_Uninitialize();
 
     glaiel::crashlogs::end_session();
+    CrashHandler::shutdown();
 
     Logger::custom(fmt::fg(fmt::color::cadet_blue), "MinHook", "Freed Library");
 
