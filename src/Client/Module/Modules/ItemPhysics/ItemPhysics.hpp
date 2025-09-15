@@ -36,6 +36,6 @@ public:
     void clearRenderData() { currentRenderData = nullptr; }
 
     void applyTransformation(glm::mat4x4& mat);
-    static void glm_rotateHook(glm::mat4x4& mat, float angle, float x, float y, float z);
-    static glm::mat4x4 glm_rotateHook2(glm::mat4x4& mat, float angle, const glm::vec3& axis);
+    static void __fastcall glm_rotateHook(glm::mat4x4& mat, float angle, float x, float y, float z);
+    static glm::mat4x4 __fastcall glm_rotateHook2(glm::mat4x4& mat, float angle, const glm::vec3& axis);
 };
