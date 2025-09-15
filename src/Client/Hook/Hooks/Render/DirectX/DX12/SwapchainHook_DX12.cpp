@@ -38,6 +38,10 @@ void SwapchainHook::DX12Init() {
     }
 
     IUnknown* queueAsUnknown = queue.get();
+    if (!queue || !queueAsUnknown) {
+        Logger::error("Failed to get D3D12 command queue");
+        return;
+    }
     HRESULT hr = D3D11On12CreateDevice(
         d3d12Device5.get(),
         D3D11_CREATE_DEVICE_BGRA_SUPPORT,
