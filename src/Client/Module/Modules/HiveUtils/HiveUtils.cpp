@@ -6,13 +6,13 @@
 
 void HiveUtils::onEnable() {
     Listen(this, PacketEvent, &HiveUtils::onPacketReceive);
-    Listen(this, KeyEvent, &AutoRQ::onKey);
+    Listen(this, KeyEvent, &HiveUtils::onKey);
     Module::onEnable();
 }
 
 void HiveUtils::onDisable() {
     Deafen(this, PacketEvent, &HiveUtils::onPacketReceive);
-    Deafen(this, KeyEvent, &AutoRQ::onKey);
+    Deafen(this, KeyEvent, &HiveUtils::onKey);
     Module::onDisable();
 }
 
