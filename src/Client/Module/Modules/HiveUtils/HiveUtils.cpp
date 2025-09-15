@@ -162,6 +162,8 @@ void HiveUtils::onPacketReceive(PacketEvent &event) {
     }
     if (id == MinecraftPacketIds::Text) {
         auto* pkt = reinterpret_cast<TextPacket*>(event.getPacket());
+        if (HiveModeCatcherListener::currentGame == "DR" and pkt->message == "§a§l» §r§bThe game has started! Run!") deaths = 0;
+        
         if (getOps<bool>("deathcountenabled") and HiveModeCatcherListener::currentGame == "DR" and pkt->message == "§c§l» §r§cYou died!")
         {
             deaths++;
