@@ -5,13 +5,15 @@
 #include "SDK/Client/Network/Packet/SetTitlePacket.hpp"
 
 void HiveUtils::onEnable() {
-    Listen(this, PacketEvent, &HiveUtils::onPacketReceive)
+    Listen(this, PacketEvent, &HiveUtils::onPacketReceive);
+    Listen(this, KeyEvent, &AutoRQ::onKey);
     Module::onEnable();
 }
 
 void HiveUtils::onDisable() {
-    Deafen(this, PacketEvent, &HiveUtils::onPacketReceive)
-     Module::onDisable();
+    Deafen(this, PacketEvent, &HiveUtils::onPacketReceive);
+    Deafen(this, KeyEvent, &AutoRQ::onKey);
+    Module::onDisable();
 }
 
 void HiveUtils::defaultConfig() {
