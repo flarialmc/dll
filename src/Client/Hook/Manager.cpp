@@ -19,6 +19,7 @@
 #include "Hooks/Visual/DimensionFogColorHook.hpp"
 #include "Hooks/Visual/OverworldFogColorHook.hpp"
 #include "Hooks/Visual/TimeChangerHook.hpp"
+#include "Hooks/Render/ItemRendererHook.hpp"
 #include "Hooks/Game/getSensHook.hpp"
 #include "Hooks/Game/ContainerScreenControllerHook.hpp"
 #include "Hooks/Render/TextureGroup_getTextureHook.hpp"
@@ -96,6 +97,7 @@ void HookManager::initialize() {
     addHook<DimensionFogColorHook>();
     addHook<OverworldFogColorHook>();
     addHook<TimeChangerHook>();
+    addHook<ItemRendererHook>();
     addHook<SendPacketHook>();
     addHook<ApplyTurnDeltaHook>();
     //addHook<getSensHook>();
