@@ -4,7 +4,8 @@
       "Bash(dir:*)",
       "Bash(cmake:*)",
       "Bash(cmd /c:*)",
-      "Bash(del:*)"
+      "Bash(del:*)",
+      "Bash(mkdir:*)"
     ],
     "deny": [],
     "ask": []

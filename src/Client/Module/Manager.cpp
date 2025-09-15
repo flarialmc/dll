@@ -81,6 +81,8 @@
 #include "Modules/MovableTitle/MovableTitle.hpp"
 #include "Modules/MovableBossbar/MovableBossbar.hpp"
 #include "Modules/MovableChat/MovableChat.hpp"
+#include "Modules/ClearScoreboard/ClearScoreboard.hpp"
+#include "Modules/ClearChat/ClearChat.hpp"
 #include "Modules/MovableCoordinates/MovableCoordinates.hpp"
 #include "Modules/MovableHotbar/MovableHotbar.hpp"
 #include "Modules/NullMovement/NullMovement.hpp"
@@ -232,6 +234,8 @@ void ModuleManager::initialize() {
 	addModule<MovableTitle>();
 	addModule<MovableBossbar>();
 	addModule<MovableChat>();
+	addModule<ClearScoreboard>();
+	addModule<ClearChat>();
 	addModule<MovableCoordinates>();
 	addModule<MovableHotbar>();
 	addModule<MovableDayCounter>();
