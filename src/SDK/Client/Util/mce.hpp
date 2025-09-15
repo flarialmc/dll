@@ -257,7 +257,7 @@ public:
 
     std::vector<AnimatedImageData> mSkinAnimatedImages;
     MinecraftJson::Value mGeometryData;
-    MinEngineVersion mGeometryDataMinEngineVersion;
+    void* mGeometryDataMinEngineVersion;
     MinecraftJson::Value mGeometryDataMutable;
     std::string mAnimationData;
     std::string mCapeId;
@@ -274,7 +274,7 @@ public:
 
     [[nodiscard]] PlayerSkin() = default;
     [[nodiscard]] PlayerSkin(const PlayerSkin &other) = default;
-    PlayerSkin &operator=(const PlayerSkin &other) = default; // Explicitly defaulted
+    PlayerSkin &operator=(const PlayerSkin &other) = default; 
     [[nodiscard]] PlayerSkin(PlayerSkin &&) noexcept = default;
     PlayerSkin &operator=(PlayerSkin &&) noexcept = default;
 };
