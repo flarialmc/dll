@@ -154,10 +154,8 @@ void __fastcall ItemPhysics::glm_rotateHook(glm::mat4x4& mat, float angle, float
 }
 
 glm::mat4x4 __fastcall ItemPhysics::glm_rotateHook2(glm::mat4x4& mat, float angle, const glm::vec3& axis) {
-    // Don't use static - get fresh pointer each time
     auto mod = ModuleManager::getModule("Item Physics");
     if (!mod) {
-        // Fallback to GLM rotate
         return rotate(mat, angle, axis);
     }
 
