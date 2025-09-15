@@ -259,24 +259,6 @@ public:
     MinecraftJson::Value mGeometryData;
     void* mGeometryDataMinEngineVersion;
     MinecraftJson::Value mGeometryDataMutable;
-    std::string mAnimationData;
-    std::string mCapeId;
-    std::vector<SerializedPersonaPieceHandle> mPersonaPieces;
-    persona::ArmSize::Type mArmSizeType;
-    std::unordered_map<persona::PieceType, TintMapColor> mPieceTintColors;
-    MCCColor mSkinColor;
-    TrustedSkinFlag mIsTrustedSkin;
-    bool mIsPremium;
-    bool mIsPersona;
-    bool mIsPersonaCapeOnClassicSkin;
-    bool mIsPrimaryUser;
-    bool mOverridesPlayerAppearance;
-
-    [[nodiscard]] PlayerSkin() = default;
-    [[nodiscard]] PlayerSkin(const PlayerSkin &other) = default;
-    PlayerSkin &operator=(const PlayerSkin &other) = default; 
-    [[nodiscard]] PlayerSkin(PlayerSkin &&) noexcept = default;
-    PlayerSkin &operator=(PlayerSkin &&) noexcept = default;
 };
 
 class PlayerSkin_1_21_90 {

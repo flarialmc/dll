@@ -115,18 +115,7 @@ public:
                     entry.playerSkin.mGeometryData = sourceSkin.mGeometryData;
                     entry.playerSkin.mGeometryDataMinEngineVersion = sourceSkin.mGeometryDataMinEngineVersion;
                     entry.playerSkin.mGeometryDataMutable = sourceSkin.mGeometryDataMutable;
-                    entry.playerSkin.mAnimationData = sourceSkin.mAnimationData;
-                    entry.playerSkin.mCapeId = sourceSkin.mCapeId;
-                    entry.playerSkin.mPersonaPieces = sourceSkin.mPersonaPieces;
-                    entry.playerSkin.mArmSizeType = sourceSkin.mArmSizeType;
-                    entry.playerSkin.mPieceTintColors = sourceSkin.mPieceTintColors;
-                    entry.playerSkin.mSkinColor = sourceSkin.mSkinColor;
-                    entry.playerSkin.mIsTrustedSkin = sourceSkin.mIsTrustedSkin;
-                    entry.playerSkin.mIsPremium = sourceSkin.mIsPremium;
-                    entry.playerSkin.mIsPersona = sourceSkin.mIsPersona;
-                    entry.playerSkin.mIsPersonaCapeOnClassicSkin = sourceSkin.mIsPersonaCapeOnClassicSkin;
-                    entry.playerSkin.mIsPrimaryUser = sourceSkin.mIsPrimaryUser;
-                    entry.playerSkin.mOverridesPlayerAppearance = sourceSkin.mOverridesPlayerAppearance;
+
                 }
 
                 tempMap.emplace(uuid, std::move(entry));
