@@ -3,7 +3,7 @@
 #include <Utils/Utils.hpp>
 #include <Utils/WinrtUtils.hpp>
 #include "crashlogs.hpp"
-#include "crashhandler.hpp"
+#include "LightweightCrashTracker.hpp"
 #include <filesystem>
 #include <fstream>
 
@@ -33,11 +33,8 @@ namespace Logger {
         glaiel::crashlogs::set_crashlog_folder(Utils::getLogsPath());
         glaiel::crashlogs::begin_monitoring();
 
-        // Initialize enhanced crash handler with symbol resolution
-        CrashHandler::initialize(Utils::getLogsPath());
-        CrashHandler::setCustomCallback([](const std::string& crashLogPath) {
-            Logger::error("Crash log saved to: {}", crashLogPath);
-        });
+        // Initialize lightweight crash tracking
+        CrashTracker::initialize();
         
         if (std::filesystem::exists(path)) {
             std::ofstream ofs(path, std::ofstream::out | std::ofstream::trunc);
