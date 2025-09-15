@@ -1,17 +1,21 @@
 #pragma once
 
-#include "../Actor/LocalPlayer.hpp"
-#include "MinecraftGame.hpp"
-#include "../Block/BlockSource.hpp"
-#include "../Render/GuiData.hpp"
 #include <cstdint>
 #include "../../../Utils/Memory/Memory.hpp"
-#include "../Network/Packet/LoopbackPacketSender.hpp"
-#include "Minecraft.hpp"
+// Keep these for value types and inline functions
 #include "../Render/GLMatrix.hpp"
-#include "../Level/LevelRender/LevelRender.hpp"
-#include "../Network/Raknet/RaknetConnector.hpp"
 #include "../Render/Camera.hpp"
+// Need full definition for inline getRakNetConnector() method
+#include "../Network/Packet/LoopbackPacketSender.hpp"
+
+// Forward declarations
+class LocalPlayer;
+class MinecraftGame;
+class BlockSource;
+class GuiData;
+class Minecraft;
+class LevelRender;
+class RaknetConnector;
 
 class ClientInstance {
 public:

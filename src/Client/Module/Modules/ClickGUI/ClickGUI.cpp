@@ -1,4 +1,8 @@
 #include "ClickGUI.hpp"
+// Include headers that were forward declared
+#include "SDK/Client/Network/Packet/TextPacket.hpp"
+#include "Utils/APIUtils.hpp"
+// Client.hpp and WinrtUtils.hpp already included in header
 
 #include <random>
 #include <Scripting/ScriptManager.hpp>

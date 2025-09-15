@@ -2,23 +2,29 @@
 
 #include <cstdint>
 #include <string>
-#include <SDK/Client/Actor/Components/ActorRotationComponent.hpp>
+#include <vector>
 #include "../../../Utils/Memory/Memory.hpp"
 #include "../../../Utils/Logger/Logger.hpp"
-#include "Components/MoveInputComponent.hpp"
-#include "../Level/Level.hpp"
-#include "../Container/Inventory.hpp"
 #include "../../../Utils/Utils.hpp"
-#include "Components/StateVectorComponent.hpp"
-#include "Components/RenderPositionComponent.hpp"
-#include "Components/ActorEquipmentComponent.hpp"
 #include "EntityContext.hpp"
-#include "Components/ActorGameTypeComponent.hpp"
-#include "Components/AABBShapeComponent.hpp"
-#include "Components/RuntimeIDComponent.hpp"
-#include "Components/ActorDataFlagComponent.hpp"
-#include "Components/MobEffectsComponent.hpp"
-#include "Components/AttributesComponent.hpp"
+
+// Forward declarations
+class ActorRotationComponent;
+class MoveInputComponent;
+class Level;
+class SimpleContainer;
+class StateVectorComponent;
+class RenderPositionComponent;
+class ActorEquipmentComponent;
+class ActorGameTypeComponent;
+class AABBShapeComponent;
+class RuntimeIDComponent;
+class ActorDataFlagComponent;
+class MobEffectsComponent;
+class AttributesComponent;
+class ItemStack;
+struct AABB;
+struct UnifiedMobEffectData;
 
 
 enum ActorFlags {

@@ -1,5 +1,7 @@
 #include "IRCChat.hpp"
 
+#include "SDK/Client/Actor/LocalPlayer.hpp"
+
 void IRCChat::execute(const std::vector<std::string>& args) {
     if (args.size() < 1) {
         addCommandMessage("You cannot send an empty message.");

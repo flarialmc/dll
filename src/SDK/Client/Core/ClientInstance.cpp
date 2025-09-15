@@ -1,4 +1,13 @@
 #include "ClientInstance.hpp"
+// Include headers that were forward declared
+#include "../Actor/LocalPlayer.hpp"
+#include "MinecraftGame.hpp"
+#include "../Block/BlockSource.hpp"
+#include "../Render/GuiData.hpp"
+// LoopbackPacketSender.hpp already included in header
+#include "Minecraft.hpp"
+#include "../Level/LevelRender/LevelRender.hpp"
+#include "../Network/Raknet/RaknetConnector.hpp"
 #include "../../SDK.hpp"
 #include <libhat/Access.hpp>
 

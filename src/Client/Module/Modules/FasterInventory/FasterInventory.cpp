@@ -1,4 +1,8 @@
 #include "FasterInventory.hpp"
+// Include packet headers that were forward declared
+#include "../../../../SDK/Client/Network/Packet/InteractPacket.hpp"
+#include "../../../../SDK/Client/Network/Packet/ContainerClosePacket.hpp"
+#include "../../../../SDK/Client/Network/Packet/ContainerOpenPacket.hpp"
 
 #include "Hook/Hooks/Game/PacketHooks.hpp"
 

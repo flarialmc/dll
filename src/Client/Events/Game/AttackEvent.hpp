@@ -1,7 +1,9 @@
 #pragma once
 #include "../Event.hpp"
 #include "../Cancellable.hpp"
-#include "../../../SDK/Client/Actor/Actor.hpp"
+
+// Forward declaration instead of full include
+class Actor;
 
 class AttackEvent : public Event, public Cancellable {
     Actor* actor;

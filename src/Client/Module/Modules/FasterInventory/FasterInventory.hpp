@@ -2,11 +2,18 @@
 
 #include "../Module.hpp"
 #include "../../../../SDK/Client/Network/Packet/Types/ContainerID.hpp"
-#include "../../../../SDK/Client/Network/Packet/InteractPacket.hpp"
-#include "../../../../SDK/Client/Network/Packet/ContainerClosePacket.hpp"
-#include "../../../../SDK/Client/Network/Packet/ContainerOpenPacket.hpp"
-
 #include "../../../../Assets/Assets.hpp"
+#include <queue>
+#include <mutex>
+
+// Forward declarations
+class InteractPacket;
+class ContainerClosePacket;
+class ContainerOpenPacket;
+class PacketSendEvent;
+class PacketEvent;
+class RaknetTickEvent;
+class TickEvent;
 
 
 class FasterInventory : public Module {

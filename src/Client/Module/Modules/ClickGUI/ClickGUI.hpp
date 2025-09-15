@@ -1,20 +1,20 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "../../../Client.hpp"
 #include "Elements/ClickGUIElements.hpp"
-#include "SDK/Client/Network/Packet/TextPacket.hpp"
-#include "Utils/APIUtils.hpp"
-#include "Utils/WinrtUtils.hpp"
 #include <chrono>
 #include <Modules/Misc/Input/GUIMouseListener.hpp>
 #include "../../../GUI/Engine/Constraints.hpp"
 #include "../../../GUI/D2D.hpp"
 #include "../../../../Assets/Assets.hpp"
+// Need these for inline methods
+#include "Utils/WinrtUtils.hpp"
+#include "../../../Client.hpp"
+
+// Forward declarations
+class TextPacket;
 
 #define clickgui ModuleManager::getModule("ClickGUI")
-
-class TextPacket;
 
 struct PageType {
     std::string type = "normal";
