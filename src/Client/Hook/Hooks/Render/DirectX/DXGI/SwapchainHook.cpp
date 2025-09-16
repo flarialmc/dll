@@ -162,12 +162,11 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
         init = false;
         initImgui = false;
         Logger::debug("[DEBUG] Recreating Swapchain");
-        swapchain = nullptr;
 
         return DXGI_ERROR_DEVICE_RESET;
     }
 
-    if(!swapchain) swapchain.copy_from(pSwapChain);
+    if(!swapchain) swapchain = pSwapChain;
     if (D2D::context) MC::windowSize = Vec2(D2D::context->GetSize().width, D2D::context->GetSize().height);
 
 
@@ -386,7 +385,7 @@ UINT SwapchainHook::lastBackbufferHeight = 0;
 std::vector<winrt::com_ptr<IDXGISurface1>> SwapchainHook::DXGISurfaces;
 std::vector<winrt::com_ptr<ID2D1Bitmap1>> SwapchainHook::D2D1Bitmaps;
 std::vector<winrt::com_ptr<ID3D11Resource>> SwapchainHook::D3D11Resources;
-winrt::com_ptr<IDXGISwapChain3> SwapchainHook::swapchain;
+IDXGISwapChain3* SwapchainHook::swapchain;
 winrt::com_ptr<ID3D12DescriptorHeap> SwapchainHook::D3D12DescriptorHeap;
 winrt::com_ptr<ID3D11On12Device> SwapchainHook::d3d11On12Device;
 winrt::com_ptr<ID2D1Bitmap1> SwapchainHook::D2D1Bitmap;
