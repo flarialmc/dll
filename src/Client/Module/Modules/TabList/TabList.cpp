@@ -1483,7 +1483,6 @@ switch (vecmap[i].buildPlatform){
                         }
                     }
 
-
                     if (refreshCache) {
                         float lol = columnx[i / maxColumn] - vectab[i].pNameMetrics.x;
                         float trollOffset = keycardSize * (showHeads ? 1 : 0.3f);
@@ -1498,27 +1497,13 @@ switch (vecmap[i].buildPlatform){
                     }
 
                     FlarialGUI::image(imageResource, vectab[i].imageRect);
-                    if (showPlatforms)
-                    {
-                        float lol2 = columnx[i / maxColumn] - vectab[i].pNameMetrics.x;
-                        float trollOffset2 = keycardSize * (showHeads ? 1.5 : 0.8f);
-
-                        if (!showHeads && textAlignment == "Center") trollOffset2 -= keycardSize * 1.75f;
-
-                        vectab[i].imageRect2 = D2D1::RectF(
-                            fakex + Constraints::SpacingConstraint(0.175, keycardSize) + trollOffset2 + (textAlignment == "Center" ? (lol2 / 2.f) - trollOffset2 * 0.75f : 0.f),
-                            realcenter.y + Constraints::SpacingConstraint(0.196, keycardSize) + Constraints::SpacingConstraint(0.17f, keycardSize),
-                            fakex + Constraints::SpacingConstraint(0.7, keycardSize) + trollOffset2 + (textAlignment == "Center" ? (lol2 / 2.f) - trollOffset2 * 0.75f : 0.f),
-                            realcenter.y + Constraints::SpacingConstraint(0.77, keycardSize) + Constraints::SpacingConstraint(0.17f, keycardSize));
-                    FlarialGUI::image(PlatformIcons, vectab[i].imageRect2);
-                    }
 
                     xx += Constraints::SpacingConstraint(0.6, keycardSize);
 
                     // FLARIAL TAG END
 
                     if (refreshCache) {
-                        vectab[i].textX = fakex + (textAlignment == "Center" ? xx / 2.f : textAlignment == "Right" ? 0 : xx) + keycardSize * (showHeads ? 1.7f : 1.0f);
+                        vectab[i].textX = fakex + (textAlignment == "Center" ? xx / 2.f : textAlignment == "Right" ? 0 : xx) + keycardSize * (showHeads ? 1.2f : 0.5f);
                         vectab[i].textY = realcenter.y + Constraints::SpacingConstraint(0.12, keycardSize);
                     }
                     if (getOps<bool>("textShadow")) {
@@ -1532,21 +1517,23 @@ switch (vecmap[i].buildPlatform){
                             vectab[i].textShadowY,
                             String::StrToWStr(vectab[i].clearedName).c_str(), vectab[i].textWidth, keycardSize, alignments[getOps<std::string>("textalignment")], floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, getColor("textShadow"), true);
                     }
+
                     FlarialGUI::FlarialTextWithFont(vectab[i].textX, vectab[i].textY, String::StrToWStr(vectab[i].clearedName).c_str(), vectab[i].textWidth, keycardSize, alignments[getOps<std::string>("textalignment")], floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
                 } else {
-                    if (refreshCache && showPlatforms) {
+                    if (showPlatforms) {
+                        if (refreshCache){
                         float lol2 = columnx[i / maxColumn] - vectab[i].pNameMetrics.x;
                         float trollOffset2 = keycardSize * (showHeads ? 1.0 : 0.3f);
 
                         if (!showHeads && textAlignment == "Center") trollOffset2 -= keycardSize * 1.75f;
 
-                        vectab[i].imageRect2 = D2D1::RectF(
+                        vectab[i].imageRect = D2D1::RectF(
                             fakex + Constraints::SpacingConstraint(0.175, keycardSize) + trollOffset2 + (textAlignment == "Center" ? (lol2 / 2.f) - trollOffset2 * 0.75f : 0.f),
                             realcenter.y + Constraints::SpacingConstraint(0.196, keycardSize) + Constraints::SpacingConstraint(0.17f, keycardSize),
                             fakex + Constraints::SpacingConstraint(0.7, keycardSize) + trollOffset2 + (textAlignment == "Center" ? (lol2 / 2.f) - trollOffset2 * 0.75f : 0.f),
                             realcenter.y + Constraints::SpacingConstraint(0.77, keycardSize) + Constraints::SpacingConstraint(0.17f, keycardSize));
-                    
-                    FlarialGUI::image(PlatformIcons, vectab[i].imageRect2);
+                        }
+                    FlarialGUI::image(PlatformIcons, vectab[i].imageRect);
                     xx += Constraints::SpacingConstraint(0.6, keycardSize);
                         }
                     if (getOps<bool>("textShadow")) {

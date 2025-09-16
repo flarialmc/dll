@@ -20,7 +20,6 @@ struct TabListEntry {
     ImVec2 pNameMetrics;
 
     D2D_RECT_F imageRect;
-    D2D_RECT_F imageRect2;
 
     float textX;
     float textY;
