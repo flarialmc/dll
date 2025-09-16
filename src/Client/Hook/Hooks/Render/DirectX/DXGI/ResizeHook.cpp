@@ -193,6 +193,7 @@ void ResizeHook::cleanShit(bool fullReset) {
             SwapchainHook::initImgui = false;
             SwapchainHook::imguiCleanupInProgress = false;
         }
+        FlarialGUI::CleanupImageResources();
 
         SwapchainHook::queue = nullptr;
         SwapchainHook::d3d12CommandList = nullptr;
