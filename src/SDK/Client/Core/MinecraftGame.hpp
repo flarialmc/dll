@@ -11,6 +11,11 @@ public:
         auto fn = reinterpret_cast<void (__thiscall *)(MinecraftGame *)>(sig);
         fn(this);
     }
+        void onActiveResourcePackChanged() {
+        static auto sig = GET_SIG_ADDRESS("MinecraftGame::onActiveResourcePackChanged");
+        auto fn = reinterpret_cast<void (__thiscall *)(MinecraftGame *)>(sig);
+        fn(this);
+    }
 //    void _onResumeWaitPreviousResourceLoads() {
 //        static auto sig = GET_SIG_ADDRESS("MinecraftGame::_onResumeWaitPreviousResourceLoads");
 //        auto fn = reinterpret_cast<void (__thiscall *)(MinecraftGame *)>(sig);

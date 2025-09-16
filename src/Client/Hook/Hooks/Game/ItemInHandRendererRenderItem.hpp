@@ -2,6 +2,7 @@
 
 #include "../Hook.hpp"
 #include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
+#include <Modules/Misc/PackChanger/PackChanger.hpp>
 
 /* dont be misled by the name this function is still used for items
  * other than the ones in the players hands (mojang being weird ig)
@@ -12,6 +13,7 @@
 class ItemInHandRendererRenderItem : public Hook {
 private:
     static void ItemInHandRendererRenderItemHook(void* a1, void* a2, Actor* entity, ItemStack* itemStack, bool a5, bool a6, bool a7, bool a8) {
+        if (!PackChanger::canRender) return;
         if(SDK::clientInstance && SDK::clientInstance->getLocalPlayer() && SDK::clientInstance->getLocalPlayer() == entity) {
 
             auto& stack = SDK::clientInstance->getCamera().getWorldMatrixStack();

@@ -5,7 +5,6 @@
 class PackChanger : public Listener {
 private:
     bool recreate = false;
-    bool canRender = false;
     bool enableFrameQueue = false;
     int frameQueue = 0;
     bool userRequestedReload = false;
@@ -18,6 +17,8 @@ private:
     static inline std::array<std::byte, 6> patch1Data;
     static inline std::array<std::byte, 2> patch2Data;
 public:
+    static inline bool canRender = false;
+
     PackChanger() {
         if(VersionUtils::checkAboveOrEqual(21,00)) {
             static auto src = VersionUtils::checkAboveOrEqual(21,20) ? GET_SIG_ADDRESS("ResourcePackManager::_composeFullStack_Patch") : GET_SIG_ADDRESS("MinecraftGame::_onActiveResourcePacksChanged_Patch");
@@ -128,7 +129,7 @@ public:
         if (frameQueue > 0) frameQueue--;
         if(!canRender && enableFrameQueue) {
             if(frameQueue == 0) {
-                if(!recreate) {
+                if(!recreate && name == "hud_screen") {
                     forcePreGame = false;
                     canRender = true;
                     canUseKeys = true;
@@ -144,14 +145,16 @@ public:
         if(name == "pause_screen") {
             if (recreate) {
                 if(!enableFrameQueue) {
+                    SDK::clientInstance->getMinecraftGame()->onActiveResourcePackChanged();
+                    SDK::clientInstance->getMinecraftGame()->_onResumeWaitReloadActors();
+                    SDK::clientInstance->getLevelRender()->getLevelRendererPlayer()->onDeviceLost();
+
                     enableFrameQueue = true;
                     frameQueue = 2;
                 }
                 if(frameQueue == 0) {
                     recreate = false;
 
-                    SDK::clientInstance->getLevelRender()->getLevelRendererPlayer()->onDeviceLost();
-                    SDK::clientInstance->getMinecraftGame()->_onResumeWaitReloadActors();
                     //SwapchainHook::recreate = true;
                 }
                 return;
@@ -174,6 +177,7 @@ public:
             last_tab = name;
         };
         static std::string tab = "screen_world_controls_and_settings";
+        std::cout << name << std::endl;
         bool value = event.getState() || forcePreGame || name == tab || last_tab == tab && name == "screen";
         event.setState(value);
     }

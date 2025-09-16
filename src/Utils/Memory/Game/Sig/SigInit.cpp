@@ -104,6 +104,7 @@ void SigInit::init2160() {
     ADD_SIG("Actor::getNametag", "48 83 EC 28 48 8B 81 28 01 00 00 48 85 C0 74 4F");
     ADD_SIG("Actor::getMobEffectsComponent", "48 89 5C 24 08 48 89 74 24 10 48 89 7C 24 18 55 41 54 41 55 41 56 41 57 48 8D 6C 24 C9 48 81 EC F0 00 00 00 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 27 4C");
 
+    ADD_SIG("MinecraftGame::onActiveResourcePackChanged", "40 53 48 83 EC 20 48 8B D9 48 8B 89 98 06 00 00");
     ADD_SIG("ThirdPersonNametag", "0F 84 FA 05 00 00 49 8B 04 24");
 
     ADD_SIG("Font::drawTransformed", "48 8B C4 48 89 58 08 48 89 70 10 48 89 78 18 55 41 54 41 55 41 56 41 57 48 8D A8 48 FF");
