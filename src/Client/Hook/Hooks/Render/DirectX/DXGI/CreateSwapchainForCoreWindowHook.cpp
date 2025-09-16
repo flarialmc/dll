@@ -55,7 +55,7 @@ HRESULT CreateSwapchainForCoreWindowHook::CreateSwapChainForCoreWindowCallback(
     /* EXTRA RELEASING PRECAUTIONS */
     ResizeHook::cleanShit(true);
     SwapchainHook::queue = nullptr;
-    //Memory::SafeRelease(SwapchainHook::swapchain);
+    SwapchainHook::swapchain = nullptr;
 
     winrt::com_ptr<ID3D12CommandQueue> pCommandQueue;
     Logger::debug("Recreating Swapchain");
