@@ -550,6 +550,7 @@ void TabList::defaultConfig() {
     setDef("maxColumn", 10);
     setDef("togglable", false);
     setDef("showHeads", true);
+    setDef("showPlatforms", true);
     setDef("textalignment", (std::string) "Left");
     setDef("textShadow", false);
     setDef("textShadowOffset", 0.003f);
@@ -593,6 +594,7 @@ void TabList::settingsRender(float settingsOffset) {
     addToggle("Togglable", "", "togglable");
     addToggle("Show Player Heads", "", "showHeads");
     addToggle("Player Count", "", "playerCount");
+    addToggle("Show Platforms", "", "showPlatforms");
     addSliderInt("Max Players per Column", "", "maxColumn", 30, 1);
     addToggle("World Name", "", "worldName");
     addToggle("Server Ping", "", "serverPing");
@@ -637,7 +639,6 @@ std::vector<PlayerListEntry> TabList::sortVecmap(
 
         for (const auto &pair: sourceMap) {
             const PlayerListEntry &entry = pair.second;
-            auto platform = entry.buildPlatform;
             if (entry.name.empty()) continue;
 
             std::string clearedName = String::removeNonAlphanumeric(String::removeColorCodes(entry.name));
@@ -1075,6 +1076,7 @@ void TabList::onRender(RenderEvent &event) {
 
             std::string textAlignment = getOps<std::string>("textalignment");
             bool showHeads = getOps<bool>("showHeads");
+            bool showPlatforms = getOps<bool>("showPlatforms");
             bool alphaOrder = getOps<bool>("alphaOrder");
             bool flarialFirst = getOps<bool>("flarialFirst");
 
@@ -1109,7 +1111,6 @@ void TabList::onRender(RenderEvent &event) {
                 validPlayers = 0;
 
                 for (size_t i = 0; i < vecmap.size(); i++) {
-                    auto platform = vecmap[i].buildPlatform;
                     if (vecmap[i].name.empty()) continue;
 
                     std::string name = String::removeColorCodes(vecmap[i].name);
@@ -1430,7 +1431,10 @@ void TabList::onRender(RenderEvent &event) {
                     }
                     // PLAYER HEAD END
                 }
+                
                 int PlatformIcons;
+                if (showPlatforms)
+                {
 switch (vecmap[i].buildPlatform){
                 case BuildPlatform::Google:
                     PlatformIcons = PlatformIcon[1];
@@ -1456,7 +1460,7 @@ switch (vecmap[i].buildPlatform){
                 case BuildPlatform::Unknown:
                     PlatformIcons = PlatformIcon[-1];
                 break;
-
+}
             }
                 auto pit = std::ranges::find(APIUtils::onlineUsers, vectab[i].clearedName);
                 if (refreshCache) {
@@ -1491,7 +1495,11 @@ switch (vecmap[i].buildPlatform){
                             realcenter.y + Constraints::SpacingConstraint(p2, keycardSize) + Constraints::SpacingConstraint(0.17f, keycardSize),
                             fakex + Constraints::SpacingConstraint(p3, keycardSize) + trollOffset + (textAlignment == "Center" ? (lol / 2.f) - trollOffset * 0.75f : 0.f),
                             realcenter.y + Constraints::SpacingConstraint(p4, keycardSize) + Constraints::SpacingConstraint(0.17f, keycardSize));
-                            
+                    }
+
+                    FlarialGUI::image(imageResource, vectab[i].imageRect);
+                    if (showPlatforms)
+                    {
                         float lol2 = columnx[i / maxColumn] - vectab[i].pNameMetrics.x;
                         float trollOffset2 = keycardSize * (showHeads ? 1.5 : 0.8f);
 
@@ -1502,10 +1510,8 @@ switch (vecmap[i].buildPlatform){
                             realcenter.y + Constraints::SpacingConstraint(0.196, keycardSize) + Constraints::SpacingConstraint(0.17f, keycardSize),
                             fakex + Constraints::SpacingConstraint(0.7, keycardSize) + trollOffset2 + (textAlignment == "Center" ? (lol2 / 2.f) - trollOffset2 * 0.75f : 0.f),
                             realcenter.y + Constraints::SpacingConstraint(0.77, keycardSize) + Constraints::SpacingConstraint(0.17f, keycardSize));
-                    }
-
-                    FlarialGUI::image(imageResource, vectab[i].imageRect);
                     FlarialGUI::image(PlatformIcons, vectab[i].imageRect2);
+                    }
 
                     xx += Constraints::SpacingConstraint(0.6, keycardSize);
 
@@ -1528,7 +1534,7 @@ switch (vecmap[i].buildPlatform){
                     }
                     FlarialGUI::FlarialTextWithFont(vectab[i].textX, vectab[i].textY, String::StrToWStr(vectab[i].clearedName).c_str(), vectab[i].textWidth, keycardSize, alignments[getOps<std::string>("textalignment")], floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
                 } else {
-                    if (refreshCache) {
+                    if (refreshCache && showPlatforms) {
                         float lol2 = columnx[i / maxColumn] - vectab[i].pNameMetrics.x;
                         float trollOffset2 = keycardSize * (showHeads ? 1.0 : 0.3f);
 
@@ -1539,9 +1545,10 @@ switch (vecmap[i].buildPlatform){
                             realcenter.y + Constraints::SpacingConstraint(0.196, keycardSize) + Constraints::SpacingConstraint(0.17f, keycardSize),
                             fakex + Constraints::SpacingConstraint(0.7, keycardSize) + trollOffset2 + (textAlignment == "Center" ? (lol2 / 2.f) - trollOffset2 * 0.75f : 0.f),
                             realcenter.y + Constraints::SpacingConstraint(0.77, keycardSize) + Constraints::SpacingConstraint(0.17f, keycardSize));
-                    }
+                    
                     FlarialGUI::image(PlatformIcons, vectab[i].imageRect2);
                     xx += Constraints::SpacingConstraint(0.6, keycardSize);
+                        }
                     if (getOps<bool>("textShadow")) {
                         if (refreshCache) {
                             vectab[i].textShadowY2 = (realcenter.y + Constraints::SpacingConstraint(0.12, keycardSize)) + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * getOps<float>("uiscale");
