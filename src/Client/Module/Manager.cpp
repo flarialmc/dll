@@ -286,7 +286,7 @@ void ModuleManager::initialize() {
 	addModule<Twerk>();
 	addModule<CinematicCamera>();
 	addModule<ChunkBorder>();
-	addModule<CompactChat>();
+	if(VersionUtils::checkAboveOrEqual(21, 70)) addModule<CompactChat>();
 	addModule<MessageLogger>();
 	addModule<TotemCounter>();
 	addModule<BetterHungerBar>();
