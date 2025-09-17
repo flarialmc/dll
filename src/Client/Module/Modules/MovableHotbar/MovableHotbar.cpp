@@ -118,8 +118,6 @@ void MovableHotbar::update() {
 void MovableHotbar::updatePosition(UIControl *control) {
     if (!(SDK::clientInstance && SDK::clientInstance->getLocalPlayer())) return;
 
-    std::cout << "man" << std::endl;
-
     auto pos = control->parentRelativePosition;
 
     if ((enabledState && originalPos == Vec2<float>{0, 0}) || delayDisable) {

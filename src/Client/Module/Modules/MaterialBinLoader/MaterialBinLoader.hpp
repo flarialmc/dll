@@ -32,11 +32,17 @@ public:
 
     void onReadFile(ReadFileEvent &event) {
         const std::string &p = event.getpath().getUtf8StdString();
+        if (SDK::currentScreen == "modal_progress_screen" || SDK::currentScreen == "world_saving_progress_screen")
+        {
+            event.returnresult(event.result);
+            return;
+        }
+
         // Logger::custom(fg(fmt::color::dark_green), "minecraft.windows.exe", "Loaded path: {}", p); //this is pretty cool
         if (p.find("/data/renderer/materials/") != std::string::npos && strncmp(p.c_str() + p.size() - 13, ".material.bin", 13) == 0) {
 
             if (!_composeFullStackHook::resourcePackManager) {
-                Logger::custom(fg(fmt::color::yellow), "MaterialBinLoader", "Shaders cant be loaded yet ResourcePackManager is null!");
+                //Logger::custom(fg(fmt::color::yellow), "MaterialBinLoader", "Shaders cant be loaded yet ResourcePackManager is null!");
                 event.returnresult(event.result);
                 return;
             }
