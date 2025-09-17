@@ -9,12 +9,14 @@
 #include <future>
 #include <queue>
 #include <condition_variable>
+#include <algorithm>
 #include <winrt/base.h>
 
 #include "Command/Commands/SkinStealCommand.hpp"
 #include "Hook/Hooks/Render/DirectX/DXGI/SwapchainHook.hpp"
 #include "Modules/ClickGUI/ClickGUI.hpp"
 #include "Modules/Nick/NickModule.hpp"
+#include "../../Manager.hpp"
 
 bool logDebug = false;
 
@@ -121,7 +123,6 @@ bool TabList::AllocatePlayerHeadDescriptor(const std::string& playerName, D3D12_
     if (!freePlayerHeadDescriptors.empty()) {
         descriptorId = freePlayerHeadDescriptors.front();
         freePlayerHeadDescriptors.pop();
-        Logger::custom(fg(fmt::color::cyan), "PlayerHeadDescriptor", "Reusing freed descriptor {} for player '{}'", descriptorId, playerName);
     } else {
         // Allocate new descriptor
         static bool initialized = false;
@@ -269,7 +270,7 @@ void InitializeDX12Uploader() {
     if (logDebug) Logger::debug("Initialized DX12 Uploader");
 }
 
-void CleanupDX12Uploader() {
+void TabList::CleanupDX12Uploader() {
     if (g_uploadFenceEvent) {
         CloseHandle(g_uploadFenceEvent);
         g_uploadFenceEvent = nullptr;
@@ -360,13 +361,23 @@ void StopAsyncLoading() {
 }
 
 // Cleanup function for player head textures
-void CleanupPlayerHeadTextures() {
+void TabList::ReinitializeAfterResize() {
+    // Check if TabList module is enabled before reinitializing
+    auto tabListModule = ModuleManager::getModule("Tab List");
+    if (tabListModule && tabListModule->isEnabled()) {
+        // Reinitialize async loading threads after cleanup
+        TabList::InitializeAsyncLoading();
+        // DX12 uploader will be initialized on-demand in ProcessReadyPlayerHeadTextures
+    }
+}
+
+void TabList::CleanupPlayerHeadTextures() {
     if (logDebug) Logger::debug("Cleaning up player head textures - DX12: {}, DX11: {}", g_playerHeadTextures.size(), g_playerHeadTexturesDX11.size());
 
     // Stop async loading first
     StopAsyncLoading();
 
-    CleanupDX12Uploader();
+    TabList::CleanupDX12Uploader();
 
     // Clear DX12 textures and free descriptors
     {
@@ -446,7 +457,7 @@ void PlayerHeadLoaderWorker() {
 
     if (logDebug) Logger::debug("PlayerHead loader worker thread exiting");
 }
-void InitializeAsyncLoading() {
+void TabList::InitializeAsyncLoading() {
     if (!g_loaderThreads.empty()) return; // Already initialized
 
     g_shouldStopLoading = false;
@@ -513,18 +524,62 @@ void ProcessReadyPlayerHeadTextures() {
     }
 }
 
-// Periodic cleanup to free unused descriptors (updated to use new system)
+// Periodic cleanup to free unused descriptors and textures
 void CleanupUnusedPlayerHeadDescriptors() {
-    // The new system automatically handles cleanup in SwapchainHook::CleanupOldPlayerHeads
-    // We call it with a reasonable limit to keep memory usage under control
+    // Clean up old descriptors
     TabList::CleanupOldPlayerHeads(500); // Keep at most 500 cached playerheads
+
+    // Also clean up texture caches to prevent unbounded memory growth
+    // Keep only the most recently used textures
+    const size_t MAX_TEXTURE_CACHE_SIZE = 200;
+
+    std::lock_guard<std::mutex> lock(g_playerHeadMutex);
+
+    // Clean DX12 textures if too many
+    if (g_playerHeadTextures.size() > MAX_TEXTURE_CACHE_SIZE) {
+        std::vector<std::pair<std::string, std::chrono::steady_clock::time_point>> textureAges;
+        for (const auto& [name, tex] : g_playerHeadTextures) {
+            if (tex.valid) {
+                textureAges.emplace_back(name, tex.lastUsed);
+            }
+        }
+
+        // Sort by oldest first
+        std::sort(textureAges.begin(), textureAges.end(),
+            [](const auto& a, const auto& b) {
+                return a.second < b.second;
+            });
+
+        // Remove oldest textures
+        size_t toRemove = g_playerHeadTextures.size() - MAX_TEXTURE_CACHE_SIZE;
+        for (size_t i = 0; i < toRemove && i < textureAges.size(); i++) {
+            auto it = g_playerHeadTextures.find(textureAges[i].first);
+            if (it != g_playerHeadTextures.end()) {
+                if (it->second.descriptorId != UINT_MAX) {
+                    TabList::FreePlayerHeadDescriptor(it->second.descriptorId);
+                }
+                g_playerHeadTextures.erase(it);
+            }
+        }
+    }
+
+    // Clean DX11 textures if too many
+    if (g_playerHeadTexturesDX11.size() > MAX_TEXTURE_CACHE_SIZE) {
+        // For DX11, we don't have lastUsed timestamps, so just clear oldest entries
+        size_t toRemove = g_playerHeadTexturesDX11.size() - MAX_TEXTURE_CACHE_SIZE;
+        auto it = g_playerHeadTexturesDX11.begin();
+        for (size_t i = 0; i < toRemove && it != g_playerHeadTexturesDX11.end(); ) {
+            it = g_playerHeadTexturesDX11.erase(it);
+            i++;
+        }
+    }
 }
 
 void TabList::onEnable() {
     Listen(this, RenderEvent, &TabList::onRender)
     Listen(this, KeyEvent, &TabList::onKey)
     Listen(this, MouseEvent, &TabList::onMouse)
-    InitializeAsyncLoading();
+    TabList::InitializeAsyncLoading();
     // START OF CHANGE: Initialize DX12 Uploader
     InitializeDX12Uploader();
     // END OF CHANGE
@@ -535,8 +590,7 @@ void TabList::onDisable() {
     Deafen(this, RenderEvent, &TabList::onRender)
     Deafen(this, KeyEvent, &TabList::onKey)
     Deafen(this, MouseEvent, &TabList::onMouse)
-    //CleanupPlayerHeadTextures();
-    CleanupPlayerHeadTextures();
+    TabList::CleanupPlayerHeadTextures();
     Module::onDisable();
 }
 
@@ -989,18 +1043,24 @@ PlayerHeadTexture *CreateTextureFromBytesDX12(
     playerTex.loadState = PlayerHeadLoadState::Loading;
     playerTex.lastUsed = std::chrono::steady_clock::now();
 
-    // Queue the loading task
+    // Queue the loading task (with size limit to prevent unbounded growth)
     {
         std::lock_guard<std::mutex> queueLock(g_loadQueueMutex);
-        g_loadQueue.push({
-            playerName,
-            std::vector<unsigned char>(data, data + (width * height * 4)),
-            width,
-            height,
-            true // isDX12
-        });
+        // Limit queue size to prevent memory issues during high player churn
+        const size_t MAX_QUEUE_SIZE = 50;
+        if (g_loadQueue.size() < MAX_QUEUE_SIZE) {
+            g_loadQueue.push({
+                playerName,
+                std::vector<unsigned char>(data, data + (width * height * 4)),
+                width,
+                height,
+                true // isDX12
+            });
+            g_loadQueueCV.notify_one();
+        } else {
+            if (logDebug) Logger::debug("Texture load queue full, skipping texture for {}", playerName);
+        }
     }
-    g_loadQueueCV.notify_one();
 
     return &playerTex;
 }
@@ -1028,18 +1088,24 @@ ID3D11ShaderResourceView *CreateTextureFromBytesDX11(
     PlayerHeadTextureDX11 &playerTex = g_playerHeadTexturesDX11[playerName];
     playerTex.loadState = PlayerHeadLoadState::Loading;
 
-    // Queue the loading task
+    // Queue the loading task (with size limit to prevent unbounded growth)
     {
         std::lock_guard<std::mutex> queueLock(g_loadQueueMutex);
-        g_loadQueue.push({
-            playerName,
-            std::vector<unsigned char>(data, data + (width * height * 4)),
-            width,
-            height,
-            false // isDX12
-        });
+        // Limit queue size to prevent memory issues during high player churn
+        const size_t MAX_QUEUE_SIZE = 50;
+        if (g_loadQueue.size() < MAX_QUEUE_SIZE) {
+            g_loadQueue.push({
+                playerName,
+                std::vector<unsigned char>(data, data + (width * height * 4)),
+                width,
+                height,
+                false // isDX12
+            });
+            g_loadQueueCV.notify_one();
+        } else {
+            if (logDebug) Logger::debug("Texture load queue full, skipping texture for {}", playerName);
+        }
     }
-    g_loadQueueCV.notify_one();
 
     return nullptr; // Will be available next frame
 }
@@ -1100,6 +1166,11 @@ void TabList::onRender(RenderEvent &event) {
                 columnx.clear();
                 refreshCache = true;
                 vecmap = sortVecmap(pmap_cache, flarialFirst, alphaOrder);
+
+                // Ensure vectab is properly sized to avoid buffer overflow
+                if (vectab.size() < vecmap.size()) {
+                    vectab.resize(vecmap.size());
+                }
 
                 totalWidth = keycardSize * (showHeads ? 1 : 0.4);
 
@@ -1294,9 +1365,9 @@ void TabList::onRender(RenderEvent &event) {
 
                     if (static_cast<int>(skinImage.imageFormat) == 4 && // RGBA8Unorm format
                         skinImage.mWidth == skinImage.mHeight && // Square texture
-                        skinImage.mWidth == 64 || skinImage.mWidth == 128 && // 64x64 or 128x128
-                        (skinImage.mWidth & (skinImage.mWidth - 1)) == 0) {
-                        // Power of 2
+                        (skinImage.mWidth == 64 || skinImage.mWidth == 128) && // 64x64 or 128x128
+                        (skinImage.mWidth & (skinImage.mWidth - 1)) == 0 && // Power of 2
+                        skinImage.mImageBytes.size() >= (size_t)(skinImage.mWidth * skinImage.mHeight * 4)) { // Has enough data
 
                         // Determine skin format based on width (0 = classic 64x64, 1 = slim 64x64+)
                         int skinFormat = (skinImage.mWidth == 64) ? 0 : 1;
@@ -1318,28 +1389,45 @@ void TabList::onRender(RenderEvent &event) {
                         // Dynamic head size detection and scaling for crisp pixels
                         // Support any skin resolution (64x64, 128x128, 256x256, etc.)
                         const int headSize = skinImage.mWidth / 8; // Head is always 1/8th of skin width
+                        if (headSize <= 0) {
+                            if (logDebug) Logger::debug("Invalid head size for player {}: width={}", vecmap[i].name, skinImage.mWidth);
+                            continue;
+                        }
                         const int scaledSize = std::max(64, headSize * 2); // At least 64x64, or 2x the original head size
-                        const int scale = scaledSize / headSize;
+                        const int scale = std::max(1, scaledSize / headSize); // Prevent division by zero
                         std::vector<unsigned char> scaledHead(scaledSize * scaledSize * 4);
                         std::vector<unsigned char> scaledHead2(scaledSize * scaledSize * 4);
 
                         if (!alrExists) {
+                            // Bounds check for head data
+                            size_t expectedHeadSize = (size_t)(headSize * headSize * 4);
+                            if (head.size() < expectedHeadSize || head2.size() < expectedHeadSize) {
+                                if (logDebug) Logger::debug("Invalid head size for player {}: expected {}, got head={}, head2={}",
+                                    vecmap[i].name, expectedHeadSize, head.size(), head2.size());
+                                continue;
+                            }
+
                             for (int y = 0; y < scaledSize; y++) {
                                 for (int x = 0; x < scaledSize; x++) {
-                                    int srcX = x / scale;
-                                    int srcY = y / scale;
+                                    int srcX = std::min(x / scale, headSize - 1);
+                                    int srcY = std::min(y / scale, headSize - 1);
                                     int srcIndex = (srcY * headSize + srcX) * 4;
                                     int dstIndex = (y * scaledSize + x) * 4;
 
-                                    scaledHead[dstIndex + 0] = head[srcIndex + 0]; // R
-                                    scaledHead[dstIndex + 1] = head[srcIndex + 1]; // G
-                                    scaledHead[dstIndex + 2] = head[srcIndex + 2]; // B
-                                    scaledHead[dstIndex + 3] = head[srcIndex + 3]; // A
+                                    // Additional bounds checking
+                                    if ((size_t)(srcIndex + 3) < head.size() && (size_t)(dstIndex + 3) < scaledHead.size()) {
+                                        scaledHead[dstIndex + 0] = head[srcIndex + 0]; // R
+                                        scaledHead[dstIndex + 1] = head[srcIndex + 1]; // G
+                                        scaledHead[dstIndex + 2] = head[srcIndex + 2]; // B
+                                        scaledHead[dstIndex + 3] = head[srcIndex + 3]; // A
+                                    }
 
-                                    scaledHead2[dstIndex + 0] = head2[srcIndex + 0]; // R
-                                    scaledHead2[dstIndex + 1] = head2[srcIndex + 1]; // G
-                                    scaledHead2[dstIndex + 2] = head2[srcIndex + 2]; // B
-                                    scaledHead2[dstIndex + 3] = head2[srcIndex + 3]; // A
+                                    if ((size_t)(srcIndex + 3) < head2.size() && (size_t)(dstIndex + 3) < scaledHead2.size()) {
+                                        scaledHead2[dstIndex + 0] = head2[srcIndex + 0]; // R
+                                        scaledHead2[dstIndex + 1] = head2[srcIndex + 1]; // G
+                                        scaledHead2[dstIndex + 2] = head2[srcIndex + 2]; // B
+                                        scaledHead2[dstIndex + 3] = head2[srcIndex + 3]; // A
+                                    }
                                 }
                             }
                         }
@@ -1432,8 +1520,11 @@ void TabList::onRender(RenderEvent &event) {
 
                 auto pit = std::ranges::find(APIUtils::onlineUsers, vectab[i].clearedName);
                 if (refreshCache) {
-                    vectab[i].pNameMetrics = FlarialGUI::getFlarialTextSize(String::StrToWStr(vectab[i].clearedName).c_str(), columnx[i / maxColumn] - (0.825 * keycardSize), keycardSize, alignments[getOps<std::string>("textalignment")], floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, true);
-                    vectab[i].textWidth = columnx[i / maxColumn] - (0.825 * keycardSize);
+                    // Safely access columnx with bounds checking to prevent crashes
+                    size_t columnIndex = i / maxColumn;
+                    float columnWidth = (columnIndex < columnx.size()) ? columnx[columnIndex] : keycardSize * 2.0f;
+                    vectab[i].pNameMetrics = FlarialGUI::getFlarialTextSize(String::StrToWStr(vectab[i].clearedName).c_str(), columnWidth - (0.825 * keycardSize), keycardSize, alignments[getOps<std::string>("textalignment")], floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, true);
+                    vectab[i].textWidth = columnWidth - (0.825 * keycardSize);
                 }
 
                 if (pit != APIUtils::onlineUsers.end()) {
@@ -1452,7 +1543,9 @@ void TabList::onRender(RenderEvent &event) {
                     }
 
                     if (refreshCache) {
-                        float lol = columnx[i / maxColumn] - vectab[i].pNameMetrics.x;
+                        size_t columnIndex = i / maxColumn;
+                        float columnWidth = (columnIndex < columnx.size()) ? columnx[columnIndex] : keycardSize * 2.0f;
+                        float lol = columnWidth - vectab[i].pNameMetrics.x;
                         float trollOffset = keycardSize * (showHeads ? 1 : 0.3f);
 
                         if (!showHeads && textAlignment == "Center") trollOffset -= keycardSize * 1.75f;
@@ -1510,7 +1603,10 @@ void TabList::onRender(RenderEvent &event) {
 
                 if ((i + 1) % maxColumn == 0) {
                     realcenter.y -= Constraints::SpacingConstraint(0.70, keycardSize) * maxColumn;
-                    fakex += columnx[i / maxColumn];
+                    size_t columnIndex = i / maxColumn;
+                    if (columnIndex < columnx.size()) {
+                        fakex += columnx[columnIndex];
+                    }
                 }
             }
 

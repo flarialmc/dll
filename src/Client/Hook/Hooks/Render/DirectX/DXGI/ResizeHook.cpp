@@ -155,6 +155,15 @@ void ResizeHook::cleanShit(bool fullReset) {
     }
 
     ImagesClass::images.clear();
+
+    // Clean up TabList resources for both fullReset and normal resize
+    TabList::CleanupDX12Uploader();
+    TabList::CleanupPlayerHeadTextures();
+    TabList::ResetDescriptorState();
+
+    // Reinitialize async loading after cleanup so player heads continue to load
+    TabList::ReinitializeAfterResize();
+
     if (fullReset) {
         FlarialGUI::hasLoadedAll = false;
         for (auto& [id, texture] : ImagesClass::ImguiDX12Textures) {
@@ -173,8 +182,6 @@ void ResizeHook::cleanShit(bool fullReset) {
 
         ImagesClass::ImguiDX11Images.clear();
 
-
-        TabList::ResetDescriptorState();
         SwapchainHook::ResetDescriptorAllocation();
     }
 
