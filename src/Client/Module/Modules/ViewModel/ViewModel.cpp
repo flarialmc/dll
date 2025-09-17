@@ -1,5 +1,6 @@
 #include "ViewModel.hpp"
 #include "Client.hpp"
+#include "Client/GUI/Engine/Engine.hpp"
 
 #include "glm/glm/ext/matrix_transform.hpp"
 

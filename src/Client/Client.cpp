@@ -1,5 +1,5 @@
 #include "Client.hpp"
-
+#include "SDK/Client/Actor/LocalPlayer.hpp"
 #include <lib/json/json.hpp>
 
 #include <filesystem>
@@ -10,18 +10,16 @@
 
 #include "Command/CommandManager.hpp"
 
-#include <winrt/Windows.UI.Core.h>
 #include <winrt/Windows.Foundation.h>
-#include <winrt/Windows.ApplicationModel.Core.h>
 #include <winrt/Windows.ApplicationModel.Activation.h>
 #include <Scripting/ScriptManager.hpp>
 #include <winrt/Windows.Foundation.Collections.h>
-#include <winrt/Windows.Foundation.h>
 
 #include "Utils/APIUtils.hpp"
 
 #include "../Assets/Assets.hpp"
 #include "Events/Misc/ProtocolEvent.hpp"
+#include "GUI/Engine/EngineImGui.hpp"
 
 namespace winrt
 {

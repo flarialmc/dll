@@ -11,6 +11,7 @@
 #include <curl/curl/easy.h>
 
 #include "SDK/SDK.hpp"
+#include "SDK/Client/Actor/LocalPlayer.hpp"
 
 size_t WriteCallback(void* contents, size_t size, size_t nmemb, std::string* output) {
     size_t totalSize = size * nmemb;

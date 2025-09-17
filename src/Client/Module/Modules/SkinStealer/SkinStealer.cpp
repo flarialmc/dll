@@ -1,10 +1,12 @@
 #include "SkinStealer.hpp"
-
+#include "Client/GUI/Engine/Engine.hpp"
 #include <utility>
 
 #include "Command/Commands/SkinStealCommand.hpp"
 
 #include "SDK/Client/Network/Packet/PlayerSkinPacket.hpp"
+#include "SDK/Client/Level/Level.hpp"
+#include "SDK/Client/Actor/LocalPlayer.hpp"
 
 std::vector<std::shared_ptr<Packet> > SkinStealer::inFlightPackets;
 
@@ -81,7 +83,8 @@ bool isValidUtf8(const std::string &s) {
 }
 
 void SkinStealer::cloneSkin(std::string targetName) {
-    for (const auto val: SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap() | std::views::values) {
+    std::unordered_map<mcUUID, PlayerListEntry> playerMap = SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap();
+    for (const auto& val: playerMap | std::views::values) {
         if (String::removeNonAlphanumeric(String::removeColorCodes(String::toLower(val.name))) != targetName) continue;
         if (!isValidUtf8(val.playerSkin.mId)) {
             SDK::clientInstance->getGuiData()->displayClientMessage("§cUnable to clone skin");

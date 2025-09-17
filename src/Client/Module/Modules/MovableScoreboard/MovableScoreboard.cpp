@@ -1,4 +1,5 @@
 #include "MovableScoreboard.hpp"
+#include "SDK/Client/Render/GuiData.hpp"
 
 
 void MovableScoreboard::onEnable() {

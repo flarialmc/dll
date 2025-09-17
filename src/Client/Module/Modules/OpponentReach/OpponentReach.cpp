@@ -1,4 +1,7 @@
 #include "OpponentReach.hpp"
+#include "SDK/Client/Actor/LocalPlayer.hpp"
+#include "SDK/Client/Actor/Components/RuntimeIDComponent.hpp"
+#include "SDK/Client/Level/Level.hpp"
 
 
 

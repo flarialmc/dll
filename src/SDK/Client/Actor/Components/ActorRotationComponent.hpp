@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Utils/Utils.hpp"
-#include "SDK/Client/Actor/EntityContext.hpp"
+#include "../../../../Utils/Utils.hpp"
+#include "../EntityContext.hpp"
 
 struct ActorRotationComponent : IEntityComponent {
     Vec2<float> rot;

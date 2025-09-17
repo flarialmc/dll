@@ -1144,7 +1144,7 @@ bool FlarialGUI::LoadFontFromFontFamily(FontKey fontK) {
 	}
 
 	std::string name = fontK.name;
-	std::ranges::transform(name, name.begin(), ::towlower);
+	std::ranges::transform(name, name.begin(), ::tolower);
 	std::wstring fontName = to_wide(name);
 	std::wstring fontFilePath = GetFontFilePath(fontName, fontK.weight);
 	std::string path;

@@ -1,5 +1,5 @@
 #include "HitResult.hpp"
-
+#include "../Actor/LocalPlayer.hpp"
 #include <Utils/Memory/Game/SignatureAndOffsetManager.hpp>
 #include <Utils/VersionUtils.hpp>
 #include <Utils/Memory/Memory.hpp>

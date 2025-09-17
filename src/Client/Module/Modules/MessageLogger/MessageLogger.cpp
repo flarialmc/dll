@@ -1,4 +1,5 @@
 #include "MessageLogger.hpp"
+#include "SDK/Client/Render/GuiData.hpp"
 
 
 void MessageLogger::onEnable() {

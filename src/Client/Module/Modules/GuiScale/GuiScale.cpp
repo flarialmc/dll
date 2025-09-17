@@ -1,6 +1,6 @@
 #include "GuiScale.hpp"
-
-
+#include "SDK/Client/Actor/LocalPlayer.hpp"
+#include "SDK/Client/Render/GuiData.hpp"
 #include "Modules/MovableBossbar/MovableBossbar.hpp"
 #include "Modules/MovableChat/MovableChat.hpp"
 #include "Modules/MovableCoordinates/MovableCoordinates.hpp"

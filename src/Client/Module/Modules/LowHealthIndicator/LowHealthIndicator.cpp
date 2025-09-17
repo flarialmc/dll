@@ -1,5 +1,5 @@
 #include "LowHealthIndicator.hpp"
-
+#include "SDK/Client/Actor/LocalPlayer.hpp"
 #include "GUI/Engine/Constraints.hpp"
 
 

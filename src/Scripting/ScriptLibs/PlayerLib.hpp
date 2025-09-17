@@ -5,6 +5,12 @@
 #include <Utils/Utils.hpp>
 #include <SDK/SDK.hpp>
 #include <SDK/Client/Actor/Actor.hpp>
+#include <SDK/Client/Actor/LocalPlayer.hpp>
+#include <SDK/Client/Actor/Components/ActorRotationComponent.hpp>
+#include <SDK/Client/Container/PlayerInventory.hpp>
+#include <SDK/Client/Container/Inventory.hpp>
+#include <SDK/Client/Block/BlockSource.hpp>
+#include <SDK/Client/Item/Item.hpp>
 #include <SDK/Client/Network/Packet/TextPacket.hpp>
 #include <SDK/Client/Network/Packet/CommandRequestPacket.hpp>
 

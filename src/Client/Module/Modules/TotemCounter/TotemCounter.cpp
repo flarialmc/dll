@@ -1,5 +1,6 @@
 #include "TotemCounter.hpp"
-
+#include "SDK/Client/Actor/LocalPlayer.hpp"
+#include "SDK/Client/Container/PlayerInventory.hpp"
 
 #include "Events/Game/TickEvent.hpp"
 

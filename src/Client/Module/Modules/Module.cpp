@@ -1,5 +1,5 @@
 #include "Module.hpp"
-
+#include "SDK/Client/Render/GuiData.hpp"
 #include "../../Client.hpp"
 
 #include <lib/json/json.hpp>

@@ -13,6 +13,14 @@
 #include <devpkey.h>
 
 #include "DebugMenu.hpp"
+#include "SDK/Client/Actor/LocalPlayer.hpp"
+#include "SDK/Client/Actor/Components/StateVectorComponent.hpp"
+#include "SDK/Client/Actor/Components/ActorRotationComponent.hpp"
+#include "SDK/Client/Level/Dimension.hpp"
+#include "SDK/Client/Block/BlockSource.hpp"
+#include "SDK/Client/Level/HitResult.hpp"
+#include "SDK/Client/Level/HitResult.hpp"
+#include "SDK/Client/Actor/Gamemode.hpp"
 #include "Tags.hpp"
 #include "Modules/Time/Time.hpp"
 #include "Modules/CPS/CPSCounter.hpp"

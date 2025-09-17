@@ -2,6 +2,8 @@
 #include "../Module.hpp"
 #include <chrono>
 #include <algorithm>
+#include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
+#include "../../../../SDK/Client/Actor/Components/ActorRotationComponent.hpp"
 
 
 class JavaViewBobbing : public Module {

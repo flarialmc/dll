@@ -1,4 +1,6 @@
 #include "TabList.hpp"
+#include "SDK/Client/Actor/LocalPlayer.hpp"
+#include "Utils/APIUtils.hpp"
 
 #include <wrl/client.h>
 #include <unordered_map>

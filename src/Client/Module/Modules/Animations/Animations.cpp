@@ -1,6 +1,7 @@
 #include "Animations.hpp"
 
 #include "Client.hpp"
+#include "../../../GUI/Engine/Engine.hpp"
 
 
 void Animations::onEnable() {

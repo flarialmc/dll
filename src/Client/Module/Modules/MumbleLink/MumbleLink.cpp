@@ -1,4 +1,6 @@
 #include "MumbleLink.hpp"
+#include "SDK/Client/Actor/LocalPlayer.hpp"
+#include "SDK/Client/Actor/Components/ActorRotationComponent.hpp"
 
 
 void MumbleLink::onEnable()

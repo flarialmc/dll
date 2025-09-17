@@ -2,7 +2,11 @@
 #include "../../Module/Manager.hpp"
 
 #include <Utils/WinrtUtils.hpp>
-
+#include "SDK/Client/Level/Level.hpp"
+#include "SDK/Client/Actor/LocalPlayer.hpp"
+#include "SDK/Client/Container/PlayerInventory.hpp"
+#include "SDK/Client/Container/Inventory.hpp"
+#include "SDK/Client/Item/Item.hpp"
 
 void WikiCommand::execute(const std::vector<std::string> &args) {
 
@@ -26,7 +30,7 @@ void WikiCommand::execute(const std::vector<std::string> &args) {
         return;
     }
 
-    std::string link = std::format("https://minecraft.wiki/w/{}", item->getname());
+    std::string link = std::format("https://minecraft.wiki/w/{}", item->name);
 
     if (args[0] == "open") {
         WinrtUtils::launchURI(link);

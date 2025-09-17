@@ -2,6 +2,7 @@
 #include "../../../../../../Assets/Assets.hpp"
 #include "../../../../../Module/Modules/ClickGUI/ClickGUI.hpp"
 #include "../Utils/WinrtUtils.hpp"
+#include "GUI/Engine/Engine.hpp"
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 
@@ -24,7 +25,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
     }
 
     if (index > shadowsizesr.size() - 1 || index == 0) {
-        shadowsizesr.emplace_back(0.01, 0.01);
+        shadowsizesr.emplace_back(0.01f, 0.01f);
     }
 
     if (index > hoveringFav.size() - 1 || index == 0) {

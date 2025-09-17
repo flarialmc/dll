@@ -1,4 +1,5 @@
 #include "HueChanger.hpp"
+#include "Client/GUI/Engine/Engine.hpp"
 
 
 

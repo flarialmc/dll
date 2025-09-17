@@ -1,4 +1,5 @@
 #include "RawInputBuffer.hpp"
+#include "Client/GUI/Engine/Engine.hpp"
 
 
 void RawInputBuffer::onEnable()

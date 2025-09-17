@@ -1,5 +1,7 @@
 #include "PotionHUD.hpp"
-
+#include "SDK/Client/Render/GuiData.hpp"
+#include "SDK/Client/Actor/LocalPlayer.hpp"
+#include "SDK/Client/Actor/Components/MobEffectsComponent.hpp"
 
 #include "Modules/ClickGUI/ClickGUI.hpp"
 #include "Utils/Render/PositionUtils.hpp"

@@ -1,5 +1,10 @@
 #include "ArrowCounter.hpp"
 
+#include "Client/GUI/Engine/Engine.hpp"
+#include "SDK/Client/Actor/LocalPlayer.hpp"
+#include "SDK/Client/Container/PlayerInventory.hpp"
+#include "SDK/Client/Container/Inventory.hpp"
+#include "SDK/Client/Item/Item.hpp"
 
 #include "Events/Game/TickEvent.hpp"
 

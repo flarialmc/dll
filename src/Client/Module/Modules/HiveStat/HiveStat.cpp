@@ -1,5 +1,6 @@
 #include "HiveStat.hpp"
-
+#include "SDK/Client/Actor/LocalPlayer.hpp"
+#include "SDK/Client/Level/Level.hpp"
 #include <thread>
 #include <vector>
 #include <algorithm>

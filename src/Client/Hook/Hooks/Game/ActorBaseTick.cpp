@@ -2,6 +2,7 @@
 #include "ActorBaseTick.hpp"
 #include "../../../Client.hpp"
 #include "Events/Game/TickEvent.hpp"
+#include "SDK/Client/Actor/LocalPlayer.hpp"
 
 void ActorBaseTick::enableHook() {
 

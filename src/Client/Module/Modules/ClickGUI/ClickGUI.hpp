@@ -10,6 +10,7 @@
 // Need these for inline methods
 #include "Utils/WinrtUtils.hpp"
 #include "../../../Client.hpp"
+#include "GUI/Engine/EngineImGui.hpp"
 
 // Forward declarations
 class TextPacket;
@@ -71,7 +72,7 @@ public:
             {"Regular", "§4"}
         });
 
-    static inline D2D_COLOR_F getColor(const std::string& text);
+    static D2D_COLOR_F getColor(const std::string& text);
 
 private:
     template<typename WordContainer>

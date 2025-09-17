@@ -1,5 +1,7 @@
 #include "BlockBreakIndicator.hpp"
 
+#include "SDK/Client/Actor/LocalPlayer.hpp"
+#include "SDK/Client/Actor/Gamemode.hpp"
 
 #include "Events/Render/RenderEvent.hpp"
 #include "Modules/ClickGUI/ClickGUI.hpp"

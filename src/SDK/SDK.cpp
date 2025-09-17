@@ -1,6 +1,8 @@
 #pragma once
 
 #include "SDK.hpp"
+#include "Client/Actor/LocalPlayer.hpp"
+#include "../Client/GUI/Engine/Engine.hpp"
 #include "../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 #include <cctype>
 

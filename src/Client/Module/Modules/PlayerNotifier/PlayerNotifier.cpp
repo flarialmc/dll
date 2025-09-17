@@ -1,4 +1,8 @@
 #include "PlayerNotifier.hpp"
+#include "SDK/Client/Actor/LocalPlayer.hpp"
+#include "SDK/Client/Level/Level.hpp"
+#include "SDK/Client/Container/PlayerInventory.hpp"
+#include "Client/GUI/Engine/Engine.hpp"
 
 void PlayerNotifier::defaultConfig() {
 	getKeybind();

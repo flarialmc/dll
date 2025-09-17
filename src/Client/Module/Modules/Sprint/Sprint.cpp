@@ -1,5 +1,6 @@
 #include "Sprint.hpp"
-
+#include "SDK/Client/Actor/LocalPlayer.hpp"
+#include "SDK/Client/Actor/Components/MoveInputComponent.hpp"
 
 #include "Modules/Sneak/Sneak.hpp"
 

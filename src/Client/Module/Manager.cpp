@@ -1,5 +1,6 @@
-﻿#include "Manager.hpp"
+#include "Manager.hpp"
 
+#include "../GUI/Engine/Engine.hpp"
 #include "Modules/Misc/Input/GUIKeyListener.hpp"
 #include "Modules/Misc/SaveConfig/SaveConfigListener.hpp"
 #include "Modules/Misc/RGB/rgbListener.hpp"

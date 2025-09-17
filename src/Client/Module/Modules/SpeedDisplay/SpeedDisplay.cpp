@@ -1,4 +1,6 @@
 #include "SpeedDisplay.hpp"
+#include "SDK/Client/Actor/LocalPlayer.hpp"
+#include "SDK/Client/Actor/Components/StateVectorComponent.hpp"
 
 
 void SpeedDisplay::onEnable()

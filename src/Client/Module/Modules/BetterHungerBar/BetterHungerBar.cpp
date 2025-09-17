@@ -2,6 +2,15 @@
 
 #include "BetterHungerBar.hpp"
 
+#include "Client/GUI/Engine/Engine.hpp"
+#include "SDK/Client/Actor/LocalPlayer.hpp"
+#include "SDK/Client/Actor/Components/MobEffectsComponent.hpp"
+#include "SDK/Client/Actor/Components/ActorGameTypeComponent.hpp"
+#include "SDK/Client/Container/PlayerInventory.hpp"
+#include "SDK/Client/Container/Inventory.hpp"
+#include "SDK/Client/Item/Item.hpp"
+#include "SDK/Client/Render/GuiData.hpp"
+#include "SDK/Client/Level/Level.hpp"
 
 #include "Events/Game/TickEvent.hpp"
 #include <Client.hpp>

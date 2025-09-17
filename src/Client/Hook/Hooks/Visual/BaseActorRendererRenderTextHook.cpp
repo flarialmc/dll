@@ -2,6 +2,7 @@
 
 #include "Client.hpp"
 #include "Utils/Render/MaterialUtils.hpp"
+#include "../../../../SDK/Client/Core/MinecraftGame.hpp"
 
 void BaseActorRendererRenderTextHook::drawLogo(ScreenContext* screenContext, const Vec3<float>& cameraPos,
                                                const Vec3<float>& cameraTargetPos, const std::string& nameTag, const Vec3<float>& tagPos, Font* font)

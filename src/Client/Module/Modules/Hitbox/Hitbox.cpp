@@ -1,4 +1,7 @@
 #include "Hitbox.hpp"
+#include "SDK/Client/Actor/LocalPlayer.hpp"
+#include "SDK/Client/Level/Level.hpp"
+#include "SDK/Client/Actor/Components/RenderPositionComponent.hpp"
 
 void Hitbox::onEnable() {
     Listen(this, SetupAndRenderEvent, &Hitbox::onSetupAndRender)

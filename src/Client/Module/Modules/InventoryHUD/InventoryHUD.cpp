@@ -3,6 +3,11 @@
 
 #include "Modules/ClickGUI/ClickGUI.hpp"
 #include "SDK/Client/Render/BaseActorRenderContext.hpp"
+#include "SDK/Client/Actor/LocalPlayer.hpp"
+#include "SDK/Client/Container/PlayerInventory.hpp"
+#include "SDK/Client/Container/Inventory.hpp"
+#include "SDK/Client/Item/Item.hpp"
+#include "SDK/Client/Render/GuiData.hpp"
 #include "Utils/Render/PositionUtils.hpp"
 
 void InventoryHUD::onEnable() {

@@ -1,4 +1,5 @@
 #include "ParticleMultiplier.hpp"
+#include "SDK/Client/Actor/Components/RuntimeIDComponent.hpp"
 #include "Events/EventManager.hpp"
 #include "GUI/Engine/EngineImGui.hpp"
 #include "Hook/Hooks/Game/PacketHooks.hpp"

@@ -1,6 +1,6 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
-
+#include "SDK/Client/Actor/LocalPlayer.hpp"
 #include "src/Client/Client.hpp"
 #include "src/Client/Hook/Manager.hpp"
 #include "src/Client/Events/EventManager.hpp"

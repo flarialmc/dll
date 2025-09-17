@@ -6,6 +6,8 @@
 #include <algorithm>
 
 #include "../../../../Assets/Assets.hpp"
+#include "../../../../SDK/Client/Util/mce.hpp"
+#include "../../../../SDK/Client/Level/Level.hpp"
 
 struct TabListEntry {
     bool valid = false;

@@ -1,6 +1,9 @@
 #include "InstantHurtAnimation.hpp"
-
+#include "SDK/Client/Actor/LocalPlayer.hpp"
+#include "SDK/Client/Actor/Components/RuntimeIDComponent.hpp"
+#include "SDK/Client/Container/Inventory.hpp"
 #include "Client.hpp"
+#include "Client/GUI/Engine/Engine.hpp"
 #include "SDK/Client/Network/Packet/EntityEventPacket.hpp"
 
 void InstantHurtAnimation::onEnable() {

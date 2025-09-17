@@ -1,5 +1,5 @@
 #include "Level.hpp"
-
+#include "../Actor/LocalPlayer.hpp"
 #include <Utils/WinrtUtils.hpp>
 
 #include "../../SDK.hpp"

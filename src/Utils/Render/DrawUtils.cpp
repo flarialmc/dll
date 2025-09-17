@@ -4,6 +4,9 @@
 #include "../../Client/GUI/Engine/Engine.hpp"
 #include "../../SDK/SDK.hpp"
 #include "../../SDK/Client/Render/Matrix.hpp"
+#include "../../SDK/Client/Actor/LocalPlayer.hpp"
+#include "../../SDK/Client/Actor/Components/RenderPositionComponent.hpp"
+#include "../../SDK/Client/Actor/Components/AABBShapeComponent.hpp"
 
 void DrawUtils::addLine(Vec2<float> start, Vec2<float> end, float lineWidth, D2D_COLOR_F color) {
 
@@ -168,7 +171,7 @@ void DrawUtils::addEntityBox(Actor* ent, float lineWidth, D2D_COLOR_F color) {
     Vec3<float> end = ent->getRenderPositionComponent()->renderPos;
 
     if(lineWidth == 0)
-        lineWidth = (float) fmax(0.5f, 1 / (float) fmax(1,
+        lineWidth = (float) fmax(0.5f, 1 / (float) fmax(1.0f,
                                                          (float) SDK::clientInstance->getLocalPlayer()->getRenderPositionComponent()->renderPos.dist(
                                                                  end)));
 

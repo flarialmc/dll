@@ -1,4 +1,8 @@
 #include "ClickGUI.hpp"
+
+#include "SDK/Client/Actor/LocalPlayer.hpp"
+#include "SDK/Client/Level/Level.hpp"
+
 // Include headers that were forward declared
 #include "SDK/Client/Network/Packet/TextPacket.hpp"
 #include "Utils/APIUtils.hpp"

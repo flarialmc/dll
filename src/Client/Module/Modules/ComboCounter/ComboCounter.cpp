@@ -1,5 +1,7 @@
 #include "ComboCounter.hpp"
 
+#include "SDK/Client/Actor/LocalPlayer.hpp"
+#include "SDK/Client/Level/Level.hpp"
 
 #include "Events/Game/TickEvent.hpp"
 #include "Events/Render/RenderEvent.hpp"

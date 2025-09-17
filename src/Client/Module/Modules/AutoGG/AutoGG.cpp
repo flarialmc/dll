@@ -1,6 +1,7 @@
 #include "AutoGG.hpp"
 
-
+#include "Client/GUI/Engine/Engine.hpp"
+#include "SDK/Client/Actor/LocalPlayer.hpp"
 
 
 void AutoGG::onEnable() {

@@ -1,4 +1,5 @@
 #include "NickModule.hpp"
+#include "SDK/Client/Actor/LocalPlayer.hpp"
 
 
 

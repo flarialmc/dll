@@ -3,6 +3,8 @@
 #include "Manager.hpp"
 
 #include "Modules/ClickGUI/ClickGUI.hpp"
+#include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
+#include "../../../../SDK/Client/Render/GuiData.hpp"
 
 void ArmorHUD::onEnable() {
 	Listen(this, RenderEvent, &ArmorHUD::onRender)

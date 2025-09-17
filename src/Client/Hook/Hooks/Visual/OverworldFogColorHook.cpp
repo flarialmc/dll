@@ -1,4 +1,5 @@
 #include "OverworldFogColorHook.hpp"
+#include "../../../../SDK/Client/Level/Dimension.hpp"
 
 MCCColor& OverworldFogColorHook::OverworldFogColorCallback(Dimension* _this, MCCColor& result,
     MCCColor const& baseColor, float brightness)

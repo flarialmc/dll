@@ -1,5 +1,5 @@
 #include "RenderOptions.hpp"
-
+#include "Client/GUI/Engine/Engine.hpp"
 #include "SDK/Client/Core/Options.hpp"
 
 

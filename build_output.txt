@@ -1,0 +1,248 @@
+
+===============================================
+            Flarial Build Script
+===============================================
+
+Selected build type: Release
+
+Build directory: cmake-build-release-ninja
+
+Setting up MSVC environment...
+Found Visual Studio at: C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat
+Initializing MSVC x64 environment...
+Ninja version: 
+1.12.1
+
+Creating build directory: cmake-build-release-ninja
+
+===============================================
+             Configuring CMake
+===============================================
+
+-- {fmt} version: 12.0.0
+-- Build type: Release
+-- Configuring done (8.7s)
+-- Generating done (0.4s)
+-- Build files have been written to: D:/Documents/New Github/dll/cmake-build-release-ninja
+
+===============================================
+               Building Project
+===============================================
+
+Building with 8 parallel jobs...
+[1/74] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\lctype.c.obj
+[2/74] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\ldump.c.obj
+[3/74] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\lapi.c.obj
+[4/74] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\ldebug.c.obj
+[5/74] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\lcode.c.obj
+[6/74] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\ldo.c.obj
+[7/74] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\lfunc.c.obj
+[8/74] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\lopcodes.c.obj
+[9/74] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\lmem.c.obj
+[10/74] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\lobject.c.obj
+[11/74] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\llex.c.obj
+[12/74] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\lgc.c.obj
+[13/74] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\lstate.c.obj
+[14/74] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\lstring.c.obj
+[15/74] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\ltable.c.obj
+[16/74] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\ltm.c.obj
+[17/74] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\lundump.c.obj
+[18/74] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\lparser.c.obj
+[19/74] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\lzio.c.obj
+[20/74] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\lbaselib.c.obj
+[21/74] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\lcorolib.c.obj
+[22/74] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\lauxlib.c.obj
+[23/74] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\liolib.c.obj
+[24/74] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\ldblib.c.obj
+[25/74] Building C object CMakeFiles\miniz.dir\lib\miniz\miniz.c.obj
+[26/74] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\loslib.c.obj
+[27/74] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\lmathlib.c.obj
+[28/74] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\ltablib.c.obj
+[29/74] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\lutf8lib.c.obj
+[30/74] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\lstrlib.c.obj
+[31/74] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\linit.c.obj
+[32/74] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\loadlib.c.obj
+[33/74] Building CXX object _deps\libhat-build\CMakeFiles\libhat.dir\src\os\unix\Process.cpp.obj
+[34/74] Building CXX object _deps\libhat-build\CMakeFiles\libhat.dir\src\os\linux\MemoryProtector.cpp.obj
+[35/74] Building CXX object _deps\libhat-build\CMakeFiles\libhat.dir\src\os\unix\System.cpp.obj
+[36/74] Building CXX object _deps\libhat-build\CMakeFiles\libhat.dir\src\System.cpp.obj
+[37/74] Building CXX object _deps\libhat-build\CMakeFiles\libhat.dir\src\os\win32\MemoryProtector.cpp.obj
+[38/74] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\lvm.c.obj
+[39/74] Building CXX object _deps\libhat-build\CMakeFiles\libhat.dir\src\os\win32\Process.cpp.obj
+[40/74] Building CXX object _deps\libhat-build\CMakeFiles\libhat.dir\src\os\win32\System.cpp.obj
+[41/74] Building CXX object _deps\libhat-build\CMakeFiles\libhat.dir\src\arch\arm\System.cpp.obj
+[42/74] Building CXX object _deps\libhat-build\CMakeFiles\libhat.dir\src\Scanner.cpp.obj
+[43/74] Building CXX object _deps\libhat-build\CMakeFiles\libhat.dir\src\arch\x86\System.cpp.obj
+[44/74] Building RC object CMakeFiles\Flarial.dir\src\Assets\Assets.rc.res
+[45/74] Linking C static library miniz.lib
+[46/74] Linking C static library lib\lua\lua-5.4.7\lua_static.lib
+[47/74] Building CXX object _deps\libhat-build\CMakeFiles\libhat.dir\src\os\win32\Scanner.cpp.obj
+[48/74] Building C object lib\lua\lua-5.4.7\CMakeFiles\luac.dir\src\luac.c.obj
+[49/74] Building CXX object _deps\libhat-build\CMakeFiles\libhat.dir\src\arch\x86\SSE.cpp.obj
+[50/74] Building CXX object _deps\libhat-build\CMakeFiles\libhat.dir\src\arch\x86\AVX2.cpp.obj
+[51/74] Linking C executable lib\lua\luac.exe
+[52/74] Building CXX object _deps\libhat-build\CMakeFiles\libhat.dir\src\arch\x86\AVX512.cpp.obj
+[53/74] Linking CXX static library _deps\libhat-build\libhat.lib
+[54/74] Building CXX object _deps\fmt-build\CMakeFiles\fmt.dir\src\os.cc.obj
+[55/74] Building CXX object _deps\fmt-build\CMakeFiles\fmt.dir\src\format.cc.obj
+[56/74] Linking CXX static library _deps\fmt-build\fmt.lib
+[57/74] Building CXX object CMakeFiles\Flarial.dir\cmake_pch.cxx.obj
+[58/74] Building CXX object CMakeFiles\Flarial.dir\Unity\unity_13_cxx.cxx.obj
+[59/74] Building CXX object CMakeFiles\Flarial.dir\Unity\unity_12_cxx.cxx.obj
+[60/74] Building CXX object CMakeFiles\Flarial.dir\Unity\unity_10_cxx.cxx.obj
+[61/74] Building CXX object CMakeFiles\Flarial.dir\Unity\unity_8_cxx.cxx.obj
+[62/74] Building CXX object CMakeFiles\Flarial.dir\Unity\unity_9_cxx.cxx.obj
+[63/74] Building CXX object CMakeFiles\Flarial.dir\Unity\unity_11_cxx.cxx.obj
+[64/74] Building CXX object CMakeFiles\Flarial.dir\Unity\unity_4_cxx.cxx.obj
+[65/74] Building CXX object CMakeFiles\Flarial.dir\Unity\unity_15_cxx.cxx.obj
+[66/74] Building CXX object CMakeFiles\Flarial.dir\Unity\unity_14_cxx.cxx.obj
+[67/74] Building CXX object CMakeFiles\Flarial.dir\Unity\unity_2_cxx.cxx.obj
+[68/74] Building CXX object CMakeFiles\Flarial.dir\Unity\unity_6_cxx.cxx.obj
+[69/74] Building CXX object CMakeFiles\Flarial.dir\Unity\unity_1_cxx.cxx.obj
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\xutility(462): warning C4244: 'argument': conversion from '_Ty' to 'T', possible loss of data
+        with
+        [
+            _Ty=__std_tzdb_epoch_milli
+        ]
+        and
+        [
+            T=float
+        ]
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\xutility(462): note: the template instantiation context (the oldest one first) is
+D:/Documents/New Github/dll/src/Client/GUI/Engine/Elements/Control/ModCard/ModCard.cpp(28): note: see reference to function template instantiation 'Vec2<T> &std::vector<Vec2<T>,std::allocator<Vec2<T>>>::emplace_back<double,double>(double &&,double &&)' being compiled
+        with
+        [
+            T=float
+        ]
+D:/Documents/New Github/dll/src/Client/GUI/Engine/Elements/Control/ModCard/ModCard.cpp(28): note: see the first reference to 'std::vector<Vec2<T>,std::allocator<Vec2<T>>>::emplace_back' in 'ClickGUIElements::ModCard'
+        with
+        [
+            T=float
+        ]
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\vector(924): note: see reference to function template instantiation '_Ty &std::vector<_Ty,std::allocator<_Ty>>::_Emplace_one_at_back<double,double>(double &&,double &&)' being compiled
+        with
+        [
+            _Ty=Vec2<float>
+        ]
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\vector(845): note: see reference to function template instantiation '_Ty &std::vector<_Ty,std::allocator<_Ty>>::_Emplace_back_with_unused_capacity<double,double>(double &&,double &&)' being compiled
+        with
+        [
+            _Ty=Vec2<float>
+        ]
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\vector(863): note: see reference to function template instantiation 'void std::_Default_allocator_traits<_Alloc>::construct<_Ty,double,double>(_Alloc &,_Objty *const ,double &&,double &&)' being compiled
+        with
+        [
+            _Alloc=std::allocator<Vec2<float>>,
+            _Ty=Vec2<float>,
+            _Objty=Vec2<float>
+        ]
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\xmemory(730): note: see reference to function template instantiation '_Ty *std::construct_at<_Objty,double,double>(_Ty *const ,double &&,double &&) noexcept(<expr>)' being compiled
+        with
+        [
+            _Ty=Vec2<float>,
+            _Objty=Vec2<float>
+        ]
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\xutility(463): warning C4244: 'argument': conversion from '_Ty' to 'T', possible loss of data
+        with
+        [
+            _Ty=__std_tzdb_epoch_milli
+        ]
+        and
+        [
+            T=float
+        ]
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\xutility(463): note: the template instantiation context (the oldest one first) is
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\vector(863): note: see reference to function template instantiation 'void std::_Default_allocator_traits<_Alloc>::construct<_Ty,double,double>(_Alloc &,_Objty *const ,double &&,double &&)' being compiled
+        with
+        [
+            _Alloc=std::allocator<Vec2<float>>,
+            _Ty=Vec2<float>,
+            _Objty=Vec2<float>
+        ]
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\xmemory(730): note: see reference to function template instantiation '_Ty *std::construct_at<_Objty,double,double>(_Ty *const ,double &&,double &&) noexcept(false)' being compiled
+        with
+        [
+            _Ty=Vec2<float>,
+            _Objty=Vec2<float>
+        ]
+[70/74] Building CXX object CMakeFiles\Flarial.dir\Unity\unity_3_cxx.cxx.obj
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\algorithm(3958): warning C4244: '=': conversion from 'wint_t' to 'char', possible loss of data
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\algorithm(3958): note: the template instantiation context (the oldest one first) is
+D:/Documents/New Github/dll/src/Client/GUI/Engine/Engine.cpp(1147): note: see reference to function template instantiation 'std::ranges::in_out_result<std::_String_iterator<std::_String_val<std::_Simple_types<_Elem>>>,std::_String_iterator<std::_String_val<std::_Simple_types<_Elem>>>> std::ranges::_Transform_fn::operator ()<std::string&,std::_String_iterator<std::_String_val<std::_Simple_types<_Elem>>>,wint_t(__cdecl *)(wint_t),std::identity>(_Rng,_Out,_Fn,_Pj)' being compiled
+        with
+        [
+            _Elem=char,
+            _Rng=std::string &,
+            _Out=std::_String_iterator<std::_String_val<std::_Simple_types<char>>>,
+            _Fn=wint_t (__cdecl *)(wint_t),
+            _Pj=std::identity
+        ]
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\algorithm(3890): note: see reference to function template instantiation 'std::ranges::in_out_result<char *,char *> std::ranges::_Transform_fn::_Transform_unary_unchecked<char*,_Elem*,char*,wint_t(__cdecl *)(wint_t),_Fn>(_It,const _Se,_Out,unsigned short(__cdecl *)(wint_t),_Pj)' being compiled
+        with
+        [
+            _Elem=char,
+            _Fn=std::identity,
+            _It=char *,
+            _Se=char *,
+            _Out=char *,
+            _Pj=std::identity
+        ]
+[71/74] Building CXX object CMakeFiles\Flarial.dir\Unity\unity_5_cxx.cxx.obj
+D:\Documents\New Github\dll\src\Client\Hook\Hooks\Visual\DimensionFogColorHook.cpp(10) : warning C4172: returning address of local variable or temporary : event
+D:\Documents\New Github\dll\src\Client\Hook\Hooks\Visual\OverworldFogColorHook.cpp(11) : warning C4172: returning address of local variable or temporary : event
+[72/74] Building CXX object CMakeFiles\Flarial.dir\Unity\unity_0_cxx.cxx.obj
+[73/74] Building CXX object CMakeFiles\Flarial.dir\Unity\unity_7_cxx.cxx.obj
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\xutility(4813): warning C4244: '=': conversion from 'wchar_t' to 'char', possible loss of data
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\xutility(4813): note: the template instantiation context (the oldest one first) is
+D:/Documents/New Github/dll/src/Client/Module/Modules/DebugMenu/DebugMenu.cpp(589): note: see reference to function template instantiation 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>::basic_string<std::_String_iterator<std::_String_val<std::_Simple_types<_Elem>>>,0>(_Iter,_Iter,const _Alloc &)' being compiled
+        with
+        [
+            _Elem=wchar_t,
+            _Iter=std::_String_iterator<std::_String_val<std::_Simple_types<wchar_t>>>,
+            _Alloc=std::allocator<char>
+        ]
+D:/Documents/New Github/dll/src/Client/Module/Modules/DebugMenu/DebugMenu.cpp(589): note: see the first reference to 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>::basic_string' in 'JavaDebugMenu::onRender'
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\xstring(812): note: see reference to function template instantiation 'void std::basic_string<char,std::char_traits<char>,std::allocator<char>>::_Construct_from_iter<wchar_t*,wchar_t*,_Size_type>(_Iter,const _Sent,_Size)' being compiled
+        with
+        [
+            _Size_type=unsigned __int64,
+            _Iter=wchar_t *,
+            _Sent=wchar_t *,
+            _Size=unsigned __int64
+        ]
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\xstring(968): note: see reference to function template instantiation '_OutIt *std::_Copy_n_unchecked4<wchar_t*,_Size,char*>(_InIt,_SizeTy,_OutIt)' being compiled
+        with
+        [
+            _OutIt=char *,
+            _Size=unsigned __int64,
+            _InIt=wchar_t *,
+            _SizeTy=unsigned __int64
+        ]
+[74/74] Linking CXX shared library Flarial.dll
+
+===============================================
+             Build Completed Successfully
+===============================================
+
+Build type: Release
+Output directory: cmake-build-release-ninja
+Binary location: cmake-build-release-ninja\Flarial.dll
+
+Build artifacts:
+ Volume in drive D is Caulk v2
+ Volume Serial Number is CC5B-5830
+
+ Directory of D:\Documents\New Github\dll\cmake-build-release-ninja
+
+09/17/2025  06:18 PM         8,257,024 Flarial.dll
+
+ Directory of D:\Documents\New Github\dll\cmake-build-release-ninja
+
+
+ Directory of D:\Documents\New Github\dll\cmake-build-release-ninja
+
+09/17/2025  06:14 PM           227,478 miniz.lib
+               2 File(s)      8,484,502 bytes
+               0 Dir(s)  392,158,801,920 bytes free
+
+Build completed Press any key to exit...

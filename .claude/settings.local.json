@@ -4,7 +4,14 @@
       "Bash(dir:*)",
       "Bash(cmake:*)",
       "Bash(cmd /c:*)",
-      "Bash(del:*)"
+      "Bash(del:*)",
+      "Read(//d/Documents/**)",
+      "Bash(cd:*)",
+      "Bash(find:*)",
+      "Bash(cl:*)",
+      "Bash(build.bat R)",
+      "Bash(./build.bat R)",
+      "Bash(ninja:*)"
     ],
     "deny": [],
     "ask": []

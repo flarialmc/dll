@@ -1,6 +1,9 @@
 #include "HitPing.hpp"
-
-
+#include "SDK/Client/Actor/LocalPlayer.hpp"
+#include "SDK/Client/Actor/Components/RuntimeIDComponent.hpp"
+#include "SDK/Client/Actor/Components/StateVectorComponent.hpp"
+#include "SDK/Client/Actor/Components/AABBShapeComponent.hpp"
+#include "SDK/Client/Level/Level.hpp"
 #include "SDK/Client/Network/Packet/EntityEventPacket.hpp"
 
 void HitPing::onEnable() {

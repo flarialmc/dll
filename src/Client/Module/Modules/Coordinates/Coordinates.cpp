@@ -1,6 +1,9 @@
 #include "Coordinates.hpp"
-#include <cmath>
 
+#include "SDK/Client/Actor/LocalPlayer.hpp"
+#include "SDK/Client/Actor/Components/StateVectorComponent.hpp"
+
+#include <cmath>
 
 
 void Coordinates::onEnable() {

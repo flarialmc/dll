@@ -1,7 +1,7 @@
 #include "SkinStealCommand.hpp"
 
 #include <Utils/WinrtUtils.hpp>
-
+#include "SDK/Client/Actor/LocalPlayer.hpp"
 #ifndef SVPNG_LINKAGE
 #define SVPNG_LINKAGE
 #endif
@@ -21,6 +21,7 @@
 #include <fstream>
 
 #include "Modules/SkinStealer/SkinStealer.hpp"
+#include "SDK/Client/Level/Level.hpp"
 #include "SDK/Client/Network/Packet/PlayerSkinPacket.hpp"
 
 /*! \def SVPNG_PUT
@@ -213,7 +214,8 @@ void SkinStealCommand::execute(const std::vector<std::string> &args) {
     }
 
     bool found = false;
-    for (const auto &pair: SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap()) {
+    std::unordered_map<mcUUID, PlayerListEntry> playerMap = SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap();
+    for (const auto &pair: playerMap) {
         if (String::toLower(pair.second.name) == playerName) {
             addCommandMessage("§aSuccessfully {} {}'s skin! Saved at Roamingstate/Flarial/Skins.", shouldClone ? "cloned" : "stole", pair.second.name);
             SaveSkin(pair.second.name, pair.second.playerSkin.mSkinImage, pair.second.playerSkin.mCapeImage);
