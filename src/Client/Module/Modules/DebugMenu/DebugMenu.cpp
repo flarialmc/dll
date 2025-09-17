@@ -21,6 +21,7 @@
 #include "SDK/Client/Level/HitResult.hpp"
 #include "SDK/Client/Level/HitResult.hpp"
 #include "SDK/Client/Actor/Gamemode.hpp"
+#include "SDK/Client/Render/GuiData.hpp"
 #include "Tags.hpp"
 #include "Modules/Time/Time.hpp"
 #include "Modules/CPS/CPSCounter.hpp"
@@ -29,6 +30,7 @@
 #include "Utils/WinrtUtils.hpp"
 #include "GUI/Engine/Constraints.hpp"
 #include "Hook/Hooks/Render/DirectX/DXGI/SwapchainHook.hpp"
+#include "GUI/Engine/EngineImGui.hpp"
 
 
 void JavaDebugMenu::onEnable() {
@@ -586,7 +588,7 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
             else {
                 if (this->cpuName.empty()) {
                     std::wstring temp(std::format(L"CPU: {}x {} ({} Cores)", this->GetCpuThreadCount(), this->GetCpuName(), this->GetCpuCoreCount()));
-                    this->cpuName = std::string(temp.begin(), temp.end());
+                    this->cpuName = String::WStrToStr(temp);
                 }
                 right.emplace_back(this->cpuName);
             }

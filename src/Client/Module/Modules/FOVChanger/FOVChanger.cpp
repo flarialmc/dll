@@ -1,4 +1,6 @@
 #include "FOVChanger.hpp"
+#include "GUI/Engine/Engine.hpp"
+
 void FOVChanger::onEnable() {
     Listen(this, FOVEvent, &FOVChanger::onGetFOV)
     Module::onEnable();

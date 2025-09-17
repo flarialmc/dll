@@ -1,5 +1,8 @@
 #include "EntityCounter.hpp"
 
+#include "SDK/Client/Actor/LocalPlayer.hpp"
+#include "SDK/Client/Level/Level.hpp"
+#include "GUI/Engine/Engine.hpp"
 
 void EntityCounter::onEnable() {
     Listen(this, RenderEvent, &EntityCounter::onRender);

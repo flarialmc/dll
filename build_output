@@ -1,0 +1,372 @@
+
+===============================================
+            Flarial Build Script
+===============================================
+
+Selected build type: Debug
+
+Build directory: cmake-build-debug-ninja
+
+Setting up MSVC environment...
+Found Visual Studio at: C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat
+Initializing MSVC x64 environment...
+Ninja version: 
+1.12.1
+
+Creating build directory: cmake-build-debug-ninja
+
+===============================================
+             Configuring CMake
+===============================================
+
+-- {fmt} version: 12.0.0
+-- Build type: Debug
+-- Configuring done (11.6s)
+-- Generating done (0.5s)
+-- Build files have been written to: D:/Documents/New Github/dll/cmake-build-debug-ninja
+
+===============================================
+               Building Project
+===============================================
+
+Building with 8 parallel jobs...
+[1/313] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\lctype.c.obj
+[2/313] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\lapi.c.obj
+[3/313] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\ldebug.c.obj
+[4/313] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\ldump.c.obj
+[5/313] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\lcode.c.obj
+[6/313] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\ldo.c.obj
+[7/313] Building C object CMakeFiles\miniz.dir\lib\miniz\miniz.c.obj
+[8/313] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\lopcodes.c.obj
+[9/313] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\lfunc.c.obj
+[10/313] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\lmem.c.obj
+[11/313] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\llex.c.obj
+[12/313] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\lobject.c.obj
+[13/313] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\lgc.c.obj
+[14/313] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\lparser.c.obj
+[15/313] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\lstate.c.obj
+[16/313] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\lstring.c.obj
+[17/313] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\ltable.c.obj
+[18/313] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\ltm.c.obj
+[19/313] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\lundump.c.obj
+[20/313] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\lzio.c.obj
+[21/313] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\lbaselib.c.obj
+[22/313] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\lauxlib.c.obj
+[23/313] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\ldblib.c.obj
+[24/313] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\lvm.c.obj
+[25/313] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\lcorolib.c.obj
+[26/313] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\lmathlib.c.obj
+[27/313] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\liolib.c.obj
+[28/313] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\loslib.c.obj
+[29/313] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\ltablib.c.obj
+[30/313] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\lstrlib.c.obj
+[31/313] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\lutf8lib.c.obj
+[32/313] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\linit.c.obj
+[33/313] Building CXX object _deps\libhat-build\CMakeFiles\libhat.dir\src\os\unix\System.cpp.obj
+[34/313] Building CXX object _deps\libhat-build\CMakeFiles\libhat.dir\src\os\linux\MemoryProtector.cpp.obj
+[35/313] Building CXX object _deps\libhat-build\CMakeFiles\libhat.dir\src\os\unix\Process.cpp.obj
+[36/313] Building C object lib\lua\lua-5.4.7\CMakeFiles\lua_static.dir\src\loadlib.c.obj
+[37/313] Building CXX object _deps\libhat-build\CMakeFiles\libhat.dir\src\System.cpp.obj
+[38/313] Building CXX object _deps\libhat-build\CMakeFiles\libhat.dir\src\os\win32\MemoryProtector.cpp.obj
+[39/313] Building CXX object _deps\libhat-build\CMakeFiles\libhat.dir\src\os\win32\Process.cpp.obj
+[40/313] Building CXX object _deps\libhat-build\CMakeFiles\libhat.dir\src\os\win32\System.cpp.obj
+[41/313] Building CXX object _deps\libhat-build\CMakeFiles\libhat.dir\src\arch\arm\System.cpp.obj
+[42/313] Building CXX object _deps\libhat-build\CMakeFiles\libhat.dir\src\arch\x86\System.cpp.obj
+[43/313] Building CXX object _deps\libhat-build\CMakeFiles\libhat.dir\src\Scanner.cpp.obj
+[44/313] Building CXX object _deps\libhat-build\CMakeFiles\libhat.dir\src\os\win32\Scanner.cpp.obj
+[45/313] Linking C static library miniz.lib
+[46/313] Building RC object CMakeFiles\Flarial.dir\src\Assets\Assets.rc.res
+[47/313] Building CXX object _deps\libhat-build\CMakeFiles\libhat.dir\src\arch\x86\SSE.cpp.obj
+[48/313] Linking C static library lib\lua\lua-5.4.7\lua_static.lib
+[49/313] Building C object lib\lua\lua-5.4.7\CMakeFiles\luac.dir\src\luac.c.obj
+[50/313] Linking C executable lib\lua\luac.exe
+[51/313] Building CXX object _deps\libhat-build\CMakeFiles\libhat.dir\src\arch\x86\AVX2.cpp.obj
+[52/313] Building CXX object _deps\libhat-build\CMakeFiles\libhat.dir\src\arch\x86\AVX512.cpp.obj
+[53/313] Linking CXX static library _deps\libhat-build\libhat.lib
+[54/313] Building CXX object _deps\fmt-build\CMakeFiles\fmt.dir\src\os.cc.obj
+[55/313] Building CXX object _deps\fmt-build\CMakeFiles\fmt.dir\src\format.cc.obj
+[56/313] Linking CXX static library _deps\fmt-build\fmtd.lib
+[57/313] Building CXX object CMakeFiles\Flarial.dir\cmake_pch.cxx.obj
+[58/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Command\Commands\EjectCommand.cpp.obj
+[59/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Command\Commands\HelpCommand.cpp.obj
+[60/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Command\Commands\FixFontCommand.cpp.obj
+[61/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Command\Commands\IRCChat.cpp.obj
+[62/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Command\Commands\BindCommand.cpp.obj
+[63/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Command\Commands\PrefixCommand.cpp.obj
+[64/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Command\CommandManager.cpp.obj
+[65/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Command\Commands\SpotifyCommand\SpotifyCommand.cpp.obj
+[66/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Command\Commands\PathCommand.cpp.obj
+[67/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Events\EventManager.cpp.obj
+[68/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Events\Game\isPreGameEvent.cpp.obj
+[69/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\GUI\Engine\Constraints.cpp.obj
+[70/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\GUI\Engine\Effects\Blur\blur.cpp.obj
+[71/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\GUI\Engine\Effects\CombinedDeepFry\CombinedDeepFry.cpp.obj
+[72/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\GUI\Engine\Effects\DeepFry\DeepFry.cpp.obj
+[73/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\GUI\Engine\Effects\GaussianBlur\GaussianBlur.cpp.obj
+[74/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\GUI\Engine\Effects\Hue\Hue.cpp.obj
+[75/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\GUI\Engine\Effects\PaintEffect\PaintEffect.cpp.obj
+[76/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Command\Commands\SkinStealCommand.cpp.obj
+[77/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Command\Commands\TestCommand.cpp.obj
+[78/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\GUI\Engine\Elements\Control\ColorWheel\ColorWheel.cpp.obj
+[79/313] Building CXX object CMakeFiles\Flarial.dir\main.cpp.obj
+[80/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Command\Commands\ConfigCommand.cpp.obj
+[81/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\GUI\Engine\Elements\Control\Image\Image.cpp.obj
+[82/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Command\Commands\WikiCommand.cpp.obj
+[83/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Command\Commands\LuaCommand.cpp.obj
+[84/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Client.cpp.obj
+[85/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\GUI\Engine\Elements\Control\Button\Button.cpp.obj
+[86/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\GUI\Engine\Elements\Control\ColorPicker\ColorPicker.cpp.obj
+[87/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\GUI\Engine\Elements\Control\Dropdown\Dropdown.cpp.obj
+[88/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\GUI\Engine\Elements\Control\RoundedRadioButton\RoundedRadioButton.cpp.obj
+[89/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\GUI\Engine\Elements\Control\KeybindSelector\KeybindSelector.cpp.obj
+[90/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\GUI\Engine\Elements\Control\ModCard\ModCard.cpp.obj
+[91/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\GUI\Engine\Elements\Control\RoundedButton\RoundedButton.cpp.obj
+[92/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\GUI\Engine\Elements\Shapes\Circle\Circle.cpp.obj
+[93/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\GUI\Engine\Elements\Shapes\Rect\BlurRect\BlurRect.cpp.obj
+[94/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\GUI\Engine\Elements\Shapes\Rect\InnerShadowRect\InnerShadowRect.cpp.obj
+[95/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\GUI\Engine\Elements\Shapes\Rect\RoundedHollowRect\RoundedHollowRect.cpp.obj
+[96/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\GUI\Engine\Elements\Shapes\Rect\RoundedRect\RoundedRect.cpp.obj
+[97/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\GUI\Engine\Elements\Shapes\Rect\RoundedRectWithImageAndText\RoundedRectWithImageAndText.cpp.obj
+[98/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\GUI\Engine\Elements\Shapes\Rect\ShadowRect\ShadowRect.cpp.obj
+[99/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\GUI\Engine\Elements\Utils\ConvertImageToBitmap.cpp.obj
+[100/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\GUI\Engine\Elements\Utils\FontManager\FontManager.cpp.obj
+[101/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\GUI\Engine\Elements\Control\ScrollBar\ScrollBar.cpp.obj
+[102/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\GUI\Engine\Elements\Control\SearchBar\SearchBar.cpp.obj
+[103/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Hook\Hooks\Game\ActorBaseTick.cpp.obj
+[104/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Hook\Hooks\Game\GameModeAttack.cpp.obj
+[105/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Hook\Hooks\Game\OnSuspend.cpp.obj
+[106/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Hook\Hooks\Game\PacketHooks.cpp.obj
+[107/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Hook\Hooks\Game\RaknetTick.cpp.obj
+[108/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Hook\Hooks\Game\UpdatePlayerHook.cpp.obj
+[109/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\GUI\Engine\Elements\Control\Slider\Slider.cpp.obj
+[110/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\GUI\Engine\Elements\Control\SliderInt\SliderInt.cpp.obj
+[111/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Hook\Hooks\Game\getTimeOfDayHook.cpp.obj
+[112/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Hook\Hooks\Game\getViewPerspective.cpp.obj
+[113/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Hook\Hooks\Hook.cpp.obj
+[114/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Hook\Hooks\Input\KeyHook.cpp.obj
+[115/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Hook\Hooks\Input\MouseHook.cpp.obj
+[116/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Hook\Hooks\Render\BobHurt.cpp.obj
+[117/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Hook\Hooks\Render\DirectX\DX11\DebugLayer_DX11.cpp.obj
+[118/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Hook\Hooks\Render\DirectX\DX12\DebugLayer_DX12.cpp.obj
+[119/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Hook\Hooks\Render\DirectX\DXGI\CommandListHook.cpp.obj
+[120/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Hook\Hooks\Render\DirectX\DX11\SwapchainHook_DX11.cpp.obj
+[121/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Hook\Hooks\Render\DirectX\DXGI\CreateSwapchainForCoreWindowHook.cpp.obj
+[122/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Hook\Hooks\Render\DirectX\DX12\SwapchainHook_DX12.cpp.obj
+[123/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\GUI\Engine\Elements\Control\TextBox\TextBox.cpp.obj
+[124/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Hook\Hooks\Render\DirectX\DXGI\UnderUIHooks.cpp.obj
+[125/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\GUI\Engine\Elements\Control\Toggle\Toggle.cpp.obj
+[126/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Hook\Hooks\Render\GlmRotateHook.cpp.obj
+[127/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Hook\Hooks\Render\HudCursorRenderer.cpp.obj
+[128/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Hook\Hooks\Render\DirectX\DXGI\SwapchainHook.cpp.obj
+[129/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Hook\Hooks\Render\HudMobEffectsRenderer.cpp.obj
+[130/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Hook\Hooks\Render\RenderLevelHook.cpp.obj
+[131/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Hook\Hooks\Render\TextureGroup_getTextureHook.cpp.obj
+[132/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Hook\Hooks\Visual\ActorShaderParams.cpp.obj
+[133/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Hook\Hooks\Render\ItemRendererHook.cpp.obj
+[134/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\GUI\Engine\Elements\Control\Tooltip\Tooltip.cpp.obj
+[135/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Hook\Hooks\Render\DirectX\DXGI\ResizeHook.cpp.obj
+[136/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Hook\Hooks\Visual\DimensionFogColorHook.cpp.obj
+[137/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Hook\Hooks\Visual\HurtColorHook.cpp.obj
+[138/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Hook\Hooks\Visual\OverworldFogColorHook.cpp.obj
+[139/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Hook\Hooks\Visual\RenderOutlineSelectionHook.cpp.obj
+[140/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Hook\Hooks\Visual\TintColorHook.cpp.obj
+[141/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Hook\Hooks\Visual\TimeChangerHook.cpp.obj
+[142/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Hook\Hooks\Visual\BaseActorRendererRenderTextHook.cpp.obj
+[143/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Hook\Hooks\Visual\Level_addParticleEffect.cpp.obj
+[144/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Hook\Hooks\Visual\getFovHook.cpp.obj
+[145/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Hook\Hooks\Visual\Level_sendServerLegacyParticle.cpp.obj
+[146/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Hook\Hooks\Visual\getGammaHook.cpp.obj
+[147/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\GUI\Engine\Elements\Windows\ColorPickerWindow\ColorPickerWindow.cpp.obj
+[148/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\Animations\Animations.cpp.obj
+[149/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\ArrowCounter\ArrowCounter.cpp.obj
+[150/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\AutoPerspective\AutoPerspective.cpp.obj
+[151/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\AutoGG\AutoGG.cpp.obj
+[152/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\BlockHit\BlockHit.cpp.obj
+[153/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\BetterHungerBar\BetterHungerBar.cpp.obj
+[154/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\BlockOutline\BlockOutline.cpp.obj
+[155/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\CPSLimiter\CPSLimiter.cpp.obj
+[156/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Hook\Manager.cpp.obj
+[157/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\CPS\CPSCounter.cpp.obj
+[158/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\ChunkBorder\ChunkBorder.cpp.obj
+[159/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\CinematicCamera\CinematicCamera.cpp.obj
+[160/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\CommandHotkey\CommandHotkey.cpp.obj
+[161/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\ComboCounter\ComboCounter.cpp.obj
+[162/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\GUI\Engine\Engine.cpp.obj
+[163/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\Crosshair\Crosshair.cpp.obj
+[164/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\CompactChat\CompactChat.cpp.obj
+[165/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Hook\Hooks\Visual\FontDrawTransformedHook.cpp.obj
+[166/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\Coordinates\Coordinates.cpp.obj
+[167/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\DVD_Screen\dvd.cpp.obj
+[168/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\CustomCrosshair\CustomCrosshair.cpp.obj
+[169/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\Deepfry\Deepfry.cpp.obj
+[170/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\DeathLogger\DeathLogger.cpp.obj
+[171/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\ArmorHUD\ArmorHUD.cpp.obj
+[172/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\DisableMouseWheel\DisableMouseWheel.cpp.obj
+[173/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\Doom\Doom.cpp.obj
+[174/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\FOVChanger\FOVChanger.cpp.obj
+[175/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\BlockBreakIndicator\BlockBreakIndicator.cpp.obj
+[176/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\FPS\FPS.cpp.obj
+[177/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\EntityCounter\EntityCounter.cpp.obj
+[178/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\FasterInventory\FasterInventory.cpp.obj
+[179/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\FogColor\FogColor.cpp.obj
+[180/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\ForceCoords\ForceCoords.cpp.obj
+[181/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\Fullbright\Fullbright.cpp.obj
+[182/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\GlintColor\GlintColor.cpp.obj
+[183/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\Freelook\Freelook.cpp.obj
+[184/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\Hitbox\Hitbox.cpp.obj
+[185/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\HitPing\HitPing.cpp.obj
+[186/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\HiveUtils\HiveUtils.cpp.obj
+[187/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\HueChanger\HueChanger.cpp.obj
+[188/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\HurtColor\HurtColor.cpp.obj
+[189/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\IPDisplay\IPDisplay.cpp.obj
+[190/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\InstantHurtAnimation\InstantHurtAnimation.cpp.obj
+[191/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\CustomCrosshair\CrosshairEditor.cpp.obj
+[192/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\DirectionHUD\DirectionHUD.cpp.obj
+[193/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\ItemUseDelayFix\ItemUseDelayFix.cpp.obj
+[194/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\JavaDynamicFOV\JavaDynamicFOV.cpp.obj
+[195/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\ItemPhysics\ItemPhysics.cpp.obj
+[196/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\ClickGUI\ClickGUI.cpp.obj
+[197/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Manager.cpp.obj
+[198/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\JavaInventoryHotkeys\JavaInventoryHotkeys.cpp.obj
+[199/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\LowHealthIndicator\LowHealthIndicator.cpp.obj
+[200/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\Lewis\Lewis.cpp.obj
+[201/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\Memory\Memory.cpp.obj
+[202/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\MessageLogger\MessageLogger.cpp.obj
+[203/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\ModernKeybindHandling\ModernKeybindHandling.cpp.obj
+[204/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\MotionBlur\AvgPixelMotionBlurHelper.cpp.obj
+[205/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\MotionBlur\RealMotionBlurHelper.cpp.obj
+[206/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\GuiScale\GuiScale.cpp.obj
+[207/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\MotionBlur\MotionBlur.cpp.obj
+[208/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\HiveStat\HiveStat.cpp.obj
+[209/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\InventoryHUD\InventoryHUD.cpp.obj
+[210/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\Keystrokes\Keystrokes.cpp.obj
+[211/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\MovableHUD\MovableHUD.cpp.obj
+[212/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\DebugMenu\DebugMenu.cpp.obj
+[213/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\Mousestrokes\Mousestrokes.cpp.obj
+[214/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\Module.cpp.obj
+[215/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\MovableBossbar\MovableBossbar.cpp.obj
+[216/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\MumbleLink\MumbleLink.cpp.obj
+[217/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\MovableChat\MovableChat.cpp.obj
+[218/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\NoHurtCam\NoHurtCam.cpp.obj
+[219/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\Nick\NickModule.cpp.obj
+[220/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\NullMovement\NullMovement.cpp.obj
+[221/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\ParticleMultiplier\ParticleMultiplier.cpp.obj
+[222/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\OpponentReach\OpponentReach.cpp.obj
+[223/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\PatarHD\PatarHD.cpp.obj
+[224/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\PingCounter\PingCounter.cpp.obj
+[225/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\MovableCoordinates\MovableCoordinates.cpp.obj
+[226/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\PotCounter\PotCounter.cpp.obj
+[227/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\PlayerNotifier\PlayerNotifier.cpp.obj
+[228/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\RawInputBuffer\RawInputBuffer.cpp.obj
+[229/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\RenderOptions\RenderOptions.cpp.obj
+[230/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\MovableDayCounter\MovableDayCounter.cpp.obj
+[231/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\ReachCounter\ReachCounter.cpp.obj
+[232/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\SnapLook\SnapLook.cpp.obj
+[233/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\MovableHotbar\MovableHotbar.cpp.obj
+[234/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\Sneak\Sneak.cpp.obj
+[235/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\SkinStealer\SkinStealer.cpp.obj
+[236/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\MovableScoreboard\MovableScoreboard.cpp.obj
+[237/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\ThirdPersonNametag\ThirdPerson.cpp.obj
+[238/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\SpeedDisplay\SpeedDisplay.cpp.obj
+[239/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\TextHotkey\TextHotkey.cpp.obj
+[240/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\Sprint\Sprint.cpp.obj
+[241/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\TimeChanger\TimeChanger.cpp.obj
+[242/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\UpsideDown\UpsideDown.cpp.obj
+[243/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\Twerk\Twerk.cpp.obj
+[244/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\Time\Time.cpp.obj
+[245/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\TotemCounter\TotemCounter.cpp.obj
+[246/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\MovableTitle\MovableTitle.cpp.obj
+[247/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\ViewModel\ViewModel.cpp.obj
+[248/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\Waila\Waila.cpp.obj
+[249/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\WeatherChanger\WeatherChanger.cpp.obj
+[250/313] Building CXX object CMakeFiles\Flarial.dir\src\PCH.cpp.obj
+[251/313] Building CXX object CMakeFiles\Flarial.dir\src\SDK\Client\Actor\ItemActor.cpp.obj
+[252/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\ZeqaUtils\ZeqaUtils.cpp.obj
+[253/313] Building CXX object CMakeFiles\Flarial.dir\src\SDK\Client\Block\Block.cpp.obj
+[254/313] Building CXX object CMakeFiles\Flarial.dir\src\SDK\Client\Block\BlockLegacy.cpp.obj
+[255/313] Building CXX object CMakeFiles\Flarial.dir\src\SDK\Client\Container\Inventory.cpp.obj
+[256/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\Waypoints\Waypoints.cpp.obj
+[257/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\PaperDoll\PaperDoll.cpp.obj
+[258/313] Building CXX object CMakeFiles\Flarial.dir\src\SDK\Client\GUI\ScreenRenderer.cpp.obj
+[259/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\Zoom\Zoom.cpp.obj
+[260/313] Building CXX object CMakeFiles\Flarial.dir\src\SDK\Client\GUI\Screens\Controllers\ContainerScreenController.cpp.obj
+[261/313] Building CXX object CMakeFiles\Flarial.dir\src\SDK\Client\Item\ItemStack.cpp.obj
+[262/313] Building CXX object CMakeFiles\Flarial.dir\src\SDK\Client\Block\BlockSource.cpp.obj
+[263/313] Building CXX object CMakeFiles\Flarial.dir\src\SDK\Client\Network\Packet\Packet.cpp.obj
+[264/313] Building CXX object CMakeFiles\Flarial.dir\src\SDK\Client\Level\HitResult.cpp.obj
+[265/313] Building CXX object CMakeFiles\Flarial.dir\src\SDK\Client\Network\Packet\LevelSoundEventPacket.cpp.obj
+[266/313] Building CXX object CMakeFiles\Flarial.dir\src\SDK\Client\Core\ClientInstance.cpp.obj
+[267/313] Building CXX object CMakeFiles\Flarial.dir\src\SDK\Client\Render\Font.cpp.obj
+[268/313] Building CXX object CMakeFiles\Flarial.dir\src\SDK\Client\Render\BaseActorRenderContext.cpp.obj
+[269/313] Building CXX object CMakeFiles\Flarial.dir\src\SDK\Client\Render\GuiData.cpp.obj
+[270/313] Building CXX object CMakeFiles\Flarial.dir\src\SDK\Client\Render\ItemRenderer.cpp.obj
+[271/313] Building CXX object CMakeFiles\Flarial.dir\src\SDK\Client\Render\Matrix.cpp.obj
+[272/313] Building CXX object CMakeFiles\Flarial.dir\src\SDK\Client\Render\MatrixStack.cpp.obj
+[273/313] Building CXX object CMakeFiles\Flarial.dir\src\SDK\Client\Render\Tessellator\MeshHelpers.cpp.obj
+[274/313] Building CXX object CMakeFiles\Flarial.dir\src\SDK\Client\Render\Tessellator\RenderMaterialGroup.cpp.obj
+[275/313] Building CXX object CMakeFiles\Flarial.dir\src\SDK\Client\Util\MathUtility.cpp.obj
+[276/313] Building CXX object CMakeFiles\Flarial.dir\src\SDK\SDK.cpp.obj
+[277/313] Building CXX object CMakeFiles\Flarial.dir\src\SDK\Client\Actor\Actor.cpp.obj
+[278/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\PotionHUD\PotionHUD.cpp.obj
+[279/313] Building CXX object CMakeFiles\Flarial.dir\src\Scripting\ScriptSettings\ScriptSettingManager.cpp.obj
+[280/313] Building CXX object CMakeFiles\Flarial.dir\src\Utils\APIUtils.cpp.obj
+[281/313] Building CXX object CMakeFiles\Flarial.dir\src\Utils\Audio.cpp.obj
+[282/313] Building CXX object CMakeFiles\Flarial.dir\src\Utils\Logger\crashlogs.cpp.obj
+[283/313] Building CXX object CMakeFiles\Flarial.dir\src\Utils\Memory\CustomAllocator\Buffer.cpp.obj
+[284/313] Building CXX object CMakeFiles\Flarial.dir\src\Utils\Memory\Game\Offset\OffsetInit.cpp.obj
+[285/313] Building CXX object CMakeFiles\Flarial.dir\src\Utils\Memory\Game\Sig\SigInit.cpp.obj
+[286/313] Building CXX object CMakeFiles\Flarial.dir\src\SDK\Client\Options\OptionsParser.cpp.obj
+[287/313] Building CXX object CMakeFiles\Flarial.dir\src\Utils\Render\DrawUtil3D.cpp.obj
+[288/313] Building CXX object CMakeFiles\Flarial.dir\src\Utils\Memory\Game\SignatureAndOffsetManager.cpp.obj
+[289/313] Building CXX object CMakeFiles\Flarial.dir\src\Utils\Render\MaterialUtils.cpp.obj
+[290/313] Building CXX object CMakeFiles\Flarial.dir\src\Client\Module\Modules\TabList\TabList.cpp.obj
+[291/313] Building CXX object CMakeFiles\Flarial.dir\src\Utils\Render\PositionUtils.cpp.obj
+[292/313] Building CXX object CMakeFiles\Flarial.dir\src\Utils\Render\DrawUtils.cpp.obj
+[293/313] Building CXX object CMakeFiles\Flarial.dir\src\SDK\Client\Level\Level.cpp.obj
+[294/313] Building CXX object CMakeFiles\Flarial.dir\src\Utils\Telemetry.cpp.obj
+[295/313] Building CXX object CMakeFiles\Flarial.dir\lib\ImGui\imgui.cpp.obj
+[296/313] Building CXX object CMakeFiles\Flarial.dir\lib\ImGui\imgui_demo.cpp.obj
+[297/313] Building CXX object CMakeFiles\Flarial.dir\lib\ImGui\imgui_draw.cpp.obj
+[298/313] Building CXX object CMakeFiles\Flarial.dir\lib\ImGui\imgui_freetype.cpp.obj
+[299/313] Building CXX object CMakeFiles\Flarial.dir\lib\ImGui\imgui_impl_dx11.cpp.obj
+[300/313] Building CXX object CMakeFiles\Flarial.dir\src\Scripting\ModuleScript.cpp.obj
+[301/313] Building CXX object CMakeFiles\Flarial.dir\lib\ImGui\imgui_impl_dx12.cpp.obj
+[302/313] Building CXX object CMakeFiles\Flarial.dir\src\Utils\Logger\Logger.cpp.obj
+[303/313] Building CXX object CMakeFiles\Flarial.dir\lib\ImGui\imgui_impl_win32.cpp.obj
+[304/313] Building CXX object CMakeFiles\Flarial.dir\lib\ImGui\imgui_tables.cpp.obj
+[305/313] Building CXX object CMakeFiles\Flarial.dir\lib\kiero\kiero.cpp.obj
+[306/313] Building CXX object CMakeFiles\Flarial.dir\lib\ImGui\imgui_widgets.cpp.obj
+[307/313] Building CXX object CMakeFiles\Flarial.dir\src\Scripting\ScriptManager.cpp.obj
+[308/313] Building CXX object CMakeFiles\Flarial.dir\lib\glm\glm.cpp.obj
+[309/313] Building CXX object CMakeFiles\Flarial.dir\src\Utils\VersionUtils.cpp.obj
+[310/313] Building CXX object CMakeFiles\Flarial.dir\src\Utils\Utils.cpp.obj
+[311/313] Building CXX object CMakeFiles\Flarial.dir\src\Scripting\Script.cpp.obj
+[312/313] Building CXX object CMakeFiles\Flarial.dir\src\Utils\WinrtUtils.cpp.obj
+[313/313] Linking CXX shared library Flarial.dll
+
+===============================================
+             Build Completed Successfully
+===============================================
+
+Build type: Debug
+Output directory: cmake-build-debug-ninja
+Binary location: cmake-build-debug-ninja\Flarial.dll
+
+Build artifacts:
+ Volume in drive D is Caulk v2
+ Volume Serial Number is CC5B-5830
+
+ Directory of D:\Documents\New Github\dll\cmake-build-debug-ninja
+
+09/17/2025  07:35 PM        27,554,304 Flarial.dll
+
+ Directory of D:\Documents\New Github\dll\cmake-build-debug-ninja
+
+
+ Directory of D:\Documents\New Github\dll\cmake-build-debug-ninja
+
+09/17/2025  07:22 PM           359,032 miniz.lib
+               2 File(s)     27,913,336 bytes
+               0 Dir(s)  391,686,356,992 bytes free
+
+Build completed Press any key to exit...

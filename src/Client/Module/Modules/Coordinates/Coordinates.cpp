@@ -2,8 +2,10 @@
 
 #include "SDK/Client/Actor/LocalPlayer.hpp"
 #include "SDK/Client/Actor/Components/StateVectorComponent.hpp"
+#include "SDK/Client/Block/BlockSource.hpp"
 
 #include <cmath>
+#include "GUI/Engine/EngineImGui.hpp"
 
 
 void Coordinates::onEnable() {

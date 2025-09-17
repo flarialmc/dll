@@ -6,7 +6,9 @@
 #include "Events/Render/RenderEvent.hpp"
 #include "Modules/ClickGUI/ClickGUI.hpp"
 #include "Modules/CPS/CPSCounter.hpp"
-
+#include "GUI/Engine/EngineImGui.hpp"
+#include "GUI/Engine/EngineDirectX.hpp"
+#include "GUI/Engine/Engine.hpp"
 void BlockBreakIndicator::onEnable() {
     Listen(this, RenderEvent, &BlockBreakIndicator::onRender)
     Module::onEnable();

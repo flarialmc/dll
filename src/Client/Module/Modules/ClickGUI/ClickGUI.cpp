@@ -7,6 +7,7 @@
 #include "SDK/Client/Network/Packet/TextPacket.hpp"
 #include "Utils/APIUtils.hpp"
 // Client.hpp and WinrtUtils.hpp already included in header
+#include "GUI/Engine/Engine.hpp"
 
 #include <random>
 #include <Scripting/ScriptManager.hpp>

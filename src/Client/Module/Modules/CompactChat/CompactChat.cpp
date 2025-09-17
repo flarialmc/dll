@@ -4,7 +4,7 @@
 
 #include "SDK/Client/Render/GuiMessage.hpp"
 #include "Modules/Nick/NickModule.hpp"
-
+#include "GUI/Engine/EngineImGui.hpp"
 void CompactChat::onEnable() {
     Listen(this, PacketEvent, &CompactChat::onPacketReceive)
     Listen(this, ChatScreenControllerTickEvent, &CompactChat::onChatScreenControllerTickEvent)

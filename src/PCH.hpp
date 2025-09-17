@@ -44,3 +44,5 @@
 #include "Events/Events.hpp"
 
 #include <lib/json/json.hpp>
+
+#include "GUI/Engine/Engine.hpp"

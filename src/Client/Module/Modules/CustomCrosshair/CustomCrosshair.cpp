@@ -4,7 +4,7 @@
 #include "SDK/Client/Core/MinecraftGame.hpp"
 #include "SDK/Client/Level/Level.hpp"
 #include "Client.hpp"
-
+#include "GUI/Engine/EngineImGui.hpp"
 #include "Utils/Render/PositionUtils.hpp"
 
 void CustomCrosshair::onEnable() {

@@ -1,5 +1,6 @@
 #include "ModernKeybindHandling.hpp"
 #include "SDK/Client/Actor/LocalPlayer.hpp"
+#include "SDK/Client/Actor/Components/MoveInputComponent.hpp"
 
 #include "Hook/Hooks/Input/KeyHook.hpp"
 

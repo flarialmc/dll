@@ -2,6 +2,9 @@
 
 #include "Modules/ClickGUI/ClickGUI.hpp"
 #include "Modules/Waypoints/Waypoints.hpp"
+#include "SDK/Client/Actor/LocalPlayer.hpp"
+#include "SDK/Client/Actor/Components/ActorRotationComponent.hpp"
+#include "SDK/Client/Block/BlockSource.hpp"
 
 void DirectionHUD::onEnable() {
     Listen(this, RenderEvent, &DirectionHUD::onRender);

@@ -7,7 +7,8 @@ MCCColor& DimensionFogColorHook::DimensionFogColorCallback(Dimension* _this, MCC
     auto event = nes::make_holder<FogColorEvent>(funcOriginal(_this, result, baseColor, brightness));
     eventMgr.trigger(event);
 
-    return event->getFogColor();
+    result = event->getFogColor();
+    return result;
 }
 
 DimensionFogColorHook::DimensionFogColorHook(): Hook("Fog Color Hook", GET_SIG_ADDRESS("Dimension::getBrightnessDependentFogColor"))

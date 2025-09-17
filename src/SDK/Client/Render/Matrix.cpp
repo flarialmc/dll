@@ -2,6 +2,7 @@
 
 #include <SDK/SDK.hpp>
 #include <Client/GUi/D2D.hpp>
+#include <SDK/Client/Render/GuiData.hpp>
 
 glm::mat4 Matrix::getMatrixCorrection(GLMatrix mat) {
     glm::mat4 toReturn;

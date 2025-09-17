@@ -2,7 +2,7 @@
 
 #include "SDK/Client/Actor/LocalPlayer.hpp"
 #include "SDK/Client/Level/Level.hpp"
-
+#include "GUI/Engine/EngineImGui.hpp"
 #include "Events/Render/RenderOutlineSelectionEvent.hpp"
 
 void BlockOutline::onEnable() {

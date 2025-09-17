@@ -1,6 +1,8 @@
 #include "CommandHotkey.hpp"
 
 #include "Client.hpp"
+#include "GUI/Engine/EngineImGui.hpp"
+#include "GUI/Engine/Engine.hpp"
 
 
 

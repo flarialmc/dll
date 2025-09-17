@@ -3,6 +3,8 @@
 #include "Manager.hpp"
 #include "Client/GUI/Engine/Engine.hpp"
 #include "SDK/Client/Actor/LocalPlayer.hpp"
+#include "SDK/Client/Level/Level.hpp"
+#include "SDK/Client/Block/BlockSource.hpp"
 
 #include <Utils/Render/DrawUtil3D.hpp>
 #include "Utils/Render/MaterialUtils.hpp"

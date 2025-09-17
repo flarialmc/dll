@@ -7,6 +7,7 @@
 #include "../../SDK/Client/Actor/LocalPlayer.hpp"
 #include "../../SDK/Client/Actor/Components/RenderPositionComponent.hpp"
 #include "../../SDK/Client/Actor/Components/AABBShapeComponent.hpp"
+#include "../../SDK/Client/Render/GuiData.hpp"
 
 void DrawUtils::addLine(Vec2<float> start, Vec2<float> end, float lineWidth, D2D_COLOR_F color) {
 

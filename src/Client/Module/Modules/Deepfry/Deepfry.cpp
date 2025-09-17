@@ -1,4 +1,6 @@
 #include "Deepfry.hpp"
+#include "GUI/Engine/EngineImGui.hpp"
+#include "GUI/Engine/EngineDirectX.hpp"
 
 class RenderEvent;
 

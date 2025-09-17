@@ -5,6 +5,7 @@
 
 #include "Events/Game/TickEvent.hpp"
 #include "Events/Render/RenderEvent.hpp"
+#include "GUI/Engine/EngineImGui.hpp"
 
 void ComboCounter::onEnable() {
     Listen(this, AttackEvent, &ComboCounter::onAttack)

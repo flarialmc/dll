@@ -8,6 +8,7 @@
 #include "Components/ActorGameTypeComponent.hpp"
 #include "Components/AABBShapeComponent.hpp"
 #include "Components/RuntimeIDComponent.hpp"
+#include "LocalPlayer.hpp"
 #include "Components/ActorDataFlagComponent.hpp"
 #include "Components/MobEffectsComponent.hpp"
 #include "Components/AttributesComponent.hpp"

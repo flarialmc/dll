@@ -1,7 +1,6 @@
 #include "FPS.hpp"
 
-
-
+#include "GUI/Engine/Engine.hpp"
 
 void FPS::onEnable() {
     Listen(this, RenderEvent, &FPS::onRender)
