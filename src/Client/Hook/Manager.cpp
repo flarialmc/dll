@@ -109,7 +109,6 @@ void HookManager::initialize() {
         addHook<TickingTextureStageRenderHook>(); // due to mv
     }
     addHook<UIControl_updateCachedPositionHook>();
-    addHook<GeneralSettingsScreenControllerCtorHook>();
 
     if (VersionUtils::checkAboveOrEqual(21, 40)) {
         addHook<ContainerScreenControllerHook>();
@@ -125,7 +124,7 @@ void HookManager::initialize() {
         addHook<RenderOrderExecuteHook>();
         addHook<RenderChunkCoordinatorHandleVisibilityUpdatesHook>();
         addHook<SettingsScreenOnExitHook>();
-//
+        addHook<GeneralSettingsScreenControllerCtorHook>();
     }
 
     addHook<ItemInHandRendererRenderItem>();
@@ -139,8 +138,8 @@ void HookManager::initialize() {
     addHook<ActorShaderParamsHook>();
     addHook<ChatScreenControllerHook>();
     addHook<HudScreenControllerHook>();
-    addHook<Level_addParticleEffect>();
-    addHook<Level_sendServerLegacyParticle>();
+    //addHook<Level_addParticleEffect>();
+    //addHook<Level_sendServerLegacyParticle>();
 
     if(VersionUtils::checkAboveOrEqual(21, 40)) {
         addHook<UpdatePlayerHook>();
