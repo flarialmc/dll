@@ -1457,6 +1457,9 @@ switch (vecmap[i].buildPlatform){
                 case BuildPlatform::Xbox:
                     PlatformIcons = PlatformIcon[13];
                 break;
+                case BuildPlatform::Linux:
+                    PlatformIcons = PlatformIcon[15];
+                break;
                 case BuildPlatform::Unknown:
                     PlatformIcons = PlatformIcon[-1];
                 break;
