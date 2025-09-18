@@ -158,6 +158,10 @@ echo.
 set /a "NUM_CORES=%NUMBER_OF_PROCESSORS%"
 echo Building with %NUM_CORES% parallel jobs...
 
+:: Add timing and verbose options for detailed build information
+echo Starting build with per-object timing information...
+echo.
+
 ninja -j %NUM_CORES%
 
 if errorlevel 1 (

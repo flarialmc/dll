@@ -11,7 +11,9 @@
       "Bash(cl:*)",
       "Bash(build.bat R)",
       "Bash(./build.bat R)",
-      "Bash(ninja:*)"
+      "Bash(ninja:*)",
+      "Bash(build.bat Debug)",
+      "Bash(./build.bat D)"
     ],
     "deny": [],
     "ask": []
