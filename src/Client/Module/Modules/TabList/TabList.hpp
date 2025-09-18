@@ -91,11 +91,6 @@ public:
 
     void settingsRender(float settingsOffset) override;
 
-    static int getRolePriority(const std::string &name);
-
-    static std::vector<PlayerListEntry> sortVecmap(const std::unordered_map<mcUUID, PlayerListEntry> &sourceMap, bool flarialFirst, bool sort);
-
-    int getPingImage(int ping);
 
     void onRender(RenderEvent &event);
 

@@ -58,6 +58,11 @@ PlayerHeadTexture *CreateTextureFromBytesDX12(const std::string &playerName, con
 ID3D11ShaderResourceView *CreateTextureFromBytesDX11(const std::string &playerName, const unsigned char *data, int width, int height);
 void RenderPlayerHeadWithPointFiltering(D3D12_GPU_DESCRIPTOR_HANDLE srvHandle, D2D1_RECT_F rect, const std::string &debugName);
 void RenderPlayerHeadWithPointFilteringDX11(ID3D11ShaderResourceView *srv, D2D1_RECT_F rect, const std::string &debugName);
+int getPingImage(int ping);
+
+// Function declarations for TabListSorting.cpp
+int getRolePriority(const std::string &name);
+std::vector<PlayerListEntry> sortVecmap(const std::unordered_map<mcUUID, PlayerListEntry> &sourceMap, bool flarialFirst, bool sort);
 
 void TabList::onRender(RenderEvent &event) {
     if (!this->isEnabled()) return;

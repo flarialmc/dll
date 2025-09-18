@@ -857,7 +857,7 @@ ID3D11ShaderResourceView *CreateTextureFromBytesDX11(
     return nullptr; // Will be available next frame
 }
 
-int TabList::getPingImage(int ping) {
+int getPingImage(int ping) {
     if (ping > 300) return IDR_PING_QUIT;
     else if (ping > 250) return IDR_PING_BAD;
     else if (ping > 175) return IDR_PING_OKAY;

@@ -3,7 +3,7 @@
 
 // Player role priority and sorting functions
 
-int TabList::getRolePriority(const std::string &name) {
+int getRolePriority(const std::string &name) {
     std::string clearedName = String::removeNonAlphanumeric(String::removeColorCodes(name));
     if (clearedName.empty()) return 5; // Lowest priority for invalid names
 
@@ -19,7 +19,7 @@ int TabList::getRolePriority(const std::string &name) {
     return 5; // Default Flarial user (in onlineUsers but no specific role)
 }
 
-std::vector<PlayerListEntry> TabList::sortVecmap(
+std::vector<PlayerListEntry> sortVecmap(
     const std::unordered_map<mcUUID, PlayerListEntry> &sourceMap, bool flarialFirst, bool sort) {
     if (flarialFirst) {
         std::vector<PlayerListEntry> flarialEntries;

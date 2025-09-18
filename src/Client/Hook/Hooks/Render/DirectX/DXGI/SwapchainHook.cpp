@@ -330,7 +330,7 @@ winrt::com_ptr<ID3D11Texture2D> SwapchainHook::GetBackbuffer() {
 void SwapchainHook::SaveBackbuffer(bool underui) {
 
     SavedD3D11BackBuffer = nullptr;
-    ExtraSavedD3D11BackBuffer = nullptr;
+    //ExtraSavedD3D11BackBuffer = nullptr;
     if (!isDX12) {
 
         SwapchainHook::swapchain->GetBuffer(0, IID_PPV_ARGS(SavedD3D11BackBuffer.put()));
