@@ -1,21 +1,38 @@
 @echo off
-setlocal enabledelayedexpansion
+setlocal EnableDelayedExpansion
 
-:: Timing wrapper for compilation commands
-:: Usage: time_wrapper.bat <command>
+:: Get the start time
+for /f "tokens=*" %%i in ('powershell -Command "& { (Get-Date).Ticks }"') do set START_TIME=%%i
 
-:: Find the source file first
+:: Execute the original command and capture output
+%*
+set EXIT_CODE=%errorlevel%
+
+:: Get the end time and calculate duration
+for /f "tokens=*" %%i in ('powershell -Command "& { $endTime = (Get-Date).Ticks; $elapsed = [math]::Round((%START_TIME% - $endTime) / -10000000.0, 3); $elapsed }"') do set ELAPSED=%%i
+
+:: Extract the source file from the command line arguments
 set SOURCE_FILE=
+set COMMAND_LINE=%*
 for %%a in (%*) do (
-    if "%%~xa"==".cpp" set SOURCE_FILE=%%~na.cpp
-    if "%%~xa"==".c" set SOURCE_FILE=%%~na.c
+    set "arg=%%a"
+    if "!arg:~-4!"==".cpp" set "SOURCE_FILE=!arg!"
+    if "!arg:~-3!"==".cc" set "SOURCE_FILE=!arg!"
+    if "!arg:~-2!"==".c" set "SOURCE_FILE=!arg!"
+    if "!arg:~-4!"==".cxx" set "SOURCE_FILE=!arg!"
 )
 
-:: Use PowerShell Measure-Command for accurate timing with single invocation
-for /f "tokens=*" %%i in ('powershell -Command "& { $result = Measure-Command { cmd /c '%*' 2>$null | Out-Null }; [math]::Round($result.TotalSeconds, 2) }"') do set ELAPSED=%%i
+:: If no direct source file found, try to extract from /Fo or other patterns
+if "!SOURCE_FILE!"=="" (
+    echo !COMMAND_LINE! | findstr /i "\.cpp\|\.cc\|\.c\|\.cxx" >nul
+    if !errorlevel! equ 0 (
+        for /f "tokens=*" %%f in ('echo !COMMAND_LINE! ^| powershell -Command "& { $input = $input -replace '/Fo.*?\s', ''; if ($input -match '([^\s]+\.(cpp|cc|c|cxx))') { $matches[1] } }"') do set "SOURCE_FILE=%%f"
+    )
+)
 
-:: Output timing and save to file if we found a source file
-if defined SOURCE_FILE (
-    echo !SOURCE_FILE!: !ELAPSED!s
+:: Log the timing if we found a source file
+if not "!SOURCE_FILE!"=="" (
     echo !ELAPSED! !SOURCE_FILE! >> build_times.tmp
 )
+
+exit /b %EXIT_CODE%

@@ -18,8 +18,8 @@
 #include "../../../SDK/SDK.hpp"
 #include "../../../Assets/Assets.hpp"
 #include "../../Events/Input/KeyEvent.hpp"
-#include <windows.h>
-#include <unknwn.h>
+// #include <windows.h> // Removed - not used
+// #include <unknwn.h> // Removed - not used
 
 Module::Module(const std::string& ename, const std::string& edescription, int eicon, const std::string& ekey, bool isScripting, const std::vector<std::string>& ealiases)
     : name(ename), tooltip(edescription), description(edescription), icon(eicon), isScriptingModule(isScripting), defaultKeybind(ekey), aliases(ealiases), settings(Settings())
@@ -40,14 +40,13 @@ Module::Module(const std::string& ename, const std::string& edescription, int ei
 
     settingspath = isScripting ? Utils::getClientPath() + R"(\Scripts\Configs\)" + name + ".json" : "this is unused for non scripting modules";
 
-    // Initialize vectors with proper constraints
-    conditionalSliderAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
-    conditionalToggleAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
-    conditionalDropdownAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
-    conditionalTextBoxAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
-    conditionalColorPickerAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
-
-    prevAlignments = std::vector<DWRITE_TEXT_ALIGNMENT>(100, DWRITE_TEXT_ALIGNMENT_JUSTIFIED);
+    // Initialize vectors with lazy allocation for better compilation performance
+    conditionalSliderAnims.reserve(16);
+    conditionalToggleAnims.reserve(16);
+    conditionalDropdownAnims.reserve(16);
+    conditionalTextBoxAnims.reserve(16);
+    conditionalColorPickerAnims.reserve(16);
+    prevAlignments.reserve(16);
 }
 
 Module::Module(const std::string& ename, const std::string& etooltip, const std::string& edescription, int eicon, const std::string& ekey, bool isScripting, const std::vector<std::string>& ealiases)
@@ -61,14 +60,13 @@ Module::Module(const std::string& ename, const std::string& etooltip, const std:
 
     settingspath = isScripting ? Utils::getClientPath() + R"(\Scripts\Configs\)" + name + ".json" : "this is unused for non scripting modules";
 
-    // Initialize vectors with proper constraints
-    conditionalSliderAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
-    conditionalToggleAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
-    conditionalDropdownAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
-    conditionalTextBoxAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
-    conditionalColorPickerAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
-
-    prevAlignments = std::vector<DWRITE_TEXT_ALIGNMENT>(100, DWRITE_TEXT_ALIGNMENT_JUSTIFIED);
+    // Initialize vectors with lazy allocation for better compilation performance
+    conditionalSliderAnims.reserve(16);
+    conditionalToggleAnims.reserve(16);
+    conditionalDropdownAnims.reserve(16);
+    conditionalTextBoxAnims.reserve(16);
+    conditionalColorPickerAnims.reserve(16);
+    prevAlignments.reserve(16);
 }
 
 

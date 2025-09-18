@@ -50,13 +50,13 @@ std::unordered_map<std::string, Vec2<float>> FlarialGUI::TextSizesXY;
 // Static variables moved from header for better compilation performance
 namespace FlarialGUI {
     std::stack<Dimensions> dimensionStack;
-    std::vector<float> darkenAmounts(10000);
-    std::vector<float> glowAlphas(10000);
-    std::vector<float> opacityAmounts(100);
-    std::vector<float> toggleSpacings(100);
-    std::vector<float> rotationAngles(100, 0);
-    std::vector<D2D1_COLOR_F> toggleColors(100, D2D1::ColorF(D2D1::ColorF::White));
-    std::vector<D2D1_COLOR_F> buttonColors(100, D2D1::ColorF(D2D1::ColorF::Red));
+    std::vector<float> darkenAmounts;
+    std::vector<float> glowAlphas;
+    std::vector<float> opacityAmounts;
+    std::vector<float> toggleSpacings;
+    std::vector<float> rotationAngles;
+    std::vector<D2D1_COLOR_F> toggleColors;
+    std::vector<D2D1_COLOR_F> buttonColors;
 
     D2D1_COLOR_F rgbColor;
     float rgbHue = 0.0f;

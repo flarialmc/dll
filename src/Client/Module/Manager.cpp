@@ -1,4 +1,6 @@
 #include "Manager.hpp"
+#include "../Client.hpp"
+#include "../../Scripting/ScriptManager.hpp"
 
 
 void ModuleManager::getModules() {

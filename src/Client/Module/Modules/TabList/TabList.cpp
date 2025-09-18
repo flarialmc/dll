@@ -2,7 +2,7 @@
 #include "SDK/Client/Actor/LocalPlayer.hpp"
 #include "Utils/APIUtils.hpp"
 
-#include <wrl/client.h>
+// #include <wrl/client.h> // Removed - not used
 #include <unordered_map>
 #include <mutex>
 #include <chrono>

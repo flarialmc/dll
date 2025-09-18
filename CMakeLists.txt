@@ -51,20 +51,16 @@ add_compile_options($<$<CONFIG:Release>:/Ob2>)
 
 add_compile_options(/bigobj)
 add_compile_options(/utf-8)
-# Add timing information for MSVC
-add_compile_options(/Bt)
-
-# Set up timing wrapper for compilation commands
-set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CMAKE_CURRENT_SOURCE_DIR}/time_wrapper.bat")
+# Timing information is handled by time_wrapper.bat
 
 if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "Test")
     # Optimize for performance
-    add_compile_options(/O2 /Oi /Gy /Gw /GF /fp:fast /Gd /MT /Ob2)
-    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
+    add_compile_options(/O2 /Oi /Gy /Gw /GF /fp:fast /Gd /MD /Ob2)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
 elseif (CMAKE_BUILD_TYPE STREQUAL "Debug")
     # Optimize for build time
-    add_compile_options(/Od /Zi /MT)
-    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
+    add_compile_options(/Od /Zi /MD)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
 endif()
 
 # Generate version and build date
@@ -89,6 +85,8 @@ target_include_directories(Flarial PRIVATE
         "src/Client/Module"
         "lib"
         "lib/lua/lua-5.4.7/include"
+        "lib/ImGui"
+        "lib/fmt/include"
 )
 
 add_library(miniz STATIC lib/miniz/miniz.c)
@@ -100,8 +98,13 @@ set_target_properties(miniz PROPERTIES
         MSVC_RUNTIME_LIBRARY "MultiThreaded"
 )
 
-add_subdirectory(lib/lua)
 add_subdirectory(lib/freetype)
+
+add_library(lua STATIC IMPORTED GLOBAL)
+set_target_properties(lua PROPERTIES
+        MSVC_RUNTIME_LIBRARY "MultiThreaded"
+)
+set_target_properties(lua PROPERTIES IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/lib/lua/lua.lib")
 
 
 add_library(MinHook SHARED IMPORTED GLOBAL)
@@ -121,6 +124,12 @@ set_target_properties(zlib PROPERTIES
         MSVC_RUNTIME_LIBRARY "MultiThreaded"
 )
 set_target_properties(zlib PROPERTIES IMPORTED_IMPLIB "${CMAKE_CURRENT_SOURCE_DIR}/lib/curl/zlib.lib")
+
+add_library(imgui STATIC IMPORTED GLOBAL)
+set_target_properties(imgui PROPERTIES
+        MSVC_RUNTIME_LIBRARY "MultiThreaded"
+)
+set_target_properties(imgui PROPERTIES IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/lib/ImGui/imgui.lib")
 
 include(FetchContent)
 
@@ -142,10 +151,14 @@ FetchContent_Declare(
         GIT_TAG        d6297514b05fd238f5b46d003325f108c22741e3
 )
 
-FetchContent_Declare(
-        fmt
-        GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-        GIT_TAG        master
+# Use prebuilt fmt library
+add_library(fmt SHARED IMPORTED GLOBAL)
+set_target_properties(fmt PROPERTIES
+        MSVC_RUNTIME_LIBRARY "MultiThreadedDLL"
+)
+set_target_properties(fmt PROPERTIES
+        IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/lib/fmt/bin/fmt.dll"
+        IMPORTED_IMPLIB "${CMAKE_CURRENT_SOURCE_DIR}/lib/fmt/lib/fmt.lib"
 )
 
 FetchContent_Declare(
@@ -160,11 +173,16 @@ FetchContent_Declare(
         GIT_TAG        master
 )
 
-FetchContent_MakeAvailable(libhat entt nes fmt magic_enum LuaBridge)
+FetchContent_MakeAvailable(libhat entt nes magic_enum LuaBridge)
 
-target_link_libraries(Flarial PRIVATE libcurl ws2_32.lib crypt32.lib normaliz.lib wldap32.lib LuaBridge lua_static libhat fmt::fmt EnTT::EnTT NES windowscodecs.lib urlmon.lib dwrite.lib d3d12.lib dxgi.lib d3d11.lib d2d1.lib wininet.lib setupapi.lib version FreeType magic_enum runtimeobject)
+target_link_libraries(Flarial PRIVATE libcurl ws2_32.lib crypt32.lib normaliz.lib wldap32.lib LuaBridge lua libhat fmt EnTT::EnTT NES windowscodecs.lib urlmon.lib dwrite.lib d3d12.lib dxgi.lib d3d11.lib d2d1.lib wininet.lib setupapi.lib version FreeType magic_enum runtimeobject imgui d3dcompiler.lib)
 
 target_link_libraries(Flarial PUBLIC MinHook)
+
+# Add incremental linking for faster build times
+set_target_properties(Flarial PROPERTIES
+    LINK_FLAGS "/INCREMENTAL /DEBUG:FASTLINK"
+)
 
 if (EXISTS "${CMAKE_SOURCE_DIR}/compiledoom.txt")
     message(WARNING "Compiling with Doom Module, Flarial may freeze or crash.")

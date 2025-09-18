@@ -1,7 +1,7 @@
 #include <numbers>
 #include <cmath>
 #include <algorithm>
-#include <deque>
+// #include <deque> // Removed - not used
 #include <string>
 #include <vector>
 #include <format>
@@ -18,7 +18,6 @@
 #include "SDK/Client/Actor/Components/ActorRotationComponent.hpp"
 #include "SDK/Client/Level/Dimension.hpp"
 #include "SDK/Client/Block/BlockSource.hpp"
-#include "SDK/Client/Level/HitResult.hpp"
 #include "SDK/Client/Level/HitResult.hpp"
 #include "SDK/Client/Actor/Gamemode.hpp"
 #include "SDK/Client/Render/GuiData.hpp"
