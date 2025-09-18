@@ -408,7 +408,7 @@ void JavaDebugMenu::onSetupAndRender(SetupAndRenderEvent &event) {
                 if (this->isOnSetting("showTargetedBlockTags") && this->lookingAt != this->lastLookingAt) {
                     this->lastLookingAt = this->lookingAt;
                     std::vector<std::string> tags = {};
-                    for (auto i: tagMap) {
+                    for (auto i: getTagMap()) {
                         if (std::ranges::find(i.second, block->getName()) != i.second.end()) {
                             tags.emplace_back(i.first);
                         }

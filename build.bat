@@ -162,14 +162,36 @@ echo Building with %NUM_CORES% parallel jobs...
 echo Starting build with per-object timing information...
 echo.
 
-ninja -j %NUM_CORES%
+:: Clear previous timing data
+if exist build_times.tmp del build_times.tmp
 
-if errorlevel 1 (
+:: Get build start time
+for /f "tokens=*" %%i in ('powershell -Command "& { (Get-Date).ToFileTime() }"') do set BUILD_START_TIME=%%i
+
+ninja -j %NUM_CORES%
+set BUILD_EXIT_CODE=%errorlevel%
+
+:: Get build end time and calculate total
+for /f "tokens=*" %%i in ('powershell -Command "& { $endTime = (Get-Date).ToFileTime(); $elapsed = [math]::Round((%BUILD_START_TIME% - $endTime) / -10000000.0, 2); \"Total build time: $elapsed seconds\" }"') do echo %%i
+
+if %BUILD_EXIT_CODE% neq 0 (
     echo.
     echo ERROR: Build failed!
     cd ..
     pause
     exit /b 1
+)
+
+:: Display slowest compilation times
+if exist build_times.tmp (
+    echo.
+    echo ===============================================
+    echo              Slowest Files to Compile
+    echo ===============================================
+    echo.
+    powershell -Command "& { Get-Content 'build_times.tmp' | ForEach-Object { $parts = $_ -split ' ', 2; [PSCustomObject]@{ Time = [double]$parts[0]; File = $parts[1] } } | Sort-Object Time -Descending | Select-Object -First 10 | ForEach-Object { '{0,6:F2}s  {1}' -f $_.Time, $_.File } }"
+    echo.
+    del build_times.tmp
 )
 
 cd ..

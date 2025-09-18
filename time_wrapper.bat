@@ -4,20 +4,18 @@ setlocal enabledelayedexpansion
 :: Timing wrapper for compilation commands
 :: Usage: time_wrapper.bat <command>
 
-:: Get start time in milliseconds
-for /f "tokens=*" %%i in ('powershell -Command "& { (Get-Date).ToFileTime() }"') do set START_TIME=%%i
-
-:: Execute the command (suppress output)
-%* >nul 2>&1
-
-:: Get end time in milliseconds
-for /f "tokens=*" %%i in ('powershell -Command "& { (Get-Date).ToFileTime() }"') do set END_TIME=%%i
-
-:: Calculate elapsed time in seconds
-for /f "tokens=*" %%i in ('powershell -Command "& { [math]::Round((!END_TIME! - !START_TIME!) / 10000000.0, 2) }"') do set ELAPSED=%%i
-
-:: Extract just the source filename from the command
+:: Find the source file first
+set SOURCE_FILE=
 for %%a in (%*) do (
-    if "%%~xa"==".cpp" echo %%~na.cpp: !ELAPSED!s
-    if "%%~xa"==".c" echo %%~na.c: !ELAPSED!s
+    if "%%~xa"==".cpp" set SOURCE_FILE=%%~na.cpp
+    if "%%~xa"==".c" set SOURCE_FILE=%%~na.c
+)
+
+:: Use PowerShell Measure-Command for accurate timing with single invocation
+for /f "tokens=*" %%i in ('powershell -Command "& { $result = Measure-Command { cmd /c '%*' 2>$null | Out-Null }; [math]::Round($result.TotalSeconds, 2) }"') do set ELAPSED=%%i
+
+:: Output timing and save to file if we found a source file
+if defined SOURCE_FILE (
+    echo !SOURCE_FILE!: !ELAPSED!s
+    echo !ELAPSED! !SOURCE_FILE! >> build_times.tmp
 )

@@ -14,6 +14,7 @@ namespace ModuleManager {
     extern bool cguiRefresh;
 
     void initialize();
+    void registerAllModules();
     void restart();
     void terminate();
 

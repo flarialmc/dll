@@ -1,4 +1,5 @@
 Flarial.dir/
+.claude/
 CMakeCache.txt
 *.vcxproj.filters
 *.vcxproj
