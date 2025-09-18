@@ -59,8 +59,8 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "Test")
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
 elseif (CMAKE_BUILD_TYPE STREQUAL "Debug")
     # Optimize for build time
-    add_compile_options(/Od /Zi /MTd)
-    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDebug")
+    add_compile_options(/Od /Zi /MT)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
 endif()
 
 # Generate version and build date
@@ -125,11 +125,11 @@ set_target_properties(zlib PROPERTIES
 )
 set_target_properties(zlib PROPERTIES IMPORTED_IMPLIB "${CMAKE_CURRENT_SOURCE_DIR}/lib/curl/zlib.lib")
 
-add_library(imgui STATIC IMPORTED GLOBAL)
+add_library(imgui SHARED IMPORTED GLOBAL)
 set_target_properties(imgui PROPERTIES
         MSVC_RUNTIME_LIBRARY "MultiThreaded"
 )
-set_target_properties(imgui PROPERTIES IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/lib/ImGui/imgui.lib")
+set_target_properties(imgui PROPERTIES IMPORTED_IMPLIB "${CMAKE_CURRENT_SOURCE_DIR}/lib/ImGui/imgui.lib")
 
 include(FetchContent)
 
@@ -152,11 +152,11 @@ FetchContent_Declare(
 )
 
 # Use prebuilt fmt library
-add_library(fmt STATIC IMPORTED GLOBAL)
+add_library(fmt SHARED IMPORTED GLOBAL)
 set_target_properties(fmt PROPERTIES
         MSVC_RUNTIME_LIBRARY "MultiThreaded"
 )
-set_target_properties(fmt PROPERTIES IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/lib/fmt/lib/fmt.lib")
+set_target_properties(fmt PROPERTIES IMPORTED_IMPLIB "${CMAKE_CURRENT_SOURCE_DIR}/lib/fmt/lib/fmt.lib")
 
 FetchContent_Declare(
         magic_enum
