@@ -10,7 +10,7 @@
 #include <wrl/client.h>
 
 // ImGui FreeType headers
-#include <imgui/misc/freetype/imgui_freetype.h>
+#include <imgui/imgui_freetype.h>
 
 // Resource loading and management functions
 
