@@ -49,7 +49,7 @@ static std::unordered_map<std::string, PlayerHeadTextureDX11> g_playerHeadTextur
 static std::unordered_map<std::string, PlayerHeadTexture> g_playerHeadTextures;
 static std::mutex g_playerHeadMutex;
 
-// Async loading infrastructure
+
 struct PlayerHeadLoadTask {
     std::string playerName;
     std::vector<unsigned char> imageData;
