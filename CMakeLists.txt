@@ -55,12 +55,12 @@ add_compile_options(/utf-8)
 
 if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "Test")
     # Optimize for performance
-    add_compile_options(/O2 /Oi /Gy /Gw /GF /fp:fast /Gd /MD /Ob2)
-    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
+    add_compile_options(/O2 /Oi /Gy /Gw /GF /fp:fast /Gd /MT /Ob2)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
 elseif (CMAKE_BUILD_TYPE STREQUAL "Debug")
     # Optimize for build time
-    add_compile_options(/Od /Zi /MD)
-    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
+    add_compile_options(/Od /Zi /MTd)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDebug")
 endif()
 
 # Generate version and build date
@@ -152,14 +152,11 @@ FetchContent_Declare(
 )
 
 # Use prebuilt fmt library
-add_library(fmt SHARED IMPORTED GLOBAL)
+add_library(fmt STATIC IMPORTED GLOBAL)
 set_target_properties(fmt PROPERTIES
-        MSVC_RUNTIME_LIBRARY "MultiThreadedDLL"
+        MSVC_RUNTIME_LIBRARY "MultiThreaded"
 )
-set_target_properties(fmt PROPERTIES
-        IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/lib/fmt/bin/fmt.dll"
-        IMPORTED_IMPLIB "${CMAKE_CURRENT_SOURCE_DIR}/lib/fmt/lib/fmt.lib"
-)
+set_target_properties(fmt PROPERTIES IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/lib/fmt/lib/fmt.lib")
 
 FetchContent_Declare(
         magic_enum

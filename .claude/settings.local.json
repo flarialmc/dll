@@ -16,7 +16,11 @@
       "Bash(./build.bat D)",
       "Bash(./build.bat Debug)",
       "Bash(./build.bat Release)",
-      "Bash(./build.bat)"
+      "Bash(./build.bat)",
+      "Bash(dumpbin:*)",
+      "Bash(objdump:*)",
+      "Bash(where:*)",
+      "Bash(grep:*)"
     ],
     "deny": [],
     "ask": []
