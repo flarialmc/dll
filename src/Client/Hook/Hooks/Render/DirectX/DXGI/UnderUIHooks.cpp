@@ -80,11 +80,11 @@ void UnderUIHooks::ClearDepthStencilViewCallbackDX12(
 void UnderUIHooks::enableHook() {
 
     bool queue;
-    if (SwapchainHook::queue) queue = true;
+    if (SwapchainHook::isDX12) queue = true;
     else queue = false;
     Logger::debug("Queue value: {}", queue);
 
-    if (!SwapchainHook::queue) {
+    if (!SwapchainHook::isDX12) {
 
         /* DX11 */
 

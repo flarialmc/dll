@@ -3,7 +3,7 @@
 
 
 void MotionBlur::onEnable() {
-    if (SwapchainHook::queue) {
+    if (SwapchainHook::isDX12) {
         if (!once) {
             FlarialGUI::Notify("Please turn on Better Frames in Settings!");
             once = true;
@@ -67,7 +67,7 @@ void MotionBlur::settingsRender(float settingsOffset) {
 
 void MotionBlur::onRender(RenderUnderUIEvent &event) {
     if (!this->isEnabled()) return;
-    if (SwapchainHook::queue) return;
+    if (SwapchainHook::isDX12) return;
 
 
     if (getOps<std::string>("blurType") == "Ghost Frames" || !getOps<bool>("renderUnderUI")) {
@@ -115,7 +115,7 @@ void MotionBlur::onRender(RenderUnderUIEvent &event) {
 
 void MotionBlur::onRenderNormal(RenderEvent &event) {
     if (!this->isEnabled() || ModuleManager::getModule("ClickGUI")->active) return;
-    if (SwapchainHook::queue) return;
+    if (SwapchainHook::isDX12) return;
 
     if (getOps<std::string>("blurType") != "Ghost Frames" && getOps<bool>("renderUnderUI")) {
         return;
@@ -176,7 +176,7 @@ void MotionBlur::ImageWithOpacity(const winrt::com_ptr<ID3D11ShaderResourceView>
 
 winrt::com_ptr<ID3D11ShaderResourceView> MotionBlur::BackbufferToSRVExtraMode() {
     if (!FlarialGUI::needsBackBuffer) return nullptr;
-    if (SwapchainHook::queue) return BackbufferToSRV();
+    if (SwapchainHook::isDX12) return BackbufferToSRV();
     HRESULT hr;
 
     D3D11_TEXTURE2D_DESC d;

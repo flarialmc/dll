@@ -62,6 +62,7 @@ HRESULT CreateSwapchainForCoreWindowHook::CreateSwapChainForCoreWindowCallback(
     if (Client::settings.getSettingByName<bool>("killdx")->value) SwapchainHook::queue = nullptr;
     if (Client::settings.getSettingByName<bool>("killdx")->value && SUCCEEDED(pDevice->QueryInterface(IID_PPV_ARGS(pCommandQueue.put())))) {
         SwapchainHook::queue = nullptr;
+        SwapchainHook::isDX12 = false;
         Logger::success("Fell back to DX11");
         return DXGI_ERROR_INVALID_CALL;
     }
@@ -69,8 +70,8 @@ HRESULT CreateSwapchainForCoreWindowHook::CreateSwapChainForCoreWindowCallback(
     auto vsync = Client::settings.getSettingByName<bool>("vsync")->value;
     SwapchainHook::currentVsyncState = vsync;
 
-    if (vsync) pDesc->Flags |= DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
-
+    if (vsync) pDesc->Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
+//
     SwapchainHook::recreate = false;
     HRESULT hr = funcOriginal(This, pDevice, pWindow, pDesc, pRestrictToOutput, ppSwapChain);
     if (FAILED(hr)) {
