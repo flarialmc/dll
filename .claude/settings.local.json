@@ -14,7 +14,9 @@
       "Bash(ninja:*)",
       "Bash(build.bat Debug)",
       "Bash(./build.bat D)",
-      "Bash(./build.bat Debug)"
+      "Bash(./build.bat Debug)",
+      "Bash(./build.bat Release)",
+      "Bash(./build.bat)"
     ],
     "deny": [],
     "ask": []
