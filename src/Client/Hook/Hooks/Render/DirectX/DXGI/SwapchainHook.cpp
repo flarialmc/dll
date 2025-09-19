@@ -47,25 +47,9 @@ bool unloadDll(const wchar_t *moduleName) {
     return false;
 }
 
-bool containsModule(const std::wstring &moduleName) {
-    HANDLE hProcess = GetCurrentProcess();
-    HMODULE hMods[1024];
-    DWORD cbNeeded;
-
-    if (EnumProcessModulesEx(hProcess, hMods, sizeof(hMods), &cbNeeded, LIST_MODULES_ALL)) {
-        for (unsigned int i = 0; i < (cbNeeded / sizeof(HMODULE)); i++) {
-            TCHAR szModName[MAX_PATH];
-
-            if (GetModuleFileNameEx(hProcess, hMods[i], szModName, sizeof(szModName) / sizeof(TCHAR))) {
-                std::wstring baseModuleName = std::filesystem::path(szModName).filename().wstring();
-                if (moduleName == baseModuleName) {
-                    return true;
-                }
-            }
-        }
-    }
-
-    return false;
+bool SwapchainHook::containsModule(const std::wstring &moduleName) {
+    HMODULE hModule = GetModuleHandleW(moduleName.c_str());
+    return hModule != nullptr;
 }
 
 HWND FindWindowByTitle(const std::string &titlePart) {
@@ -135,10 +119,18 @@ void SwapchainHook::enableHook() {
     Logger::info("GPU name: {}", gpuName.c_str());
 
     bool isRTSS = containsModule(L"RTSSHooks64.dll");
-
+    bool isMedal = containsModule(L"medal-hook64.dll");
     if (isRTSS) {
         Logger::debug("[Swapchain] MSI Afterburner failed to unload!");
         Utils::MessageDialogW(L"Flarial: client failed to initialize, disable MSI Afterburner or RTSS!", L"Error!");
+        ModuleManager::terminate();
+        Client::disable = true;
+    }
+
+    if (isMedal && (Client::settings.getSettingByName<bool>("vsync")->value || Client::settings.getSettingByName<bool>("killdx")->value))
+    {
+        Logger::debug("[Swapchain] Medal failed to unload!");
+        Utils::MessageDialogW(L"Flarial: client failed to initialize, close Medal! We current don't support it with V-SYNC DISABLER or BETTER FRAMES.", L"Error!");
         ModuleManager::terminate();
         Client::disable = true;
     }
@@ -157,11 +149,13 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
     if (currentVsyncState != Client::settings.getSettingByName<bool>("vsync")->value) {
         recreate = true;
     }
+    if (containsModule(L"medal-hook64.dll")) recreate = false;
 
     if (recreate) {
         init = false;
         initImgui = false;
         Logger::debug("[DEBUG] Recreating Swapchain");
+        pSwapChain->ResizeBuffers(0, MC::windowSize.x, MC::windowSize.y, DXGI_FORMAT_UNKNOWN, DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING);
 
         return DXGI_ERROR_DEVICE_RESET;
     }
