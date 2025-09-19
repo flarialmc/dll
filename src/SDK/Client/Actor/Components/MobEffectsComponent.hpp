@@ -154,12 +154,12 @@ public:
 
     static std::string amplifierToString(int amplifier) {
         switch (amplifier) {
-            case 0: return "I";
-            case 1: return "II";
-            case 2: return "III";
-            case 3: return "IV";
-            case 4: return "V";
-            default: return FlarialGUI::cached_to_string(amplifier + 1);
+            case 1: return "I";
+            case 2: return "II";
+            case 3: return "III";
+            case 4: return "IV";
+            case 5: return "V";
+            default: return FlarialGUI::cached_to_string(amplifier);
         }
     }
 };
