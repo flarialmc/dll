@@ -126,7 +126,7 @@ void SwapchainHook::enableHook() {
         ModuleManager::terminate();
         Client::disable = true;
     }
-
+isMedal = false;
     if (isMedal && (Client::settings.getSettingByName<bool>("vsync")->value || Client::settings.getSettingByName<bool>("killdx")->value))
     {
         Logger::debug("[Swapchain] Medal failed to unload!");
@@ -149,7 +149,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
     if (currentVsyncState != Client::settings.getSettingByName<bool>("vsync")->value) {
         recreate = true;
     }
-    if (containsModule(L"medal-hook64.dll")) recreate = false;
+    //if (containsModule(L"medal-hook64.dll")) recreate = false;
 
     if (recreate) {
         init = false;
