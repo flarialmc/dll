@@ -98,7 +98,7 @@ void PotionHUD::renderText()
 
                     std::string text = effect.getNameAndTime();
                     std::stringstream ss(text);
-                    std::string effectName = effect.getName() + " "; // effect name
+                    std::string effectName = effect.getName() + " "; // effect  name
                     if (getOps<bool>("useRoman")) {
                         if (getOps<bool>("useRomanFull")) effectName += Utils::intToRoman(effect.getAmplifier());
                         else effectName += MobEffect::amplifierToString(effect.getAmplifier());
