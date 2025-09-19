@@ -361,7 +361,7 @@ void FlarialGUI::image(int resourceId, D2D1_RECT_F rect, LPCTSTR type, bool shou
 }
 
 void FlarialGUI::LoadAllImages() {
-	if(SwapchainHook::queue) {
+	if(SwapchainHook::isDX12) {
         // Check if consolidated descriptor heap is available
         if(!SwapchainHook::d3d12DescriptorHeapImGuiRender) return;
 

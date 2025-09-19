@@ -11,6 +11,7 @@ std::chrono::time_point<std::chrono::high_resolution_clock> ClickGUI::favoriteSt
 
 // Moved static method implementations from header for better compilation performance
 D2D_COLOR_F ClickGUI::getColor(const std::string& text) {
+    if(!clickgui->settings.getSettingByName<bool>(text + "RGB")) return D2D1::ColorF(D2D1::ColorF::White);
     D2D_COLOR_F col = clickgui->settings.getSettingByName<bool>(text + "RGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>(text + "Col")->value);
     col.a = clickgui->settings.getSettingByName<float>(text + "Opacity")->value;
     return col;

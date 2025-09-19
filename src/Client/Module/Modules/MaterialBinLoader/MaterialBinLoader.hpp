@@ -5,7 +5,8 @@
 #include "src/Client/Hook/Hooks/Game/composeFullStack.hpp"
 
 class MaterialBinLoader : public Module {
-
+private:
+    bool ispatched;
 
 public:
     MaterialBinLoader() : Module("MaterialBinLoader", "Load Shaders from ResourcePack",
@@ -31,13 +32,45 @@ public:
 
     void onReadFile(ReadFileEvent &event) {
         const std::string &p = event.getpath().getUtf8StdString();
+        if (SDK::currentScreen == "modal_progress_screen" || SDK::currentScreen == "world_saving_progress_screen")
+        {
+            event.returnresult(event.result);
+            return;
+        }
+
         // Logger::custom(fg(fmt::color::dark_green), "minecraft.windows.exe", "Loaded path: {}", p); //this is pretty cool
         if (p.find("/data/renderer/materials/") != std::string::npos && strncmp(p.c_str() + p.size() - 13, ".material.bin", 13) == 0) {
 
             if (!_composeFullStackHook::resourcePackManager) {
-                Logger::error("Couldn't load materials ResourcePackManager is null!");
+                //Logger::custom(fg(fmt::color::yellow), "MaterialBinLoader", "Shaders cant be loaded yet ResourcePackManager is null!");
                 event.returnresult(event.result);
                 return;
+            }
+
+            if (!ispatched) {
+                ispatched = true;
+                // Bypass VendorID check to support some Intel GPUs
+                // bgfx::d3d12::RendererContextD3D12::init
+                if (auto ptr = reinterpret_cast<uint8_t*>(Memory::findSig("81 BF ?? ?? 00 00 86 80 00 00")); ptr) {
+                    // 1.19.40
+                    ScopedVP(ptr, 10, PAGE_READWRITE);
+                    ptr[6] = 0;
+                    ptr[7] = 0;
+                    Logger::custom(fg(fmt::color::green), "MaterialBinLoader", "Successfully patched bgfx::d3d12::RendererContextD3D12::init");
+                } else {
+                    Logger::custom(fg(fmt::color::red), "MaterialBinLoader", "Failed to patch bgfx::d3d12::RendererContextD3D12::init");
+                }
+
+                // Fix rendering issues on some NVIDIA GPUs
+                // dragon::bgfximpl::toSamplerFlags
+                if (auto ptr = reinterpret_cast<uint8_t*>(Memory::findSig("FF E1 80 7B ? ? B8 00 00 07 10")); ptr) {
+                    // 1.21.50
+                    ScopedVP(ptr, 10, PAGE_READWRITE);
+                    ptr[9] = 0;
+                    Logger::custom(fg(fmt::color::green), "MaterialBinLoader", "Successfully patched dragon::bgfximpl::toSamplerFlags");
+                } else {
+                    Logger::custom(fg(fmt::color::red), "MaterialBinLoader", "Failed to patch dragon::bgfximpl::toSamplerFlags");
+                }
             }
 
             std::string binPath = "renderer/materials/" + p.substr(p.find_last_of('/') + 1);
@@ -56,8 +89,6 @@ public:
                     else event.retstr->assign(out);
 
                 Logger::custom(fg(fmt::color::green), "MaterialBinLoader", "Successfully loaded: {}", binPath);
-            } else {
-                Logger::custom(fg(fmt::color::red), "MaterialBinLoader", "Failed to load: {}", binPath);
             }
         }
     }

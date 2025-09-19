@@ -226,7 +226,9 @@ void Waypoints::settingsRender(float settingsOffset) {
 	addSlider("Outer Beam Radius", "", "outerBeamRadius", 1.f, 0.2f);
 	extraPadding();
 
-	for (auto pair : WaypointList) {
+	// Create a copy of the waypoint list to iterate over safely
+	auto waypointListCopy = WaypointList;
+	for (auto pair : waypointListCopy) {
 		std::string end = "-" + FlarialGUI::cached_to_string(pair.second.index);
 		if (!this->settings.getSettingByName<std::string>("waypoint" + end)) continue;
 		if (getOps<std::string>("world" + end) != SDK::clientInstance->getLocalPlayer()->getLevel()->getWorldFolderName()) continue;
@@ -240,10 +242,9 @@ void Waypoints::settingsRender(float settingsOffset) {
 		addToggle("Show Inner Beam", "", "showInnerBeam" + end);
 		addToggle("Show Outer Beam", "", "showOuterBeam" + end);
 
-		addButton("Delete Waypoint", "", "Delete", [this, index = pair.second.index]() {
+		addButton("Delete Waypoint", "", "Delete", [this, index = pair.second.index, waypointName = pair.first]() {
 			std::string end = "-" + FlarialGUI::cached_to_string(index);
-			std::string waypointName = getOps<std::string>("waypoint" + end);
-			
+
 			// Remove from settings
 			this->settings.deleteSetting("waypoint" + end);
 			this->settings.deleteSetting("color" + end);
@@ -257,10 +258,10 @@ void Waypoints::settingsRender(float settingsOffset) {
 			this->settings.deleteSetting("dimension" + end);
 			this->settings.deleteSetting("showInnerBeam" + end);
 			this->settings.deleteSetting("showOuterBeam" + end);
-			
+
 			// Remove from WaypointList in memory
 			WaypointList.erase(waypointName);
-			
+
 			Client::SaveSettings();
 		});
 	}

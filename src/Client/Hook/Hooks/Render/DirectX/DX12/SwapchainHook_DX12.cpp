@@ -38,6 +38,10 @@ void SwapchainHook::DX12Init() {
     }
 
     IUnknown* queueAsUnknown = queue.get();
+    if (!queue || !queueAsUnknown) {
+        Logger::error("Failed to get D3D12 command queue");
+        return;
+    }
     HRESULT hr = D3D11On12CreateDevice(
         d3d12Device5.get(),
         D3D11_CREATE_DEVICE_BGRA_SUPPORT,
@@ -348,7 +352,7 @@ bool SwapchainHook::AllocateImageDescriptor(UINT imageId, D3D12_CPU_DESCRIPTOR_H
     }
 
     UINT descriptorIndex = (imageId - 100) + IMGUI_FONT_DESCRIPTORS;
-
+//
     if (descriptorIndex >= TOTAL_CONSOLIDATED_DESCRIPTORS) {
         Logger::custom(fg(fmt::color::red), "DescriptorAlloc", "ERROR: Image ID {} would exceed descriptor heap capacity (index {} >= {})",
                        imageId, descriptorIndex, TOTAL_CONSOLIDATED_DESCRIPTORS);

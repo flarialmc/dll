@@ -81,6 +81,8 @@
 #include "Modules/MovableTitle/MovableTitle.hpp"
 #include "Modules/MovableBossbar/MovableBossbar.hpp"
 #include "Modules/MovableChat/MovableChat.hpp"
+#include "Modules/ClearScoreboard/ClearScoreboard.hpp"
+#include "Modules/ClearChat/ClearChat.hpp"
 #include "Modules/MovableCoordinates/MovableCoordinates.hpp"
 #include "Modules/MovableHotbar/MovableHotbar.hpp"
 #include "Modules/NullMovement/NullMovement.hpp"
@@ -119,6 +121,8 @@
 #include "Modules/MessageLogger/MessageLogger.hpp"
 #include "Modules/TotemCounter/TotemCounter.hpp"
 #include "Modules/BetterHungerBar/BetterHungerBar.hpp"
+#include "Modules/ParticleMultiplier/ParticleMultiplier.hpp"
+#include "Modules/BowSensitivity/BowSensitivity.hpp"
 
 #ifdef COMPILE_DOOM
 	#include "Modules/Doom/Doom.hpp"
@@ -231,13 +235,15 @@ void ModuleManager::initialize() {
 	addModule<MovableTitle>();
 	addModule<MovableBossbar>();
 	addModule<MovableChat>();
+	addModule<ClearScoreboard>();
+	addModule<ClearChat>();
 	addModule<MovableCoordinates>();
 	addModule<MovableHotbar>();
 	addModule<MovableDayCounter>();
 	// addModule<CompactChat>();
-	if(!VersionUtils::checkAboveOrEqual(21, 100)) {
-		addModule<ItemPhysics>();
-	}
+
+	addModule<ItemPhysics>();
+
 
 	addModule<Mousestrokes>();
 
@@ -280,10 +286,15 @@ void ModuleManager::initialize() {
 	addModule<Twerk>();
 	addModule<CinematicCamera>();
 	addModule<ChunkBorder>();
+	if(VersionUtils::checkAboveOrEqual(21, 70))
+	{
 	addModule<CompactChat>();
 	addModule<MessageLogger>();
+	}
 	addModule<TotemCounter>();
 	addModule<BetterHungerBar>();
+	addModule<ParticleMultiplier>();
+	addModule<BowSensitivity>();
 
 #ifdef COMPILE_DOOM
 	addModule<DoomModule>();

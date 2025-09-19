@@ -45,7 +45,7 @@ private:
 
     std::vector<float> columnx;
     std::vector<PlayerListEntry> vecmap;
-    std::vector<TabListEntry> vectab = std::vector<TabListEntry>(1000);
+    std::vector<TabListEntry> vectab;
     float totalWidth;
     float baseTotalHeight;
     size_t validPlayers;
@@ -108,6 +108,12 @@ public:
 
     // Reset all TabList descriptor state - called during swapchain recreation
     static void ResetDescriptorState();
+
+    // Cleanup functions for resource management during resize
+    static void CleanupDX12Uploader();
+    static void CleanupPlayerHeadTextures();
+    static void InitializeAsyncLoading();
+    static void ReinitializeAfterResize();
 
     // PlayerHead descriptor management data
     struct PlayerHeadDescriptorInfo {

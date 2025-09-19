@@ -16,7 +16,7 @@ void SigInit::init21100() {
 
     ADD_SIG("MinecraftPackets::createPacket", "48 89 5C 24 10 48 89 6C 24 18 48 89 74 24 20 57 48 83 EC 70 48 8B 05 ? ? ? ? 48 33 C4 48 89 44 24 60 48 8B F9 48 89");
 
-    ADD_SIG("ItemPositionConst", "80 BD ? ? ? ? ? 0F 85 ? ? ? ? 66 0F 6E B5");
+    ADD_SIG("ItemPositionConst", "F3 0F 59 35 ? ? ? ? 0F 28 D6 49 8B D5 48 8B CD E8");
 
     ADD_SIG("glm_rotateRef", "E8 ? ? ? ? 48 8B D0 8B 08 89 0B 8B 48 ? 89 4B ? 8B 48 ? 89 4B ? 8B 48 ? 89 4B ? 8B 48 ? 89 4B ? 8B 48 ? 89 4B ? 8B 40 ? 89 43 ? 8B 42 ? 89 43 ? 8B 42 ? 89 43 ? 8B 42 ? 89 43 ? 8B 42 ? 89 43 ? 8B 42 ? 89 43 ? 8B 42 ? 89 43 ? 8B 42 ? 89 43 ? 8B 42 ? 89 43 ? 8B 42 ? 89 43 ? 48 83 C4");
 
@@ -95,6 +95,7 @@ void SigInit::init2170() {
     ADD_SIG("GeneralSettingsScreenController::GeneralSettingsScreenController", "48 89 5C 24 18 55 56 57 41 54 41 55 41 56 41 57 48 8D AC 24 20 FB FF FF 48 81 EC E0 05 00 00 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 85 D0 04 00 00 45");
     ADD_SIG("Actor::baseTick", "48 8D ? ? ? ? ? 48 89 ? BA ? ? ? ? 44 8D ? ? 44 8D ? ? 66 C7 44 24 20 ? ? E8 ? ? ? ? 48 8B");
     ADD_SIG("CameraAssignAngle", "76 0E F3 0F 5C C7");
+    ADD_SIG("ResourceLocation::getFullPath", "48 89 5C 24 ? 48 89 74 24 ? 57 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 ? ? ? ? 48 8B FA 48 8B F1 48 89 54 24 ? 33 DB");
 }
 
 void SigInit::init2160() {

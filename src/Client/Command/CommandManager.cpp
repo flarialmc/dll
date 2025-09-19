@@ -2,6 +2,7 @@
 
 #include "../../SDK/Client/Network/Packet/TextPacket.hpp"
 #include "Commands/BindCommand.hpp"
+#include "Commands/UnbindCommand.hpp"
 #include "Commands/ConfigCommand.hpp"
 #include "Commands/PrefixCommand.hpp"
 #include "Commands/HelpCommand.hpp"
@@ -33,6 +34,7 @@ void CommandManager::initialize() {
     Commands.push_back(std::make_unique<ConfigCommand>());
     Commands.push_back(std::make_unique<SpotifyCommand>());
     Commands.push_back(std::make_unique<BindCommand>());
+    Commands.push_back(std::make_unique<UnbindCommand>());
     Commands.push_back(std::make_unique<WikiCommand>());
     Commands.push_back(std::make_unique<FixFontCommand>());
     //Commands.push_back(std::make_unique<IRCChat>());

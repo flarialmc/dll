@@ -35,7 +35,7 @@ void ResizeHook::resizeCallback(IDXGISwapChain* pSwapChain, UINT bufferCount, UI
     if (module != nullptr && module->active && SDK::hasInstanced && SDK::clientInstance != nullptr)
         SDK::clientInstance->releaseMouse();
     GuiScale::fixResize = true;
-    if (SwapchainHook::currentVsyncState) flags |= DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
+    if (SwapchainHook::currentVsyncState) flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
     return funcOriginal(pSwapChain, bufferCount, width, height, newFormat, flags);
 }
 
@@ -54,7 +54,6 @@ void ResizeHook::cleanShit(bool fullReset) {
 
     //SwapchainHook::d3d11Device = nullptr;
 
-    SwapchainHook::swapchain = nullptr;
     SwapchainHook::SavedD3D11BackBuffer = nullptr;
     SwapchainHook::ExtraSavedD3D11BackBuffer = nullptr;
 
@@ -156,6 +155,15 @@ void ResizeHook::cleanShit(bool fullReset) {
     }
 
     ImagesClass::images.clear();
+
+    // Clean up TabList resources for both fullReset and normal resize
+    TabList::CleanupDX12Uploader();
+    TabList::CleanupPlayerHeadTextures();
+    TabList::ResetDescriptorState();
+
+    // Reinitialize async loading after cleanup so player heads continue to load
+    TabList::ReinitializeAfterResize();
+
     if (fullReset) {
         FlarialGUI::hasLoadedAll = false;
         for (auto& [id, texture] : ImagesClass::ImguiDX12Textures) {
@@ -174,8 +182,6 @@ void ResizeHook::cleanShit(bool fullReset) {
 
         ImagesClass::ImguiDX11Images.clear();
 
-
-        TabList::ResetDescriptorState();
         SwapchainHook::ResetDescriptorAllocation();
     }
 
@@ -194,6 +200,7 @@ void ResizeHook::cleanShit(bool fullReset) {
             SwapchainHook::initImgui = false;
             SwapchainHook::imguiCleanupInProgress = false;
         }
+        FlarialGUI::CleanupImageResources();
 
         SwapchainHook::queue = nullptr;
         SwapchainHook::d3d12CommandList = nullptr;
