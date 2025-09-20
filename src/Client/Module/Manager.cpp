@@ -96,6 +96,7 @@
 #include "Scripting/ScriptManager.hpp"
 #include "Modules/AutoPerspective/AutoPerspective.hpp"
 #include "Modules/BlockHit/BlockHit.hpp"
+#include "Modules/SwingAnimations/SwingAnimations.hpp"
 #include "Modules/CinematicCamera/CinematicCamera.hpp"
 #include "Modules/LowHealthIndicator/LowHealthIndicator.hpp"
 #include "Modules/PlayerNotifier/PlayerNotifier.hpp"
@@ -250,6 +251,7 @@ void ModuleManager::initialize() {
 	if (VersionUtils::checkAboveOrEqual(21, 40)) {
 		addModule<JavaInventoryHotkeys>();
 		addModule<BlockHit>();
+		addModule<SwingAnimations>();
 	}
 
 

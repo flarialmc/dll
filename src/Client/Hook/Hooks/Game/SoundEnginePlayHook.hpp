@@ -4,10 +4,10 @@
 class SoundEnginePlayHook : public Hook {
 
 private:
-    static void* callback(void* SoundEngine, const std::string& name, Vec3<float> a3, float a4, float a5);
+    static uint64_t callback(void* SoundEngine, const std::string& name, Vec3<float> a3, float a4, float a5);
 
 public:
-    typedef void*(__thiscall *original)(void* SoundEngine, const std::string& name, Vec3<float> a3, float a4, float a5);
+    typedef uint64_t(__thiscall *original)(void* SoundEngine, const std::string& name, Vec3<float> a3, float a4, float a5);
 
     static inline original funcOriginal = nullptr;
 

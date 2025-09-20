@@ -46,6 +46,7 @@
 #include "Hooks/Game/ChatScreenControllerHook.hpp"
 #include "Hooks/Game/HudScreenControllerHook.hpp"
 #include "Hooks/Game/SoundEnginePlayHook.hpp"
+#include "Hooks/Game/getCurrentSwingDurationHook.hpp"
 
 #include "Hooks/Render/BobHurt.hpp"
 #include "Hooks/Render/RenderLevelHook.hpp"
@@ -142,6 +143,7 @@ void HookManager::initialize() {
     //addHook<Level_addParticleEffect>();
     //addHook<Level_sendServerLegacyParticle>();
     addHook<SoundEnginePlayHook>();
+    addHook<getCurrentSwingDurationHook>();
     if(VersionUtils::checkAboveOrEqual(21, 40)) {
         addHook<UpdatePlayerHook>();
     }
