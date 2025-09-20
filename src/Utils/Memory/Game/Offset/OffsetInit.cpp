@@ -12,7 +12,7 @@ void OffsetInit::init21100() {
 
     ADD_OFFSET("NetworkSystem::remoteConnectorComposite", 0xF0);
     ADD_OFFSET("MinecraftGame::textureGroup", 0x758);
-
+    ADD_OFFSET("SwingAngle", 9);
     ADD_OFFSET("Level::worldFolderName", 0x258);
 }
 
@@ -142,7 +142,7 @@ void OffsetInit::init2150() {
     ADD_OFFSET("Actor::hurtTime", 0x19C);
     ADD_OFFSET("Actor::level", 0x1D8);
     ADD_OFFSET("Actor::categories", 0x210);
-
+    ADD_OFFSET("SwingAngle", 5);
     ADD_OFFSET("Player::gamemode", 0xB18);
     ADD_OFFSET("Player::playerName", 0xCA0);
 
