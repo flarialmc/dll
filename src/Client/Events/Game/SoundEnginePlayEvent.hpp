@@ -6,7 +6,7 @@
 class SoundEnginePlayEvent : public Event {
     public:
         const std::string& name;
-        std::string pos;
+        Vec3<float> pos;
         float a4;
         float a5;
 

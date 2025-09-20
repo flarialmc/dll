@@ -4,6 +4,7 @@
 
 #include "Events/Game/SoundEnginePlayEvent.hpp"
 #include "SoundDescriptions.hpp"
+#include "glm/glm/ext/quaternion_geometric.hpp"
 
 void Subtitles::onEnable() {
     Listen(this, RenderEvent, &Subtitles::onRender)
@@ -30,21 +31,24 @@ void Subtitles::settingsRender(float settingsOffset) {
 
 void Subtitles::onRender(RenderEvent& event) {
     if (!this->isEnabled()) return;
-
-    std::string thing = fmt::format("{} {} {}", "jflkdsafjdl", "jfkdlsa", "jfkldsaf");
-
-    this->normalRender(36, thing);
+    std::string singleSubtitle = fmt::format("{} {} {}", left, currentSoundName, right);
+    this->normalRender(36, singleSubtitle);
 }
 
 void Subtitles::onSoundEnginePlay(SoundEnginePlayEvent& event) {
     currentSoundName = SoundDescriptions::getSoundDescription(event.name);
-    left = true ? "" : "<";
-    right = true ? "" : ">";
+
+    Vec3<float> diff = SDK::clientInstance->getLocalPlayer()->getPosition()->sub(event.pos).normalize();
+    Vec3<float> up(0.0f, 1.0f, 0.0f);
+    Vec3<float> side = diff.cross(up);
+
+    left = side.z < 0 ? "" : "<";
+    right = side.z > 0 ? "" : ">";
 
 
     Logger::debug("Sound Name: {}", event.name);
     Logger::debug("Sound Description: {}", SoundDescriptions::getSoundDescription(event.name));
-    Logger::debug("Sound Position: {}", (std::string) event.pos);
+    Logger::debug("Sound Position : {}, {}, {}", event.pos.x, event.pos.y, event.pos.z);
 }
 
 
