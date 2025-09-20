@@ -1,56 +1,26 @@
 #pragma once
 
 #include "../Module.hpp"
+#include "Events/Render/GammaEvent.hpp"
+#include "../../../../Assets/Assets.hpp"
 
 
 class Fullbright : public Module {
 public:
 	Fullbright() : Module("Fullbright",
 		"No need for torches!\nProvides consistent and constant illumination.\nEffectively removing darkness and shadows.",
-		IDR_FULLBRIGHT_PNG, "") {
-		Module::setup();
+		IDR_FULLBRIGHT_PNG, "", false, {"gamma"}) {
 
 	};
 
-	void onEnable() override {
-		Listen(this, GammaEvent, &Fullbright::onGetGamma)
-			Module::onEnable();
-	}
+	void onEnable() override;
 
-	void onDisable() override {
-		Deafen(this, GammaEvent, &Fullbright::onGetGamma)
-			Module::onDisable();
-	}
+	void onDisable() override;
 
-	void defaultConfig() override {
-		Module::defaultConfig();
-		if (settings.getSettingByName<float>("gamma") == nullptr) settings.addSetting("gamma", 25.0f);
-	}
+	void defaultConfig() override;
 
-	void settingsRender(float settingsOffset) override {
-		float x = Constraints::PercentageConstraint(0.019, "left");
-		float y = Constraints::PercentageConstraint(0.10, "top");
-
-		const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
-
-
-		FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
-		FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
-			Constraints::RelativeConstraint(1.0, "width"),
-			Constraints::RelativeConstraint(0.88f, "height"));
-
-		this->addHeader("Misc");
-		this->addSlider("Brightness", "", this->settings.getSettingByName<float>("gamma")->value, 25.0f);
-
-		FlarialGUI::UnsetScrollView();
-
-		this->resetPadding();
-
-
-	}
+	void settingsRender(float settingsOffset) override;
 
 	// TODO: Make it changable
-	void onGetGamma(GammaEvent& event) {
-		event.setGamma(this->settings.getSettingByName<float>("gamma")->value);
-	};
+	void onGetGamma(GammaEvent& event);
 };

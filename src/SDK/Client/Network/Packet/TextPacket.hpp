@@ -3,8 +3,11 @@
 #include "../../../../Utils/Memory/Memory.hpp"
 #include "Packet.hpp"
 #include <string>
+#include <vector>
+#include <optional>
+#include <cstdint>
 
-enum class TextPacketType : int {
+enum class TextPacketType : int8_t {
     RAW = 0,
     CHAT = 1,
     TRANSLATION = 2,
@@ -21,15 +24,16 @@ enum class TextPacketType : int {
 
 class TextPacket : public Packet {
 public:
-    TextPacketType type;  // 0x28
+    TextPacketType type;  // 0x30
 
-    std::string name;           // 0x30
-    std::string message;              // 0x50
-    std::vector<std::string> mParams;   // 0x70
-    bool translationNeeded = false;  // 0x88
+    std::string name;           // 0x38
+    std::string message;              // 0x58
+    std::vector<std::string> mParams;   // 0x78
+    std::optional<std::string> filteredMessage; // 0xA0
+    bool translationNeeded = false;  // 0xB8
 
-    std::string xuid;
-    std::string platformId;
+    std::string xuid; // 0xC0
+    std::string platformId; // 0xE0
 
     TextPacket() = default;
     //code has peaked
@@ -53,3 +57,5 @@ public:
         }
     }
 };
+
+static_assert(sizeof(TextPacket) == 0x100);

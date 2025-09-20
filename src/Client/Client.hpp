@@ -1,79 +1,68 @@
-﻿#pragma once
+#pragma once
 
-#include "Hook/Manager.hpp"
-#include "Module/Manager.hpp"
 #include <vector>
+#include <string>
+#include <filesystem>
+#include <lib/json/json_fwd.hpp>
+#include <windows.h>
 
-#include "Utils/APIUtils.hpp"
+// Forward declarations
+class Settings;
 
 #define ADD_SETTING(setting, value) \
 if (Client::settings.getSettingByName<decltype(value)>(setting) == nullptr) \
 Client::settings.addSetting(setting, value);
 
+namespace fs = std::filesystem;
+
 class Client {
+	static std::string privatePath;
 public:
-    static std::string current_commit;
-    static float elapsed;
-    static uint64_t start;
+	static std::string current_commit;
+	static float elapsed;
+	static uint64_t start;
+	static std::vector<std::string> availableConfigs;
+	static std::vector<std::string> getPlayersVector(const nlohmann::json& data);
+	static bool init;
 
-    static std::vector<std::string> availableConfigs;
+	static void UnregisterActivationHandler();
 
-    static std::vector<std::string> getPlayersVector(const nlohmann::json &data);
+	static void createConfig(std::string name);
+	static void switchConfig(std::string name, bool deleting = false);
+	static void deleteConfig(std::string name);
 
-    static void UnregisterActivationHandler();
+	static void loadAvailableConfigs();
 
-    static void createConfig(std::string name);
+	static void PerformPostLegacySetup();
 
-    static void deleteConfig(std::string name);
+	static void initialize();
 
-    static void loadAvailableConfigs();
+	static bool disable;
 
-    static void initialize();
+	static void centerCursor();
 
-    static bool disable;
+	static std::string activeConfig;
+	static bool hasLegacySettings;
+	static bool softLoadLegacy;
+	static bool privateInit;
+	static bool savingSettings;
+	static bool savingPrivate;
 
-    static void centerCursor();
+	static Settings settings;
+	static Settings legacySettings;
 
-    static Settings settings;
-    inline static std::string version;
-    inline static HMODULE currentModule = nullptr;
+	static nlohmann::json globalSettings;
+	static std::string version;
+	static HMODULE currentModule; // Keep as HMODULE for Windows API compatibility
 
-    inline static std::string path = Utils::getConfigsPath() + "\\main.flarial";
-    static void SaveSettings() {
+	static std::string path;
+	static std::string legacyPath;
+	static std::string legacyDir;
 
-        try {
-            std::ofstream outputFile(path);
-            if (outputFile) {
-                outputFile << settings.ToJson();
-            } else {
-                Logger::error("Failed to open settings file: {}", path);
-            }
-        } catch (const std::exception& e) {
-            Logger::error("An error occurred while trying to save settings to {}: {}", path, e.what());
-        }
-    }
-
-    static void LoadSettings() {
-        std::ifstream inputFile(path);
-
-        if (!inputFile) {
-            Logger::error("Failed to open settings file: {}", path);
-            return;
-        }
-
-        std::stringstream ss;
-        ss << inputFile.rdbuf();
-        settings.FromJson(ss.str());
-    }
-
-    static void CheckSettingsFile() {
-        if (!std::filesystem::exists(path)) {
-            std::filesystem::create_directories(std::filesystem::path(path).parent_path());
-
-            std::ofstream file(path, std::ios::app);
-            if (!file) {
-                Logger::error("Failed to create settings file: {}", path);
-            }
-        }
-    }
+	static void LoadLegacySettings();
+	static void SavePrivate();
+	static void LoadPrivate();
+	static void SaveSettings();
+	static void LoadSettings();
+	static void CheckSettingsFile();
 };

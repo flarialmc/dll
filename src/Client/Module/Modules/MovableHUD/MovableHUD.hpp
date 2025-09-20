@@ -20,21 +20,16 @@ private:
 	static inline Vec2<float> originalPos = Vec2<float>{ 0.0f, 0.0f };
 	Vec2<float> currentSize = Vec2<float>{ 0.0f, 0.0f };
 public:
-	MovableHUD() : Module("Movable HUD", "Makes everything on screen movable!", IDR_MOVABLE_PNG, "") {
-		Module::setup();
-	};
+	MovableHUD(): Module("Movable HUD", "Makes everything on screen movable!",
+		IDR_MOVABLE_PNG, "") {
 
-	void onEnable() override {
 	}
 
-	void onDisable() override {
-	}
+	void onEnable() override;
 
-	void defaultConfig() override {
-		Module::defaultConfig();
-		if (settings.getSettingByName<float>("percentageX") == nullptr) settings.addSetting("percentageX", 0.0f);
-		if (settings.getSettingByName<float>("percentageY") == nullptr) settings.addSetting("percentageY", 0.0f);
-	}
+	void onDisable() override;
 
-	void settingsRender(float settingsOffset) override {}
+	void defaultConfig() override;
+
+	void settingsRender(float settingsOffset) override;
 };

@@ -73,7 +73,8 @@ add_compile_definitions(
 
 file(GLOB_RECURSE SOURCE_FILES "src/*.cpp" "src/*.hpp")
 file(GLOB_RECURSE LIB_FILES "lib/*.cpp" "lib/*.h")
-add_library(Flarial SHARED main.cpp ${SOURCE_FILES} ${LIB_FILES} src/Assets/Assets.rc)
+add_library(Flarial SHARED main.cpp ${SOURCE_FILES} ${LIB_FILES} src/Assets/Assets.rc
+        src/SDK/Client/Network/Packet/AnimatePacket.hpp)
 
 target_include_directories(Flarial PRIVATE
         "."
@@ -115,8 +116,6 @@ set_target_properties(zlib PROPERTIES
 )
 set_target_properties(zlib PROPERTIES IMPORTED_IMPLIB "${CMAKE_CURRENT_SOURCE_DIR}/lib/curl/zlib.lib")
 
-target_precompile_headers(Flarial PRIVATE "src/PCH.cpp")
-
 include(FetchContent)
 
 FetchContent_Declare(
@@ -157,5 +156,21 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(libhat entt nes fmt magic_enum LuaBridge)
 
-target_link_libraries(Flarial PRIVATE libcurl ws2_32.lib crypt32.lib normaliz.lib wldap32.lib LuaBridge lua_static libhat fmt::fmt EnTT::EnTT NES windowscodecs.lib urlmon.lib dwrite.lib d3d12.lib dxgi.lib d3d11.lib d2d1.lib wininet.lib version FreeType magic_enum)
+target_link_libraries(Flarial PRIVATE libcurl ws2_32.lib crypt32.lib normaliz.lib wldap32.lib LuaBridge lua_static libhat fmt::fmt EnTT::EnTT NES windowscodecs.lib urlmon.lib dwrite.lib d3d12.lib dxgi.lib d3d11.lib d2d1.lib wininet.lib setupapi.lib version FreeType magic_enum runtimeobject)
+
 target_link_libraries(Flarial PUBLIC MinHook)
+
+if (EXISTS "${CMAKE_SOURCE_DIR}/compiledoom.txt")
+    message(WARNING "Compiling with Doom Module, Flarial may freeze or crash.")
+    add_compile_definitions(COMPILE_DOOM)
+    file(GLOB_RECURSE DOOM_SOURCES "src/Client/Module/Modules/Doom/doomgeneric/*.c" "src/Client/Module/Modules/Doom/doomgeneric/*.h")
+    add_library(DoomModule ${DOOM_SOURCES})
+    target_link_libraries(Flarial PRIVATE DoomModule)
+endif ()
+
+target_precompile_headers(Flarial PRIVATE "src/PCH.hpp")
+
+if (CMAKE_BUILD_TYPE STREQUAL "Release")
+set_property(TARGET Flarial PROPERTY UNITY_BUILD ON)
+set_property(TARGET Flarial PROPERTY UNITY_BUILD_BATCH_SIZE 16)
+endif ()

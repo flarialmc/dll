@@ -1,3 +1,5 @@
+#include "EventManager.hpp"
+
 #include "Game/AttackEvent.hpp"
 #include "Game/FOVEvent.hpp"
 #include "Game/PerspectiveEvent.hpp"
@@ -12,6 +14,7 @@
 #include "Game/AfterSettingsScreenOnExitEvent.hpp"
 #include "Game/BeforeSettingsScreenOnExitEvent.hpp"
 #include "Game/displayClientMessageEvent.hpp"
+#include "Game/TurnDeltaEvent.hpp"
 
 #include "Input/KeyEvent.hpp"
 #include "Input/MouseEvent.hpp"
@@ -40,3 +43,9 @@
 #include "Misc/ProtocolEvent.hpp"
 #include "Game/RenderItemInHandEvent.hpp"
 #include "Render/RenderOutlineSelectionEvent.hpp"
+#include "Game/ReadFileEvent.hpp"
+#include "Render/BobHurtEvent.hpp"
+#include "Game/ChatScreenControllerTickEvent.hpp"
+#include "Render/BobHurtEvent.hpp"
+#include "Render/Render3DEvent.hpp"
+#include "Render/ItemRendererEvent.hpp"

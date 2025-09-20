@@ -1,6 +1,9 @@
 #pragma once
 
 #include <string>
+#include "../../../Utils/path.hpp"
+#include "../../../Utils/Memory/Memory.hpp"
+#include "../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 enum ResourceFileSystem : int32_t {
     UserPackage = 0x0000,
@@ -42,6 +45,21 @@ public:
 
     bool operator<(const ResourceLocation& other) const {
         return this->filePath < other.filePath;
+    }
+
+    // Get the full path to a texture file within a resource pack
+    // Usage example:
+    // ResourceLocation textureLocation("textures/items/apple.png", false);
+    // Core::PathBuffer<std::string> fullPath;
+    // textureLocation.getFullPath(&fullPath);
+    // std::string texturePath = fullPath.getContainer();
+    Core::PathBuffer<std::string>* getFullPath(Core::PathBuffer<std::string>* result) {
+        static auto sig = GET_SIG_ADDRESS("ResourceLocation::getFullPath");
+        if (!sig) return result;
+
+        using GetFullPathFunc = Core::PathBuffer<std::string>*(__thiscall*)(ResourceLocation*, Core::PathBuffer<std::string>*);
+        static auto getFullPathFunc = reinterpret_cast<GetFullPathFunc>(sig);
+        return getFullPathFunc(this, result);
     }
 
 private:

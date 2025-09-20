@@ -1,7 +1,12 @@
-﻿#pragma once
+#pragma once
 
-#include "Hooks/Render/ResizeHook.hpp"
-#include "Hooks/Render/CommandListHook.hpp"
+#include "Manager.hpp"
+#include "Hooks/Input/KeyHook.hpp"
+#include "Hooks/Input/MouseHook.hpp"
+#include "Hooks/Render/DirectX/DXGI/SwapchainHook.hpp"
+
+#include "Hooks/Render/DirectX/DXGI/ResizeHook.hpp"
+#include "Hooks/Render/DirectX/DXGI/CommandListHook.hpp"
 #include "Hooks/Render/SetupAndRenderHook.hpp"
 #include "Hooks/Game/ActorBaseTick.hpp"
 #include "Hooks/Visual/getGammaHook.hpp"
@@ -14,6 +19,7 @@
 #include "Hooks/Visual/DimensionFogColorHook.hpp"
 #include "Hooks/Visual/OverworldFogColorHook.hpp"
 #include "Hooks/Visual/TimeChangerHook.hpp"
+#include "Hooks/Render/ItemRendererHook.hpp"
 #include "Hooks/Game/getSensHook.hpp"
 #include "Hooks/Game/ContainerScreenControllerHook.hpp"
 #include "Hooks/Render/TextureGroup_getTextureHook.hpp"
@@ -34,6 +40,18 @@
 #include "Hooks/Game/ItemInHandRendererRenderItem.hpp"
 #include "Hooks/Visual/RenderOutlineSelectionHook.hpp"
 #include "Hooks/Game/displayClientMessage.hpp"
+#include "Hooks/Game/getTimeOfDayHook.hpp"
+#include "Hooks/game/ReadFileHook.hpp"
+#include "Hooks/Game/ApplyTurnDeltaHook.hpp"
+#include "Hooks/Game/ChatScreenControllerHook.hpp"
+#include "Hooks/Game/HudScreenControllerHook.hpp"
+
+#include "Hooks/Render/BobHurt.hpp"
+#include "Hooks/Render/RenderLevelHook.hpp"
+#include "Hooks/Visual/ActorShaderParams.hpp"
+#include "Hooks/Visual/TintColorHook.hpp"
+#include "Hooks/Visual/Level_addParticleEffect.hpp"
+#include "Hooks/Visual/Level_sendServerLegacyParticle.hpp"
 
 std::vector<std::shared_ptr<Hook>> HookManager::hooks;
 
@@ -51,9 +69,6 @@ void HookManager::initialize() {
         kiero::init(kiero::RenderType::D3D10);
         Logger::debug("[Kiero] Trying d3d10");
     }
-
-    Logger::debug("Renderer: {}", dxVersion[kiero::getRenderType()]);
-
 
     addHook<KeyHook>();
     addHook<MouseHook>();
@@ -82,8 +97,10 @@ void HookManager::initialize() {
     addHook<DimensionFogColorHook>();
     addHook<OverworldFogColorHook>();
     addHook<TimeChangerHook>();
+    addHook<ItemRendererHook>();
     addHook<SendPacketHook>();
-    addHook<getSensHook>();
+    addHook<ApplyTurnDeltaHook>();
+    //addHook<getSensHook>();
     addHook<HudMobEffectsRendererHook>();
     if(VersionUtils::checkAboveOrEqual(20, 60)) { // due to texture group offset
         addHook<HudCursorRendererHook>();
@@ -92,28 +109,45 @@ void HookManager::initialize() {
         addHook<TickingTextureStageRenderHook>(); // due to mv
     }
     addHook<UIControl_updateCachedPositionHook>();
-    addHook<GeneralSettingsScreenControllerCtorHook>();
 
     if (VersionUtils::checkAboveOrEqual(21, 40)) {
         addHook<ContainerScreenControllerHook>();
     }
 
-    addHook<isPreGameHook>();
     addHook<_composeFullStackHook>();
 
-    addHook<RenderOrderExecuteHook>();
-    addHook<RenderChunkCoordinatorHandleVisibilityUpdatesHook>();
+    // likely packchanger hooks, im not sure!
+    if(!VersionUtils::checkAboveOrEqual(21, 60))
+    {
+        addHook<isPreGameHook>();
 
-    addHook<SettingsScreenOnExitHook>();
+        addHook<RenderOrderExecuteHook>();
+        addHook<RenderChunkCoordinatorHandleVisibilityUpdatesHook>();
+        addHook<SettingsScreenOnExitHook>();
+        addHook<GeneralSettingsScreenControllerCtorHook>();
+    }
 
     addHook<ItemInHandRendererRenderItem>();
 
     addHook<RenderOutlineSelectionHook>();
+    addHook<getTimeOfDayHook>();
+
+    addHook<BobHurtHook>();
+    addHook<RenderLevelHook>();
+    addHook<TintColorHook>();
+    addHook<ActorShaderParamsHook>();
+    addHook<ChatScreenControllerHook>();
+    addHook<HudScreenControllerHook>();
+    //addHook<Level_addParticleEffect>();
+    //addHook<Level_sendServerLegacyParticle>();
 
     if(VersionUtils::checkAboveOrEqual(21, 40)) {
         addHook<UpdatePlayerHook>();
     }
 
+    if(VersionUtils::checkAboveOrEqual(21, 50)) {
+        addHook<ReadFileHook>();
+    }
     for (const auto& hook: hooks) {
         hook->enableHook();
     }
