@@ -32,7 +32,7 @@ void SigInit::init21100() {
 
     ADD_SIG("ClientInstance::getScreenName", "48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 41 56 48 83 EC ? 4C 8B F2 48 8B D9 33 ED 48 8B 01 48 8B 80 ? ? ? ? FF 15 ? ? ? ? 84 C0 74");
     ADD_SIG("ResourcePackManager::_composeFullStack", "48 89 5C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 41 56 48 83 EC ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 44 24 ? 48 8B F9 40 B6");
-
+    ADD_SIG("SwingAngle", "F3 44 0F 59 15 ?? ?? ?? ?? 4C 8D 4C 24 30 48 8B D0");
     ADD_SIG("AppPlatform::readAssetFile", "48 89 5C 24 ? 48 89 7C 24 ? 55 48 8D 6C 24 ? 48 81 EC 60 01 00 00 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 ? 48 8B F9 48 89 4D");
 }
 
@@ -162,7 +162,7 @@ void SigInit::init2150() {
     ADD_SIG("FluxSwing", "E8 ? ? ? ? ? ? ? F3 0F 10 1D ? ? ? ? F3 0F 10 15 ? ? ? ? F3 0F 10 0D ? ? ? ? C6 40 ? ? ? ? ? EB");
     ADD_SIG("Mob::getCurrentSwingDuration", "48 89 5C 24 ? 48 89 6C 24 ? 56 57 41 56 48 83 EC ? 8B 41 ? 48 8D 54 24 ? 48 8B 35");
     ADD_SIG("SoundEngine::play", "40 53 55 56 57 41 54 41 55 41 56 41 57 48 81 EC E8 00 00 00 0F 29 B4 24 D0 00 00 00");
-
+    ADD_SIG("SwingAngle", "F3 44 0F 59 05 ? ? ? ? 4C 8D 4C 24 ? 89 43");
     DEPRECATE_SIG("GameMode::vtable"); // its not broken but not used anymore
 }
 

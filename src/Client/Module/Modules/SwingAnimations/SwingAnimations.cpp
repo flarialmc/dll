@@ -13,6 +13,10 @@ void SwingAnimations::onEnable() {
         patch();
         isPatched = true;
     }
+
+    initializeSwingAngle();
+    previousSwingAngle = getOps<float>("swingAngle");
+    updateSwingAngle(previousSwingAngle);
 }
 
 void SwingAnimations::onDisable() {
@@ -25,12 +29,15 @@ void SwingAnimations::onDisable() {
         unpatch();
         isPatched = false;
     }
+
+    restoreSwingAngle();
 }
 
 void SwingAnimations::onItemInHandRender(RenderItemInHandEvent &event) {
     if (!this->isEnabled()) return;
 
     bool currentFluxSwingState = getOps<bool>("fluxSwing");
+    float currentSwingAngle = getOps<float>("swingAngle");
 
     if (currentFluxSwingState != previousFluxSwingState) {
         if (currentFluxSwingState && !isPatched) {
@@ -41,6 +48,11 @@ void SwingAnimations::onItemInHandRender(RenderItemInHandEvent &event) {
             isPatched = false;
         }
         previousFluxSwingState = currentFluxSwingState;
+    }
+
+    if (currentSwingAngle != previousSwingAngle) {
+        updateSwingAngle(currentSwingAngle);
+        previousSwingAngle = currentSwingAngle;
     }
 }
 
@@ -81,7 +93,14 @@ void SwingAnimations::settingsRender(float settingsOffset) {
         previousFluxSwingState = newFluxSwingState;
     }
 
-    addSlider("Swing Angle", "Adjusts the swing rotation angle in degrees", "swingAngle", 360.0f, 0.0f);
+    float currentSwingAngle = getOps<float>("swingAngle");
+    addSlider("Swing Angle", "Adjusts the swing rotation angle in degrees", "swingAngle", 90.0f, -180.0f, false);
+    float newSwingAngle = getOps<float>("swingAngle");
+
+    if (currentSwingAngle != newSwingAngle) {
+        updateSwingAngle(newSwingAngle);
+        previousSwingAngle = newSwingAngle;
+    }
 
     FlarialGUI::UnsetScrollView();
     resetPadding();
