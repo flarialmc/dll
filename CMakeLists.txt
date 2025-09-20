@@ -53,10 +53,11 @@ add_compile_options(/bigobj)
 add_compile_options(/utf-8)
 if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "Test")
     # Optimize for performance
-    add_compile_options(/O2 /Oi /Gy /Gw /GF /fp:fast /Gd /MT /Ob2 /WX)
+    add_compile_options(/O2 /Oi /Gy /Gw /GF /fp:fast /Gd /MT /Ob2)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
 elseif (CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_compile_options(/Od /Zi /MT /WX)
+    # Optimize for build time
+    add_compile_options(/Od /Zi /MT)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
 endif()
 

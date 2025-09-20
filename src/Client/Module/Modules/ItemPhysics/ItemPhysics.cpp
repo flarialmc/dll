@@ -175,12 +175,10 @@ void ItemPhysics::applyTransformation(glm::mat4x4& mat) {
     auto actor = currentRenderData->actor;
 
     if (!actor) return;
-    auto curr = static_cast<ItemActor*>(actor);
-    if (!curr) return;
     static float height = 0.5f;
-    bool isOnGround = curr->isOnGround();
+    bool isOnGround = actor->isOnGround();
 
-    if (!actorData.contains(curr)) {
+    if (!actorData.contains(actor)) {
         static std::mt19937 gen(std::chrono::steady_clock::now().time_since_epoch().count());
 
         std::uniform_int_distribution dist(0, 1);
@@ -190,11 +188,11 @@ void ItemPhysics::applyTransformation(glm::mat4x4& mat) {
         const auto sign = Vec3(dist(gen) * 2 - 1, dist(gen) * 2 - 1, dist(gen) * 2 - 1);
 
         auto def = std::tuple{ isOnGround ? 0.f : height, vec, sign };
-        actorData.emplace(curr, def);
+        actorData.emplace(actor, def);
     }
 
     const float deltaTime = 1.f / static_cast<float>(MC::fps);
-    float& yMod = std::get<0>(actorData.at(curr));
+    float& yMod = std::get<0>(actorData.at(actor));
 
     yMod -= height * deltaTime;
     if (yMod <= 0.f)
@@ -203,8 +201,8 @@ void ItemPhysics::applyTransformation(glm::mat4x4& mat) {
     Vec3<float> pos = currentRenderData->position;
     pos.y += yMod;
 
-    auto& vec = std::get<1>(actorData.at(curr));
-    auto& sign = std::get<2>(actorData.at(curr));
+    auto& vec = std::get<1>(actorData.at(actor));
+    auto& sign = std::get<2>(actorData.at(actor));
 
     auto& settings = this->settings;
     const auto speed = settings.getSettingByName<float>("speed")->value;
@@ -241,6 +239,7 @@ void ItemPhysics::applyTransformation(glm::mat4x4& mat) {
         if (smoothRotations && (sign.x != 0 || sign.y != 0 && sign.z != 0)) {
             vec.x += static_cast<float>(sign.x) * deltaTime * speed * xMul;
 
+            const auto curr = static_cast<ItemActor*>(actor);
             if (curr->getStack().block != nullptr) {
                 vec.z += static_cast<float>(sign.z) * deltaTime * speed * zMul;
 
@@ -268,7 +267,7 @@ void ItemPhysics::applyTransformation(glm::mat4x4& mat) {
                 }
             }
         }
-
+        const auto curr = static_cast<ItemActor*>(actor);
         if (!smoothRotations) {
             if (curr->getStack().block != nullptr) {
                 renderVec.x = 0.f;
