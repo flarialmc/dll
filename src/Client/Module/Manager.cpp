@@ -124,6 +124,7 @@
 #include "Modules/BetterHungerBar/BetterHungerBar.hpp"
 #include "Modules/ParticleMultiplier/ParticleMultiplier.hpp"
 #include "Modules/BowSensitivity/BowSensitivity.hpp"
+#include "Modules/Subtitles/Subtitles.hpp"
 
 #ifdef COMPILE_DOOM
 	#include "Modules/Doom/Doom.hpp"
@@ -297,6 +298,7 @@ void ModuleManager::initialize() {
 	addModule<BetterHungerBar>();
 	addModule<ParticleMultiplier>();
 	addModule<BowSensitivity>();
+	addModule<Subtitles>();
 
 #ifdef COMPILE_DOOM
 	addModule<DoomModule>();
