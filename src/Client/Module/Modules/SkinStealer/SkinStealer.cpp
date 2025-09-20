@@ -92,7 +92,7 @@ void SkinStealer::cloneSkin(std::string targetName) {
             if (std::shared_ptr<SkinStealer> ssmod = std::dynamic_pointer_cast<SkinStealer>(mod)) {
                 if (ssmod->clone) {
                     SkinStealCommand::SaveSkin(val.name, val.playerSkin.mSkinImage, val.playerSkin.mCapeImage);
-                    SDK::clientInstance->getGuiData()->displayClientMessage("§aSaved skin locally");
+                    SDK::clientInstance->getGuiData()->displayClientMessage("§aSaved skin and cape locally: Use <.path skin> to open the folder.");
                 }
             }
         }
