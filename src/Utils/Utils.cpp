@@ -577,8 +577,9 @@ std::string String::removeNonNumeric(const std::string &string, bool integer) {
     std::string result;
     result.reserve(string.size());
 
-    for (char c: string) {
-        if ((c >= '0' && c <= '9') || (!integer && c == '.')) {
+    for (size_t i = 0; i < string.size(); ++i) {
+        char c = string[i];
+        if ((c >= '0' && c <= '9') || (!integer && c == '.') || (c == '-' && i == 0)) {
             result += c;
         }
     }
