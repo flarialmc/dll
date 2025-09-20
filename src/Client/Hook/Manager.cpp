@@ -45,6 +45,7 @@
 #include "Hooks/Game/ApplyTurnDeltaHook.hpp"
 #include "Hooks/Game/ChatScreenControllerHook.hpp"
 #include "Hooks/Game/HudScreenControllerHook.hpp"
+#include "Hooks/Game/SoundEnginePlayHook.hpp"
 
 #include "Hooks/Render/BobHurt.hpp"
 #include "Hooks/Render/RenderLevelHook.hpp"
@@ -140,7 +141,7 @@ void HookManager::initialize() {
     addHook<HudScreenControllerHook>();
     //addHook<Level_addParticleEffect>();
     //addHook<Level_sendServerLegacyParticle>();
-
+    addHook<SoundEnginePlayHook>();
     if(VersionUtils::checkAboveOrEqual(21, 40)) {
         addHook<UpdatePlayerHook>();
     }
