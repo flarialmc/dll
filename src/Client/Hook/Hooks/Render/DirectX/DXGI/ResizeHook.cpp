@@ -118,6 +118,7 @@ void ResizeHook::cleanShit(bool fullReset) {
     Blur::pIntermediateTexture2 = nullptr;
 
     Memory::SafeRelease(FlarialGUI::blur);
+    Memory::SafeRelease(FlarialGUI::blur);
     Memory::SafeRelease(FlarialGUI::shadow_blur);
     Memory::SafeRelease(FlarialGUI::blurbrush);
     Memory::SafeRelease(FlarialGUI::screen_bitmap_cache);

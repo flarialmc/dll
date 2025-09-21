@@ -234,7 +234,8 @@ void SwapchainHook::RenderSync() {
 void SwapchainHook::prepareBlur() {
 
     auto blurIntensity = Client::settings.getSettingByName<float>("blurintensity")->value;
-
+    Memory::SafeRelease(FlarialGUI::blur_bitmap_cache);
+    Memory::SafeRelease(FlarialGUI::blurbrush);
     if ((ModuleManager::doesAnyModuleHave("BlurEffect") &&
         blurIntensity > 1) && !FlarialGUI::inMenu) {
 
