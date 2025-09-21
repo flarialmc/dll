@@ -188,8 +188,6 @@ private:
 
         if (player && SDK::clientInstance->getLevelRender()) {
             origin = SDK::clientInstance->getLevelRender()->getOrigin();
-            if (Level_addParticleEffect::funcOriginal == nullptr)
-                Level_addParticleEffect::enableHookk();
         }
 
         FrameTransform transform = {SDK::clientInstance->getViewMatrix(), origin, SDK::clientInstance->getFov()};
