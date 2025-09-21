@@ -4,6 +4,7 @@
 #include "../../../../Client.hpp"
 #include <windows.h>
 #include <unknwn.h>
+#include <cctype>
 
 // TODO: LIKELY REQ A FIX
 class GUIKeyListener : public Listener {
@@ -92,7 +93,21 @@ public:
                                     while (box.isDeleting) {
 
                                         if (!box.text.empty() && !firstTime) {
-                                            box.text.erase(box.text.length() - 1);  // Erase the last character
+                                            if (GetAsyncKeyState(VK_CONTROL) & 0x8000) {
+                                                size_t pos = box.text.length();
+
+                                                while (pos > 0 && std::isspace(box.text[pos - 1])) {
+                                                    pos--;
+                                                }
+
+                                                while (pos > 0 && !std::isspace(box.text[pos - 1])) {
+                                                    pos--;
+                                                }
+
+                                                box.text.erase(pos);
+                                            } else {
+                                                box.text.erase(box.text.length() - 1);
+                                            }
                                         }
 
                                         if (firstTime) {
@@ -112,7 +127,21 @@ public:
                             }
 
                             if (!box.text.empty()) {
-                                box.text.erase(box.text.length() - 1);  // Erase the last character
+                                if (GetAsyncKeyState(VK_CONTROL) & 0x8000) {
+                                    size_t pos = box.text.length();
+
+                                    while (pos > 0 && std::isspace(box.text[pos - 1])) {
+                                        pos--;
+                                    }
+
+                                    while (pos > 0 && !std::isspace(box.text[pos - 1])) {
+                                        pos--;
+                                    }
+
+                                    box.text.erase(pos);
+                                } else {
+                                    box.text.erase(box.text.length() - 1);
+                                }
                             }
                         }
 
