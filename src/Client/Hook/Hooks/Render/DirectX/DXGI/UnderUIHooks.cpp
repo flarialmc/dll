@@ -1,7 +1,6 @@
 #include "UnderUIHooks.hpp"
 #include "SwapchainHook.hpp"
-#include "../../../Module/Modules/DepthOfField/DepthOfFieldHelper.hpp"
-#include "../../../Module/Manager.hpp"
+#include "Modules/DepthOfField/DepthOfFieldHelper.hpp"
 #include "Utils/Logger/Logger.hpp"
 #include "SDK/Client/Options/OptionsParser.hpp"
 
@@ -156,7 +155,6 @@ void UnderUIHooks::ClearDepthStencilViewCallbackDX11(
             srvDesc.Texture2D.MipLevels = 1;
             hr = pDevice->CreateShaderResourceView(pDepthMapTexture, &srvDesc, &DepthOfFieldHelper::pDepthMapSRV);
             if (FAILED(hr)) {
-                Logger::debug("UnderUIHooks::ClearDepthStencilViewCallbackDX11 - Failed to create depth map SRV");
                 pDepthMapTexture->Release();
                 pDepthTexture->Release();
                 pDevice->Release();

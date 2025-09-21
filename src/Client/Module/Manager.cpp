@@ -111,7 +111,6 @@
 #include "Modules/DebugMenu/DebugMenu.hpp"
 #include "Modules/DirectionHUD/DirectionHUD.hpp"
 #include "Modules/JavaViewBobbing/JavaViewBobbing.hpp"
-<<<<<<< HEAD
 #include "Modules/DeathLogger/DeathLogger.hpp"
 #include "Modules/HurtColor/HurtColor.hpp"
 #include "Modules/Twerk/Twerk.hpp"
@@ -289,7 +288,6 @@ void ModuleManager::initialize() {
 
 	addModule<JavaViewBobbing>();
 
-<<<<<<< HEAD
 	addModule<DeathLogger>();
 	addModule<Twerk>();
 	addModule<CinematicCamera>();

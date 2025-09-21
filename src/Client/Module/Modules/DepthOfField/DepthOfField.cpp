@@ -1,9 +1,11 @@
 #include "DepthOfField.hpp"
 #include "Events/EventManager.hpp"
 #include "DepthOfFieldHelper.hpp"
-#include "Hook/Hooks/Render/SwapchainHook.hpp"
+#include "Hook/Hooks/Render/DirectX/DXGI/SwapchainHook.hpp"
 #include "Modules/MotionBlur/MotionBlur.hpp"
-#include "Utils/Logger/Logger.hpp"
+#include "../../../GUI/Engine/Constraints.hpp"
+#include "Manager.hpp"
+#include "../../../GUI/Engine/Engine.hpp"
 
 void DepthOfField::onEnable() {
     Listen(this, RenderUnderUIEvent, &DepthOfField::onRender)
@@ -73,9 +75,10 @@ void DepthOfField::settingsRender(float settingsOffset) {
 }
 
 void DepthOfField::onRender(RenderUnderUIEvent &event) {
-    if (!SwapchainHook::context || !SwapchainHook::d3d11Device || !event.RTV) {
+    if (!SwapchainHook::context || !SwapchainHook::d3d11Device || !event.RTV || SDK::getCurrentScreen() != "hud_screen" || ModuleManager::getModule("ClickGUI")->active) {
         return;
     }
+    if (SwapchainHook::isDX12) return;
 
     static bool initialized = false;
     if (!initialized) {

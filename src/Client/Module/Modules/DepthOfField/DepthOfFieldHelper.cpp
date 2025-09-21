@@ -2,7 +2,7 @@
 #include <d3d11.h>
 #include <d3dcompiler.h>
 #include <chrono>
-
+#include "../../../Hook/Hooks/Render/DirectX/DXGI/SwapchainHook.hpp"
 #include "DepthOfFieldHelper.hpp"
 #include "../../../../Utils/Logger/Logger.hpp"
 #include "../../../../Client/Client.hpp"
@@ -303,7 +303,11 @@ ID3DBlob *DofTryCompileShader(const char *pSrcData, const char *pTarget)
 void DepthOfFieldHelper::InitializePipeline()
 {
     HRESULT hr;
-    ID3D11DeviceContext* pContext = SwapchainHook::context;
+    winrt::com_ptr<ID3D11DeviceContext> pContext = SwapchainHook::context;
+
+    if (!SwapchainHook::d3d11Device) {
+        throw std::runtime_error("D3D11 device is null");
+    }
 
 
     // byteWidth has to be a multiple of 32, BlurInputBuffer has a size of 24
@@ -386,7 +390,7 @@ void DepthOfFieldHelper::InitializePipeline()
 
 void DepthOfFieldHelper::RenderToRTV(ID3D11RenderTargetView *pRenderTargetView, ID3D11ShaderResourceView *pShaderResourceView, XMFLOAT2 rtvSize)
 {
-    ID3D11DeviceContext* pContext = SwapchainHook::context;
+    winrt::com_ptr<ID3D11DeviceContext> pContext = SwapchainHook::context;
     if (!pContext) return;
 
     // Use cached render states (no recreation overhead)
@@ -579,12 +583,30 @@ void DepthOfFieldHelper::RenderDepthOfField(ID3D11RenderTargetView *pDstRenderTa
 
     if (!SwapchainHook::GetBackbuffer()) return;
 
-    winrt::com_ptr<ID3D11ShaderResourceView> pOrigShaderResourceView = MotionBlur::BackbufferToSRVExtraMode();
-    if (!pOrigShaderResourceView) {
+    // Create SRV from backbuffer directly (like MotionBlur does)
+    winrt::com_ptr<ID3D11ShaderResourceView> pOrigShaderResourceView;
+    if (!SwapchainHook::ExtraSavedD3D11BackBuffer) {
         return;
     }
 
-    ID3D11DeviceContext* pContext = SwapchainHook::context;
+    D3D11_TEXTURE2D_DESC d;
+    SwapchainHook::ExtraSavedD3D11BackBuffer->GetDesc(&d);
+    D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+    srvDesc.Format = d.Format;
+    srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.Texture2D.MipLevels = d.MipLevels;
+    srvDesc.Texture2D.MostDetailedMip = 0;
+
+    HRESULT hr = SwapchainHook::d3d11Device->CreateShaderResourceView(SwapchainHook::ExtraSavedD3D11BackBuffer.get(), &srvDesc, pOrigShaderResourceView.put());
+    if (FAILED(hr)) {
+        return;
+    }
+
+    if (!pDepthMapSRV) {
+        return;
+    }
+
+    winrt::com_ptr<ID3D11DeviceContext> pContext = SwapchainHook::context;
     if (!pContext) return;
 
     D3D11_TEXTURE2D_DESC desc;

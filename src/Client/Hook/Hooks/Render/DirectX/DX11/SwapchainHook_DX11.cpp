@@ -21,6 +21,7 @@
 #include "../DXGI/UnderUIHooks.hpp"
 #include "../DXGI/ResizeHook.hpp"
 #include "Modules/MotionBlur/MotionBlur.hpp"
+#include "Modules/DepthOfField/DepthOfFieldHelper.hpp"
 using ::IUnknown;
 
 void SwapchainHook::DX11Init() {
@@ -91,6 +92,7 @@ void SwapchainHook::DX11Init() {
     }
 
     Blur::InitializePipeline();
+    DepthOfFieldHelper::InitializePipeline();
     if (!MotionBlur::initted)
     MotionBlur::initted = AvgPixelMotionBlurHelper::Initialize() && RealMotionBlurHelper::Initialize();
 
@@ -192,11 +194,14 @@ void SwapchainHook::DX11Blur() {
     /* Blur Stuff */
     prepareBlur();
     if (ModuleManager::initialized) {
-        auto module = ModuleManager::getModule("Motion Blur");
-        if (module) {
-            if (module->isEnabled() || FlarialGUI::inMenu) FlarialGUI::needsBackBuffer = true;
-            else FlarialGUI::needsBackBuffer = false;
-        }
+        auto motionBlurModule = ModuleManager::getModule("Motion Blur");
+        auto depthOfFieldModule = ModuleManager::getModule("Depth Of Field");
+
+        bool needsBuffer = FlarialGUI::inMenu;
+        if (motionBlurModule && motionBlurModule->isEnabled()) needsBuffer = true;
+        if (depthOfFieldModule && depthOfFieldModule->isEnabled()) needsBuffer = true;
+
+        FlarialGUI::needsBackBuffer = needsBuffer;
     }
     /* Blur End */
 
