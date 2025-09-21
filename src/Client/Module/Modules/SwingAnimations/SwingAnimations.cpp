@@ -59,6 +59,7 @@ void SwingAnimations::onItemInHandRender(RenderItemInHandEvent &event) {
 void SwingAnimations::onSwingDuration(SwingDurationEvent &event) {
     if (!this->isEnabled()) return;
 
+
     float swingSpeed = getOps<float>("swingSpeed");
     int originalDuration = event.getDuration();
     int modifiedDuration = static_cast<int>(originalDuration / swingSpeed);

@@ -1525,10 +1525,19 @@ const std::unordered_map<std::string, std::string> SoundDescriptions::soundDescr
     {"wind_charge.burst", "Wind charge bursts"}
 };
 
+
 std::string SoundDescriptions::getSoundDescription(const std::string& soundName) {
+    if (soundName == "") return "Unknown sound";
+
     auto it = soundDescriptions.find(soundName);
     if (it != soundDescriptions.end()) {
         return it->second;
     }
-    return "Unknown sound";
+    return soundName;
+}
+
+std::string SoundDescriptions::getSoundSimpleDescription(const std::string& soundName) { // TBD
+    if (soundName == "") return "Unknown sound";
+
+    return soundName;
 }

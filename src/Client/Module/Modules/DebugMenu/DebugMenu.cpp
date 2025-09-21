@@ -186,11 +186,9 @@ bool JavaDebugMenu::isOnSetting(std::string settingName, int block = -1) {
 
 void JavaDebugMenu::updateTimedVector(std::vector<TimedObj> &vec, float diff) {
     double microTime = Microtime();
-    vec.erase(
-        std::remove_if(vec.begin(), vec.end(), [microTime, diff](const TimedObj &obj) {
-            return (microTime - obj.timestamp) > diff;
-        }), vec.end()
-    );
+    std::erase_if(vec, [microTime, diff](const TimedObj &obj) {
+        return (microTime - obj.timestamp) > diff;
+    });
 }
 
 void JavaDebugMenu::getOnePercLows() {

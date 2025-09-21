@@ -124,6 +124,7 @@
 #include "Modules/BetterHungerBar/BetterHungerBar.hpp"
 #include "Modules/ParticleMultiplier/ParticleMultiplier.hpp"
 #include "Modules/BowSensitivity/BowSensitivity.hpp"
+#include "Modules/SwingAnimations/SwingAnimations.hpp"
 #include "Modules/Subtitles/Subtitles.hpp"
 #include "Modules/SensMultiplier/SensMultiplier.hpp"
 
@@ -300,6 +301,7 @@ void ModuleManager::initialize() {
 	addModule<BetterHungerBar>();
 	addModule<ParticleMultiplier>();
 	addModule<BowSensitivity>();
+	// addModule<SwingAnimations>();
 	addModule<Subtitles>();
 	addModule<SensMultiplier>();
 
