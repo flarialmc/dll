@@ -51,6 +51,7 @@ public:
 
     static winrt::com_ptr<ID3D11Texture2D> GetBackbuffer();
     static void SaveBackbuffer(bool underui = false);
+    static void SaveDepthmap(ID3D11DeviceContext* pContext, ID3D11DepthStencilView* pDepthStencilView);
 
     typedef HRESULT(__thiscall *SwapchainOriginal)(IDXGISwapChain3 *, UINT, UINT);
 

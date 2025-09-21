@@ -12,6 +12,7 @@
 #include "UnderUIHooks.hpp"
 #include "CreateSwapchainForCoreWindowHook.hpp"
 #include "ResizeHook.hpp"
+#include "../../../../../Module/Modules/DepthOfField/DepthOfFieldHelper.hpp"
 using ::IUnknown;
 
 SwapchainHook::SwapchainHook() : Hook("swapchain_hook", 0) {}
@@ -364,6 +365,104 @@ void SwapchainHook::SaveBackbuffer(bool underui) {
                 std::cout << "Failed to query interface: " << std::hex << hr << std::endl;
             }
         }
+}
+
+void SwapchainHook::SaveDepthmap(ID3D11DeviceContext* pContext, ID3D11DepthStencilView* pDepthStencilView) {
+    if (!pDepthStencilView || isDX12) return;
+
+    // Check if DepthOfField module is enabled
+    auto depthOfFieldModule = ModuleManager::getModule("Depth Of Field");
+    if (!depthOfFieldModule || !depthOfFieldModule->isEnabled()) {
+        return;
+    }
+
+    ID3D11Resource* pResource = nullptr;
+    pDepthStencilView->GetResource(&pResource);
+    ID3D11Texture2D* pDepthTexture = nullptr;
+    pResource->QueryInterface(__uuidof(ID3D11Texture2D), (void**)&pDepthTexture);
+    pResource->Release();
+
+    D3D11_TEXTURE2D_DESC desc;
+    pDepthTexture->GetDesc(&desc);
+    char buffer[256];
+    sprintf_s(buffer, "Format: %u, Usage: %u, BindFlags: %u, CPUAccessFlags: %u, Width: %u, Height: %u, RowPitch: %zu\n",
+              desc.Format, desc.Usage, desc.BindFlags, desc.CPUAccessFlags, desc.Width, desc.Height, (size_t)(desc.Width * sizeof(float)));
+    OutputDebugStringA(buffer);
+
+    if (!(desc.Usage == D3D11_USAGE_DEFAULT && desc.BindFlags & D3D11_BIND_DEPTH_STENCIL)) {
+        OutputDebugStringA("Warning: Depth texture may not be copyable!\n");
+    }
+
+    ID3D11Device* pDevice = nullptr;
+    pContext->GetDevice(&pDevice);
+
+    // Create a texture with shader resource binding
+    D3D11_TEXTURE2D_DESC depthTexDesc = desc;
+    depthTexDesc.Usage = D3D11_USAGE_DEFAULT;
+    depthTexDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    depthTexDesc.CPUAccessFlags = 0;
+    depthTexDesc.SampleDesc.Count = 1;
+    depthTexDesc.SampleDesc.Quality = 0;
+
+    // Convert depth format to shader-readable format
+    switch (desc.Format) {
+        case DXGI_FORMAT_D24_UNORM_S8_UINT:
+            depthTexDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+            break;
+        case DXGI_FORMAT_D32_FLOAT:
+            depthTexDesc.Format = DXGI_FORMAT_R32_FLOAT;
+            break;
+        case DXGI_FORMAT_D16_UNORM:
+            depthTexDesc.Format = DXGI_FORMAT_R16_UNORM;
+            break;
+        case DXGI_FORMAT_D32_FLOAT_S8X24_UINT:
+            depthTexDesc.Format = DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS;
+            break;
+        default:
+            depthTexDesc.Format = DXGI_FORMAT_R32_FLOAT;
+            break;
+    }
+
+    ID3D11Texture2D* pDepthMapTexture = nullptr;
+    HRESULT hr = pDevice->CreateTexture2D(&depthTexDesc, nullptr, &pDepthMapTexture);
+    if (FAILED(hr)) {
+        Logger::debug("SwapchainHook::SaveDepthmap - Failed to create depth map texture, hr: {:x}", hr);
+        pDepthTexture->Release();
+        pDevice->Release();
+        return;
+    }
+
+    // Copy depth data using GPU copy
+    if (desc.SampleDesc.Count > 1) {
+        // Handle MSAA by resolving
+        pContext->ResolveSubresource(pDepthMapTexture, 0, pDepthTexture, 0, desc.Format);
+    } else {
+        // Direct copy for non-MSAA
+        pContext->CopyResource(pDepthMapTexture, pDepthTexture);
+    }
+
+    // Release old SRV to prevent memory leak
+    if (DepthOfFieldHelper::pDepthMapSRV) {
+         DepthOfFieldHelper::pDepthMapSRV->Release();
+        DepthOfFieldHelper::pDepthMapSRV = nullptr;
+    }
+
+    // Create SRV for the depth map with matching format
+    D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+    srvDesc.Format = depthTexDesc.Format;
+    srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.Texture2D.MipLevels = 1;
+    hr = pDevice->CreateShaderResourceView(pDepthMapTexture, &srvDesc, &DepthOfFieldHelper::pDepthMapSRV);
+    if (FAILED(hr)) {
+        pDepthMapTexture->Release();
+        pDepthTexture->Release();
+        pDevice->Release();
+        return;
+    }
+
+    pDepthTexture->Release();
+    pDepthMapTexture->Release();
+    pDevice->Release();
 }
 
 SwapchainHook::SwapchainOriginal SwapchainHook::funcOriginal = nullptr;
