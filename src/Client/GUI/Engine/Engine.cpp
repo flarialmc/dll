@@ -1471,8 +1471,8 @@ Vec2<float> FlarialGUI::CalculateMovedXY(float x, float y, int num, float rectWi
 	if (x - WindowRects[num].fixer < 0) x = 0.001f - WindowRects[num].fixer;
 	if (y < 0) y = 0;
 
-	if (x + rectWidth - WindowRects[num].fixer > MC::windowSize.x) x = MC::windowSize.x + WindowRects[num].fixer;
-	if (y + rectHeight > MC::windowSize.y) y = MC::windowSize.y;
+	if (x + rectWidth - WindowRects[num].fixer > MC::windowSize.x) x = MC::windowSize.x - rectWidth + WindowRects[num].fixer;
+	if (y + rectHeight > MC::windowSize.y) y = MC::windowSize.y - rectHeight;
 
 	if (x == 0) x = 0.0001f;
 	if (y == 0) y = 0.0001f;

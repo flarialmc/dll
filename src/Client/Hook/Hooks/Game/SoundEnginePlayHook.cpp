@@ -6,7 +6,6 @@ uint64_t SoundEnginePlayHook::callback(void* SoundEngine, const std::string& nam
   auto event = nes::make_holder<SoundEnginePlayEvent>(name, pos, a4, a5);
   eventMgr.trigger(event);
 
-  Logger::debug(name);
   return funcOriginal(SoundEngine, name, pos, a4, a5);
 }
 

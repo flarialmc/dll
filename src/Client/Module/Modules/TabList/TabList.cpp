@@ -484,19 +484,19 @@ void ProcessReadyPlayerHeadTextures() {
     auto frameDuration = std::chrono::duration_cast<std::chrono::microseconds>(currentTime - lastFrameTime);
     lastFrameTime = currentTime;
 
-    // More aggressive loading - only skip if frame time is really bad (40fps or worse)
-    if (frameDuration.count() > 25000) {
+    // More aggressive loading - only skip if frame time is really bad (20fps or worse)
+    if (frameDuration.count() > 50000) {
         return;
     }
 
-    // Process multiple textures per frame based on performance
+    // Process multiple textures per frame based on performance - increased limits for better responsiveness
     int maxPerFrame;
     if (frameDuration.count() < 10000) {
-        maxPerFrame = 3; // Very fast frame, process 3
+        maxPerFrame = 8; // Very fast frame, process 8
     } else if (frameDuration.count() < 16670) {
-        maxPerFrame = 2; // Good frame, process 2
+        maxPerFrame = 5; // Good frame, process 5
     } else {
-        maxPerFrame = 1; // Slower frame, process 1
+        maxPerFrame = 3; // Slower frame, process 3
     }
 
     int processed = 0;
@@ -1046,8 +1046,8 @@ PlayerHeadTexture *CreateTextureFromBytesDX12(
     // Queue the loading task (with size limit to prevent unbounded growth)
     {
         std::lock_guard<std::mutex> queueLock(g_loadQueueMutex);
-        // Limit queue size to prevent memory issues during high player churn
-        const size_t MAX_QUEUE_SIZE = 50;
+        // Limit queue size to prevent memory issues during high player churn - increased for better performance
+        const size_t MAX_QUEUE_SIZE = 200;
         if (g_loadQueue.size() < MAX_QUEUE_SIZE) {
             g_loadQueue.push({
                 playerName,
@@ -1091,8 +1091,8 @@ ID3D11ShaderResourceView *CreateTextureFromBytesDX11(
     // Queue the loading task (with size limit to prevent unbounded growth)
     {
         std::lock_guard<std::mutex> queueLock(g_loadQueueMutex);
-        // Limit queue size to prevent memory issues during high player churn
-        const size_t MAX_QUEUE_SIZE = 50;
+        // Limit queue size to prevent memory issues during high player churn - increased for better performance
+        const size_t MAX_QUEUE_SIZE = 200;
         if (g_loadQueue.size() < MAX_QUEUE_SIZE) {
             g_loadQueue.push({
                 playerName,
@@ -1466,8 +1466,31 @@ void TabList::onRender(RenderEvent &event) {
                             vectab[i].headSize22D = ImVec2(headDisplaySize2, headDisplaySize2);
                         }
 
-                        if (SwapchainHook::isDX12) {
+                        // Check DX11 first as it's more commonly used, then fallback to DX12
+                        if (SwapchainHook::d3d11Device != nullptr && !SwapchainHook::isDX12) {
+                            // DX11 path - use synchronous creation for better performance and reliability
+                            if (logDebug) Logger::debug("Using DX11 sync path for player {}", playerName);
+                            ID3D11ShaderResourceView *srv = CreateTextureFromBytesDX11Sync(uniqueTextureKey, scaledHead.data(), scaledSize, scaledSize);
+                            ID3D11ShaderResourceView *srv2 = CreateTextureFromBytesDX11Sync("_" + uniqueTextureKey, scaledHead2.data(), scaledSize, scaledSize);
+
+                            if (srv) {
+                                ImDrawList *drawList = ImGui::GetForegroundDrawList();
+                                if (drawList) {
+                                    if (logDebug) Logger::debug("DX11 SRV for {}: 0x{:x}", playerName, reinterpret_cast<uintptr_t>(srv));
+
+                                    // Render with point filtering for crisp pixels
+                                    RenderPlayerHeadWithPointFilteringDX11(srv, D2D1::RectF(vectab[i].headPos.x, vectab[i].headPos.y, vectab[i].headPos.x + vectab[i].headSize2D.x, vectab[i].headPos.y + vectab[i].headSize2D.y), playerName);
+                                    RenderPlayerHeadWithPointFilteringDX11(srv2, D2D1::RectF(vectab[i].headPos2.x, vectab[i].headPos2.y, vectab[i].headPos2.x + vectab[i].headSize22D.x, vectab[i].headPos2.y + vectab[i].headSize22D.y), "_" + playerName);
+
+                                    if (logDebug) Logger::debug("Rendered DX11 head for player {} at ({}, {})", playerName, vectab[i].headPos.x, vectab[i].headPos.y);
+                                }
+                                // Don't release - it's managed by the cache now
+                            } else {
+                                if (logDebug) Logger::debug("Failed to create/get DX11 texture for player {}", playerName);
+                            }
+                        } else if (SwapchainHook::isDX12 && SwapchainHook::d3d12Device5 != nullptr) {
                             // DX12 path
+                            if (logDebug) Logger::debug("Using DX12 path for player {}", playerName);
                             PlayerHeadTexture *playerTex = CreateTextureFromBytesDX12(uniqueTextureKey, scaledHead.data(), scaledSize, scaledSize);
                             PlayerHeadTexture *playerTex2 = CreateTextureFromBytesDX12("_" + uniqueTextureKey, scaledHead2.data(), scaledSize, scaledSize);
 
@@ -1491,28 +1514,12 @@ void TabList::onRender(RenderEvent &event) {
                             } else {
                                 if (logDebug) Logger::debug("Failed to create/get DX12 texture for player {}", playerName);
                             }
-                        } else if (SwapchainHook::d3d11Device != nullptr) {
-                            // DX11 path
-                            ID3D11ShaderResourceView *srv = CreateTextureFromBytesDX11(uniqueTextureKey, scaledHead.data(), scaledSize, scaledSize);
-                            ID3D11ShaderResourceView *srv2 = CreateTextureFromBytesDX11("_" + uniqueTextureKey, scaledHead2.data(), scaledSize, scaledSize);
-
-                            if (srv) {
-                                ImDrawList *drawList = ImGui::GetForegroundDrawList();
-                                if (drawList) {
-                                    if (logDebug) Logger::debug("DX11 SRV for {}: 0x{:x}", playerName, reinterpret_cast<uintptr_t>(srv));
-
-                                    // Render with point filtering for crisp pixels
-                                    RenderPlayerHeadWithPointFilteringDX11(srv, D2D1::RectF(vectab[i].headPos.x, vectab[i].headPos.y, vectab[i].headPos.x + vectab[i].headSize2D.x, vectab[i].headPos.y + vectab[i].headSize2D.y), playerName);
-                                    RenderPlayerHeadWithPointFilteringDX11(srv2, D2D1::RectF(vectab[i].headPos2.x, vectab[i].headPos2.y, vectab[i].headPos2.x + vectab[i].headSize22D.x, vectab[i].headPos2.y + vectab[i].headSize22D.y), "_" + playerName);
-
-                                    if (logDebug) Logger::debug("Rendered DX11 head for player {} at ({}, {})", playerName, vectab[i].headPos.x, vectab[i].headPos.y);
-                                }
-                                // Don't release - it's managed by the cache now
-                            } else {
-                                if (logDebug) Logger::debug("Failed to create/get DX11 texture for player {}", playerName);
-                            }
                         } else {
-                            if (logDebug) Logger::debug("No DirectX device available for player {}", playerName);
+                            // Enhanced error logging to help debug initialization issues
+                            Logger::error("No DirectX device available for player {}. isDX12: {}, d3d11Device: 0x{:x}, d3d12Device5: 0x{:x}",
+                                playerName, SwapchainHook::isDX12,
+                                reinterpret_cast<uintptr_t>(SwapchainHook::d3d11Device.get()),
+                                reinterpret_cast<uintptr_t>(SwapchainHook::d3d12Device5.get()));
                         }
                     }
                     // PLAYER HEAD END
