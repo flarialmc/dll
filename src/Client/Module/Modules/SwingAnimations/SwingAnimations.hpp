@@ -8,6 +8,11 @@
 #include "Modules/Doom/Doom.hpp"
 
 class SwingAnimations : public Module {
+
+private:
+
+	std::shared_ptr<Module> cgui;
+
 public:
 	Perspective perspective;
 	static inline uintptr_t fluxSwing;

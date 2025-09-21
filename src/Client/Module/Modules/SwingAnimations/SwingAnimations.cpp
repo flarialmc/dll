@@ -1,6 +1,7 @@
 #include "SwingAnimations.hpp"
 
 #include "glm/glm/ext/matrix_transform.hpp"
+#include "Manager.hpp"
 
 void SwingAnimations::onEnable() {
     Module::onEnable();
@@ -17,6 +18,8 @@ void SwingAnimations::onEnable() {
     initializeSwingAngle();
     previousSwingAngle = getOps<float>("swingAngle");
     updateSwingAngle(previousSwingAngle);
+
+    cgui = ModuleManager::getModule("cgui");
 }
 
 void SwingAnimations::onDisable() {
@@ -35,6 +38,8 @@ void SwingAnimations::onDisable() {
 
 void SwingAnimations::onItemInHandRender(RenderItemInHandEvent &event) {
     if (!this->isEnabled()) return;
+    if (!cgui) return;
+    if (cgui->active) return;
 
     bool currentFluxSwingState = getOps<bool>("fluxSwing");
     float currentSwingAngle = getOps<float>("swingAngle");
@@ -58,7 +63,8 @@ void SwingAnimations::onItemInHandRender(RenderItemInHandEvent &event) {
 
 void SwingAnimations::onSwingDuration(SwingDurationEvent &event) {
     if (!this->isEnabled()) return;
-
+    if (!cgui) return;
+    if (cgui->active) return;
 
     float swingSpeed = getOps<float>("swingSpeed");
     int originalDuration = event.getDuration();

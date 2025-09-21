@@ -301,7 +301,9 @@ void ModuleManager::initialize() {
 	addModule<BetterHungerBar>();
 	addModule<ParticleMultiplier>();
 	addModule<BowSensitivity>();
-	// addModule<SwingAnimations>();
+
+	if (VersionUtils::checkBelowOrEqual(21, 90)) addModule<SwingAnimations>();
+
 	addModule<Subtitles>();
 	addModule<SensMultiplier>();
 
