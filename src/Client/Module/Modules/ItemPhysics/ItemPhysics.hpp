@@ -14,7 +14,7 @@ private:
     bool patched = false;
     bool rotateHooked = false;
 
-    std::unordered_map<ItemActor*, std::tuple<float, Vec3<float>, Vec3<int>>> actorData;
+    std::unordered_map<Actor*, std::tuple<float, Vec3<float>, Vec3<int>>> actorData;
     ActorRenderData* currentRenderData = nullptr;
 
     char translatePatch1[5] = {0};

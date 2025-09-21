@@ -186,11 +186,9 @@ bool JavaDebugMenu::isOnSetting(std::string settingName, int block = -1) {
 
 void JavaDebugMenu::updateTimedVector(std::vector<TimedObj> &vec, float diff) {
     double microTime = Microtime();
-    vec.erase(
-        std::remove_if(vec.begin(), vec.end(), [microTime, diff](const TimedObj &obj) {
-            return (microTime - obj.timestamp) > diff;
-        }), vec.end()
-    );
+    std::erase_if(vec, [microTime, diff](const TimedObj &obj) {
+        return (microTime - obj.timestamp) > diff;
+    });
 }
 
 void JavaDebugMenu::getOnePercLows() {
@@ -457,7 +455,7 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
 
         bool spoof = this->getOps<bool>("imPoorButIWannaLookRich");
 
-        if (this->versionName.empty()) this->versionName = std::format("Flarial V2 Open Beta, Minecraft {}", WinrtUtils::getFormattedVersion());
+        if (this->versionName.empty()) this->versionName = std::format("Flarial V2, Minecraft {}", WinrtUtils::getFormattedVersion());
         left.emplace_back(this->versionName);
 
         if (this->isOnBlock(1)) {

@@ -478,6 +478,8 @@ void FlarialGUI::PrepareBlur(float intensity) {
             FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, intensity);
             FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_OPTIMIZATION,
                                        getOptimizationLevel(MC::fps, highQualityBlur, dynamicBlurQuality));
+            
+
             FlarialGUI::blur->GetOutput(&FlarialGUI::blur_bitmap_cache);
 
             frameTimestamp = std::chrono::high_resolution_clock::now();

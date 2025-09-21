@@ -96,6 +96,7 @@
 #include "Scripting/ScriptManager.hpp"
 #include "Modules/AutoPerspective/AutoPerspective.hpp"
 #include "Modules/BlockHit/BlockHit.hpp"
+#include "Modules/SwingAnimations/SwingAnimations.hpp"
 #include "Modules/CinematicCamera/CinematicCamera.hpp"
 #include "Modules/LowHealthIndicator/LowHealthIndicator.hpp"
 #include "Modules/PlayerNotifier/PlayerNotifier.hpp"
@@ -125,6 +126,9 @@
 #include "Modules/ParticleMultiplier/ParticleMultiplier.hpp"
 #include "Modules/BowSensitivity/BowSensitivity.hpp"
 #include "Modules/DepthOfField/DepthOfField.hpp"
+#include "Modules/SwingAnimations/SwingAnimations.hpp"
+#include "Modules/Subtitles/Subtitles.hpp"
+#include "Modules/SensMultiplier/SensMultiplier.hpp"
 
 #ifdef COMPILE_DOOM
 	#include "Modules/Doom/Doom.hpp"
@@ -252,6 +256,7 @@ void ModuleManager::initialize() {
 	if (VersionUtils::checkAboveOrEqual(21, 40)) {
 		addModule<JavaInventoryHotkeys>();
 		addModule<BlockHit>();
+		addModule<SwingAnimations>();
 	}
 
 
@@ -299,12 +304,16 @@ void ModuleManager::initialize() {
 	addModule<ParticleMultiplier>();
 	addModule<BowSensitivity>();
 
+	if (VersionUtils::checkBelowOrEqual(21, 90)) addModule<SwingAnimations>();
+
+	addModule<Subtitles>();
+	addModule<SensMultiplier>();
+
+	addModule<DepthOfField>();
+
 #ifdef COMPILE_DOOM
 	addModule<DoomModule>();
 #endif
-=======
-	addModule<DepthOfField>();
->>>>>>> dof
 
 	addService<GUIKeyListener>();
 	if (!VersionUtils::checkAboveOrEqual(21, 60)) {

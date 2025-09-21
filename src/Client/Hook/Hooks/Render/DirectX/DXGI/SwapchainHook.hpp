@@ -62,6 +62,7 @@ public:
     static std::atomic<bool> imguiCleanupInProgress;
     static int dx12FrameCount;
 
+    static bool containsModule(const std::wstring& moduleName);
     void enableHook() override;
 
     static bool currentVsyncState;
