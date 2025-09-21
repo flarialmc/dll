@@ -5,7 +5,9 @@
       "Bash(find:*)",
       "Bash(rg:*)",
       "Bash(build.bat)",
-      "Bash(cmd:*)"
+      "Bash(cmd:*)",
+      "Bash(cmake:*)",
+      "WebFetch(domain:developer.nvidia.com)"
     ],
     "deny": []
   }

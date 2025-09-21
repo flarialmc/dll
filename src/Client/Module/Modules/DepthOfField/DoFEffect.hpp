@@ -42,7 +42,9 @@ public:
         XMFLOAT2 resolution;
         XMFLOAT2 halfPixel;
         float baseIntensity;
-        float padding;
+        float focalDepth;
+        float focusRange;
+        float maxBlur;
     } constantBuffer;
 
     static inline const XMFLOAT4 quadVertices[6] = {
@@ -186,13 +188,16 @@ public:
         return true;
     }
 
-    void Render(ID3D11RenderTargetView* pDstRenderTargetView, int iterations, float baseIntensity) {
+    void Render(ID3D11RenderTargetView* pDstRenderTargetView, int iterations, float baseIntensity, float focusRange = 0.1f, float maxBlur = 3.0f) {
+    // Comprehensive safety checks
     if (baseIntensity <= 0 || !pDstRenderTargetView || !pDepthMapSRV || !d3d11Context || !pVertexShader ||
         !pHorizontalBlurShader || !pVerticalBlurShader || !pInputLayout || !pVertexBuffer ||
         !pConstantBuffer || !pSamplerState || !pDepthStencilState || !pBlendState || !pRasterizerState) {
-        OutputDebugStringA("Invalid resource in DepthOfFieldShader::Render!\n");
         return;
     }
+
+    // Limit iterations for performance
+    iterations = std::max(1, std::min(iterations, 2));
 
     winrt::com_ptr<ID3D11ShaderResourceView> pColorSRV = MotionBlur::BackbufferToSRVExtraMode();
     if (!pColorSRV) {
@@ -216,6 +221,9 @@ public:
     constantBuffer.resolution = renderSize;
     constantBuffer.halfPixel = XMFLOAT2(0.5f / renderSize.x, 0.5f / renderSize.y);
     constantBuffer.baseIntensity = baseIntensity;
+    constantBuffer.focalDepth = 0.5f; // Not used anymore, but keep for shader compatibility
+    constantBuffer.focusRange = focusRange;
+    constantBuffer.maxBlur = maxBlur;
 
     // Additional validation before UpdateSubresource
     if (!pConstantBuffer) {
@@ -261,7 +269,7 @@ public:
         d3d11Context->PSSetShader(pHorizontalBlurShader, nullptr, 0);
         ID3D11ShaderResourceView* colorSRVArray[] = { currentSRV };
         d3d11Context->PSSetShaderResources(0, 1, colorSRVArray);
-        RenderToRTV(pIntermediateRTV, renderSize);
+        RenderToRTV(pIntermediateRTV, renderSize, true); // Clear intermediate target
 
         d3d11Context->PSSetShaderResources(0, 1, &nullSRV);
 
@@ -269,13 +277,13 @@ public:
         ID3D11ShaderResourceView* intermediateSRVArray[] = { pIntermediateSRV };
         d3d11Context->PSSetShaderResources(0, 1, intermediateSRVArray);
         if (i == actualIterations - 1) {
-            RenderToRTV(pDstRenderTargetView, renderSize);
+            RenderToRTV(pDstRenderTargetView, renderSize, false); // Don't clear final target
         } else {
             if (!pIntermediateRTV2 || !pIntermediateSRV2) {
                 OutputDebugStringA("Intermediate RTV2 or SRV2 is null!\n");
                 return;
             }
-            RenderToRTV(pIntermediateRTV2, renderSize);
+            RenderToRTV(pIntermediateRTV2, renderSize, true); // Clear intermediate target
             std::swap(pIntermediateRTV, pIntermediateRTV2);
             std::swap(pIntermediateSRV, pIntermediateSRV2);
             currentSRV = pIntermediateSRV;
@@ -286,14 +294,16 @@ public:
     d3d11Context->PSSetShaderResources(0, 1, &nullSRV);
     d3d11Context->PSSetShaderResources(1, 1, &nullSRV);
 }
-
-private:
-    void RenderToRTV(ID3D11RenderTargetView* pRTV, XMFLOAT2 renderSize) {
+    
+    void RenderToRTV(ID3D11RenderTargetView* pRTV, XMFLOAT2 renderSize, bool clearTarget = true) {
         D3D11_VIEWPORT viewport = { 0.0f, 0.0f, renderSize.x, renderSize.y, 0.0f, 1.0f };
         d3d11Context->RSSetViewports(1, &viewport);
 
-        FLOAT clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-        d3d11Context->ClearRenderTargetView(pRTV, clearColor);
+        if (clearTarget) {
+            FLOAT clearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+            d3d11Context->ClearRenderTargetView(pRTV, clearColor);
+        }
+
         d3d11Context->OMSetRenderTargets(1, &pRTV, nullptr);
         d3d11Context->Draw(6, 0);
     }
@@ -386,7 +396,9 @@ private:
             float2 resolution;
             float2 halfPixel;
             float baseIntensity;
-            float padding;
+            float focalDepth;
+            float focusRange;
+            float maxBlur;
         };
 
         sampler sampler0 : register(s0);
@@ -396,26 +408,34 @@ private:
         float4 main(float4 screenSpace : SV_Position) : SV_TARGET
         {
             float2 uv = screenSpace.xy / resolution;
-            float4 colorSum = float4(0.0, 0.0, 0.0, 0.0);
 
+            // Sample depth at center of screen (focus point)
             float2 centerUV = float2(0.5, 0.5);
-            float focalDepth = texture1.Sample(sampler0, centerUV).r;
+            float centerDepth = texture1.Sample(sampler0, centerUV).r;
+
+            // Sample depth at current pixel
             float currentDepth = texture1.Sample(sampler0, uv).r;
 
-            float depthDiff = abs(currentDepth - focalDepth);
-            float intensity = baseIntensity * clamp(depthDiff * 10.0, 0.0, 1.0);
+            // Calculate blur based on depth difference from center focus point
+            float depthDiff = abs(currentDepth - centerDepth);
+            float blurRadius = min(depthDiff / focusRange, 1.0) * maxBlur;
 
-            int sampleCount = clamp((int)(intensity * 4.0 + 5.0), 5, 15);
+            // Early exit for pixels in focus (near center depth)
+            if (blurRadius < 0.1) {
+                return texture0.Sample(sampler0, uv);
+            }
+
+            // Fixed sample count for consistent performance
+            float4 colorSum = float4(0.0, 0.0, 0.0, 0.0);
             float weightSum = 0.0;
 
-            float sigma = intensity * 1.5 + 0.5;
-            float twoSigmaSq = 2.0 * sigma * sigma;
-            int halfSamples = sampleCount / 2;
-
-            for (int i = -halfSamples; i <= halfSamples; i++) {
+            // Use fewer samples for better performance
+            int samples = 5;
+            for (int i = -samples; i <= samples; i++) {
                 float x = (float)i;
-                float weight = exp(-(x * x) / twoSigmaSq);
-                float2 sampleOffset = float2(x * halfPixel.x * intensity, 0.0);
+                float weight = 1.0 - abs(x) / (float)(samples + 1);
+                float2 sampleOffset = float2(x * halfPixel.x * blurRadius * baseIntensity, 0.0);
+
                 colorSum += texture0.Sample(sampler0, uv + sampleOffset) * weight;
                 weightSum += weight;
             }
@@ -429,7 +449,9 @@ private:
             float2 resolution;
             float2 halfPixel;
             float baseIntensity;
-            float padding;
+            float focalDepth;
+            float focusRange;
+            float maxBlur;
         };
 
         sampler sampler0 : register(s0);
@@ -439,26 +461,34 @@ private:
         float4 main(float4 screenSpace : SV_Position) : SV_TARGET
         {
             float2 uv = screenSpace.xy / resolution;
-            float4 colorSum = float4(0.0, 0.0, 0.0, 0.0);
 
+            // Sample depth at center of screen (focus point)
             float2 centerUV = float2(0.5, 0.5);
-            float focalDepth = texture1.Sample(sampler0, centerUV).r;
+            float centerDepth = texture1.Sample(sampler0, centerUV).r;
+
+            // Sample depth at current pixel
             float currentDepth = texture1.Sample(sampler0, uv).r;
 
-            float depthDiff = abs(currentDepth - focalDepth);
-            float intensity = baseIntensity * clamp(depthDiff * 10.0, 0.0, 1.0);
+            // Calculate blur based on depth difference from center focus point
+            float depthDiff = abs(currentDepth - centerDepth);
+            float blurRadius = min(depthDiff / focusRange, 1.0) * maxBlur;
 
-            int sampleCount = clamp((int)(intensity * 4.0 + 5.0), 5, 15);
+            // Early exit for pixels in focus (near center depth)
+            if (blurRadius < 0.1) {
+                return texture0.Sample(sampler0, uv);
+            }
+
+            // Fixed sample count for consistent performance
+            float4 colorSum = float4(0.0, 0.0, 0.0, 0.0);
             float weightSum = 0.0;
 
-            float sigma = intensity * 1.5 + 0.5;
-            float twoSigmaSq = 2.0 * sigma * sigma;
-            int halfSamples = sampleCount / 2;
-
-            for (int i = -halfSamples; i <= halfSamples; i++) {
+            // Use fewer samples for better performance
+            int samples = 5;
+            for (int i = -samples; i <= samples; i++) {
                 float y = (float)i;
-                float weight = exp(-(y * y) / twoSigmaSq);
-                float2 sampleOffset = float2(0.0, y * halfPixel.y * intensity);
+                float weight = 1.0 - abs(y) / (float)(samples + 1);
+                float2 sampleOffset = float2(0.0, y * halfPixel.y * blurRadius * baseIntensity);
+
                 colorSum += texture0.Sample(sampler0, uv + sampleOffset) * weight;
                 weightSum += weight;
             }

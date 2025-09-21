@@ -1,6 +1,8 @@
 #include "UnderUIHooks.hpp"
 #include "SwapchainHook.hpp"
-#include "../../../Module/Modules/DepthOfField/DoFEffect.hpp"
+#include "../../../Module/Modules/DepthOfField/DepthOfFieldHelper.hpp"
+#include "../../../Module/Manager.hpp"
+#include "Utils/Logger/Logger.hpp"
 #include "SDK/Client/Options/OptionsParser.hpp"
 
 /*
@@ -58,9 +60,17 @@ void UnderUIHooks::ClearDepthStencilViewCallbackDX11(
         SwapchainHook::DX11Render(true);
     }
 
-    // Check if F1 key is held down
+    // Only capture depth if DepthOfField module is enabled
     if (underUI) {
         underUI = false;
+
+        // Check if DepthOfField module is enabled
+        auto depthOfFieldModule = ModuleManager::getModule("Depth Of Field");
+        if (!depthOfFieldModule || !depthOfFieldModule->isEnabled()) {
+            funcOriginalDX11(pContext, pDepthStencilView, ClearFlags, Depth, Stencil);
+            return;
+        }
+
         if (pDepthStencilView) {
             if (pLastDepthStencilView) pLastDepthStencilView->Release();
             pDepthStencilView->AddRef();
@@ -75,100 +85,88 @@ void UnderUIHooks::ClearDepthStencilViewCallbackDX11(
             D3D11_TEXTURE2D_DESC desc;
             pDepthTexture->GetDesc(&desc);
             char buffer[256];
-            sprintf_s(buffer, "Format: %u, Usage: %u, BindFlags: %u, CPUAccessFlags: %u, Width: %u, Height: %u, RowPitch: %u\n",
-                      desc.Format, desc.Usage, desc.BindFlags, desc.CPUAccessFlags, desc.Width, desc.Height, desc.Width * sizeof(float));
+            sprintf_s(buffer, "Format: %u, Usage: %u, BindFlags: %u, CPUAccessFlags: %u, Width: %u, Height: %u, RowPitch: %zu\n",
+                      desc.Format, desc.Usage, desc.BindFlags, desc.CPUAccessFlags, desc.Width, desc.Height, (size_t)(desc.Width * sizeof(float)));
             OutputDebugStringA(buffer);
 
             if (!(desc.Usage == D3D11_USAGE_DEFAULT && desc.BindFlags & D3D11_BIND_DEPTH_STENCIL)) {
                 OutputDebugStringA("Warning: Depth texture may not be copyable!\n");
             }
 
-            D3D11_TEXTURE2D_DESC stagingDesc = desc;
-            stagingDesc.Usage = D3D11_USAGE_STAGING;
-            stagingDesc.BindFlags = 0;
-            stagingDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
-            stagingDesc.SampleDesc.Count = 1;
-            stagingDesc.SampleDesc.Quality = 0;
-            ID3D11Texture2D* pStagingTexture = nullptr;
             ID3D11Device* pDevice = nullptr;
             pContext->GetDevice(&pDevice);
-            HRESULT hr = pDevice->CreateTexture2D(&stagingDesc, nullptr, &pStagingTexture);
-            if (FAILED(hr)) {
-                sprintf_s(buffer, "Failed to create staging texture! HRESULT: %x\n", hr);
-                OutputDebugStringA(buffer);
-                pDepthTexture->Release();
-                pDevice->Release();
-                funcOriginalDX11(pContext, pDepthStencilView, ClearFlags, Depth, Stencil);
-                return;
-            }
 
-            if (desc.SampleDesc.Count > 1) {
-                ID3D11Texture2D* pResolvedTexture = nullptr;
-                hr = pDevice->CreateTexture2D(&stagingDesc, nullptr, &pResolvedTexture);
-                if (SUCCEEDED(hr)) {
-                    pContext->ResolveSubresource(pResolvedTexture, 0, pDepthTexture, 0, desc.Format);
-                    pContext->CopyResource(pStagingTexture, pResolvedTexture);
-                    pResolvedTexture->Release();
-                } else {
-                    OutputDebugStringA("Failed to create resolved texture for MSAA!\n");
-                }
-            } else {
-                pContext->CopyResource(pStagingTexture, pDepthTexture);
-            }
-
-            D3D11_MAPPED_SUBRESOURCE mapped;
-            hr = pContext->Map(pStagingTexture, 0, D3D11_MAP_READ, 0, &mapped);
-            if (FAILED(hr)) {
-                sprintf_s(buffer, "Failed to map staging texture! HRESULT: %x\n", hr);
-                OutputDebugStringA(buffer);
-                pStagingTexture->Release();
-                pDepthTexture->Release();
-                pDevice->Release();
-                funcOriginalDX11(pContext, pDepthStencilView, ClearFlags, Depth, Stencil);
-                return;
-            }
-
-            // Create a texture to hold the depth map
+            // Create a texture with shader resource binding
             D3D11_TEXTURE2D_DESC depthTexDesc = desc;
-            depthTexDesc.Format = DXGI_FORMAT_R32_FLOAT; // Store depth as float
             depthTexDesc.Usage = D3D11_USAGE_DEFAULT;
             depthTexDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
             depthTexDesc.CPUAccessFlags = 0;
+            depthTexDesc.SampleDesc.Count = 1;
+            depthTexDesc.SampleDesc.Quality = 0;
+
+            // Convert depth format to shader-readable format
+            switch (desc.Format) {
+                case DXGI_FORMAT_D24_UNORM_S8_UINT:
+                    depthTexDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+                    break;
+                case DXGI_FORMAT_D32_FLOAT:
+                    depthTexDesc.Format = DXGI_FORMAT_R32_FLOAT;
+                    break;
+                case DXGI_FORMAT_D16_UNORM:
+                    depthTexDesc.Format = DXGI_FORMAT_R16_UNORM;
+                    break;
+                case DXGI_FORMAT_D32_FLOAT_S8X24_UINT:
+                    depthTexDesc.Format = DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS;
+                    break;
+                default:
+                    // Fallback to a compatible format
+                    depthTexDesc.Format = DXGI_FORMAT_R32_FLOAT;
+                    break;
+            }
+
             ID3D11Texture2D* pDepthMapTexture = nullptr;
-            hr = pDevice->CreateTexture2D(&depthTexDesc, nullptr, &pDepthMapTexture);
+            HRESULT hr = pDevice->CreateTexture2D(&depthTexDesc, nullptr, &pDepthMapTexture);
             if (FAILED(hr)) {
-                OutputDebugStringA("Failed to create depth map texture!\n");
-                pContext->Unmap(pStagingTexture, 0);
-                pStagingTexture->Release();
+                Logger::debug("UnderUIHooks::ClearDepthStencilViewCallbackDX11 - Failed to create depth map texture, hr: {:x}", hr);
                 pDepthTexture->Release();
                 pDevice->Release();
                 funcOriginalDX11(pContext, pDepthStencilView, ClearFlags, Depth, Stencil);
                 return;
             }
 
-            // Copy depth data to the new texture
-            pContext->UpdateSubresource(pDepthMapTexture, 0, nullptr, mapped.pData, mapped.RowPitch, 0);
+            // Copy depth data using GPU copy
+            if (desc.SampleDesc.Count > 1) {
+                // Handle MSAA by resolving
+                pContext->ResolveSubresource(pDepthMapTexture, 0, pDepthTexture, 0, desc.Format);
+            } else {
+                // Direct copy for non-MSAA
+                pContext->CopyResource(pDepthMapTexture, pDepthTexture);
+            }
 
-            // Create SRV for the depth map
+            // Release old SRV to prevent memory leak
+            if (DepthOfFieldHelper::pDepthMapSRV) {
+                 DepthOfFieldHelper::pDepthMapSRV->Release();
+                DepthOfFieldHelper::pDepthMapSRV = nullptr;
+            }
+
+            // Create SRV for the depth map with matching format
             D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-            srvDesc.Format = DXGI_FORMAT_R32_FLOAT;
+            srvDesc.Format = depthTexDesc.Format; // Use the same format as the texture
             srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
             srvDesc.Texture2D.MipLevels = 1;
-            hr = pDevice->CreateShaderResourceView(pDepthMapTexture, &srvDesc, &DepthOfFieldShader::pDepthMapSRV);
+            hr = pDevice->CreateShaderResourceView(pDepthMapTexture, &srvDesc, &DepthOfFieldHelper::pDepthMapSRV);
             if (FAILED(hr)) {
-                OutputDebugStringA("Failed to create depth map SRV!\n");
+                Logger::debug("UnderUIHooks::ClearDepthStencilViewCallbackDX11 - Failed to create depth map SRV");
                 pDepthMapTexture->Release();
-                pContext->Unmap(pStagingTexture, 0);
-                pStagingTexture->Release();
                 pDepthTexture->Release();
                 pDevice->Release();
                 funcOriginalDX11(pContext, pDepthStencilView, ClearFlags, Depth, Stencil);
                 return;
             }
 
-            pContext->Unmap(pStagingTexture, 0);
-            pStagingTexture->Release();
+            // No staging texture to clean up in GPU-based approach
             pDepthTexture->Release();
+            pDepthMapTexture->Release(); // Release the depth map texture after SRV creation
             pDevice->Release();
         }
     }

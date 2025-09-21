@@ -26,6 +26,7 @@
 using ::IUnknown;
 
 #include "../../../Module/Modules/MotionBlur/MotionBlur.hpp"
+#include "../../../Module/Modules/DepthOfField/DepthOfFieldHelper.hpp"
 #include "../../../../Assets/Assets.hpp"
 
 SwapchainHook::SwapchainHook() : Hook("swapchain_hook", 0) {}
@@ -305,6 +306,7 @@ void SwapchainHook::DX11Init() {
     Blur::InitializePipeline();
     MotionBlur::initted = AvgPixelMotionBlurHelper::Initialize();
     MotionBlur::initted = RealMotionBlurHelper::Initialize();
+    DepthOfFieldHelper::InitializePipeline();
 
     Memory::SafeRelease(eBackBuffer);
     init = true;
@@ -403,6 +405,7 @@ void SwapchainHook::DX12Init() {
         Memory::SafeRelease(d2dFactory);
 
         Blur::InitializePipeline();
+        DepthOfFieldHelper::InitializePipeline();
         init = true;
     }
 }
@@ -732,11 +735,39 @@ void SwapchainHook::DX11Blur() {
     /* Blur Stuff */
     prepareBlur();
     if (ModuleManager::initialized) {
-        auto module = ModuleManager::getModule("Motion Blur");
-        if (module) {
-            if (module->isEnabled() || FlarialGUI::inMenu) FlarialGUI::needsBackBuffer = true;
-            else FlarialGUI::needsBackBuffer = false;
+        // Debug: Check if this function is being called
+        static int callCount = 0;
+        if (callCount < 5) {
+            OutputDebugStringA(("SwapchainHook::DX11Blur called, count: " + std::to_string(callCount) + "\n").c_str());
+            callCount++;
         }
+        auto motionBlurModule = ModuleManager::getModule("Motion Blur");
+        auto depthOfFieldModule = ModuleManager::getModule("Depth Of Field");
+
+        // Debug: Check if modules are found
+        static bool loggedModules = false;
+        if (!loggedModules) {
+            OutputDebugStringA(("Found Motion Blur: " + std::to_string(motionBlurModule != nullptr) +
+                               ", Found Depth Of Field: " + std::to_string(depthOfFieldModule != nullptr) + "\n").c_str());
+            if (depthOfFieldModule) {
+                OutputDebugStringA(("Depth Of Field enabled: " + std::to_string(depthOfFieldModule->isEnabled()) + "\n").c_str());
+            }
+            loggedModules = true;
+        }
+
+        bool needsBackBuffer = FlarialGUI::inMenu;
+        if (motionBlurModule && motionBlurModule->isEnabled()) needsBackBuffer = true;
+        if (depthOfFieldModule && depthOfFieldModule->isEnabled()) {
+            needsBackBuffer = true;
+            // Add a one-time debug message when DepthOfField sets the flag
+            static bool loggedDepthOfField = false;
+            if (!loggedDepthOfField) {
+                OutputDebugStringA("SwapchainHook: DepthOfField enabled, setting needsBackBuffer = true\n");
+                loggedDepthOfField = true;
+            }
+        }
+
+        FlarialGUI::needsBackBuffer = needsBackBuffer;
     }
     /* Blur End */
 
@@ -746,8 +777,24 @@ void SwapchainHook::DX12Blur() {
 
     /* Blur Stuff */
     prepareBlur();
-    if (FlarialGUI::inMenu) FlarialGUI::needsBackBuffer = true;
-    else FlarialGUI::needsBackBuffer = false;
+    if (ModuleManager::initialized) {
+        auto motionBlurModule = ModuleManager::getModule("Motion Blur");
+        auto depthOfFieldModule = ModuleManager::getModule("Depth Of Field");
+
+        bool needsBackBuffer = FlarialGUI::inMenu;
+        if (motionBlurModule && motionBlurModule->isEnabled()) needsBackBuffer = true;
+        if (depthOfFieldModule && depthOfFieldModule->isEnabled()) {
+            needsBackBuffer = true;
+            // Add a one-time debug message when DepthOfField sets the flag
+            static bool loggedDepthOfField = false;
+            if (!loggedDepthOfField) {
+                OutputDebugStringA("SwapchainHook: DepthOfField enabled, setting needsBackBuffer = true\n");
+                loggedDepthOfField = true;
+            }
+        }
+
+        FlarialGUI::needsBackBuffer = needsBackBuffer;
+    }
     /* Blur End */
 
 }

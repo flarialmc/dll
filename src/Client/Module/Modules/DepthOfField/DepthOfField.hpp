@@ -17,5 +17,5 @@ public:
 
     void settingsRender(float settingsOffset) override;
 
-    void onRender(RenderEvent& event);
+    void onRender(RenderUnderUIEvent& event);
 };
