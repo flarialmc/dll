@@ -110,6 +110,7 @@
 #include "Modules/DebugMenu/DebugMenu.hpp"
 #include "Modules/DirectionHUD/DirectionHUD.hpp"
 #include "Modules/JavaViewBobbing/JavaViewBobbing.hpp"
+<<<<<<< HEAD
 #include "Modules/DeathLogger/DeathLogger.hpp"
 #include "Modules/HurtColor/HurtColor.hpp"
 #include "Modules/Twerk/Twerk.hpp"
@@ -123,6 +124,7 @@
 #include "Modules/BetterHungerBar/BetterHungerBar.hpp"
 #include "Modules/ParticleMultiplier/ParticleMultiplier.hpp"
 #include "Modules/BowSensitivity/BowSensitivity.hpp"
+#include "Modules/DepthOfField/DepthOfField.hpp"
 
 #ifdef COMPILE_DOOM
 	#include "Modules/Doom/Doom.hpp"
@@ -282,6 +284,7 @@ void ModuleManager::initialize() {
 
 	addModule<JavaViewBobbing>();
 
+<<<<<<< HEAD
 	addModule<DeathLogger>();
 	addModule<Twerk>();
 	addModule<CinematicCamera>();
@@ -299,6 +302,9 @@ void ModuleManager::initialize() {
 #ifdef COMPILE_DOOM
 	addModule<DoomModule>();
 #endif
+=======
+	addModule<DepthOfField>();
+>>>>>>> dof
 
 	addService<GUIKeyListener>();
 	if (!VersionUtils::checkAboveOrEqual(21, 60)) {

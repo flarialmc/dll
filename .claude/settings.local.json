@@ -1,13 +1,15 @@
 {
   "permissions": {
     "allow": [
-      "Bash(dir:*)",
+      "Bash(grep:*)",
+      "Bash(find:*)",
+      "Bash(rg:*)",
+      "Bash(build.bat)",
+      "Bash(cmd:*)",
       "Bash(cmake:*)",
-      "Bash(cmd /c:*)",
-      "Bash(del:*)",
-      "Bash(mkdir:*)"
+      "WebFetch(domain:developer.nvidia.com)",
+      "Bash(git add:*)"
     ],
-    "deny": [],
-    "ask": []
+    "deny": []
   }
 }
