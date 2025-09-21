@@ -37,6 +37,7 @@ class SwapchainHook : public Hook {
 public:
     static void DX12Render(bool underui = false);
 
+    static void _DX11RenderUnderUI();
     static void DX11Render(bool underui = false);
 
     static void DX12Blur();
@@ -44,6 +45,7 @@ public:
     static void DX11Blur();
 
     static void DX11Init();
+    static void _DX11Render();
 
     static void DX12Init();
 

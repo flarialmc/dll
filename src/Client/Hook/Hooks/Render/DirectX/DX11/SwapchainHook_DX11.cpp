@@ -100,12 +100,13 @@ void SwapchainHook::DX11Init() {
     init = true;
 }
 
-void SwapchainHook::DX11Render(bool underui) {
+void SwapchainHook::_DX11Render()
+{
     if (!D2D::context || !context) return;
 
     DX11Blur();
 
-    SaveBackbuffer(underui);
+    SaveBackbuffer(false);
 
     static UINT lastBufferWidth = 0, lastBufferHeight = 0;
 
@@ -126,10 +127,6 @@ void SwapchainHook::DX11Render(bool underui) {
         lastBufferHeight = desc.Height;
     }
 
-    ID3D11RenderTargetView* originalRTVs[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT] = { nullptr };
-    ID3D11DepthStencilView* originalDSV = nullptr;
-    context->OMGetRenderTargets(D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT, originalRTVs, &originalDSV);
-
     D2D::context->BeginDraw();
 
     ImGui_ImplDX11_NewFrame();
@@ -141,15 +138,10 @@ void SwapchainHook::DX11Render(bool underui) {
         ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground |
         ImGuiWindowFlags_NoDecoration);
 
-    if (!underui) {
-        auto event = nes::make_holder<RenderEvent>();
-        event->RTV = cachedDX11RTV.get();
-        eventMgr.trigger(event);
-    } else {
-        auto event = nes::make_holder<RenderUnderUIEvent>();
-        event->RTV = cachedDX11RTV.get();
-        eventMgr.trigger(event);
-    }
+
+    auto event = nes::make_holder<RenderEvent>();
+    event->RTV = cachedDX11RTV.get();
+    eventMgr.trigger(event);
 
     static bool notificationsShown = false;
     if (!notificationsShown && SwapchainHook::init) {
@@ -169,23 +161,93 @@ void SwapchainHook::DX11Render(bool underui) {
     ImGui::Render();
 
     ID3D11RenderTargetView* rtvPtr = cachedDX11RTV.get();
-    context->OMSetRenderTargets(1, &rtvPtr, originalDSV);
+    context->OMSetRenderTargets(1, &rtvPtr, nullptr);
     ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+}
 
-    bool allValid = true;
-    for (auto & originalRTV : originalRTVs) {
-        if (originalRTV == nullptr) {
-            allValid = false;
+void SwapchainHook::_DX11RenderUnderUI()
+{
+    if (!D2D::context || !context) return;
+
+    DX11Blur();
+
+    SaveBackbuffer(true);
+
+    /*
+    static UINT lastBufferWidth = 0, lastBufferHeight = 0;
+
+    winrt::com_ptr<ID3D11Texture2D> backBuffer;
+    if (FAILED(swapchain->GetBuffer(0, IID_PPV_ARGS(backBuffer.put())))) {
+        return;
+    }
+
+    D3D11_TEXTURE2D_DESC desc;
+    backBuffer->GetDesc(&desc);
+
+    if (!cachedDX11RTV.get() || desc.Width != lastBufferWidth || desc.Height != lastBufferHeight) {
+        cachedDX11RTV = nullptr;
+        if (FAILED(d3d11Device->CreateRenderTargetView(backBuffer.get(), nullptr, cachedDX11RTV.put()))) {
+            return;
         }
+        lastBufferWidth = desc.Width;
+        lastBufferHeight = desc.Height;
     }
+*/
+    winrt::com_ptr<ID3D11RenderTargetView> originalRTV[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT];
+    winrt::com_ptr<ID3D11DepthStencilView> originalDSV = nullptr;
 
-    if (allValid)
-    context->OMSetRenderTargets(D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT, originalRTVs, originalDSV);
+    ID3D11RenderTargetView* rtvs[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT] = {};
+    ID3D11DepthStencilView* dsv = nullptr;
 
-    Memory::SafeRelease(originalDSV);
-    for (auto & originalRTV : originalRTVs) {
-        Memory::SafeRelease(originalRTV);
+    context->OMGetRenderTargets(D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT, rtvs, &dsv);
+
+    for (UINT i = 0; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; i++) {
+        originalRTV[i].attach(rtvs[i]);
     }
+    originalDSV.attach(dsv);
+
+
+    /*
+    D2D::context->BeginDraw();
+
+    ImGui_ImplDX11_NewFrame();
+    ImGui_ImplWin32_NewFrame();
+    ImGui::NewFrame();
+
+    ImGui::Begin("t", nullptr,
+        ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
+        ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground |
+        ImGuiWindowFlags_NoDecoration);
+
+*/
+
+    auto event = nes::make_holder<RenderUnderUIEvent>();
+    event->RTV = cachedDX11RTV.get();
+    eventMgr.trigger(event);
+
+    /* At the moment, Flarial does not utilize ImGui under ui.
+     * Even if you uncomment the following lines, it won't work,
+     * Something special needs to be done.
+    D2D::context->EndDraw();
+
+    ImGui::End();
+    ImGui::EndFrame();
+    ImGui::Render();
+
+    ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+    */
+
+
+    ID3D11RenderTargetView* restoreRTVs[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT] = {};
+    for (UINT i = 0; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; i++) {
+        restoreRTVs[i] = originalRTV[i].get();
+    }
+    context->OMSetRenderTargets(D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT, restoreRTVs, originalDSV.get());
+}
+void SwapchainHook::DX11Render(bool underui) {
+
+    if (underui) _DX11RenderUnderUI();
+    else _DX11Render();
 }
 
 void SwapchainHook::DX11Blur() {
