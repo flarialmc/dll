@@ -1,6 +1,7 @@
 #include <vector>
 #include <d3d11.h>
 #include <d3dcompiler.h>
+#include <chrono>
 
 #include "DepthOfFieldHelper.hpp"
 #include "../../../../Utils/Logger/Logger.hpp"
@@ -198,6 +199,89 @@ float4 main(float4 screenSpace : SV_Position) : SV_TARGET
 }
 )";
 
+// Simple depth blur shaders for smoothing the depth map
+const char *depthBlurHorizontalShaderSrc = R"(
+cbuffer BlurInputBuffer : register(b0)
+{
+    float2 resolution;
+    float2 offset;
+    float2 halfPixel;
+    float intensity;
+    float focusRange;
+    float focusDistance;
+    float autoFocus;
+    float _padding;
+    float _padding2;
+};
+
+sampler sampler0 : register(s0);
+Texture2D texture0 : register(t0);  // Depth buffer
+
+float4 main(float4 screenSpace : SV_Position) : SV_TARGET
+{
+    float2 uv = screenSpace.xy / resolution;
+
+    float depthSum = 0.0;
+    float weightSum = 0.0;
+
+    // Variable blur radius based on intensity (depthBlur amount)
+    int blurRadius = clamp((int)(intensity + 0.5), 1, 5);
+
+    for (int i = -blurRadius; i <= blurRadius; i++)
+    {
+        float weight = 1.0 - abs(i) / (float)(blurRadius + 1);
+        float2 sampleUV = uv + float2(i * halfPixel.x * intensity, 0.0);
+        float depth = texture0.Sample(sampler0, sampleUV).r;
+
+        depthSum += depth * weight;
+        weightSum += weight;
+    }
+
+    return float4(depthSum / weightSum, 0.0, 0.0, 1.0);
+}
+)";
+
+const char *depthBlurVerticalShaderSrc = R"(
+cbuffer BlurInputBuffer : register(b0)
+{
+    float2 resolution;
+    float2 offset;
+    float2 halfPixel;
+    float intensity;
+    float focusRange;
+    float focusDistance;
+    float autoFocus;
+    float _padding;
+    float _padding2;
+};
+
+sampler sampler0 : register(s0);
+Texture2D texture0 : register(t0);  // Horizontally blurred depth
+
+float4 main(float4 screenSpace : SV_Position) : SV_TARGET
+{
+    float2 uv = screenSpace.xy / resolution;
+
+    float depthSum = 0.0;
+    float weightSum = 0.0;
+
+    // Variable blur radius based on intensity (depthBlur amount)
+    int blurRadius = clamp((int)(intensity + 0.5), 1, 5);
+
+    for (int i = -blurRadius; i <= blurRadius; i++)
+    {
+        float weight = 1.0 - abs(i) / (float)(blurRadius + 1);
+        float2 sampleUV = uv + float2(0.0, i * halfPixel.y * intensity);
+        float depth = texture0.Sample(sampler0, sampleUV).r;
+
+        depthSum += depth * weight;
+        weightSum += weight;
+    }
+
+    return float4(depthSum / weightSum, 0.0, 0.0, 1.0);
+}
+)";
+
 ID3DBlob *DofTryCompileShader(const char *pSrcData, const char *pTarget)
 {
     HRESULT hr;
@@ -248,6 +332,12 @@ void DepthOfFieldHelper::InitializePipeline()
     shaderBlob = DofTryCompileShader(dofGaussianBlurVerticalShaderSrc, "ps_4_0");
     SwapchainHook::d3d11Device->CreatePixelShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &pGaussianBlurVerticalShader);
 
+    shaderBlob = DofTryCompileShader(depthBlurHorizontalShaderSrc, "ps_4_0");
+    SwapchainHook::d3d11Device->CreatePixelShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &pDepthBlurHorizontalShader);
+
+    shaderBlob = DofTryCompileShader(depthBlurVerticalShaderSrc, "ps_4_0");
+    SwapchainHook::d3d11Device->CreatePixelShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &pDepthBlurVerticalShader);
+
     shaderBlob = DofTryCompileShader(dofVertexShaderSrc, "vs_4_0");
     SwapchainHook::d3d11Device->CreateVertexShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &pVertexShader);
 
@@ -287,6 +377,7 @@ void DepthOfFieldHelper::InitializePipeline()
     rd.DepthClipEnable = false;
     rd.ScissorEnable = false;
     hr = SwapchainHook::d3d11Device->CreateRasterizerState(&rd, &pRasterizerState);
+
 
     // Pre-allocate intermediate textures with common screen resolution to reduce first-frame lag
     EnsureIntermediateTextures(MC::windowSize.x, MC::windowSize.y);
@@ -405,6 +496,36 @@ bool DepthOfFieldHelper::EnsureIntermediateTextures(UINT width, UINT height)
         return false;
     }
 
+    // Create depth blur textures (R32_FLOAT format for depth)
+    D3D11_TEXTURE2D_DESC depthDesc = desc;
+    depthDesc.Format = DXGI_FORMAT_R32_FLOAT;
+
+    HRESULT hr3 = SwapchainHook::d3d11Device->CreateTexture2D(&depthDesc, nullptr, &pDepthBlurTexture1);
+    HRESULT hr4 = SwapchainHook::d3d11Device->CreateTexture2D(&depthDesc, nullptr, &pDepthBlurTexture2);
+
+    if (FAILED(hr3) || FAILED(hr4)) {
+        ReleaseIntermediateTextures();
+        return false;
+    }
+
+    // Create depth blur render target views
+    hr3 = SwapchainHook::d3d11Device->CreateRenderTargetView(pDepthBlurTexture1, nullptr, &pDepthBlurRTV1);
+    hr4 = SwapchainHook::d3d11Device->CreateRenderTargetView(pDepthBlurTexture2, nullptr, &pDepthBlurRTV2);
+
+    if (FAILED(hr3) || FAILED(hr4)) {
+        ReleaseIntermediateTextures();
+        return false;
+    }
+
+    // Create depth blur shader resource views
+    hr3 = SwapchainHook::d3d11Device->CreateShaderResourceView(pDepthBlurTexture1, nullptr, &pDepthBlurSRV1);
+    hr4 = SwapchainHook::d3d11Device->CreateShaderResourceView(pDepthBlurTexture2, nullptr, &pDepthBlurSRV2);
+
+    if (FAILED(hr3) || FAILED(hr4)) {
+        ReleaseIntermediateTextures();
+        return false;
+    }
+
     currentTextureWidth = width;
     currentTextureHeight = height;
 
@@ -419,6 +540,14 @@ void DepthOfFieldHelper::ReleaseIntermediateTextures()
     if (pIntermediateRTV2) { pIntermediateRTV2->Release(); pIntermediateRTV2 = nullptr; }
     if (pIntermediateTexture1) { pIntermediateTexture1->Release(); pIntermediateTexture1 = nullptr; }
     if (pIntermediateTexture2) { pIntermediateTexture2->Release(); pIntermediateTexture2 = nullptr; }
+
+    // Cleanup depth blur textures
+    if (pDepthBlurSRV1) { pDepthBlurSRV1->Release(); pDepthBlurSRV1 = nullptr; }
+    if (pDepthBlurSRV2) { pDepthBlurSRV2->Release(); pDepthBlurSRV2 = nullptr; }
+    if (pDepthBlurRTV1) { pDepthBlurRTV1->Release(); pDepthBlurRTV1 = nullptr; }
+    if (pDepthBlurRTV2) { pDepthBlurRTV2->Release(); pDepthBlurRTV2 = nullptr; }
+    if (pDepthBlurTexture1) { pDepthBlurTexture1->Release(); pDepthBlurTexture1 = nullptr; }
+    if (pDepthBlurTexture2) { pDepthBlurTexture2->Release(); pDepthBlurTexture2 = nullptr; }
     currentTextureWidth = 0;
     currentTextureHeight = 0;
 }
@@ -432,6 +561,8 @@ void DepthOfFieldHelper::Cleanup()
     if (pRasterizerState) { pRasterizerState->Release(); pRasterizerState = nullptr; }
     if (pGaussianBlurHorizontalShader) { pGaussianBlurHorizontalShader->Release(); pGaussianBlurHorizontalShader = nullptr; }
     if (pGaussianBlurVerticalShader) { pGaussianBlurVerticalShader->Release(); pGaussianBlurVerticalShader = nullptr; }
+    if (pDepthBlurHorizontalShader) { pDepthBlurHorizontalShader->Release(); pDepthBlurHorizontalShader = nullptr; }
+    if (pDepthBlurVerticalShader) { pDepthBlurVerticalShader->Release(); pDepthBlurVerticalShader = nullptr; }
     if (pVertexShader) { pVertexShader->Release(); pVertexShader = nullptr; }
     if (pInputLayout) { pInputLayout->Release(); pInputLayout = nullptr; }
     if (pSampler) { pSampler->Release(); pSampler = nullptr; }
@@ -439,9 +570,10 @@ void DepthOfFieldHelper::Cleanup()
     if (pConstantBuffer) { pConstantBuffer->Release(); pConstantBuffer = nullptr; }
     if (pDepthMapSRV) { pDepthMapSRV->Release(); pDepthMapSRV = nullptr; }
 
+
 }
 
-void DepthOfFieldHelper::RenderDepthOfField(ID3D11RenderTargetView *pDstRenderTargetView, int iterations, float intensity, float focusRange, float focusDistance, bool autoFocus)
+void DepthOfFieldHelper::RenderDepthOfField(ID3D11RenderTargetView *pDstRenderTargetView, int iterations, float intensity, float focusRange, float focusDistance, bool autoFocus, float depthBlurAmount)
 {
     if(intensity <= 0) return;
 
@@ -472,8 +604,44 @@ void DepthOfFieldHelper::RenderDepthOfField(ID3D11RenderTargetView *pDstRenderTa
     constantBuffer.autoFocus = autoFocus ? 1.0f : 0.0f;
     constantBuffer.offset = XMFLOAT2(1.0f, 1.0f);
 
+
     // Use iterations parameter
     int actualIterations = std::max(1, iterations);
+
+    // First, blur the depth map if available
+    ID3D11ShaderResourceView* blurredDepthSRV = pDepthMapSRV;
+    if (pDepthMapSRV && pDepthBlurHorizontalShader && pDepthBlurVerticalShader && depthBlurAmount > 0.0f) {
+        // Clear shader resource bindings
+        ID3D11ShaderResourceView* nullSRV = nullptr;
+        pContext->PSSetShaderResources(0, 1, &nullSRV);
+        pContext->PSSetShaderResources(1, 1, &nullSRV);
+
+        // Set depth blur amount in constant buffer (temporarily overwrite intensity)
+        float originalIntensity = constantBuffer.intensity;
+        constantBuffer.intensity = depthBlurAmount;
+        pContext->UpdateSubresource(pConstantBuffer, 0, nullptr, &constantBuffer, 0, 0);
+
+        // Horizontal depth blur pass
+        pContext->PSSetShader(pDepthBlurHorizontalShader, nullptr, 0);
+        RenderToRTV(pDepthBlurRTV1, pDepthMapSRV, renderSize);
+
+        // Clear binding again
+        pContext->PSSetShaderResources(0, 1, &nullSRV);
+
+        // Vertical depth blur pass
+        pContext->PSSetShader(pDepthBlurVerticalShader, nullptr, 0);
+        RenderToRTV(pDepthBlurRTV2, pDepthBlurSRV1, renderSize);
+
+        // Use blurred depth
+        blurredDepthSRV = pDepthBlurSRV2;
+
+        // Restore original intensity for DOF
+        constantBuffer.intensity = originalIntensity;
+        pContext->UpdateSubresource(pConstantBuffer, 0, nullptr, &constantBuffer, 0, 0);
+
+        // Clear bindings again
+        pContext->PSSetShaderResources(0, 1, &nullSRV);
+    }
 
     ID3D11ShaderResourceView* currentSRV = pOrigShaderResourceView.get();
 
@@ -485,13 +653,21 @@ void DepthOfFieldHelper::RenderDepthOfField(ID3D11RenderTargetView *pDstRenderTa
 
         // Horizontal pass
         pContext->PSSetShader(pGaussianBlurHorizontalShader, nullptr, 0);
+
+        // Bind the blurred depth for DOF calculations
+        ID3D11ShaderResourceView* tempDepthSRV = pDepthMapSRV;
+        pDepthMapSRV = blurredDepthSRV;
         RenderToRTV(pIntermediateRTV1, currentSRV, renderSize);
+        pDepthMapSRV = tempDepthSRV;
 
         // Clear binding again
         pContext->PSSetShaderResources(0, 1, &nullSRV);
 
         // Vertical pass
         pContext->PSSetShader(pGaussianBlurVerticalShader, nullptr, 0);
+
+        // Bind the blurred depth for DOF calculations
+        pDepthMapSRV = blurredDepthSRV;
         if (i == actualIterations - 1) {
             // Last iteration: render to final destination
             RenderToRTV(pDstRenderTargetView, pIntermediateSRV1, renderSize);
@@ -500,6 +676,9 @@ void DepthOfFieldHelper::RenderDepthOfField(ID3D11RenderTargetView *pDstRenderTa
             RenderToRTV(pIntermediateRTV2, pIntermediateSRV1, renderSize);
             currentSRV = pIntermediateSRV2;
         }
+        pDepthMapSRV = tempDepthSRV;
     }
 
 }
+
+
