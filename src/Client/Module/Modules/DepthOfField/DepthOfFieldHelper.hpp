@@ -28,6 +28,7 @@ public:
     static inline ID3D11PixelShader* pDepthBlurVerticalShader = nullptr;
     static inline ID3D11VertexShader* pVertexShader = nullptr;
     static inline ID3D11InputLayout* pInputLayout = nullptr;
+    static inline ID3D11ComputeShader* pDepthResolveComputeShader = nullptr;
 
     static inline ID3D11SamplerState* pSampler = nullptr;
     static inline ID3D11Buffer* pVertexBuffer = nullptr;
@@ -70,6 +71,8 @@ public:
 
     static void RenderDepthOfField(ID3D11RenderTargetView*, int, float, float, float, bool, float);
 
+    // Function to resolve MSAA depth buffer using compute shader
+    static bool ResolveDepthWithComputeShader(ID3D11DeviceContext* pContext, ID3D11Texture2D* pMSAADepthTexture, ID3D11Texture2D* pResolvedDepthTexture);
 
 private:
     static bool EnsureIntermediateTextures(UINT width, UINT height);

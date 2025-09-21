@@ -376,6 +376,16 @@ void SwapchainHook::SaveDepthmap(ID3D11DeviceContext* pContext, ID3D11DepthStenc
         return;
     }
 
+    // Ensure DepthOfField pipeline is initialized (especially the compute shader)
+    if (!DepthOfFieldHelper::pDepthResolveComputeShader) {
+        try {
+            DepthOfFieldHelper::InitializePipeline();
+        } catch (const std::exception& e) {
+            Logger::debug("SwapchainHook::SaveDepthmap - Failed to initialize DepthOfField pipeline: {}", e.what());
+            return;
+        }
+    }
+
     ID3D11Resource* pResource = nullptr;
     pDepthStencilView->GetResource(&pResource);
     ID3D11Texture2D* pDepthTexture = nullptr;
@@ -384,22 +394,14 @@ void SwapchainHook::SaveDepthmap(ID3D11DeviceContext* pContext, ID3D11DepthStenc
 
     D3D11_TEXTURE2D_DESC desc;
     pDepthTexture->GetDesc(&desc);
-    char buffer[256];
-    sprintf_s(buffer, "Format: %u, Usage: %u, BindFlags: %u, CPUAccessFlags: %u, Width: %u, Height: %u, RowPitch: %zu\n",
-              desc.Format, desc.Usage, desc.BindFlags, desc.CPUAccessFlags, desc.Width, desc.Height, (size_t)(desc.Width * sizeof(float)));
-    OutputDebugStringA(buffer);
-
-    if (!(desc.Usage == D3D11_USAGE_DEFAULT && desc.BindFlags & D3D11_BIND_DEPTH_STENCIL)) {
-        OutputDebugStringA("Warning: Depth texture may not be copyable!\n");
-    }
 
     ID3D11Device* pDevice = nullptr;
     pContext->GetDevice(&pDevice);
 
-    // Create a texture with shader resource binding
+    // Create a texture with shader resource and UAV binding for compute shader
     D3D11_TEXTURE2D_DESC depthTexDesc = desc;
     depthTexDesc.Usage = D3D11_USAGE_DEFAULT;
-    depthTexDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    depthTexDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
     depthTexDesc.CPUAccessFlags = 0;
     depthTexDesc.SampleDesc.Count = 1;
     depthTexDesc.SampleDesc.Quality = 0;
@@ -434,8 +436,16 @@ void SwapchainHook::SaveDepthmap(ID3D11DeviceContext* pContext, ID3D11DepthStenc
 
     // Copy depth data using GPU copy
     if (desc.SampleDesc.Count > 1) {
-        // Handle MSAA by resolving
-        pContext->ResolveSubresource(pDepthMapTexture, 0, pDepthTexture, 0, desc.Format);
+        // Handle MSAA by using compute shader resolve instead of ResolveSubresource
+        // ResolveSubresource fails on depth textures with D3D11_BIND_DEPTH_STENCIL
+        bool resolveSuccess = DepthOfFieldHelper::ResolveDepthWithComputeShader(pContext, pDepthTexture, pDepthMapTexture);
+        if (!resolveSuccess) {
+            Logger::debug("SwapchainHook::SaveDepthmap - Failed to resolve MSAA depth texture with compute shader");
+            pDepthMapTexture->Release();
+            pDepthTexture->Release();
+            pDevice->Release();
+            return;
+        }
     } else {
         // Direct copy for non-MSAA
         pContext->CopyResource(pDepthMapTexture, pDepthTexture);

@@ -4,7 +4,6 @@
 #include <chrono>
 #include "../../../Hook/Hooks/Render/DirectX/DXGI/SwapchainHook.hpp"
 #include "DepthOfFieldHelper.hpp"
-#include "../../../../Utils/Logger/Logger.hpp"
 #include "../../../../Client/Client.hpp"
 
 
@@ -282,6 +281,38 @@ float4 main(float4 screenSpace : SV_Position) : SV_TARGET
 }
 )";
 
+// Compute shader for resolving MSAA depth buffers
+const char *depthResolveComputeShaderSrc = R"(
+// Input: multisampled depth texture
+Texture2DMS<float> inputDepth : register(t0);
+
+// Output: resolved single-sample depth texture
+RWTexture2D<float> outputDepth : register(u0);
+
+[numthreads(16, 16, 1)]
+void main(uint3 dispatchThreadId : SV_DispatchThreadID)
+{
+    uint2 textureSize;
+    uint sampleCount;
+    inputDepth.GetDimensions(textureSize.x, textureSize.y, sampleCount);
+
+    // Check bounds
+    if (dispatchThreadId.x >= textureSize.x || dispatchThreadId.y >= textureSize.y)
+        return;
+
+    // Resolve by taking the minimum depth across all samples (closest to camera)
+    float resolvedDepth = 1.0; // Start with far plane
+
+    for (uint i = 0; i < sampleCount; ++i)
+    {
+        float sampleDepth = inputDepth.Load(dispatchThreadId.xy, i).r;
+        resolvedDepth = min(resolvedDepth, sampleDepth);
+    }
+
+    outputDepth[dispatchThreadId.xy] = resolvedDepth;
+}
+)";
+
 ID3DBlob *DofTryCompileShader(const char *pSrcData, const char *pTarget)
 {
     HRESULT hr;
@@ -332,18 +363,27 @@ void DepthOfFieldHelper::InitializePipeline()
 
     ID3DBlob *shaderBlob = DofTryCompileShader(dofGaussianBlurHorizontalShaderSrc, "ps_4_0");
     SwapchainHook::d3d11Device->CreatePixelShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &pGaussianBlurHorizontalShader);
+    shaderBlob->Release();
 
     shaderBlob = DofTryCompileShader(dofGaussianBlurVerticalShaderSrc, "ps_4_0");
     SwapchainHook::d3d11Device->CreatePixelShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &pGaussianBlurVerticalShader);
+    shaderBlob->Release();
 
     shaderBlob = DofTryCompileShader(depthBlurHorizontalShaderSrc, "ps_4_0");
     SwapchainHook::d3d11Device->CreatePixelShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &pDepthBlurHorizontalShader);
+    shaderBlob->Release();
 
     shaderBlob = DofTryCompileShader(depthBlurVerticalShaderSrc, "ps_4_0");
     SwapchainHook::d3d11Device->CreatePixelShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &pDepthBlurVerticalShader);
+    shaderBlob->Release();
 
     shaderBlob = DofTryCompileShader(dofVertexShaderSrc, "vs_4_0");
     SwapchainHook::d3d11Device->CreateVertexShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &pVertexShader);
+
+    // Compile and create compute shader for depth resolve
+    shaderBlob = DofTryCompileShader(depthResolveComputeShaderSrc, "cs_5_0");
+    SwapchainHook::d3d11Device->CreateComputeShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &pDepthResolveComputeShader);
+    shaderBlob->Release();
 
     D3D11_INPUT_ELEMENT_DESC ied =
         {"POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT,
@@ -556,6 +596,114 @@ void DepthOfFieldHelper::ReleaseIntermediateTextures()
     currentTextureHeight = 0;
 }
 
+bool DepthOfFieldHelper::ResolveDepthWithComputeShader(ID3D11DeviceContext* pContext, ID3D11Texture2D* pMSAADepthTexture, ID3D11Texture2D* pResolvedDepthTexture)
+{
+    if (!pContext || !pMSAADepthTexture || !pResolvedDepthTexture || !pDepthResolveComputeShader) {
+        return false;
+    }
+
+    // Get texture descriptions to validate compatibility
+    D3D11_TEXTURE2D_DESC msaaDesc, resolvedDesc;
+    pMSAADepthTexture->GetDesc(&msaaDesc);
+    pResolvedDepthTexture->GetDesc(&resolvedDesc);
+
+    // Validate that input is MSAA and output is single-sample
+    if (msaaDesc.SampleDesc.Count <= 1) {
+        Logger::debug("DepthOfFieldHelper::ResolveDepthWithComputeShader - Input texture is not MSAA");
+        return false;
+    }
+
+    if (resolvedDesc.SampleDesc.Count != 1) {
+        Logger::debug("DepthOfFieldHelper::ResolveDepthWithComputeShader - Output texture must be single-sample");
+        return false;
+    }
+
+    // Create SRV for the MSAA depth texture
+    D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+    srvDesc.Format = DXGI_FORMAT_R32_FLOAT; // Assume depth format is compatible
+    srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
+    srvDesc.Texture2DMS.UnusedField_NothingToDefine = 0;
+
+    // Handle different depth formats
+    switch (msaaDesc.Format) {
+        case DXGI_FORMAT_R24_UNORM_X8_TYPELESS:
+        case DXGI_FORMAT_D24_UNORM_S8_UINT:
+            srvDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+            break;
+        case DXGI_FORMAT_R32_FLOAT:
+        case DXGI_FORMAT_D32_FLOAT:
+            srvDesc.Format = DXGI_FORMAT_R32_FLOAT;
+            break;
+        case DXGI_FORMAT_R16_UNORM:
+        case DXGI_FORMAT_D16_UNORM:
+            srvDesc.Format = DXGI_FORMAT_R16_UNORM;
+            break;
+        case DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS:
+        case DXGI_FORMAT_D32_FLOAT_S8X24_UINT:
+            srvDesc.Format = DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS;
+            break;
+        default:
+            Logger::debug("DepthOfFieldHelper::ResolveDepthWithComputeShader - Unsupported depth format: {}", (int)msaaDesc.Format);
+            return false;
+    }
+
+    ID3D11Device* pDevice = nullptr;
+    pContext->GetDevice(&pDevice);
+    if (!pDevice) {
+        Logger::debug("DepthOfFieldHelper::ResolveDepthWithComputeShader - Failed to get device");
+        return false;
+    }
+
+    ID3D11ShaderResourceView* pInputSRV = nullptr;
+    HRESULT hr = pDevice->CreateShaderResourceView(pMSAADepthTexture, &srvDesc, &pInputSRV);
+    if (FAILED(hr)) {
+        Logger::debug("DepthOfFieldHelper::ResolveDepthWithComputeShader - Failed to create input SRV, hr: {:x}", hr);
+        pDevice->Release();
+        return false;
+    }
+
+    // Create UAV for the resolved depth texture
+    D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
+    uavDesc.Format = resolvedDesc.Format;
+    uavDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2D;
+    uavDesc.Texture2D.MipSlice = 0;
+
+    ID3D11UnorderedAccessView* pOutputUAV = nullptr;
+    hr = pDevice->CreateUnorderedAccessView(pResolvedDepthTexture, &uavDesc, &pOutputUAV);
+    if (FAILED(hr)) {
+        Logger::debug("DepthOfFieldHelper::ResolveDepthWithComputeShader - Failed to create output UAV, hr: {:x}", hr);
+        pInputSRV->Release();
+        pDevice->Release();
+        return false;
+    }
+
+    // Set compute shader and resources
+    pContext->CSSetShader(pDepthResolveComputeShader, nullptr, 0);
+    pContext->CSSetShaderResources(0, 1, &pInputSRV);
+    pContext->CSSetUnorderedAccessViews(0, 1, &pOutputUAV, nullptr);
+
+    // Calculate dispatch dimensions (16x16 thread groups)
+    UINT dispatchX = (resolvedDesc.Width + 15) / 16;
+    UINT dispatchY = (resolvedDesc.Height + 15) / 16;
+
+    // Dispatch the compute shader
+    pContext->Dispatch(dispatchX, dispatchY, 1);
+
+    // Clear bindings
+    ID3D11ShaderResourceView* nullSRV = nullptr;
+    ID3D11UnorderedAccessView* nullUAV = nullptr;
+    pContext->CSSetShaderResources(0, 1, &nullSRV);
+    pContext->CSSetUnorderedAccessViews(0, 1, &nullUAV, nullptr);
+    pContext->CSSetShader(nullptr, nullptr, 0);
+
+    // Cleanup
+    pInputSRV->Release();
+    pOutputUAV->Release();
+    pDevice->Release();
+
+    return true;
+}
+
 void DepthOfFieldHelper::Cleanup()
 {
     ReleaseIntermediateTextures();
@@ -568,6 +716,7 @@ void DepthOfFieldHelper::Cleanup()
     if (pDepthBlurHorizontalShader) { pDepthBlurHorizontalShader->Release(); pDepthBlurHorizontalShader = nullptr; }
     if (pDepthBlurVerticalShader) { pDepthBlurVerticalShader->Release(); pDepthBlurVerticalShader = nullptr; }
     if (pVertexShader) { pVertexShader->Release(); pVertexShader = nullptr; }
+    if (pDepthResolveComputeShader) { pDepthResolveComputeShader->Release(); pDepthResolveComputeShader = nullptr; }
     if (pInputLayout) { pInputLayout->Release(); pInputLayout = nullptr; }
     if (pSampler) { pSampler->Release(); pSampler = nullptr; }
     if (pVertexBuffer) { pVertexBuffer->Release(); pVertexBuffer = nullptr; }
