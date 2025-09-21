@@ -52,9 +52,13 @@ void UnderUIHooks::ClearDepthStencilViewCallbackDX11(
 
     static int index = 0;
     index++;
+    std::cout << "depth: " << std::hex << reinterpret_cast<uintptr_t>(pDepthStencilView) << std::endl;
 
     if (ClearFlags == D3D11_CLEAR_DEPTH && SwapchainHook::init) {
         underUI = true;
+        std::cout << "swpachain: " << std::hex << reinterpret_cast<uintptr_t>(bgfxCtx->SwapChain) << std::endl;
+        std::cout << "ctx:   " << std::hex << reinterpret_cast<uintptr_t>(bgfxCtx) << std::endl;
+
     }
 
     // Only capture depth if underUI flag is set

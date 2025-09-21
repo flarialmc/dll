@@ -401,29 +401,14 @@ void SwapchainHook::SaveDepthmap(ID3D11DeviceContext* pContext, ID3D11DepthStenc
     // Create a texture with shader resource and UAV binding for compute shader
     D3D11_TEXTURE2D_DESC depthTexDesc = desc;
     depthTexDesc.Usage = D3D11_USAGE_DEFAULT;
-    depthTexDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
+    depthTexDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    if (desc.SampleDesc.Count > 1) {
+        depthTexDesc.BindFlags |= D3D11_BIND_UNORDERED_ACCESS;
+        depthTexDesc.Format = DXGI_FORMAT_R32_FLOAT;
+    }
     depthTexDesc.CPUAccessFlags = 0;
     depthTexDesc.SampleDesc.Count = 1;
     depthTexDesc.SampleDesc.Quality = 0;
-
-    // Convert depth format to shader-readable format
-    switch (desc.Format) {
-        case DXGI_FORMAT_D24_UNORM_S8_UINT:
-            depthTexDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
-            break;
-        case DXGI_FORMAT_D32_FLOAT:
-            depthTexDesc.Format = DXGI_FORMAT_R32_FLOAT;
-            break;
-        case DXGI_FORMAT_D16_UNORM:
-            depthTexDesc.Format = DXGI_FORMAT_R16_UNORM;
-            break;
-        case DXGI_FORMAT_D32_FLOAT_S8X24_UINT:
-            depthTexDesc.Format = DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS;
-            break;
-        default:
-            depthTexDesc.Format = DXGI_FORMAT_R32_FLOAT;
-            break;
-    }
 
     ID3D11Texture2D* pDepthMapTexture = nullptr;
     HRESULT hr = pDevice->CreateTexture2D(&depthTexDesc, nullptr, &pDepthMapTexture);
@@ -435,21 +420,9 @@ void SwapchainHook::SaveDepthmap(ID3D11DeviceContext* pContext, ID3D11DepthStenc
     }
 
     // Copy depth data using GPU copy
-    if (desc.SampleDesc.Count > 1) {
-        // Handle MSAA by using compute shader resolve instead of ResolveSubresource
-        // ResolveSubresource fails on depth textures with D3D11_BIND_DEPTH_STENCIL
-        bool resolveSuccess = DepthOfFieldHelper::ResolveDepthWithComputeShader(pContext, pDepthTexture, pDepthMapTexture);
-        if (!resolveSuccess) {
-            Logger::debug("SwapchainHook::SaveDepthmap - Failed to resolve MSAA depth texture with compute shader");
-            pDepthMapTexture->Release();
-            pDepthTexture->Release();
-            pDevice->Release();
-            return;
-        }
-    } else {
-        // Direct copy for non-MSAA
+
         pContext->CopyResource(pDepthMapTexture, pDepthTexture);
-    }
+
 
     // Release old SRV to prevent memory leak
     if (DepthOfFieldHelper::pDepthMapSRV) {

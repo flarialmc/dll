@@ -380,15 +380,17 @@ void DepthOfFieldHelper::InitializePipeline()
     shaderBlob = DofTryCompileShader(dofVertexShaderSrc, "vs_4_0");
     SwapchainHook::d3d11Device->CreateVertexShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &pVertexShader);
 
+    D3D11_INPUT_ELEMENT_DESC ied =
+    {"POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT,
+     0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0};
+    SwapchainHook::d3d11Device->CreateInputLayout(&ied, 1, shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), &pInputLayout);
+    shaderBlob->Release();
+
     // Compile and create compute shader for depth resolve
     shaderBlob = DofTryCompileShader(depthResolveComputeShaderSrc, "cs_5_0");
     SwapchainHook::d3d11Device->CreateComputeShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &pDepthResolveComputeShader);
     shaderBlob->Release();
 
-    D3D11_INPUT_ELEMENT_DESC ied =
-        {"POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT,
-         0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0};
-    SwapchainHook::d3d11Device->CreateInputLayout(&ied, 1, shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), &pInputLayout);
 
     D3D11_SAMPLER_DESC sd{};
     sd.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
@@ -620,32 +622,9 @@ bool DepthOfFieldHelper::ResolveDepthWithComputeShader(ID3D11DeviceContext* pCon
 
     // Create SRV for the MSAA depth texture
     D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-    srvDesc.Format = DXGI_FORMAT_R32_FLOAT; // Assume depth format is compatible
+    srvDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS; // Assume depth format is compatible
     srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
     srvDesc.Texture2DMS.UnusedField_NothingToDefine = 0;
-
-    // Handle different depth formats
-    switch (msaaDesc.Format) {
-        case DXGI_FORMAT_R24_UNORM_X8_TYPELESS:
-        case DXGI_FORMAT_D24_UNORM_S8_UINT:
-            srvDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
-            break;
-        case DXGI_FORMAT_R32_FLOAT:
-        case DXGI_FORMAT_D32_FLOAT:
-            srvDesc.Format = DXGI_FORMAT_R32_FLOAT;
-            break;
-        case DXGI_FORMAT_R16_UNORM:
-        case DXGI_FORMAT_D16_UNORM:
-            srvDesc.Format = DXGI_FORMAT_R16_UNORM;
-            break;
-        case DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS:
-        case DXGI_FORMAT_D32_FLOAT_S8X24_UINT:
-            srvDesc.Format = DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS;
-            break;
-        default:
-            Logger::debug("DepthOfFieldHelper::ResolveDepthWithComputeShader - Unsupported depth format: {}", (int)msaaDesc.Format);
-            return false;
-    }
 
     ID3D11Device* pDevice = nullptr;
     pContext->GetDevice(&pDevice);
