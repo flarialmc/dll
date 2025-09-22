@@ -326,16 +326,76 @@ winrt::com_ptr<ID3D11Texture2D> SwapchainHook::GetBackbuffer() {
     return SavedD3D11BackBuffer;
 }
 
+void SwapchainHook::InitializeBackbufferStorage(int maxFrames) {
+    if (maxFrames <= 0 || maxFrames == maxBackbufferFrames) return;
+
+    CleanupBackbufferStorage();
+
+    maxBackbufferFrames = maxFrames;
+    currentBackbufferIndex = 0;
+    backbufferStorage.resize(maxFrames);
+
+    if (!SavedD3D11BackBuffer) return;
+
+    D3D11_TEXTURE2D_DESC textureDesc = {};
+    SavedD3D11BackBuffer->GetDesc(&textureDesc);
+    textureDesc.Usage = D3D11_USAGE_DEFAULT;
+    textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    textureDesc.CPUAccessFlags = 0;
+
+    // Create all textures and SRVs upfront
+    for (int i = 0; i < maxFrames; ++i) {
+        HRESULT hr = d3d11Device->CreateTexture2D(&textureDesc, nullptr, backbufferStorage[i].texture.put());
+        if (FAILED(hr)) continue;
+
+        D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+        srvDesc.Format = textureDesc.Format;
+        srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+        srvDesc.Texture2D.MipLevels = textureDesc.MipLevels;
+        srvDesc.Texture2D.MostDetailedMip = 0;
+
+        d3d11Device->CreateShaderResourceView(backbufferStorage[i].texture.get(), &srvDesc, backbufferStorage[i].srv.put());
+    }
+}
+
+void SwapchainHook::CleanupBackbufferStorage() {
+    backbufferStorage.clear();
+    maxBackbufferFrames = 0;
+    currentBackbufferIndex = 0;
+}
+
+winrt::com_ptr<ID3D11ShaderResourceView> SwapchainHook::GetCurrentBackbufferSRV() {
+    if (backbufferStorage.empty()) {
+        return nullptr;
+    }
+
+    int prevIndex = (currentBackbufferIndex - 1 + backbufferStorage.size()) % backbufferStorage.size();
+    return backbufferStorage[prevIndex].srv;
+}
+
 void SwapchainHook::SaveBackbuffer(bool underui) {
-
     SavedD3D11BackBuffer = nullptr;
-    ExtraSavedD3D11BackBuffer = nullptr;
-    if (!isDX12) {
 
+    if (!isDX12) {
         SwapchainHook::swapchain->GetBuffer(0, IID_PPV_ARGS(SavedD3D11BackBuffer.put()));
 
-        if (FlarialGUI::needsBackBuffer) {
+        if (FlarialGUI::needsBackBuffer && !backbufferStorage.empty()) {
+            // Use pre-created texture from storage
+            auto& currentStorage = backbufferStorage[currentBackbufferIndex];
 
+            if (underui) {
+                if (UnderUIHooks::bgfxCtx->m_msaart) {
+                    context->ResolveSubresource(currentStorage.texture.get(), 0, UnderUIHooks::bgfxCtx->m_msaart, 0, DXGI_FORMAT_R8G8B8A8_UNORM);
+                } else {
+                    context->CopyResource(currentStorage.texture.get(), SavedD3D11BackBuffer.get());
+                }
+            } else {
+                context->CopyResource(currentStorage.texture.get(), SavedD3D11BackBuffer.get());
+            }
+
+            currentBackbufferIndex = (currentBackbufferIndex + 1) % backbufferStorage.size();
+        } else if (FlarialGUI::needsBackBuffer) {
+            // Fallback to old behavior if storage not initialized
             if (!ExtraSavedD3D11BackBuffer) {
                 D3D11_TEXTURE2D_DESC textureDesc = {};
                 SavedD3D11BackBuffer->GetDesc(&textureDesc);
@@ -347,28 +407,21 @@ void SwapchainHook::SaveBackbuffer(bool underui) {
             }
 
             if (underui) {
-
                 if (UnderUIHooks::bgfxCtx->m_msaart) {
                     context->ResolveSubresource(ExtraSavedD3D11BackBuffer.get(), 0, UnderUIHooks::bgfxCtx->m_msaart, 0, DXGI_FORMAT_R8G8B8A8_UNORM);
                 } else {
                     context->CopyResource(ExtraSavedD3D11BackBuffer.get(), SavedD3D11BackBuffer.get());
                 }
-
             } else {
                 context->CopyResource(ExtraSavedD3D11BackBuffer.get(), SavedD3D11BackBuffer.get());
             }
         }
-
-
-    }
-    else
-        {
-            HRESULT hr = D3D11Resources[currentBitmap]->QueryInterface(IID_PPV_ARGS(SavedD3D11BackBuffer.put()));
-            if (FAILED(hr))
-            {
-                std::cout << "Failed to query interface: " << std::hex << hr << std::endl;
-            }
+    } else {
+        HRESULT hr = D3D11Resources[currentBitmap]->QueryInterface(IID_PPV_ARGS(SavedD3D11BackBuffer.put()));
+        if (FAILED(hr)) {
+            std::cout << "Failed to query interface: " << std::hex << hr << std::endl;
         }
+    }
 }
 
 void SwapchainHook::SaveDepthmap(ID3D11DeviceContext* pContext, ID3D11DepthStencilView* pDepthStencilView) {
@@ -476,6 +529,10 @@ std::atomic<bool> SwapchainHook::imguiCleanupInProgress{false};
 int SwapchainHook::dx12FrameCount = 0;
 
 winrt::com_ptr<ID3D11Texture2D> SwapchainHook::SavedD3D11BackBuffer;
+// Backbuffer storage system for MotionBlur
+std::vector<SwapchainHook::BackbufferStorage> SwapchainHook::backbufferStorage;
+int SwapchainHook::currentBackbufferIndex = 0;
+int SwapchainHook::maxBackbufferFrames = 0;
 winrt::com_ptr<ID3D11Texture2D> SwapchainHook::ExtraSavedD3D11BackBuffer;
 UINT SwapchainHook::lastBackbufferWidth = 0;
 UINT SwapchainHook::lastBackbufferHeight = 0;
