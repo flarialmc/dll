@@ -24,7 +24,7 @@ float4 main(VS_INPUT input) : SV_POSITION {
     return input.pos;
 }
 )";
-
+//
 const char* dofHorizontalShaderSrc = R"(
 cbuffer DepthOfFieldBuffer : register(b0)
 {
