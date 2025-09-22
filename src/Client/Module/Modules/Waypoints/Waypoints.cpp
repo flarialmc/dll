@@ -105,7 +105,7 @@ void Waypoints::onSetup() {
 			last_used = std::chrono::high_resolution_clock::now();
 		}
 		return {};
-		});
+	});
 
 	// Load all existing waypoints by scanning all possible indices
 	// This handles cases where waypoints were deleted from the middle

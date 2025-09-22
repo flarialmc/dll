@@ -353,6 +353,8 @@ public:
     static void extractFromFile(const std::string &zipFilePath, const std::string &destinationFolder);
 
     static std::string intToRoman(int n);
+
+    static double Microtime();
 };
 
 class String {

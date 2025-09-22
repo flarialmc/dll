@@ -9,7 +9,7 @@ class SensMultiplier : public Module {
 public:
 
 	SensMultiplier() : Module("Sens Multiplier", "Multiplies mouse sensitivity",
-		IDR_FIELD_OF_VIEW_PNG, "", false, {"Controller", "Stick Sens"}) {
+		IDR_MULTIPLIER_PNG, "", false, {"Controller", "Stick Sens"}) {
 	}
 
 	void onEnable() override;

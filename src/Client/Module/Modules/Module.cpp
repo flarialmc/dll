@@ -173,15 +173,16 @@ void Module::normalRenderCore(int index, std::string &text) {
 
     if (prevAlignments[index] != alignment) {
         float toAdjust = 0;
-        if (prevAlignments[index] == DWRITE_TEXT_ALIGNMENT_CENTER) {
-            if (alignment == DWRITE_TEXT_ALIGNMENT_LEADING) toAdjust = rectWidth / -2.f;
-            else toAdjust = rectWidth / 2.f;
-        } else if (prevAlignments[index] == DWRITE_TEXT_ALIGNMENT_LEADING) {
-            if (alignment == DWRITE_TEXT_ALIGNMENT_CENTER) toAdjust = rectWidth / 2.f;
-            else toAdjust = rectWidth;
-        } else if (prevAlignments[index] == DWRITE_TEXT_ALIGNMENT_TRAILING) {
-            if (alignment == DWRITE_TEXT_ALIGNMENT_CENTER) toAdjust = rectWidth / -2.f;
-            else toAdjust = -rectWidth;
+        auto prev = prevAlignments[index];
+
+        if (prev != alignment) {
+            if (prev == DWRITE_TEXT_ALIGNMENT_CENTER) {
+                toAdjust = (alignment == DWRITE_TEXT_ALIGNMENT_LEADING ? -0.5f : 0.5f) * rectWidth;
+            } else if (prev == DWRITE_TEXT_ALIGNMENT_LEADING) {
+                toAdjust = (alignment == DWRITE_TEXT_ALIGNMENT_CENTER ? 0.5f : 1.f) * rectWidth;
+            } else if (prev == DWRITE_TEXT_ALIGNMENT_TRAILING) {
+                toAdjust = (alignment == DWRITE_TEXT_ALIGNMENT_CENTER ? -0.5f : -1.f) * rectWidth;
+            }
         }
 
         settings.setValue("percentageX", (topleft.x + toAdjust) / MC::windowSize.x);
@@ -193,8 +194,7 @@ void Module::normalRenderCore(int index, std::string &text) {
     prevAlignments[index] = alignment;
 
     if (alignment != DWRITE_TEXT_ALIGNMENT_LEADING) {
-        if (alignment == DWRITE_TEXT_ALIGNMENT_TRAILING) topleft.x -= rectWidth;
-        else topleft.x -= rectWidth / 2.f;
+        topleft.x -= (alignment == DWRITE_TEXT_ALIGNMENT_TRAILING ? rectWidth : rectWidth / 2.f);
     }
 
     if (ClickGUI::editmenu) {
@@ -204,10 +204,12 @@ void Module::normalRenderCore(int index, std::string &text) {
 
         Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(topleft.x, topleft.y, index, rectWidth, rectHeight);
 
-        if (alignment != DWRITE_TEXT_ALIGNMENT_LEADING) {
-            if (alignment == DWRITE_TEXT_ALIGNMENT_TRAILING) vec2.x += rectWidth;
-            else vec2.x += rectWidth / 2.f;
-        }
+        // if (alignment != DWRITE_TEXT_ALIGNMENT_LEADING) {
+        //     if (alignment == DWRITE_TEXT_ALIGNMENT_TRAILING) vec2.x += rectWidth;
+        //     else vec2.x += rectWidth / 2.f;
+        // }
+
+        if (alignment != DWRITE_TEXT_ALIGNMENT_LEADING) vec2.x += (alignment == DWRITE_TEXT_ALIGNMENT_TRAILING ? rectWidth : rectWidth / 2.f);
 
         topleft.x = vec2.x;
         topleft.y = vec2.y;
@@ -216,10 +218,11 @@ void Module::normalRenderCore(int index, std::string &text) {
         settings.setValue("percentageX", percentages.x);
         settings.setValue("percentageY", percentages.y);
 
-        if (alignment != DWRITE_TEXT_ALIGNMENT_LEADING) {
-            if (alignment == DWRITE_TEXT_ALIGNMENT_TRAILING) topleft.x -= rectWidth;
-            else topleft.x -= rectWidth / 2.f;
-        }
+        // if (alignment != DWRITE_TEXT_ALIGNMENT_LEADING) {
+        //     if (alignment == DWRITE_TEXT_ALIGNMENT_TRAILING) topleft.x -= rectWidth;
+        //     else topleft.x -= rectWidth / 2.f;
+        // }
+        if (alignment != DWRITE_TEXT_ALIGNMENT_LEADING) topleft.x -= (alignment == DWRITE_TEXT_ALIGNMENT_TRAILING ? rectWidth : rectWidth / 2.f);
     }
 
     Vec2<float> rounde = Constraints::RoundingConstraint(getOps<float>("rounding") * getOps<float>("uiscale"), getOps<float>("rounding") * getOps<float>("uiscale"));
@@ -1051,7 +1054,7 @@ void Module::defaultAddSettings(std::string type) {
         addToggle("Glow", "", "glow");
         addConditionalSlider(getOps<bool>("glow"), "Glow Amount", "", "glowAmount", 100.f);
     } else if (type == "text") {
-        addTextBox("Format", "", 0, "text");
+        addTextBox("Format", "Use {value} for the value.", 0, "text");
         addSlider("Text Scale", "", "textscale", 2.0f);
         addDropdown("Text Alignment", "", std::vector<std::string>{"Left", "Center", "Right"}, "textalignment", true);
         addToggle("Text Shadow", "Displays a shadow under the text", "textShadow");
@@ -1072,6 +1075,21 @@ void Module::defaultAddSettings(std::string type) {
         addSlider("Rectangle Width", "", "rectwidth", 2.f, 0.001f);
         addSlider("Rectangle Height", "", "rectheight", 2.f, 0.001f);
         addSlider("Rotation", "", "rotation", 360.f, 0, false);
+    } else if (type == "all") {
+        addHeader("Main");
+        defaultAddSettings("main");
+        extraPadding();
+
+        addHeader("Text");
+        defaultAddSettings("text");
+        extraPadding();
+
+        addHeader("Colors");
+        defaultAddSettings("colors");
+        extraPadding();
+
+        addHeader("Misc");
+        defaultAddSettings("misc");
     }
 }
 
