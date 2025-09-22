@@ -46,7 +46,7 @@ private:
 
 public:
     Subtitles() : Module("Subtitles", "Adds Audio Subtitles.",
-        IDR_ANIMATIONS_PNG, "", false, {"audiosubtitles", "audio subtitles", "java"}) {
+        IDR_ANIMATIONS_PNG, "", false, {"audiosubtitles", "audio subtitles", "java", "caption"}) {
     };
 
     void onEnable() override;

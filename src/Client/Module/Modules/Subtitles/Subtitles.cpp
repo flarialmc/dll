@@ -23,6 +23,7 @@ void Subtitles::defaultConfig() {
     setDef("enabled", false);
     Module::defaultConfig("all");
     setDef("anchor", (std::string) "Bottom Right");
+    setDef("lifetimeFade", true);
     setDef("lifetime", 1.f);
     setDef("lineHeight", 1.f);
     setDef("rawMode", false);
@@ -59,6 +60,7 @@ void Subtitles::settingsRender(float settingsOffset) {
                     "Bottom Center",
                     "Bottom Right"
                 }, "anchor", true);
+    addToggle("Fade Out Effect", "", "lifetimeFade");
     addSlider("Sound Lifetime", "", "lifetime", 5.0f);
     extraPadding();
 
@@ -296,8 +298,10 @@ void Subtitles::onRender(RenderEvent &event) {
         D2D_COLOR_F curCol = getColor("text");
         D2D_COLOR_F curCol_S = getColor("textShadow");
 
-        curCol.a *= 1.f - (Microtime() - sound.timestamp) / getOps<float>("lifetime");
-        curCol_S.a *= 1.f - (Microtime() - sound.timestamp) / getOps<float>("lifetime");
+        if (getOps<bool>("lifetimeFade")) {
+            curCol.a *= 1.f - (Microtime() - sound.timestamp) / getOps<float>("lifetime");
+            curCol_S.a *= 1.f - (Microtime() - sound.timestamp) / getOps<float>("lifetime");
+        }
 
         if (getOps<bool>("textShadow"))
             FlarialGUI::FlarialTextWithFont(
