@@ -6,6 +6,7 @@
 struct Sound {
     std::string name;
     Vec3<float> pos;
+    std::string formatted;
     double timestamp;
 
     [[nodiscard]] std::pair<std::string, std::string> getSides() const {
@@ -40,6 +41,8 @@ private:
             return (microTime - obj.timestamp) > diff;
         });
     }
+private:
+    int prevYAlign = -1; // 0 top | 1 middle | 2 bottom
 
 public:
     Subtitles() : Module("Subtitles", "Adds Audio Subtitles.",
@@ -56,7 +59,7 @@ public:
 
     void onSoundEnginePlay(SoundEnginePlayEvent& event);
 
-    void normalRenderCore(int index, std::string& text) override;
+    // void normalRenderCore(int index, std::string& text) override;
 
     void onRender(RenderEvent& event);
 };
