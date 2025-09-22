@@ -169,7 +169,17 @@ void SwapchainHook::_DX11RenderUnderUI()
 {
     if (!D2D::context || !context) return;
 
-    DX11Blur();
+    //DX11Blur();
+    if (ModuleManager::initialized) {
+        auto motionBlurModule = ModuleManager::getModule("Motion Blur");
+        auto depthOfFieldModule = ModuleManager::getModule("Depth Of Field");
+
+        bool needsBuffer = FlarialGUI::inMenu;
+        if (motionBlurModule && motionBlurModule->isEnabled()) needsBuffer = true;
+        if (depthOfFieldModule && depthOfFieldModule->isEnabled()) needsBuffer = true;
+
+        FlarialGUI::needsBackBuffer = needsBuffer;
+    }
 
     SaveBackbuffer(true);
 

@@ -304,7 +304,7 @@ void ModuleManager::initialize() {
 
 	if (VersionUtils::checkBelowOrEqual(21, 90)) addModule<SwingAnimations>();
 
-	addModule<Subtitles>();
+	//addModule<Subtitles>();
 	addModule<SensMultiplier>();
 
 	addModule<DepthOfField>();
