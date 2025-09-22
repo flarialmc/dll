@@ -37,6 +37,7 @@ class SwapchainHook : public Hook {
 public:
     static void DX12Render(bool underui = false);
 
+    static void _DX11RenderUnderUI();
     static void DX11Render(bool underui = false);
 
     static void DX12Blur();
@@ -44,11 +45,13 @@ public:
     static void DX11Blur();
 
     static void DX11Init();
+    static void _DX11Render();
 
     static void DX12Init();
 
     static winrt::com_ptr<ID3D11Texture2D> GetBackbuffer();
     static void SaveBackbuffer(bool underui = false);
+    static void SaveDepthmap(ID3D11DeviceContext* pContext, ID3D11DepthStencilView* pDepthStencilView);
 
     typedef HRESULT(__thiscall *SwapchainOriginal)(IDXGISwapChain3 *, UINT, UINT);
 

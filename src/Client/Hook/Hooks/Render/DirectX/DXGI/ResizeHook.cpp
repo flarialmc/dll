@@ -16,6 +16,7 @@
 #include "../../../../../Module/Modules/MotionBlur/MotionBlur.hpp"
 #include "../../../../../Module/Modules/MotionBlur/AvgPixelMotionBlurHelper.hpp"
 #include "../../../../../Module/Modules/MotionBlur/RealMotionBlurHelper.hpp"
+#include "../../../../../Module/Modules/DepthOfField/DepthOfFieldHelper.hpp"
 
 void ResizeHook::enableHook() {
     int index;
@@ -249,6 +250,8 @@ void ResizeHook::cleanShit(bool fullReset) {
         RealMotionBlurHelper::m_blendState = nullptr;
         RealMotionBlurHelper::m_rasterizerState = nullptr;
         RealMotionBlurHelper::m_samplerState = nullptr;
+
+        DepthOfFieldHelper::Cleanup();
         MotionBlur::initted = false;
         FlarialGUI::hasLoadedAll = false;
     }

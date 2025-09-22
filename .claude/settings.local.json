@@ -8,7 +8,18 @@
       "Bash(cmd:*)",
       "Bash(cmake:*)",
       "WebFetch(domain:developer.nvidia.com)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(dir:*)",
+      "Read(//d/Documents/**)",
+      "Bash(cat:*)",
+      "Bash(where cl)",
+      "Bash(where cmake)",
+      "WebFetch(domain:wickedengine.net)",
+      "WebFetch(domain:gamedev.net)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebSearch",
+      "WebFetch(domain:www.gamedev.net)"
     ],
     "deny": []
   }
