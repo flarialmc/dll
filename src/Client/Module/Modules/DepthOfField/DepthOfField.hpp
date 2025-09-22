@@ -5,7 +5,7 @@
 class DepthOfField : public Module {
 public:
     DepthOfField() : Module("Depth Of Field", "",
-        IDR_CURSOR_PNG, "") {
+        IDR_DOF_PNG, "", false, {"dof"}) {
 
     };
 

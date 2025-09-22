@@ -5,7 +5,7 @@
 class ClearChat : public Module {
 public:
     ClearChat() : Module("Clear Chat", "Clears the chat from the screen.",
-                         IDR_MOVABLE_PNG, "") {
+        IDR_CLEARBG_PNG, "") {
     }
 
     void onEnable() override;

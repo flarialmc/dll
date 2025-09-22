@@ -8,7 +8,7 @@ class ParticleMultiplier : public Module {
 public:
 
     ParticleMultiplier(): Module("Particle Multiplier", "Particles go brrrrr",
-        IDR_SKULL_PNG, "", false, {"accelerator"}) {
+        IDR_MULTIPLIER_PNG, "", false, {"accelerator"}) {
 
     }
 

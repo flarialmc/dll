@@ -13,7 +13,7 @@ public:
 
 
 	DirectionHUD() : Module("DirectionHUD", "Shows a compass showing your direction",
-		IDR_CURSOR_PNG, "", false, {"compass"}) {
+		IDR_COMPASS_PNG, "", false, {"compass"}) {
 		
 	};
 

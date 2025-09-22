@@ -17,8 +17,7 @@ class NullMovement : public Module {
 public:
 
 	NullMovement(): Module("Null Movement", "Only registers the latest movement key.",
-		IDR_SPEED_PNG, "") {
-
+		IDR_NULL_PNG, "") {
 
 	}
 
