@@ -468,7 +468,7 @@ void FlarialGUI::PrepareBlur(float intensity) {
         auto shouldUpdate = (shouldLimit && elapsed.count() >= timeBetweenFrames) || !shouldLimit;
         auto isLerping = delta > 0.001 || delta < -0.1;
 
-        if (isLerping || shouldUpdate || FlarialGUI::blur_bitmap_cache) {
+        if (isLerping || shouldUpdate) {
             if (SwapchainHook::isDX12)
                 FlarialGUI::CopyBitmap(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap].get(),
                                        &FlarialGUI::screen_bitmap_cache);
