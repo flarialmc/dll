@@ -11,7 +11,7 @@ class PlayerNotifier : public Module {
 	int totalPlayers = 0;
 public:
 	PlayerNotifier() : Module("Player Notifier", "Notifies you when a player is in the server.",
-		IDR_CURSOR_PNG, "P", false, {"alert", "notification"}) {
+		IDR_NOTIFICATION_PNG, "P", false, {"alert", "notification"}) {
 		/*Module::setup();
 		defaultConfig();
 		loadSettings();*/

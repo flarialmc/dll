@@ -448,6 +448,11 @@ std::string Utils::intToRoman(int n) {
     return res;
 }
 
+double Utils::Microtime() {
+    return (double(std::chrono::duration_cast<std::chrono::microseconds>(
+        std::chrono::system_clock::now().time_since_epoch()).count()) / double(1000000));
+}
+
 
 std::string String::replaceAll(std::string &string, std::string_view c1, std::string_view c2) {
     size_t pos = 0;
