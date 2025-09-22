@@ -45,11 +45,6 @@ private:
 
 	std::deque<float> prevFrameTimes;
 
-	static double Microtime() {
-		return (double(std::chrono::duration_cast<std::chrono::microseconds>(
-			std::chrono::system_clock::now().time_since_epoch()).count()) / double(1000000));
-	}
-
 public:
 
 	JavaDebugMenu() : Module("Java Debug Menu", "Displays Java-style debug information.\nSimilar to F3 menu in Minecraft Java Edition.",

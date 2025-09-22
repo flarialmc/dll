@@ -2,6 +2,7 @@
 
 #include "SoundDescriptions.hpp"
 #include "Events/Game/SoundEnginePlayEvent.hpp"
+#include "Utils/Utils.hpp"
 
 struct Sound {
     std::string name;
@@ -30,13 +31,8 @@ private:
 
     std::vector<Sound> sounds;
 
-    static double Microtime() {
-        return (double(std::chrono::duration_cast<std::chrono::microseconds>(
-            std::chrono::system_clock::now().time_since_epoch()).count()) / double(1000000));
-    }
-
     static void updateSoundVec(std::vector<Sound> &vec, float diff) {
-        double microTime = Microtime();
+        double microTime = Utils::Microtime();
         std::erase_if(vec, [microTime, diff](const Sound &obj) {
             return (microTime - obj.timestamp) > diff;
         });

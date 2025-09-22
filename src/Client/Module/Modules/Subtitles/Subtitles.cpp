@@ -101,7 +101,7 @@ void Subtitles::onSoundEnginePlay(SoundEnginePlayEvent &event) {
             event.name,
             event.pos,
             "",
-            Microtime()
+            Utils::Utils::Microtime()
         });
     }
 }
@@ -109,6 +109,7 @@ void Subtitles::onSoundEnginePlay(SoundEnginePlayEvent &event) {
 void Subtitles::onRender(RenderEvent &event) {
     if (!this->isEnabled()) return;
     if (SDK::getCurrentScreen() != "hud_screen") return;
+    if (sounds.empty() && !ClickGUI::editmenu) return;
 
     updateSoundVec(sounds, getOps<float>("lifetime"));
 
@@ -134,19 +135,19 @@ void Subtitles::onRender(RenderEvent &event) {
                 "Sound",
                 Vec3<float>{0, 0, 0},
                 "< Sound 1 >",
-                Microtime()
+                Utils::Microtime()
             },
             Sound{
                 "Sound",
                 Vec3<float>{0, 0, 0},
                 "< Sound 2 >",
-                Microtime()
+                Utils::Microtime()
             },
             Sound{
                 "Sound",
                 Vec3<float>{0, 0, 0},
                 "< Sound 3 >",
-                Microtime()
+                Utils::Microtime()
             }
         };
 
@@ -299,8 +300,8 @@ void Subtitles::onRender(RenderEvent &event) {
         D2D_COLOR_F curCol_S = getColor("textShadow");
 
         if (getOps<bool>("lifetimeFade")) {
-            curCol.a *= 1.f - (Microtime() - sound.timestamp) / getOps<float>("lifetime");
-            curCol_S.a *= 1.f - (Microtime() - sound.timestamp) / getOps<float>("lifetime");
+            curCol.a *= 1.f - (Utils::Microtime() - sound.timestamp) / getOps<float>("lifetime");
+            curCol_S.a *= 1.f - (Utils::Microtime() - sound.timestamp) / getOps<float>("lifetime");
         }
 
         if (getOps<bool>("textShadow"))

@@ -21,6 +21,7 @@
 #include "Utils/WinrtUtils.hpp"
 #include "GUI/Engine/Constraints.hpp"
 #include "Hook/Hooks/Render/DirectX/DXGI/SwapchainHook.hpp"
+#include "Utils/Utils.hpp"
 
 
 void JavaDebugMenu::onEnable() {
@@ -185,7 +186,7 @@ bool JavaDebugMenu::isOnSetting(std::string settingName, int block = -1) {
 }
 
 void JavaDebugMenu::updateTimedVector(std::vector<TimedObj> &vec, float diff) {
-    double microTime = Microtime();
+    double microTime = Utils::Microtime();
     std::erase_if(vec, [microTime, diff](const TimedObj &obj) {
         return (microTime - obj.timestamp) > diff;
     });
@@ -354,7 +355,7 @@ void JavaDebugMenu::onTick(TickEvent &event) {
     if (isOnBlock(6)) {
         // TPS
         TimedObj tick{};
-        tick.timestamp = this->Microtime();
+        tick.timestamp = Utils::Microtime();
         this->tickList.insert(this->tickList.begin(), tick);
     }
 
