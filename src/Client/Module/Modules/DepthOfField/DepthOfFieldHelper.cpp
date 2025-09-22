@@ -20,22 +20,12 @@ struct VS_INPUT {
     float4 pos : POSITION;
 };
 
-struct VS_OUTPUT {
-    float4 pos : SV_POSITION;
-    float2 uv : TEXCOORD0;
-};
-
-VS_OUTPUT main(VS_INPUT input) {
-    VS_OUTPUT output;
-    output.pos = input.pos;
-    output.uv = float2((input.pos.x + 1.0) * 0.5, (1.0 - input.pos.y) * 0.5);
-    return output;
+float4 main(VS_INPUT input) : SV_POSITION {
+    return input.pos;
 }
 )";
 
-const char* dofPixelShaderSrc = R"(
-// Compile target: ps_5_0
-
+const char* dofHorizontalShaderSrc = R"(
 cbuffer DepthOfFieldBuffer : register(b0)
 {
     float2 resolution;
@@ -48,137 +38,177 @@ cbuffer DepthOfFieldBuffer : register(b0)
     float3 _padding;
 };
 
-Texture2D    colorTexture   : register(t0);
+SamplerState colorSampler : register(s0);
+SamplerState depthSampler : register(s1);
+
+Texture2D colorTexture : register(t0);
 Texture2D depthTexture : register(t1);
-Texture2DMS<float> msaaDepth : register(t2); // supports up to 4 samples
-SamplerState linearSampler  : register(s0);
+Texture2DMS<float> depthTextureMSAA : register(t2);
 
-struct PSInput
+float SampleDepth(float2 uv, int2 pixelCoord)
 {
-    float4 pos : SV_POSITION;
-    float2 uv  : TEXCOORD0;
-};
+    if (msaaLevel < 0.5) {
+        return depthTexture.Sample(depthSampler, uv).r;
+    } else {
+        uint width, height, sampleCount;
+        depthTextureMSAA.GetDimensions(width, height, sampleCount);
 
-// small disk sample offsets (12 samples)
-static const float2 SAMPLE_OFFSETS[12] =
-{
-    float2( 0.000,  0.000),
-    float2( 0.530,  0.000),
-    float2(-0.530,  0.000),
-    float2( 0.000,  0.530),
-    float2( 0.000, -0.530),
-    float2( 0.375,  0.375),
-    float2(-0.375,  0.375),
-    float2( 0.375, -0.375),
-    float2(-0.375, -0.375),
-    float2( 0.800,  0.200),
-    float2(-0.200,  0.800),
-    float2(-0.800, -0.200)
-};
-
-float GetDepthAtPixel(int2 pixCoord, float2 uv)
-{
-    // If MSAA is enabled (msaaLevel > 1) sample msaa depth and average samples.
-    if (msaaLevel > 1.0f)
-    {
-        // msaaLevel may be 2,4,... clamp to available template samples (1..4).
-        int sampleCount = (int)msaaLevel;
-        sampleCount = clamp(sampleCount, 1, 4);
-
-        float dsum = 0.0f;
-        [unroll]
-        for (int i = 0; i < 4; ++i) // iterate up to template count
-        {
-            if (i >= sampleCount) break;
-            dsum += msaaDepth.Load(pixCoord, i);
+        float depthSum = 0.0;
+        for (uint i = 0; i < sampleCount; i++) {
+            depthSum += depthTextureMSAA.Load(pixelCoord, i).r;
         }
-        return dsum / (float)sampleCount;
-    }
-    else
-    {
-        // single-sample depth: sample with SampleLevel using UV
-        return depthTexture.SampleLevel(linearSampler, uv, 0.0f).r;
+        return depthSum / float(sampleCount);
     }
 }
 
-// simple Gaussian-like weight by distance (not normalized)
-float WeightByDist(float2 offset)
+float LinearizeDepth(float depth)
 {
-    float r = length(offset);
-    // sharper falloff for larger radii
-    return exp(-r * r * 4.0);
+    float nearPlane = 0.1;
+    float farPlane = 2000.0;
+    float linearDepth = (2.0 * nearPlane) / (farPlane + nearPlane - depth * (farPlane - nearPlane));
+    return linearDepth * 100.0;
 }
 
-float4 main(PSInput IN) : SV_TARGET
+float CalculateCoC(float2 uv, float depth)
 {
-    // pixel integer coordinate for Load() on MSAA resource
-    int2 pixelCoord = int2(IN.pos.xy);
+    float linearDepth = LinearizeDepth(depth);
+    float targetFocusDistance;
 
-    // Get center depth (auto-focus override if requested)
-    float centerDepth = GetDepthAtPixel(pixelCoord, IN.uv);
-    float focal = focusDistance;
-    if (autoFocus > 0.5f)
-    {
-        // Use screen center for autofocus instead of current pixel
-        int2 centerCoord = int2(resolution * 0.5);
-        float2 centerUV = float2(0.5, 0.5);
-        focal = GetDepthAtPixel(centerCoord, centerUV);
+    if (autoFocus > 0.5) {
+        float2 screenCenter = float2(0.5, 0.5);
+        int2 centerPixel = int2(screenCenter * resolution);
+        float centerDepth = SampleDepth(screenCenter, centerPixel);
+        targetFocusDistance = LinearizeDepth(centerDepth);
+    } else {
+        targetFocusDistance = focusDistance;
     }
 
-    // safety clamp for focusRange
-    float range = max(focusRange, 1e-5);
+    float distance = abs(linearDepth - targetFocusDistance);
+    float normalizedDistance = distance / focusRange;
 
-    // circle of confusion metric [0..1], scaled by intensity
-    float depthDiff = abs(centerDepth - focal);
-    float coc = saturate(depthDiff / range) * intensity;
-
-    // For debugging - ensure some blur is always applied when intensity > 0
-    if (intensity > 0.01) {
-        coc = max(coc, 0.1); // minimum blur amount for testing
-    }
-
-    // if very small or intensity is 0, return sharp sample
-    if (coc <= 0.001 || intensity <= 0.001)
-    {
-        return colorTexture.SampleLevel(linearSampler, IN.uv, 0.0f);
-    }
-
-    // convert coc to pixel blur radius (tweak multiplier as desired)
-    // larger multiplier => stronger blur for same coc
-    float radiusPx = coc * 15.0; // increased for more visible effect
-
-    // accumulate samples
-    float3 accum = 0.0;
-    float totalWeight = 0.0;
-
-    // center sample (always)
-    float4 c = colorTexture.SampleLevel(linearSampler, IN.uv, 0.0f);
-    float w0 = 1.0;
-    accum += c.rgb * w0;
-    totalWeight += w0;
-
-    // sample disk offsets
-    [unroll]
-    for (int i = 1; i < 12; ++i)
-    {
-        float2 off = SAMPLE_OFFSETS[i] * radiusPx;
-        // convert offset in pixels -> normalized uv
-        float2 uvOff = IN.uv + off / resolution;
-
-        // Clamp UV coordinates to prevent sampling outside texture bounds
-        uvOff = clamp(uvOff, 0.0, 1.0);
-
-        float w = WeightByDist(SAMPLE_OFFSETS[i]); // weight based on normalized offset
-        float4 col = colorTexture.SampleLevel(linearSampler, uvOff, 0.0f);
-        accum += col.rgb * w;
-        totalWeight += w;
-    }
-
-    float3 finalColor = accum / max(totalWeight, 1e-6);
-
-    return float4(finalColor, 1.0);
+    return smoothstep(0.0, 1.0, normalizedDistance) * intensity;
 }
 
+float4 main(float4 screenSpace : SV_Position) : SV_TARGET
+{
+    float2 uv = screenSpace.xy / resolution;
+    int2 pixelCoord = int2(screenSpace.xy);
+
+    float depth = SampleDepth(uv, pixelCoord);
+    float coc = CalculateCoC(uv, depth);
+
+    if (coc < 0.01) {
+        return colorTexture.Sample(colorSampler, uv);
+    }
+
+    float4 colorSum = float4(0.0, 0.0, 0.0, 0.0);
+    float weightSum = 0.0;
+
+    int sampleCount = clamp((int)(coc * 8.0 + 3.0), 3, 15);
+    int halfSamples = sampleCount / 2;
+
+    for (int x = -halfSamples; x <= halfSamples; x++) {
+        float weight = 1.0 - abs(x) / (float)(halfSamples + 1);
+        float2 sampleOffset = float2(x * halfPixel.x * coc, 0.0);
+        colorSum += colorTexture.Sample(colorSampler, uv + sampleOffset) * weight;
+        weightSum += weight;
+    }
+
+    return colorSum / weightSum;
+}
+)";
+
+const char* dofVerticalShaderSrc = R"(
+cbuffer DepthOfFieldBuffer : register(b0)
+{
+    float2 resolution;
+    float2 halfPixel;
+    float intensity;
+    float focusRange;
+    float focusDistance;
+    float autoFocus;
+    float msaaLevel;
+    float3 _padding;
+};
+
+SamplerState colorSampler : register(s0);
+SamplerState depthSampler : register(s1);
+
+Texture2D colorTexture : register(t0);
+Texture2D depthTexture : register(t1);
+Texture2DMS<float> depthTextureMSAA : register(t2);
+
+float SampleDepth(float2 uv, int2 pixelCoord)
+{
+    if (msaaLevel < 0.5) {
+        return depthTexture.Sample(depthSampler, uv).r;
+    } else {
+        uint width, height, sampleCount;
+        depthTextureMSAA.GetDimensions(width, height, sampleCount);
+
+        float depthSum = 0.0;
+        for (uint i = 0; i < sampleCount; i++) {
+            depthSum += depthTextureMSAA.Load(pixelCoord, i).r;
+        }
+        return depthSum / float(sampleCount);
+    }
+}
+
+float LinearizeDepth(float depth)
+{
+    float nearPlane = 0.1;
+    float farPlane = 2000.0;
+    float linearDepth = (2.0 * nearPlane) / (farPlane + nearPlane - depth * (farPlane - nearPlane));
+    return linearDepth * 100.0;
+}
+
+float CalculateCoC(float2 uv, float depth)
+{
+    float linearDepth = LinearizeDepth(depth);
+    float targetFocusDistance;
+
+    if (autoFocus > 0.5) {
+        float2 screenCenter = float2(0.5, 0.5);
+        int2 centerPixel = int2(screenCenter * resolution);
+        float centerDepth = SampleDepth(screenCenter, centerPixel);
+        targetFocusDistance = LinearizeDepth(centerDepth);
+    } else {
+        targetFocusDistance = focusDistance;
+    }
+
+    float distance = abs(linearDepth - targetFocusDistance);
+    float normalizedDistance = distance / focusRange;
+
+    return smoothstep(0.0, 1.0, normalizedDistance) * intensity;
+}
+
+float4 main(float4 screenSpace : SV_Position) : SV_TARGET
+{
+    float2 uv = screenSpace.xy / resolution;
+    int2 pixelCoord = int2(screenSpace.xy);
+
+    float depth = SampleDepth(uv, pixelCoord);
+    float coc = CalculateCoC(uv, depth);
+
+    if (coc < 0.01) {
+        return colorTexture.Sample(colorSampler, uv);
+    }
+
+    float4 colorSum = float4(0.0, 0.0, 0.0, 0.0);
+    float weightSum = 0.0;
+
+    int sampleCount = clamp((int)(coc * 8.0 + 3.0), 3, 15);
+    int halfSamples = sampleCount / 2;
+
+    for (int y = -halfSamples; y <= halfSamples; y++) {
+        float weight = 1.0 - abs(y) / (float)(halfSamples + 1);
+        float2 sampleOffset = float2(0.0, y * halfPixel.y * coc);
+        colorSum += colorTexture.Sample(colorSampler, uv + sampleOffset) * weight;
+        weightSum += weight;
+    }
+
+    return colorSum / weightSum;
+}
 )";
 
 ID3DBlob* DofTryCompileShader(const char* pSrcData, const char* pTarget)
@@ -210,16 +240,17 @@ void DepthOfFieldHelper::InitializePipeline()
     D3D11_SUBRESOURCE_DATA vertexBufferData = {quadVertices, 0, 0};
     SwapchainHook::d3d11Device->CreateBuffer(&cbdVertex, &vertexBufferData, &pVertexBuffer);
 
-    ID3DBlob* shaderBlob = DofTryCompileShader(dofPixelShaderSrc, "ps_5_0");
-    SwapchainHook::d3d11Device->CreatePixelShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &pDepthOfFieldShader);
+    ID3DBlob* shaderBlob = DofTryCompileShader(dofHorizontalShaderSrc, "ps_5_0");
+    SwapchainHook::d3d11Device->CreatePixelShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &pHorizontalShader);
+
+    shaderBlob = DofTryCompileShader(dofVerticalShaderSrc, "ps_5_0");
+    SwapchainHook::d3d11Device->CreatePixelShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &pVerticalShader);
 
     shaderBlob = DofTryCompileShader(dofVertexShaderSrc, "vs_5_0");
     SwapchainHook::d3d11Device->CreateVertexShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &pVertexShader);
 
-    D3D11_INPUT_ELEMENT_DESC ied[] = {
-        {"POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0}
-    };
-    SwapchainHook::d3d11Device->CreateInputLayout(ied, 1, shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), &pInputLayout);
+    D3D11_INPUT_ELEMENT_DESC ied = {"POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0};
+    SwapchainHook::d3d11Device->CreateInputLayout(&ied, 1, shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), &pInputLayout);
 
     D3D11_SAMPLER_DESC sd{};
     sd.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
@@ -228,14 +259,23 @@ void DepthOfFieldHelper::InitializePipeline()
     sd.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
     SwapchainHook::d3d11Device->CreateSamplerState(&sd, &pSampler);
 
+    D3D11_DEPTH_STENCIL_DESC dsd{};
+    dsd.DepthEnable = false;
+    dsd.StencilEnable = false;
+    SwapchainHook::d3d11Device->CreateDepthStencilState(&dsd, &pDepthStencilState);
+
+    D3D11_BLEND_DESC bd{};
+    bd.AlphaToCoverageEnable = false;
+    bd.RenderTarget[0].BlendEnable = false;
+    bd.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+    SwapchainHook::d3d11Device->CreateBlendState(&bd, &pBlendState);
+
     D3D11_RASTERIZER_DESC rd{};
     rd.FillMode = D3D11_FILL_SOLID;
     rd.CullMode = D3D11_CULL_NONE;
     rd.DepthClipEnable = false;
     rd.ScissorEnable = false;
-    SwapchainHook::d3d11Device->CreateRasterizerState(&rd, &pRasterizerState);
-
-}
+    SwapchainHook::d3d11Device->CreateRasterizerState(&rd, &pRasterizerState);}
 
 void DepthOfFieldHelper::SetupShaderResources(ID3D11DeviceContext* pContext, ID3D11ShaderResourceView* pColorSRV)
 {
@@ -257,8 +297,8 @@ void DepthOfFieldHelper::RenderToRTV(ID3D11RenderTargetView* pRenderTargetView, 
     winrt::com_ptr<ID3D11DeviceContext> pContext = SwapchainHook::context;
     if (!pContext) return;
 
-    //pContext->OMSetDepthStencilState(pDepthStencilState, 0);
-    //pContext->OMSetBlendState(pBlendState, NULL, 0xffffffff);
+    pContext->OMSetDepthStencilState(pDepthStencilState, 0);
+    pContext->OMSetBlendState(pBlendState, NULL, 0xffffffff);
     pContext->RSSetState(pRasterizerState);
 
     ID3D11ShaderResourceView* nullSRV = nullptr;
@@ -276,7 +316,7 @@ void DepthOfFieldHelper::RenderToRTV(ID3D11RenderTargetView* pRenderTargetView, 
     pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
     pContext->VSSetShader(pVertexShader, nullptr, 0);
-    pContext->PSSetShader(pDepthOfFieldShader, nullptr, 0);
+    // Shader will be set in RenderDepthOfField based on pass
     pContext->PSSetSamplers(0, 1, &pSampler);
     pContext->PSSetSamplers(1, 1, &pSampler);
     pContext->PSSetConstantBuffers(0, 1, &pConstantBuffer);
@@ -301,10 +341,12 @@ void DepthOfFieldHelper::RenderToRTV(ID3D11RenderTargetView* pRenderTargetView, 
 
 void DepthOfFieldHelper::Cleanup()
 {
+
     if (pDepthStencilState) { pDepthStencilState->Release(); pDepthStencilState = nullptr; }
     if (pBlendState) { pBlendState->Release(); pBlendState = nullptr; }
     if (pRasterizerState) { pRasterizerState->Release(); pRasterizerState = nullptr; }
-    if (pDepthOfFieldShader) { pDepthOfFieldShader->Release(); pDepthOfFieldShader = nullptr; }
+    if (pHorizontalShader) { pHorizontalShader->Release(); pHorizontalShader = nullptr; }
+    if (pVerticalShader) { pVerticalShader->Release(); pVerticalShader = nullptr; }
     if (pVertexShader) { pVertexShader->Release(); pVertexShader = nullptr; }
     if (pInputLayout) { pInputLayout->Release(); pInputLayout = nullptr; }
     if (pSampler) { pSampler->Release(); pSampler = nullptr; }
@@ -318,9 +360,10 @@ void DepthOfFieldHelper::RenderDepthOfField(ID3D11RenderTargetView* pDstRenderTa
     if (intensity <= 0 || !SwapchainHook::GetBackbuffer() || !pDepthMapSRV) return;
 
     winrt::com_ptr<ID3D11ShaderResourceView> pOrigShaderResourceView = MotionBlur::BackbufferToSRVExtraMode();
-    if (!pOrigShaderResourceView) return;
+    if (!SwapchainHook::ExtraSavedD3D11BackBuffer) return;
 
-    //if (!EnsureIntermediateTextures(MC::windowSize.x, MC::windowSize.y)) return;
+    winrt::com_ptr<ID3D11DeviceContext> pContext = SwapchainHook::context;
+    if (!pContext) return;
 
     constantBuffer.intensity = intensity;
     constantBuffer.focusRange = focusRange;
@@ -328,11 +371,62 @@ void DepthOfFieldHelper::RenderDepthOfField(ID3D11RenderTargetView* pDstRenderTa
     constantBuffer.autoFocus = autoFocus ? 1.0f : 0.0f;
 
     if (isMSAADepth) {
-        constantBuffer.msaaLevel = static_cast<float>(msaaSampleCount);
+        if (msaaSampleCount == 2) constantBuffer.msaaLevel = 1.0f;
+        else if (msaaSampleCount == 4) constantBuffer.msaaLevel = 2.0f;
+        else if (msaaSampleCount == 8) constantBuffer.msaaLevel = 3.0f;
+        else constantBuffer.msaaLevel = 0.0f;
     } else {
-        constantBuffer.msaaLevel = 0.5f;
+        constantBuffer.msaaLevel = 0.0f;
     }
 
     XMFLOAT2 renderSize = XMFLOAT2(static_cast<float>(MC::windowSize.x), static_cast<float>(MC::windowSize.y));
-    RenderToRTV(pDstRenderTargetView, pOrigShaderResourceView.get(), renderSize);
+
+    // Ensure intermediate textures exist
+    D3D11_TEXTURE2D_DESC desc;
+    SwapchainHook::GetBackbuffer()->GetDesc(&desc);
+
+    if (currentTextureWidth != desc.Width || currentTextureHeight != desc.Height ||
+        !pIntermediateTexture1 || !pIntermediateRTV1 || !pIntermediateSRV1) {
+
+        // Release existing textures
+        if (pIntermediateSRV1) { pIntermediateSRV1->Release(); pIntermediateSRV1 = nullptr; }
+        if (pIntermediateRTV1) { pIntermediateRTV1->Release(); pIntermediateRTV1 = nullptr; }
+        if (pIntermediateTexture1) { pIntermediateTexture1->Release(); pIntermediateTexture1 = nullptr; }
+
+        // Create new intermediate texture
+        D3D11_TEXTURE2D_DESC textureDesc = {};
+        textureDesc.Width = desc.Width;
+        textureDesc.Height = desc.Height;
+        textureDesc.MipLevels = 1;
+        textureDesc.ArraySize = 1;
+        textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        textureDesc.SampleDesc.Count = 1;
+        textureDesc.SampleDesc.Quality = 0;
+        textureDesc.Usage = D3D11_USAGE_DEFAULT;
+        textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+        textureDesc.CPUAccessFlags = 0;
+        textureDesc.MiscFlags = 0;
+
+        SwapchainHook::d3d11Device->CreateTexture2D(&textureDesc, nullptr, &pIntermediateTexture1);
+        SwapchainHook::d3d11Device->CreateRenderTargetView(pIntermediateTexture1, nullptr, &pIntermediateRTV1);
+        SwapchainHook::d3d11Device->CreateShaderResourceView(pIntermediateTexture1, nullptr, &pIntermediateSRV1);
+
+        currentTextureWidth = desc.Width;
+        currentTextureHeight = desc.Height;
+    }
+
+    // Clear previous shader resource bindings
+    ID3D11ShaderResourceView* nullSRV = nullptr;
+    pContext->PSSetShaderResources(0, 1, &nullSRV);
+
+    // Horizontal pass
+    pContext->PSSetShader(pHorizontalShader, nullptr, 0);
+    RenderToRTV(pIntermediateRTV1, pOrigShaderResourceView.get(), renderSize);
+
+    // Clear binding again
+    pContext->PSSetShaderResources(0, 1, &nullSRV);
+
+    // Vertical pass (final)
+    pContext->PSSetShader(pVerticalShader, nullptr, 0);
+    RenderToRTV(pDstRenderTargetView, pIntermediateSRV1, renderSize);
 }

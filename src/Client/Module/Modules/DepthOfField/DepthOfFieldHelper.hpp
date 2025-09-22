@@ -21,7 +21,8 @@ class DepthOfFieldHelper
 {
 public:
 
-    static inline ID3D11PixelShader* pDepthOfFieldShader = nullptr;
+    static inline ID3D11PixelShader* pHorizontalShader = nullptr;
+    static inline ID3D11PixelShader* pVerticalShader = nullptr;
     static inline ID3D11VertexShader* pVertexShader = nullptr;
     static inline ID3D11InputLayout* pInputLayout = nullptr;
 

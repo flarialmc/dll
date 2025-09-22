@@ -24,7 +24,7 @@ void Subtitles::defaultConfig() {
     Module::defaultConfig("all");
     setDef("anchor", (std::string) "Bottom Center");
     setDef("lifetimeFade", true);
-    setDef("lifetime", 1.f);
+    setDef("lifetime", 1.5f);
     setDef("lineHeight", 1.f);
     setDef("rawMode", false);
     setDef("removeUseless", false);
