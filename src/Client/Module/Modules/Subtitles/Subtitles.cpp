@@ -22,7 +22,7 @@ void Subtitles::onDisable() {
 void Subtitles::defaultConfig() {
     setDef("enabled", false);
     Module::defaultConfig("all");
-    setDef("anchor", (std::string) "Bottom Right");
+    setDef("anchor", (std::string) "Bottom Center");
     setDef("lifetimeFade", true);
     setDef("lifetime", 1.f);
     setDef("lineHeight", 1.f);

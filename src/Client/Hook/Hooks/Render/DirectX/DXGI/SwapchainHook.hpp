@@ -85,6 +85,14 @@ public:
     static UINT lastBackbufferWidth;
     static UINT lastBackbufferHeight;
 
+    // Depth map storage system
+    static winrt::com_ptr<ID3D11Texture2D> cachedDepthMapTexture;
+    static winrt::com_ptr<ID3D11ShaderResourceView> cachedDepthMapSRV;
+    static UINT lastDepthMapWidth;
+    static UINT lastDepthMapHeight;
+    static UINT lastDepthMapSampleCount;
+    static DXGI_FORMAT lastDepthMapFormat;
+
     static winrt::com_ptr<ID3D12CommandQueue> queue;
     static HANDLE fenceEvent;
     static std::vector<winrt::com_ptr<IDXGISurface1>> DXGISurfaces;

@@ -435,7 +435,6 @@ void SwapchainHook::SaveBackbuffer(bool underui) {
 void SwapchainHook::SaveDepthmap(ID3D11DeviceContext* pContext, ID3D11DepthStencilView* pDepthStencilView) {
     if (!pDepthStencilView || isDX12) return;
 
-    // Check if DepthOfField module is enabled
     auto depthOfFieldModule = ModuleManager::getModule("Depth Of Field");
     if (!depthOfFieldModule || !depthOfFieldModule->isEnabled()) {
         return;
@@ -443,91 +442,76 @@ void SwapchainHook::SaveDepthmap(ID3D11DeviceContext* pContext, ID3D11DepthStenc
 
     ID3D11Resource* pResource = nullptr;
     pDepthStencilView->GetResource(&pResource);
-    ID3D11Texture2D* pDepthTexture = nullptr;
-    pResource->QueryInterface(__uuidof(ID3D11Texture2D), (void**)&pDepthTexture);
+    ID3D11Texture2D* pDepthBuffer = nullptr;
+    pResource->QueryInterface(__uuidof(ID3D11Texture2D), (void**)&pDepthBuffer);
     pResource->Release();
 
     D3D11_TEXTURE2D_DESC desc;
-    pDepthTexture->GetDesc(&desc);
-    char buffer[256];
-    sprintf_s(buffer, "Format: %u, Usage: %u, BindFlags: %u, CPUAccessFlags: %u, Width: %u, Height: %u, RowPitch: %zu\n",
-              desc.Format, desc.Usage, desc.BindFlags, desc.CPUAccessFlags, desc.Width, desc.Height, (size_t)(desc.Width * sizeof(float)));
-    OutputDebugStringA(buffer);
+    pDepthBuffer->GetDesc(&desc);
 
-    if (!(desc.Usage == D3D11_USAGE_DEFAULT && desc.BindFlags & D3D11_BIND_DEPTH_STENCIL)) {
-        OutputDebugStringA("Warning: Depth texture may not be copyable!\n");
+    bool isMSAA = desc.SampleDesc.Count > 1;
+    DXGI_FORMAT targetFormat = DXGI_FORMAT_R24G8_TYPELESS;
+
+    bool needsRecreation = !cachedDepthMapTexture || !cachedDepthMapSRV ||
+                          lastDepthMapWidth != desc.Width ||
+                          lastDepthMapHeight != desc.Height ||
+                          lastDepthMapSampleCount != desc.SampleDesc.Count ||
+                          lastDepthMapFormat != targetFormat;
+
+    if (needsRecreation) {
+        // Release old resources
+        cachedDepthMapTexture = nullptr;
+        cachedDepthMapSRV = nullptr;
+
+        // Create new texture
+        D3D11_TEXTURE2D_DESC depthTexDesc = desc;
+        depthTexDesc.Usage = D3D11_USAGE_DEFAULT;
+        depthTexDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
+        depthTexDesc.CPUAccessFlags = 0;
+        depthTexDesc.MiscFlags = 0;
+        depthTexDesc.SampleDesc = desc.SampleDesc;
+        depthTexDesc.Format = targetFormat;
+
+        HRESULT hr = d3d11Device->CreateTexture2D(&depthTexDesc, nullptr, cachedDepthMapTexture.put());
+        if (FAILED(hr)) {
+            Logger::debug("SwapchainHook::SaveDepthmap - Failed to create depth map texture, hr: {:x}", hr);
+            pDepthBuffer->Release();
+            return;
+        }
+
+        D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+        srvDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+
+        if (isMSAA) {
+            srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
+            srvDesc.Texture2DMS.UnusedField_NothingToDefine = 0;
+        } else {
+            srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+            srvDesc.Texture2D.MipLevels = 1;
+        }
+
+        hr = d3d11Device->CreateShaderResourceView(cachedDepthMapTexture.get(), &srvDesc, cachedDepthMapSRV.put());
+        if (FAILED(hr)) {
+            Logger::debug("SwapchainHook::SaveDepthmap - Failed to create depth map SRV, hr: {:x}", hr);
+            cachedDepthMapTexture = nullptr;
+            pDepthBuffer->Release();
+            return;
+        }
+
+        lastDepthMapWidth = desc.Width;
+        lastDepthMapHeight = desc.Height;
+        lastDepthMapSampleCount = desc.SampleDesc.Count;
+        lastDepthMapFormat = targetFormat;
     }
 
-    ID3D11Device* pDevice = nullptr;
-    pContext->GetDevice(&pDevice);
+    pContext->CopyResource(cachedDepthMapTexture.get(), pDepthBuffer);
 
-    // Create a texture with shader resource binding
-    D3D11_TEXTURE2D_DESC depthTexDesc = desc;
-    depthTexDesc.Usage = D3D11_USAGE_DEFAULT;
-    depthTexDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-    depthTexDesc.CPUAccessFlags = 0;
-    depthTexDesc.SampleDesc.Count = 1;
-    depthTexDesc.SampleDesc.Quality = 0;
+    DepthOfFieldHelper::pDepthMapSRV = cachedDepthMapSRV.get();
 
-    // Convert depth format to shader-readable format
-    switch (desc.Format) {
-        case DXGI_FORMAT_D24_UNORM_S8_UINT:
-            depthTexDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
-            break;
-        case DXGI_FORMAT_D32_FLOAT:
-            depthTexDesc.Format = DXGI_FORMAT_R32_FLOAT;
-            break;
-        case DXGI_FORMAT_D16_UNORM:
-            depthTexDesc.Format = DXGI_FORMAT_R16_UNORM;
-            break;
-        case DXGI_FORMAT_D32_FLOAT_S8X24_UINT:
-            depthTexDesc.Format = DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS;
-            break;
-        default:
-            depthTexDesc.Format = DXGI_FORMAT_R32_FLOAT;
-            break;
-    }
+    DepthOfFieldHelper::isMSAADepth = isMSAA;
+    DepthOfFieldHelper::msaaSampleCount = desc.SampleDesc.Count;
 
-    ID3D11Texture2D* pDepthMapTexture = nullptr;
-    HRESULT hr = pDevice->CreateTexture2D(&depthTexDesc, nullptr, &pDepthMapTexture);
-    if (FAILED(hr)) {
-        Logger::debug("SwapchainHook::SaveDepthmap - Failed to create depth map texture, hr: {:x}", hr);
-        pDepthTexture->Release();
-        pDevice->Release();
-        return;
-    }
-
-    // Copy depth data using GPU copy
-    if (desc.SampleDesc.Count > 1) {
-        // Handle MSAA by resolving
-        pContext->ResolveSubresource(pDepthMapTexture, 0, pDepthTexture, 0, desc.Format);
-    } else {
-        // Direct copy for non-MSAA
-        pContext->CopyResource(pDepthMapTexture, pDepthTexture);
-    }
-
-    // Release old SRV to prevent memory leak
-    if (DepthOfFieldHelper::pDepthMapSRV) {
-         DepthOfFieldHelper::pDepthMapSRV->Release();
-        DepthOfFieldHelper::pDepthMapSRV = nullptr;
-    }
-
-    // Create SRV for the depth map with matching format
-    D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-    srvDesc.Format = depthTexDesc.Format;
-    srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-    srvDesc.Texture2D.MipLevels = 1;
-    hr = pDevice->CreateShaderResourceView(pDepthMapTexture, &srvDesc, &DepthOfFieldHelper::pDepthMapSRV);
-    if (FAILED(hr)) {
-        pDepthMapTexture->Release();
-        pDepthTexture->Release();
-        pDevice->Release();
-        return;
-    }
-
-    pDepthTexture->Release();
-    pDepthMapTexture->Release();
-    pDevice->Release();
+    pDepthBuffer->Release();
 }
 
 SwapchainHook::SwapchainOriginal SwapchainHook::funcOriginal = nullptr;
@@ -544,6 +528,14 @@ int SwapchainHook::maxBackbufferFrames = 0;
 winrt::com_ptr<ID3D11Texture2D> SwapchainHook::ExtraSavedD3D11BackBuffer;
 UINT SwapchainHook::lastBackbufferWidth = 0;
 UINT SwapchainHook::lastBackbufferHeight = 0;
+
+// Depth map storage system
+winrt::com_ptr<ID3D11Texture2D> SwapchainHook::cachedDepthMapTexture;
+winrt::com_ptr<ID3D11ShaderResourceView> SwapchainHook::cachedDepthMapSRV;
+UINT SwapchainHook::lastDepthMapWidth = 0;
+UINT SwapchainHook::lastDepthMapHeight = 0;
+UINT SwapchainHook::lastDepthMapSampleCount = 0;
+DXGI_FORMAT SwapchainHook::lastDepthMapFormat = DXGI_FORMAT_UNKNOWN;
 
 std::vector<winrt::com_ptr<IDXGISurface1>> SwapchainHook::DXGISurfaces;
 std::vector<winrt::com_ptr<ID2D1Bitmap1>> SwapchainHook::D2D1Bitmaps;
