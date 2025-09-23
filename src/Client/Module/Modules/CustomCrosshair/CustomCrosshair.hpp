@@ -56,9 +56,14 @@ public:
 	std::map<std::string, ImTextureID> crosshairTextures;
 	std::map<std::string, Vec2<int>> crosshairSizes;
 
+	std::map<std::string, ID3D12Resource*> crosshairTexturesDX12;
+
+
 private:
 	ImTextureID defaultCrosshairTexture = 0;
 	Vec2<int> defaultCrosshairSize = Vec2<int>(16, 16);
+
+	ID3D12Resource* defaultCrosshairTextureDX12 = nullptr;
 public:
 	CustomCrosshair() : Module("Custom Crosshair", "Allows for dynamic crosshair colors.",
 		IDR_CROSSHAIR_PNG, "") {
@@ -85,11 +90,15 @@ public:
 	void onRender(RenderEvent &event);
 
 	void invalidateCrosshairTexture(const std::string& crosshairName);
+	void cleanupTextures();
+	void cleanupTexturesDX12();
+	void reinitializeAfterResize();
 
 private:
 	ImTextureID loadCrosshairTexture(const std::string& crosshairName);
+	ImTextureID loadCrosshairTextureDX12(const std::string& crosshairName);
 	void loadDefaultCrosshairTexture();
-	void cleanupTextures();
+	void loadDefaultCrosshairTextureDX12();
 	void renderImGuiCrosshair();
 	static void cleanupSamplerStates();
 };

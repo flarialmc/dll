@@ -31,7 +31,11 @@ void CustomCrosshair::onEnable() {
 
     if (crosshairs.empty()) crosshairs["Crosshair1"] = new CrosshairImage();
 
-    loadDefaultCrosshairTexture();
+    if (SwapchainHook::isDX12) {
+        loadDefaultCrosshairTextureDX12();
+    } else {
+        loadDefaultCrosshairTexture();
+    }
 }
 
 void CustomCrosshair::onDisable() {
@@ -43,10 +47,10 @@ void CustomCrosshair::onDisable() {
     Deafen(this, TickEvent, &CustomCrosshair::onTick)
     Deafen(this, RenderEvent, &CustomCrosshair::onRender)
 
-    // Small delay to ensure any ongoing render operations complete
     std::this_thread::sleep_for(std::chrono::milliseconds(16));
 
     cleanupTextures();
+    cleanupTexturesDX12();
 
     for (auto& pair : crosshairs) {
         delete pair.second;
@@ -57,7 +61,6 @@ void CustomCrosshair::onDisable() {
 
     Module::onDisable();
 
-    // Re-enable rendering for next time module is enabled
     isRenderingSafe = true;
 }
 
@@ -275,19 +278,28 @@ void CustomCrosshair::renderImGuiCrosshair() {
     Vec2<int> crosshairPixelSize;
     std::string currentCrosshair = settings.getSettingByName<std::string>("CurrentCrosshair")->value;
 
-    if (!isRenderingSafe) return; // Early exit if disabling
+    if (!isRenderingSafe) return;
 
     if (!currentCrosshair.empty()) {
-        crosshairTexture = loadCrosshairTexture(currentCrosshair);
+        if (SwapchainHook::isDX12) {
+            crosshairTexture = loadCrosshairTextureDX12(currentCrosshair);
+        } else {
+            crosshairTexture = loadCrosshairTexture(currentCrosshair);
+        }
         if (crosshairTexture && isRenderingSafe) {
             crosshairPixelSize = crosshairSizes[currentCrosshair];
         }
     }
 
-    if (!isRenderingSafe) return; // Check again before using default texture
+    if (!isRenderingSafe) return;
 
     if (!crosshairTexture) {
-        crosshairTexture = defaultCrosshairTexture;
+        if (SwapchainHook::isDX12) {
+            if (!defaultCrosshairTextureDX12) loadDefaultCrosshairTextureDX12();
+            crosshairTexture = (ImTextureID)defaultCrosshairTextureDX12;
+        } else {
+            crosshairTexture = defaultCrosshairTexture;
+        }
         crosshairPixelSize = defaultCrosshairSize;
     }
 
@@ -338,7 +350,7 @@ void CustomCrosshair::renderImGuiCrosshair() {
         SwapchainHook::d3d11Device->CreateSamplerState(&samplerDesc, &linearSampler);
     }
 
-    if (!isRenderingSafe) return; // Final safety check before drawing
+    if (!isRenderingSafe) return;
 
     ImDrawList* drawList = ImGui::GetBackgroundDrawList();
 
@@ -356,9 +368,9 @@ void CustomCrosshair::renderImGuiCrosshair() {
             SwapchainHook::d3d11Device->CreateSamplerState(&samplerDesc, &pointSampler);
         }
 
-        winrt::com_ptr<ID3D11DeviceContext> ctx = SwapchainHook::context;
-        if (pointSampler && ctx) {
-            ctx->PSSetSamplers(0, 1, &pointSampler);
+
+        if (pointSampler &&  SwapchainHook::context) {
+             SwapchainHook::context->PSSetSamplers(0, 1, &pointSampler);
         }
     }, nullptr);
 
@@ -370,35 +382,219 @@ void CustomCrosshair::renderImGuiCrosshair() {
         tintColor
     );
 
-    drawList->AddCallback([](const ImDrawList* parent_list, const ImDrawCmd* cmd) {
-        static ID3D11SamplerState* linearSampler = nullptr;
-        if (!linearSampler) {
-            D3D11_SAMPLER_DESC samplerDesc = {};
-            samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-            samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-            samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-            samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-            samplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
-            samplerDesc.MinLOD = 0;
-            samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
-            SwapchainHook::d3d11Device->CreateSamplerState(&samplerDesc, &linearSampler);
-        }
+    if (!SwapchainHook::isDX12) {
+        drawList->AddCallback([](const ImDrawList* parent_list, const ImDrawCmd* cmd) {
+            static ID3D11SamplerState* linearSampler = nullptr;
+            if (!linearSampler) {
+                D3D11_SAMPLER_DESC samplerDesc = {};
+                samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+                samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+                samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+                samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+                samplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+                samplerDesc.MinLOD = 0;
+                samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+                SwapchainHook::d3d11Device->CreateSamplerState(&samplerDesc, &linearSampler);
+            }
 
-        winrt::com_ptr<ID3D11DeviceContext> ctx = SwapchainHook::context;
-        if (linearSampler && ctx) {
-            ctx->PSSetSamplers(0, 1, &linearSampler);
-        }
-    }, nullptr);
+            if (linearSampler && SwapchainHook::context) {
+                SwapchainHook::context->PSSetSamplers(0, 1, &linearSampler);
+            }
+        }, nullptr);
+    }
 }
 
 void CustomCrosshair::invalidateCrosshairTexture(const std::string& crosshairName) {
     auto it = crosshairTextures.find(crosshairName);
     if (it != crosshairTextures.end()) {
-        ID3D11ShaderResourceView* srv = (ID3D11ShaderResourceView*)it->second;
-        srv->Release();
+        if (SwapchainHook::isDX12) {
+            auto dx12It = crosshairTexturesDX12.find(crosshairName);
+            if (dx12It != crosshairTexturesDX12.end()) {
+                if (dx12It->second) {
+                    dx12It->second->Release();
+                }
+                crosshairTexturesDX12.erase(dx12It);
+            }
+        } else {
+            ID3D11ShaderResourceView* srv = (ID3D11ShaderResourceView*)it->second;
+            srv->Release();
+        }
         crosshairTextures.erase(it);
     }
     crosshairSizes.erase(crosshairName);
+}
+
+ImTextureID CustomCrosshair::loadCrosshairTextureDX12(const std::string& crosshairName) {
+    std::string filePath = Utils::getClientPath() + "\\Crosshairs\\" + crosshairName + ".png";
+
+    if (!std::filesystem::exists(filePath)) {
+        return 0;
+    }
+
+    auto it = crosshairTextures.find(crosshairName);
+    if (it != crosshairTextures.end()) {
+        return it->second;
+    }
+
+    if (!SwapchainHook::d3d12Device5 || !SwapchainHook::d3d12DescriptorHeapImGuiRender) {
+        return 0;
+    }
+
+    D3D12_CPU_DESCRIPTOR_HANDLE cpu;
+    D3D12_GPU_DESCRIPTOR_HANDLE gpu;
+
+    UINT descriptorId = (std::hash<std::string>{}(crosshairName) % 100) + 300;
+
+    if (!SwapchainHook::AllocateImageDescriptor(descriptorId, &cpu, &gpu)) {
+        return 0;
+    }
+
+    ID3D12Resource* texture = nullptr;
+    if (FlarialGUI::LoadImageFromFile(filePath, cpu, &texture)) {
+        crosshairTextures[crosshairName] = (ImTextureID)gpu.ptr;
+        crosshairTexturesDX12[crosshairName] = texture;
+
+        auto chIt = crosshairs.find(crosshairName);
+        if (chIt != crosshairs.end() && chIt->second != nullptr) {
+            crosshairSizes[crosshairName] = Vec2<int>(chIt->second->Size, chIt->second->Size);
+        } else {
+            crosshairSizes[crosshairName] = Vec2<int>(16, 16);
+        }
+
+        return (ImTextureID)gpu.ptr;
+    }
+
+    return 0;
+}
+
+void CustomCrosshair::loadDefaultCrosshairTextureDX12() {
+    if (!SwapchainHook::d3d12Device5 || !SwapchainHook::d3d12DescriptorHeapImGuiRender) return;
+
+    std::vector<unsigned char> blankData(16 * 16 * 4, 0);
+
+    D3D12_CPU_DESCRIPTOR_HANDLE cpu;
+    D3D12_GPU_DESCRIPTOR_HANDLE gpu;
+
+    if (!SwapchainHook::AllocateImageDescriptor(299, &cpu, &gpu)) {
+        return;
+    }
+
+    UINT uploadPitch = (16 * 4 + D3D12_TEXTURE_DATA_PITCH_ALIGNMENT - 1u) & ~(D3D12_TEXTURE_DATA_PITCH_ALIGNMENT - 1u);
+    UINT uploadSize = 16 * uploadPitch;
+
+    D3D12_RESOURCE_DESC uploadDesc = {};
+    uploadDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+    uploadDesc.Alignment = 0;
+    uploadDesc.Width = uploadSize;
+    uploadDesc.Height = 1;
+    uploadDesc.DepthOrArraySize = 1;
+    uploadDesc.MipLevels = 1;
+    uploadDesc.Format = DXGI_FORMAT_UNKNOWN;
+    uploadDesc.SampleDesc.Count = 1;
+    uploadDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+    uploadDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+    D3D12_HEAP_PROPERTIES uploadProps = {};
+    uploadProps.Type = D3D12_HEAP_TYPE_UPLOAD;
+
+    winrt::com_ptr<ID3D12Resource> uploadBuffer;
+    HRESULT hr = SwapchainHook::d3d12Device5->CreateCommittedResource(&uploadProps, D3D12_HEAP_FLAG_NONE, &uploadDesc, D3D12_RESOURCE_STATE_GENERIC_READ, NULL, IID_PPV_ARGS(uploadBuffer.put()));
+    if (FAILED(hr)) return;
+
+    void* mapped = nullptr;
+    D3D12_RANGE range = { 0, uploadSize };
+    if (FAILED(uploadBuffer->Map(0, &range, &mapped))) return;
+
+    for (int y = 0; y < 16; y++)
+        memcpy((void*)((uintptr_t)mapped + y * uploadPitch), blankData.data() + y * 16 * 4, 16 * 4);
+    uploadBuffer->Unmap(0, &range);
+
+    D3D12_HEAP_PROPERTIES props = {};
+    props.Type = D3D12_HEAP_TYPE_DEFAULT;
+
+    D3D12_RESOURCE_DESC desc = {};
+    desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+    desc.Width = 16;
+    desc.Height = 16;
+    desc.DepthOrArraySize = 1;
+    desc.MipLevels = 1;
+    desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    desc.SampleDesc.Count = 1;
+    desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+    desc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+    winrt::com_ptr<ID3D12Resource> pTexture;
+    hr = SwapchainHook::d3d12Device5->CreateCommittedResource(&props, D3D12_HEAP_FLAG_NONE, &desc, D3D12_RESOURCE_STATE_COPY_DEST, NULL, IID_PPV_ARGS(pTexture.put()));
+    if (FAILED(hr)) return;
+
+    winrt::com_ptr<ID3D12CommandAllocator> allocator;
+    SwapchainHook::d3d12Device5->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(allocator.put()));
+
+    winrt::com_ptr<ID3D12GraphicsCommandList> cmdList;
+    SwapchainHook::d3d12Device5->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, allocator.get(), NULL, IID_PPV_ARGS(cmdList.put()));
+
+    D3D12_TEXTURE_COPY_LOCATION srcLocation = {};
+    srcLocation.pResource = uploadBuffer.get();
+    srcLocation.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
+    srcLocation.PlacedFootprint.Footprint.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    srcLocation.PlacedFootprint.Footprint.Width = 16;
+    srcLocation.PlacedFootprint.Footprint.Height = 16;
+    srcLocation.PlacedFootprint.Footprint.Depth = 1;
+    srcLocation.PlacedFootprint.Footprint.RowPitch = uploadPitch;
+
+    D3D12_TEXTURE_COPY_LOCATION dstLocation = {};
+    dstLocation.pResource = pTexture.get();
+    dstLocation.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+    dstLocation.SubresourceIndex = 0;
+
+    D3D12_RESOURCE_BARRIER barrier = {};
+    barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+    barrier.Transition.pResource = pTexture.get();
+    barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+    barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+    barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+
+    cmdList->CopyTextureRegion(&dstLocation, 0, 0, 0, &srcLocation, NULL);
+    cmdList->ResourceBarrier(1, &barrier);
+    cmdList->Close();
+
+    ID3D12CommandList* cmdListPtr = cmdList.get();
+    SwapchainHook::d3d12CommandQueue->ExecuteCommandLists(1, &cmdListPtr);
+
+    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+    srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.Texture2D.MipLevels = desc.MipLevels;
+    srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    SwapchainHook::d3d12Device5->CreateShaderResourceView(pTexture.get(), &srvDesc, cpu);
+
+    defaultCrosshairTextureDX12 = pTexture.detach();
+    defaultCrosshairSize = Vec2<int>(16, 16);
+}
+
+void CustomCrosshair::cleanupTexturesDX12() {
+    for (auto& pair : crosshairTexturesDX12) {
+        if (pair.second) {
+            pair.second->Release();
+        }
+    }
+    crosshairTexturesDX12.clear();
+
+    if (defaultCrosshairTextureDX12) {
+        defaultCrosshairTextureDX12->Release();
+        defaultCrosshairTextureDX12 = nullptr;
+    }
+}
+
+void CustomCrosshair::reinitializeAfterResize() {
+    if (!this->isEnabled()) return;
+
+    crosshairTextures.clear();
+    crosshairSizes.clear();
+    crosshairTexturesDX12.clear();
+
+    defaultCrosshairTexture = 0;
+    defaultCrosshairTextureDX12 = nullptr;
 }
 
 void CustomCrosshair::cleanupSamplerStates() {
