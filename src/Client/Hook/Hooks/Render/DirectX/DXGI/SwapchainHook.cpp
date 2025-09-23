@@ -343,14 +343,14 @@ void SwapchainHook::InitializeBackbufferStorage(int maxFrames) {
     currentBackbufferIndex = 0;
     backbufferStorage.resize(maxFrames);
 
-    if (!SavedD3D11BackBuffer) return;
+    if (!SavedD3D11BackBuffer) { swapchain->GetBuffer(0, IID_PPV_ARGS(SavedD3D11BackBuffer.put())); }
 
     D3D11_TEXTURE2D_DESC textureDesc = {};
     SavedD3D11BackBuffer->GetDesc(&textureDesc);
     textureDesc.Usage = D3D11_USAGE_DEFAULT;
     textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
     textureDesc.CPUAccessFlags = 0;
-
+    SavedD3D11BackBuffer = nullptr;
     // Create all textures and SRVs upfront
     for (int i = 0; i < maxFrames; ++i) {
         HRESULT hr = d3d11Device->CreateTexture2D(&textureDesc, nullptr, backbufferStorage[i].texture.put());
@@ -402,8 +402,11 @@ void SwapchainHook::SaveBackbuffer(bool underui) {
             }
 
             currentBackbufferIndex = (currentBackbufferIndex + 1) % backbufferStorage.size();
-        } else if (FlarialGUI::needsBackBuffer) {
+
+        } else if (FlarialGUI::needsBackBuffer)
+        {
             // Fallback to old behavior if storage not initialized
+            ExtraSavedD3D11BackBuffer = nullptr;
             if (!ExtraSavedD3D11BackBuffer) {
                 D3D11_TEXTURE2D_DESC textureDesc = {};
                 SavedD3D11BackBuffer->GetDesc(&textureDesc);

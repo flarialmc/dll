@@ -144,7 +144,7 @@ void MotionBlur::onRenderNormal(RenderEvent &event) {
                                  previousFrames.begin() + (previousFrames.size() - maxFrames));
         }
 
-        // Initialize storage if needed
+
         SwapchainHook::InitializeBackbufferStorage(maxFrames);
 
         auto buffer = BackbufferToSRVExtraMode();
@@ -156,7 +156,7 @@ void MotionBlur::onRenderNormal(RenderEvent &event) {
         else if (getOps<std::string>("blurType") == "Ghost Frames") {
             float alpha = 0.3f;
             for (const auto &frame: previousFrames) {
-                if (!SwapchainHook::queue) {
+                if (!SwapchainHook::isDX12) {
                     ImageWithOpacity(frame, {MC::windowSize.x, MC::windowSize.y}, alpha);
                 }
                 alpha *= this->settings.getSettingByName<float>("intensity_bleed")->value;
