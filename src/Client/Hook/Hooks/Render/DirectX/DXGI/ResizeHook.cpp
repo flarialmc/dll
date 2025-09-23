@@ -57,6 +57,7 @@ void ResizeHook::cleanShit(bool fullReset) {
 
     SwapchainHook::SavedD3D11BackBuffer = nullptr;
     SwapchainHook::ExtraSavedD3D11BackBuffer = nullptr;
+    SwapchainHook::CleanupBackbufferStorage();
 
     SwapchainHook::lastBackbufferWidth = 0;
     SwapchainHook::lastBackbufferHeight = 0;
