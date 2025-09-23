@@ -20,7 +20,8 @@
       "WebFetch(domain:raw.githubusercontent.com)",
       "WebSearch",
       "WebFetch(domain:www.gamedev.net)",
-      "Bash(timeout:*)"
+      "Bash(timeout:*)",
+      "Bash(.build.bat)"
     ],
     "deny": []
   }

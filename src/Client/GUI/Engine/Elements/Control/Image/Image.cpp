@@ -102,7 +102,7 @@ bool FlarialGUI::LoadImageFromFile(const std::string& filePath, ID3D11ShaderReso
     desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     desc.SampleDesc.Count = 1;
     desc.Usage = D3D11_USAGE_DEFAULT;
-    desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
     desc.CPUAccessFlags = 0;
 
     winrt::com_ptr<ID3D11Texture2D> pTexture;

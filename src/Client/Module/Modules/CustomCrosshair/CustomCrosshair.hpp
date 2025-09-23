@@ -18,6 +18,7 @@
 #include <d3d11.h>
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui/imgui.h>
+#include <imgui/imgui_impl_dx12.h>
 
 
 class CrosshairImage
@@ -53,17 +54,16 @@ private:
 	std::atomic<bool> isRenderingSafe = true;
 
 public:
-	std::map<std::string, ImTextureID> crosshairTextures;
+	std::map<std::string, winrt::com_ptr<ID3D11ShaderResourceView>> crosshairTextures;
 	std::map<std::string, Vec2<int>> crosshairSizes;
-
-	std::map<std::string, ID3D12Resource*> crosshairTexturesDX12;
-
+	std::map<std::string, std::pair<ImTextureID, winrt::com_ptr<ID3D12Resource>>> crosshairTexturesDX12;
+	static inline winrt::com_ptr<ID3D11SamplerState> pointSampler = nullptr;
 
 private:
-	ImTextureID defaultCrosshairTexture = 0;
+	winrt::com_ptr<ID3D11ShaderResourceView> defaultCrosshairTexture = nullptr;
 	Vec2<int> defaultCrosshairSize = Vec2<int>(16, 16);
 
-	ID3D12Resource* defaultCrosshairTextureDX12 = nullptr;
+	winrt::com_ptr<ID3D12Resource> defaultCrosshairTextureDX12 = nullptr;
 public:
 	CustomCrosshair() : Module("Custom Crosshair", "Allows for dynamic crosshair colors.",
 		IDR_CROSSHAIR_PNG, "") {

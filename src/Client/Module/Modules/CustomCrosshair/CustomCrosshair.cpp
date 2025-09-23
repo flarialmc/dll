@@ -170,7 +170,7 @@ void CustomCrosshair::onHudCursorRendererRender(HudCursorRendererRenderEvent &ev
 
 void CustomCrosshair::onRender(RenderEvent &event) {
     if (!this->isEnabled()) return;
-    isHudScreen = (SDK::getCurrentScreen() == "hud_screen");
+    isHudScreen = SDK::currentScreen == "hud_screen";
     if (actuallyRenderWindow)
         CrosshairEditorWindow();
     else {
@@ -191,12 +191,12 @@ ImTextureID CustomCrosshair::loadCrosshairTexture(const std::string& crosshairNa
 
     auto it = crosshairTextures.find(crosshairName);
     if (it != crosshairTextures.end()) {
-        return it->second;
+        return reinterpret_cast<ImTextureID>(it->second.get());
     }
 
     ID3D11ShaderResourceView* texture = nullptr;
     if (FlarialGUI::LoadImageFromFile(filePath, &texture)) {
-        crosshairTextures[crosshairName] = (ImTextureID)texture;
+        crosshairTextures[crosshairName].attach(texture);
 
         auto chIt = crosshairs.find(crosshairName);
         if (chIt != crosshairs.end() && chIt->second != nullptr) {
@@ -205,7 +205,7 @@ ImTextureID CustomCrosshair::loadCrosshairTexture(const std::string& crosshairNa
             crosshairSizes[crosshairName] = Vec2<int>(16, 16);
         }
 
-        return (ImTextureID)texture;
+        return reinterpret_cast<ImTextureID>(texture);
     }
 
     return 0;
@@ -240,26 +240,19 @@ void CustomCrosshair::loadDefaultCrosshairTexture() {
 
         ID3D11ShaderResourceView* srv = nullptr;
         if (SUCCEEDED(SwapchainHook::d3d11Device->CreateShaderResourceView(texture.get(), &srvDesc, &srv))) {
-            defaultCrosshairTexture = (ImTextureID)srv;
+            defaultCrosshairTexture.attach(srv);
             defaultCrosshairSize = Vec2<int>(16, 16);
         }
     }
 }
 
 void CustomCrosshair::cleanupTextures() {
-    for (auto& pair : crosshairTextures) {
-        if (pair.second) {
-            ID3D11ShaderResourceView* srv = (ID3D11ShaderResourceView*)pair.second;
-            srv->Release();
-        }
-    }
+
     crosshairTextures.clear();
     crosshairSizes.clear();
 
     if (defaultCrosshairTexture) {
-        ID3D11ShaderResourceView* srv = (ID3D11ShaderResourceView*)defaultCrosshairTexture;
-        srv->Release();
-        defaultCrosshairTexture = 0;
+        defaultCrosshairTexture = nullptr;
     }
 }
 
@@ -296,9 +289,9 @@ void CustomCrosshair::renderImGuiCrosshair() {
     if (!crosshairTexture) {
         if (SwapchainHook::isDX12) {
             if (!defaultCrosshairTextureDX12) loadDefaultCrosshairTextureDX12();
-            crosshairTexture = (ImTextureID)defaultCrosshairTextureDX12;
+            crosshairTexture = reinterpret_cast<ImTextureID>(defaultCrosshairTextureDX12.get());
         } else {
-            crosshairTexture = defaultCrosshairTexture;
+            crosshairTexture = reinterpret_cast<ImTextureID>(defaultCrosshairTexture.get());
         }
         crosshairPixelSize = defaultCrosshairSize;
     }
@@ -309,7 +302,8 @@ void CustomCrosshair::renderImGuiCrosshair() {
     Vec2<float> crosshairSize = Vec2<float>(crosshairPixelSize.x * scale, crosshairPixelSize.y * scale);
 
     ImVec2 screenCenter = ImVec2(ImGui::GetIO().DisplaySize.x * 0.5f, ImGui::GetIO().DisplaySize.y * 0.5f);
-    ImVec2 crosshairPos = ImVec2(screenCenter.x - crosshairSize.x * 0.5f, screenCenter.y - crosshairSize.y * 0.5f);
+    // Round to integer pixel coordinates for crisp rendering
+    ImVec2 crosshairPos = ImVec2(floorf(screenCenter.x - crosshairSize.x * 0.5f), floorf(screenCenter.y - crosshairSize.y * 0.5f));
 
     auto useSolidColor = settings.getSettingByName<bool>("solidColor")->value;
     auto useSolidColorWhenHighlighted = settings.getSettingByName<bool>("solidColorWhenHighlighted")->value;
@@ -323,9 +317,6 @@ void CustomCrosshair::renderImGuiCrosshair() {
         tintColor = IM_COL32(color.r * 255, color.g * 255, color.b * 255, color.a * 255);
     }
 
-    static ID3D11SamplerState* pointSampler = nullptr;
-    static ID3D11SamplerState* linearSampler = nullptr;
-
     if (!pointSampler) {
         D3D11_SAMPLER_DESC samplerDesc = {};
         samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
@@ -335,44 +326,31 @@ void CustomCrosshair::renderImGuiCrosshair() {
         samplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
         samplerDesc.MinLOD = 0;
         samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
-        SwapchainHook::d3d11Device->CreateSamplerState(&samplerDesc, &pointSampler);
-    }
-
-    if (!linearSampler) {
-        D3D11_SAMPLER_DESC samplerDesc = {};
-        samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-        samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-        samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-        samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-        samplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
-        samplerDesc.MinLOD = 0;
-        samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
-        SwapchainHook::d3d11Device->CreateSamplerState(&samplerDesc, &linearSampler);
+        SwapchainHook::d3d11Device->CreateSamplerState(&samplerDesc, pointSampler.put());
     }
 
     if (!isRenderingSafe) return;
 
+    if (!isRenderingSafe) return; // Final safety check before drawing
+
     ImDrawList* drawList = ImGui::GetBackgroundDrawList();
 
-    drawList->AddCallback([](const ImDrawList* parent_list, const ImDrawCmd* cmd) {
-        static ID3D11SamplerState* pointSampler = nullptr;
-        if (!pointSampler) {
-            D3D11_SAMPLER_DESC samplerDesc = {};
-            samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
-            samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
-            samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
-            samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
-            samplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
-            samplerDesc.MinLOD = 0;
-            samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
-            SwapchainHook::d3d11Device->CreateSamplerState(&samplerDesc, &pointSampler);
-        }
+    if (!SwapchainHook::isDX12) {
+        // DX11: Use class-level sampler in callback for proper resource management
+        drawList->AddCallback([](const ImDrawList* parent_list, const ImDrawCmd* cmd) {
+            ID3D11SamplerState* sampler = CustomCrosshair::pointSampler.get();
+            SwapchainHook::context->PSSetSamplers(0, 1, &sampler);
 
+        }, nullptr);
+    } else {
+        // DX12: Use the new dynamic sampler system from ImGui backend
+        drawList->AddCallback([](const ImDrawList* parent_list, const ImDrawCmd* cmd) {
+            auto cmdlist = SwapchainHook::d3d12CommandList.get();
+            auto pointSamplerHandle = ImGui_ImplDX12_GetPointSamplerHandle();
+            cmdlist->SetGraphicsRootDescriptorTable(2, pointSamplerHandle);  // Slot 2 is now the sampler table
+        }, nullptr);
 
-        if (pointSampler &&  SwapchainHook::context) {
-             SwapchainHook::context->PSSetSamplers(0, 1, &pointSampler);
-        }
-    }, nullptr);
+    }
 
     drawList->AddImage(
         crosshairTexture,
@@ -382,26 +360,19 @@ void CustomCrosshair::renderImGuiCrosshair() {
         tintColor
     );
 
+    // Reset to default rendering state
     if (!SwapchainHook::isDX12) {
+        drawList->AddCallback(ImDrawCallback_ResetRenderState, nullptr);
+    } else {
+        // DX12: Restore linear sampler for subsequent draws (e.g., fonts)
         drawList->AddCallback([](const ImDrawList* parent_list, const ImDrawCmd* cmd) {
-            static ID3D11SamplerState* linearSampler = nullptr;
-            if (!linearSampler) {
-                D3D11_SAMPLER_DESC samplerDesc = {};
-                samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-                samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-                samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-                samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-                samplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
-                samplerDesc.MinLOD = 0;
-                samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
-                SwapchainHook::d3d11Device->CreateSamplerState(&samplerDesc, &linearSampler);
-            }
-
-            if (linearSampler && SwapchainHook::context) {
-                SwapchainHook::context->PSSetSamplers(0, 1, &linearSampler);
-            }
+            auto cmdlist = SwapchainHook::d3d12CommandList.get();
+            auto linearSamplerHandle = ImGui_ImplDX12_GetLinearSamplerHandle();
+            cmdlist->SetGraphicsRootDescriptorTable(2, linearSamplerHandle);  // Restore linear sampler
         }, nullptr);
     }
+
+
 }
 
 void CustomCrosshair::invalidateCrosshairTexture(const std::string& crosshairName) {
@@ -410,14 +381,13 @@ void CustomCrosshair::invalidateCrosshairTexture(const std::string& crosshairNam
         if (SwapchainHook::isDX12) {
             auto dx12It = crosshairTexturesDX12.find(crosshairName);
             if (dx12It != crosshairTexturesDX12.end()) {
-                if (dx12It->second) {
-                    dx12It->second->Release();
+                if (dx12It->second.second) {
+                    dx12It->second.second->Release();
                 }
                 crosshairTexturesDX12.erase(dx12It);
             }
         } else {
-            ID3D11ShaderResourceView* srv = (ID3D11ShaderResourceView*)it->second;
-            srv->Release();
+            it->second = nullptr;
         }
         crosshairTextures.erase(it);
     }
@@ -431,9 +401,9 @@ ImTextureID CustomCrosshair::loadCrosshairTextureDX12(const std::string& crossha
         return 0;
     }
 
-    auto it = crosshairTextures.find(crosshairName);
-    if (it != crosshairTextures.end()) {
-        return it->second;
+    auto it = crosshairTexturesDX12.find(crosshairName);
+    if (it != crosshairTexturesDX12.end()) {
+        return it->second.first;
     }
 
     if (!SwapchainHook::d3d12Device5 || !SwapchainHook::d3d12DescriptorHeapImGuiRender) {
@@ -443,16 +413,14 @@ ImTextureID CustomCrosshair::loadCrosshairTextureDX12(const std::string& crossha
     D3D12_CPU_DESCRIPTOR_HANDLE cpu;
     D3D12_GPU_DESCRIPTOR_HANDLE gpu;
 
-    UINT descriptorId = (std::hash<std::string>{}(crosshairName) % 100) + 300;
-
-    if (!SwapchainHook::AllocateImageDescriptor(descriptorId, &cpu, &gpu)) {
+    if (!SwapchainHook::AllocateImageDescriptor(SwapchainHook::nextAvailableDescriptorIndex, &cpu, &gpu)) {
         return 0;
     }
 
     ID3D12Resource* texture = nullptr;
     if (FlarialGUI::LoadImageFromFile(filePath, cpu, &texture)) {
-        crosshairTextures[crosshairName] = (ImTextureID)gpu.ptr;
-        crosshairTexturesDX12[crosshairName] = texture;
+        crosshairTexturesDX12[crosshairName].first = (ImTextureID)gpu.ptr;
+        crosshairTexturesDX12[crosshairName].second.attach(texture);
 
         auto chIt = crosshairs.find(crosshairName);
         if (chIt != crosshairs.end() && chIt->second != nullptr) {
@@ -475,7 +443,7 @@ void CustomCrosshair::loadDefaultCrosshairTextureDX12() {
     D3D12_CPU_DESCRIPTOR_HANDLE cpu;
     D3D12_GPU_DESCRIPTOR_HANDLE gpu;
 
-    if (!SwapchainHook::AllocateImageDescriptor(299, &cpu, &gpu)) {
+    if (!SwapchainHook::AllocateImageDescriptor(SwapchainHook::nextAvailableDescriptorIndex, &cpu, &gpu)) {
         return;
     }
 
@@ -568,22 +536,19 @@ void CustomCrosshair::loadDefaultCrosshairTextureDX12() {
     srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
     SwapchainHook::d3d12Device5->CreateShaderResourceView(pTexture.get(), &srvDesc, cpu);
 
-    defaultCrosshairTextureDX12 = pTexture.detach();
+    defaultCrosshairTextureDX12 = pTexture;
     defaultCrosshairSize = Vec2<int>(16, 16);
 }
 
 void CustomCrosshair::cleanupTexturesDX12() {
+
     for (auto& pair : crosshairTexturesDX12) {
-        if (pair.second) {
-            pair.second->Release();
+        if (pair.second.second) {
+            pair.second.second = nullptr;
         }
     }
     crosshairTexturesDX12.clear();
-
-    if (defaultCrosshairTextureDX12) {
-        defaultCrosshairTextureDX12->Release();
-        defaultCrosshairTextureDX12 = nullptr;
-    }
+    defaultCrosshairTextureDX12 = nullptr;
 }
 
 void CustomCrosshair::reinitializeAfterResize() {
@@ -593,9 +558,12 @@ void CustomCrosshair::reinitializeAfterResize() {
     crosshairSizes.clear();
     crosshairTexturesDX12.clear();
 
-    defaultCrosshairTexture = 0;
+    defaultCrosshairTexture = nullptr;
     defaultCrosshairTextureDX12 = nullptr;
+
+    pointSampler = nullptr;
 }
+
 
 void CustomCrosshair::cleanupSamplerStates() {
 
