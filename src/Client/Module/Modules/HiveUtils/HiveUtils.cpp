@@ -15,6 +15,7 @@ void HiveUtils::onDisable() {
 }
 
 void HiveUtils::defaultConfig() {
+    getKeybind();
     Module::defaultConfig("core");
     setDef("map", (std::string)"");
     setDef("ReQ", true);
