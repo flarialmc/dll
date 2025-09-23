@@ -565,7 +565,6 @@ void TabList::defaultConfig() {
 
 void TabList::onSetup() {
     keybindActions.clear();
-
     keybindActions.push_back([this](std::vector<std::any> args)-> std::any {
         if (SDK::getCurrentScreen() != "hud_screen" &&
             SDK::getCurrentScreen() != "zoom_screen" &&
@@ -1433,7 +1432,18 @@ void TabList::onRender(RenderEvent &event) {
                 }
                 
                 int PlatformIcons;
-                if (showPlatforms)
+    if (isHiveDetcted == false)
+    {
+        std::string serverIP = SDK::getServerIP();
+        if ((serverIP.find("hive") != std::string::npos ||
+             serverIP.find("inpvp") != std::string::npos ||
+             serverIP.find("play.enchanted") != std::string::npos ||
+             serverIP.find("play.lbsg") != std::string::npos)) {
+            FlarialGUI::Notify("Can't use Show Platforms on " + serverIP);
+            isHiveDetcted = true;
+        }
+    }
+                if (showPlatforms && !isHiveDetcted)
                 {
 switch (vecmap[i].buildPlatform){
                 case BuildPlatform::Google:
@@ -1444,9 +1454,6 @@ switch (vecmap[i].buildPlatform){
                 break;
                 case BuildPlatform::Uwp:
                     PlatformIcons = PlatformIcon[7];
-                break;
-                case BuildPlatform::Win32:
-                    PlatformIcons = PlatformIcon[8];
                 break;
                 case BuildPlatform::Sony:
                     PlatformIcons = PlatformIcon[11];
@@ -1459,9 +1466,6 @@ switch (vecmap[i].buildPlatform){
                 break;
                 case BuildPlatform::Linux:
                     PlatformIcons = PlatformIcon[15];
-                break;
-                case BuildPlatform::Unknown:
-                    PlatformIcons = PlatformIcon[-1];
                 break;
 }
             }
@@ -1523,7 +1527,7 @@ switch (vecmap[i].buildPlatform){
 
                     FlarialGUI::FlarialTextWithFont(vectab[i].textX, vectab[i].textY, String::StrToWStr(vectab[i].clearedName).c_str(), vectab[i].textWidth, keycardSize, alignments[getOps<std::string>("textalignment")], floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
                 } else {
-                    if (showPlatforms) {
+                    if (showPlatforms && !isHiveDetcted) {
                         if (refreshCache){
                         float lol2 = columnx[i / maxColumn] - vectab[i].pNameMetrics.x;
                         float trollOffset2 = keycardSize * (showHeads ? 1.0 : 0.3f);

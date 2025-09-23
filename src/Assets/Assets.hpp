@@ -175,9 +175,7 @@
 #define IDR_APPLE_LOGO_PNG             279
 #define IDR_ANDROID_LOGO_PNG           280
 #define IDR_WIN10_LOGO_PNG             281
-#define IDR_WIN10_32BIT_LOGO_PNG       282
-#define IDR_CHROMEOS_LOGO_PNG          283
-#define IDR_UNKNOWN_LOGO_PNG           284
+#define IDR_CHROMEOS_LOGO_PNG          282
 
 // MAKE SURE YOU ALWAYS UPDATE THIS!
 
