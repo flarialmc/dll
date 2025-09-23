@@ -178,6 +178,14 @@
 #define IDR_INSTANTDAMAGE_PNG          274
 #define IDR_SATURATION_PNG             275
 
+#define IDR_NX_LOGO_PNG                276
+#define IDR_SONY_LOGO_PNG              277
+#define IDR_XBOX_LOGO_PNG              278
+#define IDR_APPLE_LOGO_PNG             279
+#define IDR_ANDROID_LOGO_PNG           280
+#define IDR_WIN10_LOGO_PNG             281
+#define IDR_CHROMEOS_LOGO_PNG          282
+
 // MAKE SURE YOU ALWAYS UPDATE THIS!
 
 #define MAX_IMAGE_ID                   262
@@ -187,3 +195,4 @@
 #define IDR_PING_OKAY                  260
 #define IDR_PING_BAD                   261
 #define IDR_PING_QUIT                  262
+

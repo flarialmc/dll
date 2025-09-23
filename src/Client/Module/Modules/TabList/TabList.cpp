@@ -604,6 +604,7 @@ void TabList::defaultConfig() {
     setDef("maxColumn", 10);
     setDef("togglable", false);
     setDef("showHeads", true);
+    setDef("showPlatforms", true);
     setDef("textalignment", (std::string) "Left");
     setDef("textShadow", false);
     setDef("textShadowOffset", 0.003f);
@@ -618,7 +619,6 @@ void TabList::defaultConfig() {
 
 void TabList::onSetup() {
     keybindActions.clear();
-
     keybindActions.push_back([this](std::vector<std::any> args)-> std::any {
         if (SDK::getCurrentScreen() != "hud_screen" &&
             SDK::getCurrentScreen() != "zoom_screen" &&
@@ -647,6 +647,7 @@ void TabList::settingsRender(float settingsOffset) {
     addToggle("Togglable", "", "togglable");
     addToggle("Show Player Heads", "", "showHeads");
     addToggle("Player Count", "", "playerCount");
+    addToggle("Show Platforms", "", "showPlatforms");
     addSliderInt("Max Players per Column", "", "maxColumn", 30, 1);
     addToggle("World Name", "", "worldName");
     addToggle("Server Ping", "", "serverPing");
@@ -1140,6 +1141,7 @@ void TabList::onRender(RenderEvent &event) {
 
             std::string textAlignment = getOps<std::string>("textalignment");
             bool showHeads = getOps<bool>("showHeads");
+            bool showPlatforms = getOps<bool>("showPlatforms");
             bool alphaOrder = getOps<bool>("alphaOrder");
             bool flarialFirst = getOps<bool>("flarialFirst");
 
@@ -1351,7 +1353,6 @@ void TabList::onRender(RenderEvent &event) {
                 }
 
                 float xx = 0;
-
                 if (showHeads) {
                     // PLAYER HEAD START
                     const auto &skinImage = vecmap[i].playerSkin.mSkinImage;
@@ -1524,7 +1525,57 @@ void TabList::onRender(RenderEvent &event) {
                     }
                     // PLAYER HEAD END
                 }
-
+                
+                int PlatformIcons;
+                std::string serverIP = SDK::getServerIP();
+                if (showPlatforms)
+                {
+    if (isHiveDetcted == false)
+    {
+        if ((serverIP.find("hive") != std::string::npos ||
+             serverIP.find("inpvp") != std::string::npos ||
+             serverIP.find("play.enchanted") != std::string::npos ||
+             serverIP.find("play.lbsg") != std::string::npos)) {
+            FlarialGUI::Notify("Can't use Show Platforms on " + serverIP);
+            isHiveDetcted = true;
+        }
+    }
+    else
+    {
+        if (!(serverIP.find("hive") != std::string::npos ||
+             serverIP.find("inpvp") != std::string::npos ||
+             serverIP.find("play.enchanted") != std::string::npos ||
+             serverIP.find("play.lbsg") != std::string::npos)) {
+                isHiveDetcted = false;
+        }
+    }
+}
+                if (showPlatforms && !isHiveDetcted)
+                {
+switch (vecmap[i].buildPlatform){
+                case BuildPlatform::Google:
+                    PlatformIcons = PlatformIcon[1];
+                break;
+                case BuildPlatform::IOS:
+                    PlatformIcons = PlatformIcon[2];
+                break;
+                case BuildPlatform::Uwp:
+                    PlatformIcons = PlatformIcon[7];
+                break;
+                case BuildPlatform::Sony:
+                    PlatformIcons = PlatformIcon[11];
+                break;
+                case BuildPlatform::Nx:
+                    PlatformIcons = PlatformIcon[12];
+                break;
+                case BuildPlatform::Xbox:
+                    PlatformIcons = PlatformIcon[13];
+                break;
+                case BuildPlatform::Linux:
+                    PlatformIcons = PlatformIcon[15];
+                break;
+}
+            }
                 auto pit = std::ranges::find(APIUtils::onlineUsers, vectab[i].clearedName);
                 if (refreshCache) {
                     // Safely access columnx with bounds checking to prevent crashes
@@ -1533,7 +1584,7 @@ void TabList::onRender(RenderEvent &event) {
                     vectab[i].pNameMetrics = FlarialGUI::getFlarialTextSize(String::StrToWStr(vectab[i].clearedName).c_str(), columnWidth - (0.825 * keycardSize), keycardSize, alignments[getOps<std::string>("textalignment")], floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, true);
                     vectab[i].textWidth = columnWidth - (0.825 * keycardSize);
                 }
-
+                
                 if (pit != APIUtils::onlineUsers.end()) {
                     // FLARIAL TAG START
                     static float p1 = 0.175;
@@ -1588,6 +1639,22 @@ void TabList::onRender(RenderEvent &event) {
 
                     FlarialGUI::FlarialTextWithFont(vectab[i].textX, vectab[i].textY, String::StrToWStr(vectab[i].clearedName).c_str(), vectab[i].textWidth, keycardSize, alignments[getOps<std::string>("textalignment")], floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
                 } else {
+                    if (showPlatforms && !isHiveDetcted) {
+                        if (refreshCache){
+                        float lol2 = columnx[i / maxColumn] - vectab[i].pNameMetrics.x;
+                        float trollOffset2 = keycardSize * (showHeads ? 1.0 : 0.3f);
+
+                        if (!showHeads && textAlignment == "Center") trollOffset2 -= keycardSize * 1.75f;
+
+                        vectab[i].imageRect = D2D1::RectF(
+                            fakex + Constraints::SpacingConstraint(0.175, keycardSize) + trollOffset2 + (textAlignment == "Center" ? (lol2 / 2.f) - trollOffset2 * 0.75f : 0.f),
+                            realcenter.y + Constraints::SpacingConstraint(0.196, keycardSize) + Constraints::SpacingConstraint(0.17f, keycardSize),
+                            fakex + Constraints::SpacingConstraint(0.7, keycardSize) + trollOffset2 + (textAlignment == "Center" ? (lol2 / 2.f) - trollOffset2 * 0.75f : 0.f),
+                            realcenter.y + Constraints::SpacingConstraint(0.77, keycardSize) + Constraints::SpacingConstraint(0.17f, keycardSize));
+                        }
+                    FlarialGUI::image(PlatformIcons, vectab[i].imageRect);
+                    xx += Constraints::SpacingConstraint(0.6, keycardSize);
+                        }
                     if (getOps<bool>("textShadow")) {
                         if (refreshCache) {
                             vectab[i].textShadowY2 = (realcenter.y + Constraints::SpacingConstraint(0.12, keycardSize)) + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * getOps<float>("uiscale");
@@ -1603,11 +1670,10 @@ void TabList::onRender(RenderEvent &event) {
                         vectab[i].nfTextX = fakex + xx + keycardSize * (showHeads ? 1.2f : 0.5f);
                         vectab[i].nfTextY = realcenter.y + Constraints::SpacingConstraint(0.12, keycardSize);
                     }
-
+                    
                     FlarialGUI::FlarialTextWithFont(vectab[i].nfTextX, vectab[i].nfTextY, String::StrToWStr(vectab[i].clearedName).c_str(), vectab[i].textWidth, keycardSize, alignments[getOps<std::string>("textalignment")], floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
                 }
                 realcenter.y += Constraints::SpacingConstraint(0.70, keycardSize);
-
                 if ((i + 1) % maxColumn == 0) {
                     realcenter.y -= Constraints::SpacingConstraint(0.70, keycardSize) * maxColumn;
                     size_t columnIndex = i / maxColumn;
