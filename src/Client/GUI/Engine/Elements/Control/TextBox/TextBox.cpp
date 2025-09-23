@@ -180,6 +180,7 @@ std::string FlarialGUI::TextBox(int index, std::string& text, int limit, float x
 			mod->settings.deleteSetting(settingName);
 			mod->defaultConfig();
 			if (special == 2) text = std::to_string(mod->settings.getSettingByName<float>(settingName)->value);
+			else if (special == 3) text = std::to_string(mod->settings.getSettingByName<int>(settingName)->value);
 			else text = mod->settings.getSettingByName<std::string>(settingName)->value;
 			FlarialGUI::TextBoxes[index].text = text;
 		}
@@ -190,7 +191,7 @@ std::string FlarialGUI::TextBox(int index, std::string& text, int limit, float x
 
 		FlarialGUI::TextBoxes[index].isActive = true;
 		FlarialGUI::TextCursorPosition = 0;
-		if (special == 2 && Client::settings.getSettingByName<bool>("clearTextBoxWhenClicked")->value) FlarialGUI::TextBoxes[index].text = "";
+		if ((special == 2 || special == 3) && Client::settings.getSettingByName<bool>("clearTextBoxWhenClicked")->value) FlarialGUI::TextBoxes[index].text = "";
 
 	}
 	else if (!CursorInRect(x, y, width, height) && MC::mouseAction == MouseAction::Press &&
@@ -209,7 +210,7 @@ std::string FlarialGUI::TextBox(int index, std::string& text, int limit, float x
 	}
 
 	if (special == 1) FlarialGUI::TextBoxes[index].text = FlarialGUI::TextBoxes[index].text.substr(0, 6);
-	if (special == 2) FlarialGUI::TextBoxes[index].text = FlarialGUI::TextBoxes[index].text.substr(0, limit);
+	if (special == 2 || special == 3) FlarialGUI::TextBoxes[index].text = FlarialGUI::TextBoxes[index].text.substr(0, limit);
 	if ((size.x > (width - 0.35 * textWidth)) && !FlarialGUI::TextBoxes[index].text.empty() && special == 3) FlarialGUI::TextBoxes[index].text.pop_back();
 
 	return FlarialGUI::TextBoxes[index].text;

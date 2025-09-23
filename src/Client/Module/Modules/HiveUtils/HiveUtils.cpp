@@ -6,15 +6,18 @@
 
 void HiveUtils::onEnable() {
     Listen(this, PacketEvent, &HiveUtils::onPacketReceive)
+    Listen(this, KeyEvent, &HiveUtils::onKey)
     Module::onEnable();
 }
 
 void HiveUtils::onDisable() {
     Deafen(this, PacketEvent, &HiveUtils::onPacketReceive)
+    Deafen(this, KeyEvent, &HiveUtils::onKey)
     Module::onDisable();
 }
 
 void HiveUtils::defaultConfig() {
+    getKeybind();
     Module::defaultConfig("core");
     setDef("map", (std::string)"");
     setDef("ReQ", true);
@@ -40,7 +43,8 @@ void HiveUtils::defaultConfig() {
     setDef("noteaming", false);
     setDef("friendaccept", false);
     setDef("partyaccept", false);
-    
+    setDef("deathcountenabled", false);
+    setDef("deathcount", 5);
 }
 
 void HiveUtils::settingsRender(float settingsOffset) {
@@ -53,6 +57,7 @@ void HiveUtils::settingsRender(float settingsOffset) {
     addToggle("Auto re-queue ", "Find a new game when the current game is over", "ReQ");
     addToggle("Solo mode ", "Re-Q when you finish a game or die and can't respawn.\nNot recomended while in a party.", "solo");
     addToggle("Team Elimination", "Re-Q when the team your on is fully ELIMINATED.", "eliminated");
+    addKeybind("Requeue Keybind", "When setting, hold the new bind for 2 seconds.", "keybind", true);
 
     addHeader("Map avoider");
 
@@ -86,7 +91,6 @@ void HiveUtils::settingsRender(float settingsOffset) {
         }
     }
 
-
     addHeader("Murder Mystery");
     addToggle("Murderer", "Re Q when you get murderer", "murderer");
     addToggle("Sheriff", "Re Q when you get sheriff", "sheriff");
@@ -96,7 +100,9 @@ void HiveUtils::settingsRender(float settingsOffset) {
     addToggle("Hider", "Re Q when you get hider", "hider");
     addToggle("Seeker", "Re Q when you get seeker", "seeker");
 
-    addHeader("Deathrun");
+    addHeader("DeathRun");
+    addToggle("Death Limiter", "Re Q after specified amount of deaths", "deathcountenabled");
+    addConditionalSliderInt(getOps<bool>("deathcountenabled"), "Death Limiter: Amount of Deaths", "Configure the amount of deaths required here.", "deathcount", 100, 1);
     addToggle("Death", "Re Q when you get death", "death");
     addToggle("Runner", "Re Q when you get runner", "runner");
 
@@ -156,6 +162,18 @@ void HiveUtils::onPacketReceive(PacketEvent &event) {
     }
     if (id == MinecraftPacketIds::Text) {
         auto* pkt = reinterpret_cast<TextPacket*>(event.getPacket());
+        if (HiveModeCatcherListener::currentGame == "DR" and pkt->message == "§a§l» §r§bThe game has started! Run!") deaths = 0;
+        
+        if (getOps<bool>("deathcountenabled") and HiveModeCatcherListener::currentGame == "DR" and pkt->message == "§c§l» §r§cYou died!")
+        {
+            deaths++;
+            if (deaths > getOps<int>("deathcount"))
+            {
+                reQ();
+                FlarialGUI::Notify("Death count limit reached.");
+                deaths = 0;
+            }
+        }
         if (getOps<bool>("ReQ")) {
             //if(!module->getOps<bool>("solo")) {
             if (pkt->message == "§c§l» §r§c§lGame OVER!") {
@@ -305,8 +323,7 @@ void HiveUtils::onPacketReceive(PacketEvent &event) {
 
                 std::shared_ptr<Packet> packet = SDK::createPacket(77);
                 auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
-                command_packet->command = "/f accept " + pkt->message.substr(40, pkt->message.length() - 44);
-
+                command_packet->command = "/f accept \"" + pkt->message.substr(40, pkt->message.length() - 44) + "\"";
                 command_packet->origin.type = CommandOriginType::Player;
 
                 command_packet->InternalSource = true;
@@ -320,7 +337,7 @@ void HiveUtils::onPacketReceive(PacketEvent &event) {
 
                 std::shared_ptr<Packet> packet = SDK::createPacket(77);
                 auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
-                command_packet->command = "/p accept " + pkt->message.substr(6, pkt->message.length() - 40);
+                command_packet->command = "/p accept \"" + pkt->message.substr(6, pkt->message.length() - 40) + "\"";
 
                 command_packet->origin.type = CommandOriginType::Player;
 
@@ -334,9 +351,10 @@ void HiveUtils::onPacketReceive(PacketEvent &event) {
 }
 
 void HiveUtils::reQ() {
-    if (!this->isEnabled()) return;
+    std::string gm = HiveModeCatcherListener::fullgamemodename;
+    if (!this->isEnabled() or gm.empty() or gm.find("Hub") != std::string::npos) return;
     if (!getOps<bool>("hub")) {
-        FlarialGUI::Notify("Finding a new game of " + HiveModeCatcherListener::fullgamemodename);
+        FlarialGUI::Notify("Finding a new game of " + gm);
 
         std::shared_ptr<Packet> packet = SDK::createPacket(77);
         auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
@@ -360,4 +378,13 @@ void HiveUtils::reQ() {
 
         SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
     }
+}
+
+void HiveUtils::onKey(KeyEvent& event)
+{
+    if (!this->isEnabled()) return;
+    if (isKeybind(event.keys) && isKeyPartOfKeybind(event.key) &&
+        (SDK::getCurrentScreen() == "hud_screen" || SDK::getCurrentScreen() == "f3_screen" || SDK::getCurrentScreen() == "zoom_screen")
+    )
+        reQ();
 }

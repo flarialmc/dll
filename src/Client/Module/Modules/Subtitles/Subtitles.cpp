@@ -27,8 +27,11 @@ void Subtitles::defaultConfig() {
     setDef("lifetime", 1.5f);
     setDef("lineHeight", 1.f);
     setDef("rawMode", false);
-    setDef("removeUseless", false);
-    setDef("simplifySounds", false);
+    setDef("removeUseless", false); // TBD
+    setDef("simplifySounds", false); // TBD
+    setDef("disableAnimations", false);
+    setDef("limitSounds", false);
+    setDef("maxSounds", 6);
 }
 
 void Subtitles::settingsRender(float settingsOffset) {
@@ -48,6 +51,12 @@ void Subtitles::settingsRender(float settingsOffset) {
     extraPadding();
 
     addHeader("Main");
+    addSlider("Sound Lifetime", "", "lifetime", 5.0f);
+    addToggle("Limit Maximum no. of Sounds", "", "limitSounds");
+    addConditionalSliderInt(getOps<bool>("limitSounds"), "Max", "", "maxSounds", 20, 1);
+    addToggle("Disable Animations", "", "disableAnimations");
+    addConditionalToggle(!getOps<bool>("disableAnimations"), "Fade Out Effect", "", "lifetimeFade");
+
     defaultAddSettings("main");
     addDropdown("Anchor Subtitles", "", std::vector<std::string>{
                     "Top Left",
@@ -60,8 +69,6 @@ void Subtitles::settingsRender(float settingsOffset) {
                     "Bottom Center",
                     "Bottom Right"
                 }, "anchor", true);
-    addToggle("Fade Out Effect", "", "lifetimeFade");
-    addSlider("Sound Lifetime", "", "lifetime", 5.0f);
     extraPadding();
 
     addHeader("Text");
@@ -87,6 +94,21 @@ void Subtitles::settingsRender(float settingsOffset) {
 
     FlarialGUI::UnsetScrollView();
     resetPadding();
+}
+
+void Subtitles::updateSoundVec(std::vector<Sound> &soundVec, float diff) {
+    double microTime = Utils::Microtime();
+    std::erase_if(soundVec, [microTime, diff](const Sound &obj) {
+        return (microTime - obj.timestamp) > diff;
+    });
+
+    if (getOps<bool>("limitSounds")) {
+        int maxSounds = getOps<int>("maxSounds");
+        while (soundVec.size() > maxSounds) {
+            soundVec.erase(soundVec.begin());
+        }
+    }
+
 }
 
 void Subtitles::onSoundEnginePlay(SoundEnginePlayEvent &event) {
@@ -188,24 +210,38 @@ void Subtitles::onRender(RenderEvent &event) {
     targetRectWidth = longestStringWidth + widthPadding;
     targetRectHeight = (realTextHeight * soundList.size()) + heightPadding;
 
-    // Initialize current dimensions on first run
-    if (currentRectWidth == 0.0f && currentRectHeight == 0.0f) {
-        currentRectWidth = targetRectWidth;
-        currentRectHeight = targetRectHeight;
-    }
-
-    // Lerp towards target dimensions (adjust 0.15f to control animation speed)
     float lerpSpeed = 0.15f;
-    currentRectWidth = lerp(currentRectWidth, targetRectWidth, lerpSpeed);
-    currentRectHeight = lerp(currentRectHeight, targetRectHeight, lerpSpeed);
 
-    // Update alpha values for each sound with same lerp speed
-    for (auto& sound : sounds) {
-        sound.currentAlpha = lerp(sound.currentAlpha, sound.targetAlpha, lerpSpeed);
+    float rectWidth;
+    float rectHeight;
+
+    if (!getOps<bool>("disableAnimations")) {
+        // Initialize current dimensions on first run
+        if (currentRectWidth == 0.0f && currentRectHeight == 0.0f) {
+            currentRectWidth = targetRectWidth;
+            currentRectHeight = targetRectHeight;
+        }
+
+        // Lerp towards target dimensions (adjust 0.15f to control animation speed)
+        currentRectWidth = lerp(currentRectWidth, targetRectWidth, lerpSpeed);
+        currentRectHeight = lerp(currentRectHeight, targetRectHeight, lerpSpeed);
+
+        // Update alpha values for each sound with same lerp speed
+        for (auto& sound : sounds) {
+            sound.currentAlpha = lerp(sound.currentAlpha, sound.targetAlpha, lerpSpeed);
+        }
+
+        rectWidth = currentRectWidth;
+        rectHeight = currentRectHeight;
     }
+    else {
+        rectWidth = targetRectWidth;
+        rectHeight = targetRectHeight;
 
-    float rectWidth = currentRectWidth;
-    float rectHeight = currentRectHeight;
+        for (auto& sound : sounds) {
+            sound.currentAlpha = 1.f;
+        }
+    }
 
     int index = 50; // dont let other modules interfere
 
@@ -328,7 +364,7 @@ void Subtitles::onRender(RenderEvent &event) {
         curCol.a *= sound.currentAlpha;
         curCol_S.a *= sound.currentAlpha;
 
-        if (getOps<bool>("lifetimeFade")) {
+        if (!getOps<bool>("disableAnimations") && getOps<bool>("lifetimeFade")) {
             float lifetimeFadeAlpha = 1.f - (Utils::Microtime() - sound.timestamp) / getOps<float>("lifetime");
             curCol.a *= lifetimeFadeAlpha;
             curCol_S.a *= lifetimeFadeAlpha;

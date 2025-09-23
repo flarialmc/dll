@@ -33,13 +33,6 @@ private:
 
     std::vector<Sound> sounds;
 
-    static void updateSoundVec(std::vector<Sound> &vec, float diff) {
-        double microTime = Utils::Microtime();
-        std::erase_if(vec, [microTime, diff](const Sound &obj) {
-            return (microTime - obj.timestamp) > diff;
-        });
-    }
-
     static float lerp(float a, float b, float t) {
         return a + t * (b - a);
     }
@@ -62,6 +55,8 @@ public:
 	void defaultConfig() override;
 
 	void settingsRender(float settingsOffset) override;
+
+    void updateSoundVec(std::vector<Sound>& soundVec, float diff);
 
     void onSoundEnginePlay(SoundEnginePlayEvent& event);
 

@@ -107,7 +107,7 @@ void ClickGUI::onPacketReceive(PacketEvent& event) {
     auto getPrefix = [&](const std::string& name)->std::optional<std::string> {
         for (const auto& [role, color] : roleColors)
             if (APIUtils::hasRole(role, name))
-                return std::format("{}{}{}", "§f[", color, "FLARIAL§f]§r ");
+                return std::format("{}{}{}", "§r§f[", color, "FLARIAL§f]§r ");
         return std::nullopt;
     };
 
