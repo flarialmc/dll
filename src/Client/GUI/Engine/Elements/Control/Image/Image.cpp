@@ -71,6 +71,61 @@ std::optional<ImageDataDX11> LoadImageDataDX11FromResource(int resourceId, LPCTS
     return result;
 }
 
+std::optional<ImageDataDX11> LoadImageDataDX11FromFile(const std::string& filePath) {
+    int width, height, channels;
+    unsigned char* image_data = stbi_load(filePath.c_str(), &width, &height, &channels, 4);
+    if (!image_data) return std::nullopt;
+
+    ImageDataDX11 result;
+    result.width = width;
+    result.height = height;
+    result.data.assign(image_data, image_data + (width * height * 4));
+    stbi_image_free(image_data);
+    return result;
+}
+
+bool FlarialGUI::LoadImageFromFile(const std::string& filePath, ID3D11ShaderResourceView** out_srv) {
+    if (!SwapchainHook::d3d11Device) return false;
+
+    // Load image data
+    auto image_data_opt = LoadImageDataDX11FromFile(filePath);
+    if (!image_data_opt) return false;
+    const auto& image_data = *image_data_opt;
+
+    // Create texture on main thread
+    D3D11_TEXTURE2D_DESC desc;
+    ZeroMemory(&desc, sizeof(desc));
+    desc.Width = image_data.width;
+    desc.Height = image_data.height;
+    desc.MipLevels = 1;
+    desc.ArraySize = 1;
+    desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    desc.SampleDesc.Count = 1;
+    desc.Usage = D3D11_USAGE_DEFAULT;
+    desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    desc.CPUAccessFlags = 0;
+
+    winrt::com_ptr<ID3D11Texture2D> pTexture;
+    D3D11_SUBRESOURCE_DATA subResource;
+    subResource.pSysMem = image_data.data.data();
+    subResource.SysMemPitch = desc.Width * 4;
+    subResource.SysMemSlicePitch = 0;
+    HRESULT r = SwapchainHook::d3d11Device->CreateTexture2D(&desc, &subResource, pTexture.put());
+    if (FAILED(r)) return false;
+
+    // Create shader resource view
+    D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+    ZeroMemory(&srvDesc, sizeof(srvDesc));
+    srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.Texture2D.MipLevels = desc.MipLevels;
+    srvDesc.Texture2D.MostDetailedMip = 0;
+    r = SwapchainHook::d3d11Device->CreateShaderResourceView(pTexture.get(), &srvDesc, out_srv);
+    if (FAILED(r)) return false;
+
+    return true;
+}
+
 bool FlarialGUI::LoadImageFromResource(int resourceId, ID3D11ShaderResourceView** out_srv, LPCTSTR type) {
     // Load image data on a background thread
     auto future = std::async(std::launch::async, LoadImageDataDX11FromResource, resourceId, type);

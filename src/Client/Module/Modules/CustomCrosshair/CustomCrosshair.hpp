@@ -8,11 +8,16 @@
 
 #include "Events/Game/PerspectiveEvent.hpp"
 #include "Events/Render/HudCursorRendererRenderEvent.hpp"
-
+#include "Events/Game/TickEvent.hpp"
 
 #include "Events/Game/PerspectiveEvent.hpp"
 #include "Utils/Render/PositionUtils.hpp"
 #include <filesystem>
+#include <map>
+#include <atomic>
+#include <d3d11.h>
+#define IMGUI_DEFINE_MATH_OPERATORS
+#include <imgui/imgui.h>
 
 
 class CrosshairImage
@@ -38,6 +43,22 @@ private:
 	std::string CurrentSelectedCrosshair;
 	std::string CrosshairText = "";
 	bool actuallyRenderWindow = false;
+
+	// Thread-safe cached values
+	bool isHoveringEntity = false;
+	bool isValidPlayer = false;
+	bool isHudScreen = false;
+
+	// Safety flag to prevent crashes during disable
+	std::atomic<bool> isRenderingSafe = true;
+
+public:
+	std::map<std::string, ImTextureID> crosshairTextures;
+	std::map<std::string, Vec2<int>> crosshairSizes;
+
+private:
+	ImTextureID defaultCrosshairTexture = 0;
+	Vec2<int> defaultCrosshairSize = Vec2<int>(16, 16);
 public:
 	CustomCrosshair() : Module("Custom Crosshair", "Allows for dynamic crosshair colors.",
 		IDR_CROSSHAIR_PNG, "") {
@@ -59,5 +80,16 @@ public:
 
 	void onHudCursorRendererRender(HudCursorRendererRenderEvent& event);
 
+	void onTick(TickEvent& event);
+
 	void onRender(RenderEvent &event);
+
+	void invalidateCrosshairTexture(const std::string& crosshairName);
+
+private:
+	ImTextureID loadCrosshairTexture(const std::string& crosshairName);
+	void loadDefaultCrosshairTexture();
+	void cleanupTextures();
+	void renderImGuiCrosshair();
+	static void cleanupSamplerStates();
 };

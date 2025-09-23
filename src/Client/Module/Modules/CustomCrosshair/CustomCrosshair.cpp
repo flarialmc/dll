@@ -2,10 +2,15 @@
 #include "Client.hpp"
 
 #include "Utils/Render/PositionUtils.hpp"
+#include "GUI/Engine/Engine.hpp"
+#include "Hook/Hooks/Render/DirectX/DXGI/SwapchainHook.hpp"
+#include <thread>
+#include <chrono>
 
 void CustomCrosshair::onEnable() {
     Listen(this, PerspectiveEvent, &CustomCrosshair::onGetViewPerspective)
     Listen(this, HudCursorRendererRenderEvent, &CustomCrosshair::onHudCursorRendererRender)
+    Listen(this, TickEvent, &CustomCrosshair::onTick)
     Listen(this, RenderEvent, &CustomCrosshair::onRender)
     Module::onEnable();
 
@@ -23,16 +28,37 @@ void CustomCrosshair::onEnable() {
 
     }
 
-    std::cout << crosshairs.empty() << std::endl;
 
     if (crosshairs.empty()) crosshairs["Crosshair1"] = new CrosshairImage();
+
+    loadDefaultCrosshairTexture();
 }
 
 void CustomCrosshair::onDisable() {
+
+    isRenderingSafe = false;
+
     Deafen(this, PerspectiveEvent, &CustomCrosshair::onGetViewPerspective)
     Deafen(this, HudCursorRendererRenderEvent, &CustomCrosshair::onHudCursorRendererRender)
+    Deafen(this, TickEvent, &CustomCrosshair::onTick)
     Deafen(this, RenderEvent, &CustomCrosshair::onRender)
+
+    // Small delay to ensure any ongoing render operations complete
+    std::this_thread::sleep_for(std::chrono::milliseconds(16));
+
+    cleanupTextures();
+
+    for (auto& pair : crosshairs) {
+        delete pair.second;
+    }
+    crosshairs.clear();
+
+    cleanupSamplerStates();
+
     Module::onDisable();
+
+    // Re-enable rendering for next time module is enabled
+    isRenderingSafe = true;
 }
 
 void CustomCrosshair::defaultConfig() {
@@ -111,93 +137,37 @@ void CustomCrosshair::onGetViewPerspective(PerspectiveEvent &event) {
     currentPerspective = event.getPerspective();
 }
 
-void CustomCrosshair::onHudCursorRendererRender(HudCursorRendererRenderEvent &event) {
+void CustomCrosshair::onTick(TickEvent &event) {
     if (!this->isEnabled()) return;
-    if (!SDK::clientInstance) return;
-    auto player = SDK::clientInstance->getLocalPlayer();
-    if (!player) return;
-    if (SDK::getCurrentScreen() != "hud_screen") return;
 
-    auto renderInThirdPerson = settings.getSettingByName<bool>("renderInThirdPerson")->value;
-    if (!renderInThirdPerson && currentPerspective != Perspective::FirstPerson) return;
-    bool isHoveringEnemy = (player->getLevel()->getHitResult().type == HitResultType::Entity);
 
-    bool isDefault = !settings.getSettingByName<bool>("CustomCrosshair")->value;
+    if (SDK::clientInstance) {
+        auto player = SDK::clientInstance->getLocalPlayer();
+        if (player) {
+            isValidPlayer = true;
 
-    auto screenContext = event.getMinecraftUIRenderContext()->getScreenContext();
+            if (isHudScreen) {
+                isHoveringEntity = (player->getLevel()->getHitResult().type == HitResultType::Entity);
+            }
+        }
+    }
+}
 
-    const ResourceLocation loc("textures/ui/cross_hair", false);
-    TexturePtr ptr = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc, false);
-    if (ptr.clientTexture == nullptr || ptr.clientTexture->clientTexture.resourcePointerBlock == nullptr) {
+void CustomCrosshair::onHudCursorRendererRender(HudCursorRendererRenderEvent &event) {
+    if (!this->isEnabled() || !isRenderingSafe) return;
+    if (!isValidPlayer || !isHudScreen) return;
+
+    bool useCustomCrosshair = settings.getSettingByName<bool>("CustomCrosshair")->value;
+    if (useCustomCrosshair) {
+        event.cancel();
         return;
     }
 
-    TexturePtr ptr2;
-
-    if (std::filesystem::exists(
-        Utils::getClientPath() + "//Crosshairs//" + settings.getSettingByName<std::string>("CurrentCrosshair")->value +
-        ".png")) {
-        const ResourceLocation loc2(
-            Utils::getClientPath() + "//Crosshairs//" + settings.getSettingByName<std::string>("CurrentCrosshair")->
-            value + ".png", true);
-        ptr2 = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc2, CrosshairReloaded);
-        CrosshairReloaded = false;
-        if (ptr2.clientTexture == nullptr || ptr2.clientTexture->clientTexture.resourcePointerBlock == nullptr) {
-            isDefault = true;
-        }
-    } else {
-        isDefault = true;
-    }
-
-    const auto tess = screenContext->getTessellator();
-
-    tess->begin(mce::PrimitiveMode::QuadList, 4);
-
-    D2D1_COLOR_F color = isHoveringEnemy && getOps<bool>("highlightOnEntity") ? getColor("enemy") : getColor("default");
-
-    tess->color(color.r, color.g, color.b, color.a);
-
-    Vec2<float> size = Vec2<float>(16, 16);
-    auto scale = settings.getSettingByName<float>("uiscale")->value;
-
-    Vec2<float> sizeUnscaled = PositionUtils::getScreenScaledPos(size);
-
-    Vec2<float> sizeScaled = sizeUnscaled.mul(scale);
-
-    auto SizeToUse = isDefault ? sizeUnscaled : sizeScaled;
-
-    Vec2<float> pos = PositionUtils::getScaledPos(Vec2<float>((MC::windowSize.x / 2) - (SizeToUse.x / 2),
-                                                              (MC::windowSize.y / 2) - (SizeToUse.y / 2)));
-
-    auto useSolidColor = settings.getSettingByName<bool>("solidColor")->value;
-    auto useSolidColorWhenHighlighted = settings.getSettingByName<bool>("solidColorWhenHighlighted")->value;
-
-    bool useSolid = false;
-
-    if (isHoveringEnemy && getOps<bool>("highlightOnEntity") && useSolidColorWhenHighlighted || (!isHoveringEnemy && useSolidColor)) {
-        useSolid = true;
-    }
-
-    mce::MaterialPtr *material = useSolid ? MaterialUtils::getUITextured() : MaterialUtils::getUICrosshair();
-
-    if (isDefault) {
-        // Pack crosshairs have textures placed whereever so this will figure it out
-        IntRectangle rect = IntRectangle(pos.x, pos.y, size.x, size.y);
-        ScreenRenderer::blit(screenContext, &ptr, &rect, material);
-    } else {
-        size = size.mul(scale);
-        tess->vertexUV(pos.x, pos.y + size.y, 0.f, 0.f, 1.f);
-        tess->vertexUV(pos.x + size.x, pos.y + size.y, 0.f, 1.f, 1.f);
-        tess->vertexUV(pos.x + size.x, pos.y, 0.f, 1.f, 0.f);
-        tess->vertexUV(pos.x, pos.y, 0.f, 0.f, 0.f);
-        MeshHelpers::renderMeshImmediately2(screenContext, tess, material, *ptr2.clientTexture);
-    }
-
-    event.cancel();
 }
 
 void CustomCrosshair::onRender(RenderEvent &event) {
     if (!this->isEnabled()) return;
+    isHudScreen = (SDK::getCurrentScreen() == "hud_screen");
     if (actuallyRenderWindow)
         CrosshairEditorWindow();
     else {
@@ -205,4 +175,232 @@ void CustomCrosshair::onRender(RenderEvent &event) {
     }
     actuallyRenderWindow = false;
     if (!blankWindow) CurrentSelectedCrosshair = settings.getSettingByName<std::string>("CurrentCrosshair")->value;
+
+    renderImGuiCrosshair();
+}
+
+ImTextureID CustomCrosshair::loadCrosshairTexture(const std::string& crosshairName) {
+    std::string filePath = Utils::getClientPath() + "\\Crosshairs\\" + crosshairName + ".png";
+
+    if (!std::filesystem::exists(filePath)) {
+        return 0;
+    }
+
+    auto it = crosshairTextures.find(crosshairName);
+    if (it != crosshairTextures.end()) {
+        return it->second;
+    }
+
+    ID3D11ShaderResourceView* texture = nullptr;
+    if (FlarialGUI::LoadImageFromFile(filePath, &texture)) {
+        crosshairTextures[crosshairName] = (ImTextureID)texture;
+
+        auto chIt = crosshairs.find(crosshairName);
+        if (chIt != crosshairs.end() && chIt->second != nullptr) {
+            crosshairSizes[crosshairName] = Vec2<int>(chIt->second->Size, chIt->second->Size);
+        } else {
+            crosshairSizes[crosshairName] = Vec2<int>(16, 16);
+        }
+
+        return (ImTextureID)texture;
+    }
+
+    return 0;
+}
+
+void CustomCrosshair::loadDefaultCrosshairTexture() {
+    if (!SwapchainHook::d3d11Device) return;
+
+    std::vector<unsigned char> blankData(16 * 16 * 4, 0);
+
+    D3D11_TEXTURE2D_DESC desc = {};
+    desc.Width = 16;
+    desc.Height = 16;
+    desc.MipLevels = 1;
+    desc.ArraySize = 1;
+    desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    desc.SampleDesc.Count = 1;
+    desc.Usage = D3D11_USAGE_DEFAULT;
+    desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    desc.CPUAccessFlags = 0;
+
+    D3D11_SUBRESOURCE_DATA initData = {};
+    initData.pSysMem = blankData.data();
+    initData.SysMemPitch = 16 * 4;
+
+    winrt::com_ptr<ID3D11Texture2D> texture;
+    if (SUCCEEDED(SwapchainHook::d3d11Device->CreateTexture2D(&desc, &initData, texture.put()))) {
+        D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+        srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+        srvDesc.Texture2D.MipLevels = 1;
+
+        ID3D11ShaderResourceView* srv = nullptr;
+        if (SUCCEEDED(SwapchainHook::d3d11Device->CreateShaderResourceView(texture.get(), &srvDesc, &srv))) {
+            defaultCrosshairTexture = (ImTextureID)srv;
+            defaultCrosshairSize = Vec2<int>(16, 16);
+        }
+    }
+}
+
+void CustomCrosshair::cleanupTextures() {
+    for (auto& pair : crosshairTextures) {
+        if (pair.second) {
+            ID3D11ShaderResourceView* srv = (ID3D11ShaderResourceView*)pair.second;
+            srv->Release();
+        }
+    }
+    crosshairTextures.clear();
+    crosshairSizes.clear();
+
+    if (defaultCrosshairTexture) {
+        ID3D11ShaderResourceView* srv = (ID3D11ShaderResourceView*)defaultCrosshairTexture;
+        srv->Release();
+        defaultCrosshairTexture = 0;
+    }
+}
+
+void CustomCrosshair::renderImGuiCrosshair() {
+    if (!isRenderingSafe || !isValidPlayer || !isHudScreen) return;
+
+    auto renderInThirdPerson = settings.getSettingByName<bool>("renderInThirdPerson")->value;
+    if (!renderInThirdPerson && currentPerspective != Perspective::FirstPerson) return;
+
+    bool useCustomCrosshair = settings.getSettingByName<bool>("CustomCrosshair")->value;
+    if (!useCustomCrosshair) return;
+
+    D2D1_COLOR_F color = isHoveringEntity && getOps<bool>("highlightOnEntity") ? getColor("enemy") : getColor("default");
+
+    ImTextureID crosshairTexture = 0;
+    Vec2<int> crosshairPixelSize;
+    std::string currentCrosshair = settings.getSettingByName<std::string>("CurrentCrosshair")->value;
+
+    if (!isRenderingSafe) return; // Early exit if disabling
+
+    if (!currentCrosshair.empty()) {
+        crosshairTexture = loadCrosshairTexture(currentCrosshair);
+        if (crosshairTexture && isRenderingSafe) {
+            crosshairPixelSize = crosshairSizes[currentCrosshair];
+        }
+    }
+
+    if (!isRenderingSafe) return; // Check again before using default texture
+
+    if (!crosshairTexture) {
+        crosshairTexture = defaultCrosshairTexture;
+        crosshairPixelSize = defaultCrosshairSize;
+    }
+
+    if (!crosshairTexture || !isRenderingSafe) return;
+
+    float scale = settings.getSettingByName<float>("uiscale")->value;
+    Vec2<float> crosshairSize = Vec2<float>(crosshairPixelSize.x * scale, crosshairPixelSize.y * scale);
+
+    ImVec2 screenCenter = ImVec2(ImGui::GetIO().DisplaySize.x * 0.5f, ImGui::GetIO().DisplaySize.y * 0.5f);
+    ImVec2 crosshairPos = ImVec2(screenCenter.x - crosshairSize.x * 0.5f, screenCenter.y - crosshairSize.y * 0.5f);
+
+    auto useSolidColor = settings.getSettingByName<bool>("solidColor")->value;
+    auto useSolidColorWhenHighlighted = settings.getSettingByName<bool>("solidColorWhenHighlighted")->value;
+    bool useSolid = (isHoveringEntity && getOps<bool>("highlightOnEntity") && useSolidColorWhenHighlighted) ||
+                    (!isHoveringEntity && useSolidColor);
+
+    ImU32 tintColor;
+    if (useSolid) {
+        tintColor = IM_COL32(color.r * 255, color.g * 255, color.b * 255, color.a * 255);
+    } else {
+        tintColor = IM_COL32(color.r * 255, color.g * 255, color.b * 255, color.a * 255);
+    }
+
+    static ID3D11SamplerState* pointSampler = nullptr;
+    static ID3D11SamplerState* linearSampler = nullptr;
+
+    if (!pointSampler) {
+        D3D11_SAMPLER_DESC samplerDesc = {};
+        samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+        samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+        samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+        samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+        samplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+        samplerDesc.MinLOD = 0;
+        samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+        SwapchainHook::d3d11Device->CreateSamplerState(&samplerDesc, &pointSampler);
+    }
+
+    if (!linearSampler) {
+        D3D11_SAMPLER_DESC samplerDesc = {};
+        samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+        samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+        samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+        samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+        samplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+        samplerDesc.MinLOD = 0;
+        samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+        SwapchainHook::d3d11Device->CreateSamplerState(&samplerDesc, &linearSampler);
+    }
+
+    if (!isRenderingSafe) return; // Final safety check before drawing
+
+    ImDrawList* drawList = ImGui::GetBackgroundDrawList();
+
+    drawList->AddCallback([](const ImDrawList* parent_list, const ImDrawCmd* cmd) {
+        static ID3D11SamplerState* pointSampler = nullptr;
+        if (!pointSampler) {
+            D3D11_SAMPLER_DESC samplerDesc = {};
+            samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+            samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+            samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+            samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+            samplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+            samplerDesc.MinLOD = 0;
+            samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+            SwapchainHook::d3d11Device->CreateSamplerState(&samplerDesc, &pointSampler);
+        }
+
+        winrt::com_ptr<ID3D11DeviceContext> ctx = SwapchainHook::context;
+        if (pointSampler && ctx) {
+            ctx->PSSetSamplers(0, 1, &pointSampler);
+        }
+    }, nullptr);
+
+    drawList->AddImage(
+        crosshairTexture,
+        crosshairPos,
+        ImVec2(crosshairPos.x + crosshairSize.x, crosshairPos.y + crosshairSize.y),
+        ImVec2(0, 0), ImVec2(1, 1),
+        tintColor
+    );
+
+    drawList->AddCallback([](const ImDrawList* parent_list, const ImDrawCmd* cmd) {
+        static ID3D11SamplerState* linearSampler = nullptr;
+        if (!linearSampler) {
+            D3D11_SAMPLER_DESC samplerDesc = {};
+            samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+            samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+            samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+            samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+            samplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+            samplerDesc.MinLOD = 0;
+            samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+            SwapchainHook::d3d11Device->CreateSamplerState(&samplerDesc, &linearSampler);
+        }
+
+        winrt::com_ptr<ID3D11DeviceContext> ctx = SwapchainHook::context;
+        if (linearSampler && ctx) {
+            ctx->PSSetSamplers(0, 1, &linearSampler);
+        }
+    }, nullptr);
+}
+
+void CustomCrosshair::invalidateCrosshairTexture(const std::string& crosshairName) {
+    auto it = crosshairTextures.find(crosshairName);
+    if (it != crosshairTextures.end()) {
+        ID3D11ShaderResourceView* srv = (ID3D11ShaderResourceView*)it->second;
+        srv->Release();
+        crosshairTextures.erase(it);
+    }
+    crosshairSizes.erase(crosshairName);
+}
+
+void CustomCrosshair::cleanupSamplerStates() {
+
 }

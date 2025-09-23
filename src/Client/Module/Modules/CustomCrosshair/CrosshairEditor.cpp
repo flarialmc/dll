@@ -233,6 +233,8 @@ void CustomCrosshair::CrosshairEditorWindow()
             for (auto& ch : crosshairs) {
                 if (ch.second != nullptr && !ch.first.empty()) {
                     ch.second->SaveImage(ch.first);
+
+                    invalidateCrosshairTexture(ch.first);
                 }
             }
 
@@ -248,6 +250,9 @@ void CustomCrosshair::CrosshairEditorWindow()
                 crosshair->SaveImage(settings.getSettingByName<std::string>("CurrentCrosshair")->value);
             }
             CrosshairReloaded = true;
+
+            invalidateCrosshairTexture(CurrentSelectedCrosshair);
+
             FlarialGUI::Notify("Loaded the crosshair: " + CurrentSelectedCrosshair);
         }
 
