@@ -166,7 +166,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
 
     static bool hooker = false;
-
+//
     if (!hooker && ((isDX12) || (!isDX12 && context))) {
         UnderUIHooks hook;
         hook.enableHook();
