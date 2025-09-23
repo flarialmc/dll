@@ -34,30 +34,26 @@ cbuffer DepthOfFieldBuffer : register(b0)
     float focusRange;
     float focusDistance;
     float autoFocus;
-    float msaaLevel;
+    float useMSAADepth;
     float3 _padding;
 };
 
 SamplerState colorSampler : register(s0);
 SamplerState depthSampler : register(s1);
 
-Texture2D colorTexture : register(t0);
-Texture2D depthTexture : register(t1);
+Texture2D<float4> colorTexture : register(t0);
+Texture2D<float> depthTexture : register(t1);
 Texture2DMS<float> depthTextureMSAA : register(t2);
+Texture2DMS<float4> colorTextureMSAA : register(t3);
 
 float SampleDepth(float2 uv, int2 pixelCoord)
 {
-    if (msaaLevel < 0.5) {
-        return depthTexture.Sample(depthSampler, uv).r;
+    if (useMSAADepth < 0.5) {
+        return depthTexture.Sample(depthSampler, uv);
     } else {
-        uint width, height, sampleCount;
-        depthTextureMSAA.GetDimensions(width, height, sampleCount);
-
-        float depthSum = 0.0;
-        for (uint i = 0; i < sampleCount; i++) {
-            depthSum += depthTextureMSAA.Load(pixelCoord, i).r;
-        }
-        return depthSum / float(sampleCount);
+        // For performance, just sample the first MSAA sample instead of averaging all
+        // Depth of field doesn't require perfect depth accuracy
+        return depthTextureMSAA.Load(pixelCoord, 0);
     }
 }
 
@@ -76,7 +72,8 @@ float CalculateCoC(float2 uv, float depth)
 
     if (autoFocus > 0.5) {
         float2 screenCenter = float2(0.5, 0.5);
-        int2 centerPixel = int2(screenCenter * resolution);
+        int2 centerPixel = int2(floor(screenCenter * resolution));
+        centerPixel = clamp(centerPixel, int2(0, 0), int2(resolution) - int2(1, 1));
         float centerDepth = SampleDepth(screenCenter, centerPixel);
         targetFocusDistance = LinearizeDepth(centerDepth);
     } else {
@@ -92,7 +89,8 @@ float CalculateCoC(float2 uv, float depth)
 float4 main(float4 screenSpace : SV_Position) : SV_TARGET
 {
     float2 uv = screenSpace.xy / resolution;
-    int2 pixelCoord = int2(screenSpace.xy);
+    int2 pixelCoord = int2(floor(screenSpace.xy));
+    pixelCoord = clamp(pixelCoord, int2(0, 0), int2(resolution) - int2(1, 1));
 
     float depth = SampleDepth(uv, pixelCoord);
     float coc = CalculateCoC(uv, depth);
@@ -127,30 +125,26 @@ cbuffer DepthOfFieldBuffer : register(b0)
     float focusRange;
     float focusDistance;
     float autoFocus;
-    float msaaLevel;
+    float useMSAADepth;
     float3 _padding;
 };
 
 SamplerState colorSampler : register(s0);
 SamplerState depthSampler : register(s1);
 
-Texture2D colorTexture : register(t0);
-Texture2D depthTexture : register(t1);
+Texture2D<float4> colorTexture : register(t0);
+Texture2D<float> depthTexture : register(t1);
 Texture2DMS<float> depthTextureMSAA : register(t2);
+Texture2DMS<float4> colorTextureMSAA : register(t3);
 
 float SampleDepth(float2 uv, int2 pixelCoord)
 {
-    if (msaaLevel < 0.5) {
-        return depthTexture.Sample(depthSampler, uv).r;
+    if (useMSAADepth < 0.5) {
+        return depthTexture.Sample(depthSampler, uv);
     } else {
-        uint width, height, sampleCount;
-        depthTextureMSAA.GetDimensions(width, height, sampleCount);
-
-        float depthSum = 0.0;
-        for (uint i = 0; i < sampleCount; i++) {
-            depthSum += depthTextureMSAA.Load(pixelCoord, i).r;
-        }
-        return depthSum / float(sampleCount);
+        // For performance, just sample the first MSAA sample instead of averaging all
+        // Depth of field doesn't require perfect depth accuracy
+        return depthTextureMSAA.Load(pixelCoord, 0);
     }
 }
 
@@ -169,7 +163,8 @@ float CalculateCoC(float2 uv, float depth)
 
     if (autoFocus > 0.5) {
         float2 screenCenter = float2(0.5, 0.5);
-        int2 centerPixel = int2(screenCenter * resolution);
+        int2 centerPixel = int2(floor(screenCenter * resolution));
+        centerPixel = clamp(centerPixel, int2(0, 0), int2(resolution) - int2(1, 1));
         float centerDepth = SampleDepth(screenCenter, centerPixel);
         targetFocusDistance = LinearizeDepth(centerDepth);
     } else {
@@ -185,7 +180,8 @@ float CalculateCoC(float2 uv, float depth)
 float4 main(float4 screenSpace : SV_Position) : SV_TARGET
 {
     float2 uv = screenSpace.xy / resolution;
-    int2 pixelCoord = int2(screenSpace.xy);
+    int2 pixelCoord = int2(floor(screenSpace.xy));
+    pixelCoord = clamp(pixelCoord, int2(0, 0), int2(resolution) - int2(1, 1));
 
     float depth = SampleDepth(uv, pixelCoord);
     float coc = CalculateCoC(uv, depth);
@@ -369,15 +365,7 @@ void DepthOfFieldHelper::RenderDepthOfField(ID3D11RenderTargetView* pDstRenderTa
     constantBuffer.focusRange = focusRange;
     constantBuffer.focusDistance = focusDistance;
     constantBuffer.autoFocus = autoFocus ? 1.0f : 0.0f;
-
-    if (isMSAADepth) {
-        if (msaaSampleCount == 2) constantBuffer.msaaLevel = 1.0f;
-        else if (msaaSampleCount == 4) constantBuffer.msaaLevel = 2.0f;
-        else if (msaaSampleCount == 8) constantBuffer.msaaLevel = 3.0f;
-        else constantBuffer.msaaLevel = 0.0f;
-    } else {
-        constantBuffer.msaaLevel = 0.0f;
-    }
+    constantBuffer.useMSAADepth = isMSAADepth ? 1.0f : 0.0f;
 
     XMFLOAT2 renderSize = XMFLOAT2(static_cast<float>(MC::windowSize.x), static_cast<float>(MC::windowSize.y));
 

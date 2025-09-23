@@ -12,7 +12,7 @@ struct DepthOfFieldInputBuffer
     float focusRange;
     float focusDistance;
     float autoFocus;
-    float msaaLevel;
+    float useMSAADepth;
     float _padding[3];
 };
 

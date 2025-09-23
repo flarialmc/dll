@@ -9,6 +9,8 @@ struct Sound {
     Vec3<float> pos;
     std::string formatted;
     double timestamp;
+    float currentAlpha = 0.0f;
+    float targetAlpha = 1.0f;
 
     [[nodiscard]] std::pair<std::string, std::string> getSides() const {
         Vec3<float> diff = SDK::clientInstance->getLocalPlayer()->getPosition()->sub(pos).normalize();
@@ -37,8 +39,16 @@ private:
             return (microTime - obj.timestamp) > diff;
         });
     }
+
+    static float lerp(float a, float b, float t) {
+        return a + t * (b - a);
+    }
 private:
     int prevYAlign = -1; // 0 top | 1 middle | 2 bottom
+    float currentRectWidth = 0.0f;
+    float currentRectHeight = 0.0f;
+    float targetRectWidth = 0.0f;
+    float targetRectHeight = 0.0f;
 
 public:
     Subtitles() : Module("Subtitles", "Adds Audio Subtitles.",

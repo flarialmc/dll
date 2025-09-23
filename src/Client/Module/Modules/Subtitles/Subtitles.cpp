@@ -101,7 +101,9 @@ void Subtitles::onSoundEnginePlay(SoundEnginePlayEvent &event) {
             event.name,
             event.pos,
             "",
-            Utils::Utils::Microtime()
+            Utils::Utils::Microtime(),
+            0.0f, // currentAlpha - start at 0 for fade-in
+            1.0f  // targetAlpha - fade to full opacity
         });
     }
 }
@@ -159,6 +161,10 @@ void Subtitles::onRender(RenderEvent &event) {
         if (!ClickGUI::editmenu) {
             s.formatted = std::format("{} {} {}", sides.first, a, sides.second);
             soundList.push_back(s);
+        } else {
+            // For edit menu, set full alpha
+            s.currentAlpha = 1.0f;
+            s.targetAlpha = 1.0f;
         }
 
         ImVec2 textMetrics = FlarialGUI::getFlarialTextSize(
@@ -179,8 +185,27 @@ void Subtitles::onRender(RenderEvent &event) {
     float heightPadding = (Constraints::SpacingConstraint(2.0, Constraints::SpacingConstraint(0.05f, textHeight)) * getOps<float>("rectheight"));
     float widthPadding = Constraints::SpacingConstraint(2.0, Constraints::SpacingConstraint(0.05f, textWidth)) * getOps<float>("rectwidth");
 
-    float rectWidth = longestStringWidth + widthPadding;
-    float rectHeight = (realTextHeight * soundList.size()) + heightPadding;
+    targetRectWidth = longestStringWidth + widthPadding;
+    targetRectHeight = (realTextHeight * soundList.size()) + heightPadding;
+
+    // Initialize current dimensions on first run
+    if (currentRectWidth == 0.0f && currentRectHeight == 0.0f) {
+        currentRectWidth = targetRectWidth;
+        currentRectHeight = targetRectHeight;
+    }
+
+    // Lerp towards target dimensions (adjust 0.15f to control animation speed)
+    float lerpSpeed = 0.15f;
+    currentRectWidth = lerp(currentRectWidth, targetRectWidth, lerpSpeed);
+    currentRectHeight = lerp(currentRectHeight, targetRectHeight, lerpSpeed);
+
+    // Update alpha values for each sound with same lerp speed
+    for (auto& sound : sounds) {
+        sound.currentAlpha = lerp(sound.currentAlpha, sound.targetAlpha, lerpSpeed);
+    }
+
+    float rectWidth = currentRectWidth;
+    float rectHeight = currentRectHeight;
 
     int index = 50; // dont let other modules interfere
 
@@ -299,9 +324,14 @@ void Subtitles::onRender(RenderEvent &event) {
         D2D_COLOR_F curCol = getColor("text");
         D2D_COLOR_F curCol_S = getColor("textShadow");
 
+        // Apply fade-in animation first
+        curCol.a *= sound.currentAlpha;
+        curCol_S.a *= sound.currentAlpha;
+
         if (getOps<bool>("lifetimeFade")) {
-            curCol.a *= 1.f - (Utils::Microtime() - sound.timestamp) / getOps<float>("lifetime");
-            curCol_S.a *= 1.f - (Utils::Microtime() - sound.timestamp) / getOps<float>("lifetime");
+            float lifetimeFadeAlpha = 1.f - (Utils::Microtime() - sound.timestamp) / getOps<float>("lifetime");
+            curCol.a *= lifetimeFadeAlpha;
+            curCol_S.a *= lifetimeFadeAlpha;
         }
 
         if (getOps<bool>("textShadow"))
