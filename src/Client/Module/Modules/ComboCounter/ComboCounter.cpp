@@ -20,7 +20,7 @@ void ComboCounter::onDisable() {
 
 void ComboCounter::defaultConfig() {
     setDef("text", (std::string)"Combo: {value}");
-    Module::defaultConfig("core");
+    Module::defaultConfig("all");
     setDef("negatives", false);
 }
 
