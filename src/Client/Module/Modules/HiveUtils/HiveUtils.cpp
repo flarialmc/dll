@@ -5,14 +5,14 @@
 #include "SDK/Client/Network/Packet/SetTitlePacket.hpp"
 
 void HiveUtils::onEnable() {
-    Listen(this, PacketEvent, &HiveUtils::onPacketReceive);
-    Listen(this, KeyEvent, &HiveUtils::onKey);
+    Listen(this, PacketEvent, &HiveUtils::onPacketReceive)
+    Listen(this, KeyEvent, &HiveUtils::onKey)
     Module::onEnable();
 }
 
 void HiveUtils::onDisable() {
-    Deafen(this, PacketEvent, &HiveUtils::onPacketReceive);
-    Deafen(this, KeyEvent, &HiveUtils::onKey);
+    Deafen(this, PacketEvent, &HiveUtils::onPacketReceive)
+    Deafen(this, KeyEvent, &HiveUtils::onKey)
     Module::onDisable();
 }
 
@@ -42,9 +42,8 @@ void HiveUtils::defaultConfig() {
     setDef("noteaming", false);
     setDef("friendaccept", false);
     setDef("partyaccept", false);
-    // setDef("bind", (std::string) "R");
     setDef("deathcountenabled", false);
-    setDef("deathcount", 3);
+    setDef("deathcount", 5);
 }
 
 void HiveUtils::settingsRender(float settingsOffset) {
@@ -57,7 +56,7 @@ void HiveUtils::settingsRender(float settingsOffset) {
     addToggle("Auto re-queue ", "Find a new game when the current game is over", "ReQ");
     addToggle("Solo mode ", "Re-Q when you finish a game or die and can't respawn.\nNot recomended while in a party.", "solo");
     addToggle("Team Elimination", "Re-Q when the team your on is fully ELIMINATED.", "eliminated");
-    addKeybind("Requeue Keybind", "When setting, hold the new bind for 2 seconds.", "bind", true);
+    addKeybind("Requeue Keybind", "When setting, hold the new bind for 2 seconds.", "keybind", true);
 
     addHeader("Map avoider");
 
@@ -383,5 +382,8 @@ void HiveUtils::reQ() {
 void HiveUtils::onKey(KeyEvent& event)
 {
     if (!this->isEnabled()) return;
-    if (event.getKey() == Utils::getStringAsKey(getOps<std::string>("bind")) && static_cast<ActionType>(event.getAction()) == ActionType::Pressed && (SDK::getCurrentScreen() == "hud_screen" || SDK::getCurrentScreen() == "f3_screen" || SDK::getCurrentScreen() == "zoom_screen")) reQ();
+    if (isKeybind(event.keys) && isKeyPartOfKeybind(event.key) &&
+        (SDK::getCurrentScreen() == "hud_screen" || SDK::getCurrentScreen() == "f3_screen" || SDK::getCurrentScreen() == "zoom_screen")
+    )
+        reQ();
 }
