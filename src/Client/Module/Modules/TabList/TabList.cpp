@@ -1433,6 +1433,8 @@ void TabList::onRender(RenderEvent &event) {
                 
                 int PlatformIcons;
                 std::string serverIP = SDK::getServerIP();
+                if (showPlatforms)
+                {
     if (isHiveDetcted == false)
     {
         if ((serverIP.find("hive") != std::string::npos ||
@@ -1452,6 +1454,7 @@ void TabList::onRender(RenderEvent &event) {
                 isHiveDetcted = false;
         }
     }
+}
                 if (showPlatforms && !isHiveDetcted)
                 {
 switch (vecmap[i].buildPlatform){
