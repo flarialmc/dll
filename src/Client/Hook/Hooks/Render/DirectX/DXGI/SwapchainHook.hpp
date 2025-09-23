@@ -53,7 +53,7 @@ public:
     static void SaveBackbuffer(bool underui = false);
     static void InitializeBackbufferStorage(int maxFrames);
     static void CleanupBackbufferStorage();
-    static winrt::com_ptr<ID3D11ShaderResourceView> GetCurrentBackbufferSRV();
+    static winrt::com_ptr<ID3D11ShaderResourceView> GetCurrentBackbufferSRV(bool underUI = false);
     static void SaveDepthmap(ID3D11DeviceContext* pContext, ID3D11DepthStencilView* pDepthStencilView);
 
     typedef HRESULT(__thiscall *SwapchainOriginal)(IDXGISwapChain3 *, UINT, UINT);
@@ -79,7 +79,9 @@ public:
         winrt::com_ptr<ID3D11ShaderResourceView> srv;
     };
     static std::vector<BackbufferStorage> backbufferStorage;
+    static std::vector<BackbufferStorage> backbufferStorageUnderUI;
     static int currentBackbufferIndex;
+    static int currentBackbufferIndexUnderUI;
     static int maxBackbufferFrames;
     static winrt::com_ptr<ID3D11Texture2D> ExtraSavedD3D11BackBuffer;
     static UINT lastBackbufferWidth;

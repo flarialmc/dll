@@ -166,7 +166,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
 
     static bool hooker = false;
-//
+
     if (!hooker && ((isDX12) || (!isDX12 && context))) {
         UnderUIHooks hook;
         hook.enableHook();
@@ -341,20 +341,24 @@ void SwapchainHook::InitializeBackbufferStorage(int maxFrames) {
 
     maxBackbufferFrames = maxFrames;
     currentBackbufferIndex = 0;
+    currentBackbufferIndexUnderUI = 0;
     backbufferStorage.resize(maxFrames);
+    backbufferStorageUnderUI.resize(maxFrames);
 
     if (!SavedD3D11BackBuffer) { swapchain->GetBuffer(0, IID_PPV_ARGS(SavedD3D11BackBuffer.put())); }
 
     D3D11_TEXTURE2D_DESC textureDesc = {};
     SavedD3D11BackBuffer->GetDesc(&textureDesc);
     textureDesc.Usage = D3D11_USAGE_DEFAULT;
-    textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
     textureDesc.CPUAccessFlags = 0;
     SavedD3D11BackBuffer = nullptr;
-    // Create all textures and SRVs upfront
+
+    // Create all textures and SRVs upfront for regular storage
     for (int i = 0; i < maxFrames; ++i) {
         HRESULT hr = d3d11Device->CreateTexture2D(&textureDesc, nullptr, backbufferStorage[i].texture.put());
         if (FAILED(hr)) continue;
+
 
         D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
         srvDesc.Format = textureDesc.Format;
@@ -364,21 +368,45 @@ void SwapchainHook::InitializeBackbufferStorage(int maxFrames) {
 
         d3d11Device->CreateShaderResourceView(backbufferStorage[i].texture.get(), &srvDesc, backbufferStorage[i].srv.put());
     }
+
+    // Create all textures and SRVs upfront for underUI storage
+    for (int i = 0; i < maxFrames; ++i) {
+        HRESULT hr = d3d11Device->CreateTexture2D(&textureDesc, nullptr, backbufferStorageUnderUI[i].texture.put());
+        if (FAILED(hr)) continue;
+
+        D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+        srvDesc.Format = textureDesc.Format;
+        srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+        srvDesc.Texture2D.MipLevels = textureDesc.MipLevels;
+        srvDesc.Texture2D.MostDetailedMip = 0;
+
+        d3d11Device->CreateShaderResourceView(backbufferStorageUnderUI[i].texture.get(), &srvDesc, backbufferStorageUnderUI[i].srv.put());
+    }
 }
 
 void SwapchainHook::CleanupBackbufferStorage() {
     backbufferStorage.clear();
+    backbufferStorageUnderUI.clear();
     maxBackbufferFrames = 0;
     currentBackbufferIndex = 0;
+    currentBackbufferIndexUnderUI = 0;
 }
 
-winrt::com_ptr<ID3D11ShaderResourceView> SwapchainHook::GetCurrentBackbufferSRV() {
-    if (backbufferStorage.empty()) {
-        return nullptr;
-    }
+winrt::com_ptr<ID3D11ShaderResourceView> SwapchainHook::GetCurrentBackbufferSRV(bool underUI) {
 
-    int prevIndex = (currentBackbufferIndex - 1 + backbufferStorage.size()) % backbufferStorage.size();
-    return backbufferStorage[prevIndex].srv;
+    if (underUI) {
+        if (backbufferStorageUnderUI.empty()) {
+            return nullptr;
+        }
+        int prevIndex = (currentBackbufferIndexUnderUI - 1 + backbufferStorageUnderUI.size()) % backbufferStorageUnderUI.size();
+        return backbufferStorageUnderUI[prevIndex].srv;
+    } else {
+        if (backbufferStorage.empty()) {
+            return nullptr;
+        }
+        int prevIndex = (currentBackbufferIndex - 1 + backbufferStorage.size()) % backbufferStorage.size();
+        return backbufferStorage[prevIndex].srv;
+    }
 }
 
 void SwapchainHook::SaveBackbuffer(bool underui) {
@@ -387,21 +415,24 @@ void SwapchainHook::SaveBackbuffer(bool underui) {
     if (!isDX12) {
         SwapchainHook::swapchain->GetBuffer(0, IID_PPV_ARGS(SavedD3D11BackBuffer.put()));
 
-        if (FlarialGUI::needsBackBuffer && !backbufferStorage.empty()) {
-            // Use pre-created texture from storage
-            auto& currentStorage = backbufferStorage[currentBackbufferIndex];
-
+        if (FlarialGUI::needsBackBuffer && !backbufferStorage.empty() && !backbufferStorageUnderUI.empty()) {
             if (underui) {
+                // Use underUI storage for frames without UI
+                auto& currentStorage = backbufferStorageUnderUI[currentBackbufferIndexUnderUI];
+
                 if (UnderUIHooks::bgfxCtx->m_msaart) {
                     context->ResolveSubresource(currentStorage.texture.get(), 0, UnderUIHooks::bgfxCtx->m_msaart, 0, DXGI_FORMAT_R8G8B8A8_UNORM);
                 } else {
                     context->CopyResource(currentStorage.texture.get(), SavedD3D11BackBuffer.get());
                 }
-            } else {
-                context->CopyResource(currentStorage.texture.get(), SavedD3D11BackBuffer.get());
-            }
 
-            currentBackbufferIndex = (currentBackbufferIndex + 1) % backbufferStorage.size();
+                currentBackbufferIndexUnderUI = (currentBackbufferIndexUnderUI + 1) % backbufferStorageUnderUI.size();
+            } else {
+
+                auto& currentStorage = backbufferStorage[currentBackbufferIndex];
+                context->CopyResource(currentStorage.texture.get(), SavedD3D11BackBuffer.get());
+                currentBackbufferIndex = (currentBackbufferIndex + 1) % backbufferStorage.size();
+            }
 
         } else if (FlarialGUI::needsBackBuffer)
         {
@@ -526,7 +557,9 @@ int SwapchainHook::dx12FrameCount = 0;
 winrt::com_ptr<ID3D11Texture2D> SwapchainHook::SavedD3D11BackBuffer;
 // Backbuffer storage system for MotionBlur
 std::vector<SwapchainHook::BackbufferStorage> SwapchainHook::backbufferStorage;
+std::vector<SwapchainHook::BackbufferStorage> SwapchainHook::backbufferStorageUnderUI;
 int SwapchainHook::currentBackbufferIndex = 0;
+int SwapchainHook::currentBackbufferIndexUnderUI = 0;
 int SwapchainHook::maxBackbufferFrames = 0;
 winrt::com_ptr<ID3D11Texture2D> SwapchainHook::ExtraSavedD3D11BackBuffer;
 UINT SwapchainHook::lastBackbufferWidth = 0;

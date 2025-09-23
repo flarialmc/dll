@@ -97,7 +97,7 @@ void MotionBlur::onRender(RenderUnderUIEvent &event) {
         // Initialize storage if needed
         SwapchainHook::InitializeBackbufferStorage(maxFrames);
 
-        auto buffer = BackbufferToSRVExtraMode();
+        auto buffer = BackbufferToSRVExtraMode(true);
         if (buffer) {
             previousFrames.push_back(std::move(buffer));
         }
@@ -147,7 +147,7 @@ void MotionBlur::onRenderNormal(RenderEvent &event) {
 
         SwapchainHook::InitializeBackbufferStorage(maxFrames);
 
-        auto buffer = BackbufferToSRVExtraMode();
+        auto buffer = BackbufferToSRVExtraMode(false);
         if (buffer) {
             previousFrames.push_back(std::move(buffer));
         }
@@ -181,17 +181,15 @@ void MotionBlur::ImageWithOpacity(const winrt::com_ptr<ID3D11ShaderResourceView>
     ImGui::SetCursorScreenPos(ImVec2(pos.x + size.x, pos.y));
 }
 
-winrt::com_ptr<ID3D11ShaderResourceView> MotionBlur::BackbufferToSRVExtraMode() {
+winrt::com_ptr<ID3D11ShaderResourceView> MotionBlur::BackbufferToSRVExtraMode(bool underui) {
     if (!FlarialGUI::needsBackBuffer) return nullptr;
-    if (SwapchainHook::isDX12) return BackbufferToSRV();
+    if (SwapchainHook::isDX12) return BackbufferToSRV(underui);
 
-    // Try to get pre-created SRV from storage first
-    auto srv = SwapchainHook::GetCurrentBackbufferSRV();
+    auto srv = SwapchainHook::GetCurrentBackbufferSRV(underui);
     if (srv) {
         return srv;
     }
 
-    // Fallback to old behavior if storage system not available
     if (!SwapchainHook::ExtraSavedD3D11BackBuffer) return nullptr;
 
     HRESULT hr;
@@ -211,7 +209,7 @@ winrt::com_ptr<ID3D11ShaderResourceView> MotionBlur::BackbufferToSRVExtraMode() 
     return outSRV;
 }
 
-winrt::com_ptr<ID3D11ShaderResourceView> MotionBlur::BackbufferToSRV() {
+winrt::com_ptr<ID3D11ShaderResourceView> MotionBlur::BackbufferToSRV(bool underui) {
     HRESULT hr;
 
     D3D11_TEXTURE2D_DESC d;
