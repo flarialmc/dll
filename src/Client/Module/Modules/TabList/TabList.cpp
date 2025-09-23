@@ -1432,9 +1432,9 @@ void TabList::onRender(RenderEvent &event) {
                 }
                 
                 int PlatformIcons;
+                std::string serverIP = SDK::getServerIP();
     if (isHiveDetcted == false)
     {
-        std::string serverIP = SDK::getServerIP();
         if ((serverIP.find("hive") != std::string::npos ||
              serverIP.find("inpvp") != std::string::npos ||
              serverIP.find("play.enchanted") != std::string::npos ||
