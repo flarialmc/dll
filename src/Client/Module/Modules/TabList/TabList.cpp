@@ -1443,6 +1443,15 @@ void TabList::onRender(RenderEvent &event) {
             isHiveDetcted = true;
         }
     }
+    else
+    {
+        if (!(serverIP.find("hive") != std::string::npos ||
+             serverIP.find("inpvp") != std::string::npos ||
+             serverIP.find("play.enchanted") != std::string::npos ||
+             serverIP.find("play.lbsg") != std::string::npos)) {
+                isHiveDetcted = false;
+        }
+    }
                 if (showPlatforms && !isHiveDetcted)
                 {
 switch (vecmap[i].buildPlatform){
