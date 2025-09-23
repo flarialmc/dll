@@ -55,22 +55,23 @@ void ComboCounter::settingsRender(float settingsOffset) {
 void ComboCounter::onAttack(AttackEvent &event) {
     if (!this->isEnabled()) return;
 
-    auto uhdhdrclock = std::chrono::high_resolution_clock::now();
+    auto now = std::chrono::high_resolution_clock::now();
 
     if (Combo < 0) {
         Combo = 1;
-        last_hit = uhdhdrclock;
+        last_hit = now;
         return;
     }
 
     if (now - last_hit > std::chrono::milliseconds(480)) {
         Combo++;
-        last_hit = uhdhdrclock;
+        last_hit = now;
     }
 }
 
 void ComboCounter::onTick(TickEvent &event) {
     if (!this->isEnabled()) return;
+
     if (!SDK::clientInstance->getLocalPlayer()) return;
 
     int currentHurtTime = reinterpret_cast<LocalPlayer*>(event.getActor())->getHurtTime();
