@@ -12,12 +12,20 @@ void ParticleMultiplier::onEnable() {
     Module::onEnable();
 
 }
-//
+
+void* stolenDispatcher = nullptr;
+void* stolenIdentifier = nullptr;
+void* stolenCallback = nullptr;
+
 void ParticleMultiplier::onDisable() {
     Deafen(this, RenderEvent, &ParticleMultiplier::onRender)
     Deafen(this, PacketEvent, &ParticleMultiplier::onPacketReceive)
     Deafen(this, AttackEvent, &ParticleMultiplier::onAttack)
     Module::onDisable();
+
+    stolenDispatcher = nullptr;
+    stolenIdentifier = nullptr;
+    stolenCallback = nullptr;
 }
 
 void ParticleMultiplier::defaultConfig() {
@@ -38,10 +46,6 @@ void ParticleMultiplier::settingsRender(float settingsOffset) {
 void ParticleMultiplier::onRender(RenderEvent &event) {
 }
 
-void* stolenDispatcher = nullptr;
-void* stolenIdentifier = nullptr;
-void* stolenCallback = nullptr;
-
 void ParticleMultiplier::onPacketReceive(PacketEvent& event)
 {
     if (!this->isEnabled()) return;
@@ -50,9 +54,18 @@ void ParticleMultiplier::onPacketReceive(PacketEvent& event)
     if (!stolenDispatcher)
     {
         stolenDispatcher = event.getPacketHandlerDispatcher();
+    }
+
+    if (!stolenIdentifier)
+    {
         stolenIdentifier = event.getNetworkIdentifier();
+    }
+
+    if (!stolenCallback)
+    {
         stolenCallback = event.getNetEventCallback();
     }
+
     if (id == MinecraftPacketIds::Animate)
     {
         for (int i = 0; i < getOps<float>("intensity"); i++)
