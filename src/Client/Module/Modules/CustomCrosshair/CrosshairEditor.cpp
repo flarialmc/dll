@@ -310,17 +310,31 @@ void CustomCrosshair::CrosshairEditorWindow()
         if (FlarialGUI::RoundedButton(8, ButtonPosX, ButtonPosY,
             anotherColor, textCol, L"", CrosshairRectHeight, CrosshairRectHeight, round.x / 2, round.x / 2))
         {
-            auto it = crosshairs.find(CurrentSelectedCrosshair);
-
-            if (it != crosshairs.end()) {
-                delete it->second;
-                crosshairs.erase(it);
+            // Check if there's only one crosshair left
+            int validCrosshairCount = 0;
+            for (const auto& ch : crosshairs) {
+                if (ch.second != nullptr && !ch.first.empty()) {
+                    validCrosshairCount++;
+                }
             }
 
-            if (settings.getSettingByName<std::string>("CurrentCrosshair")->value == CurrentSelectedCrosshair)
-            {
-                settings.getSettingByName<std::string>("CurrentCrosshair")->value = "";
-                CrosshairReloaded = true;
+            if (validCrosshairCount <= 1) {
+                // Show warning if trying to delete the last crosshair
+                FlarialGUI::Notify("Cannot delete the last remaining crosshair!");
+            } else {
+                // Proceed with deletion if there are multiple crosshairs
+                auto it = crosshairs.find(CurrentSelectedCrosshair);
+
+                if (it != crosshairs.end()) {
+                    delete it->second;
+                    crosshairs.erase(it);
+                }
+
+                if (settings.getSettingByName<std::string>("CurrentCrosshair")->value == CurrentSelectedCrosshair)
+                {
+                    settings.getSettingByName<std::string>("CurrentCrosshair")->value = "";
+                    CrosshairReloaded = true;
+                }
             }
         }
 

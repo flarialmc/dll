@@ -151,6 +151,7 @@ public:
 
     // Consolidated descriptor heap management functions
     static bool AllocateImageDescriptor(UINT imageId, D3D12_CPU_DESCRIPTOR_HANDLE* out_cpu_handle, D3D12_GPU_DESCRIPTOR_HANDLE* out_gpu_handle);
+    static UINT AllocateNextImageDescriptor(D3D12_CPU_DESCRIPTOR_HANDLE* out_cpu_handle, D3D12_GPU_DESCRIPTOR_HANDLE* out_gpu_handle);
     static void FreeImageDescriptor(UINT imageId);
     static void ResetDescriptorAllocation();
 };

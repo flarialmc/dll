@@ -64,6 +64,7 @@ private:
 	Vec2<int> defaultCrosshairSize = Vec2<int>(16, 16);
 
 	winrt::com_ptr<ID3D12Resource> defaultCrosshairTextureDX12 = nullptr;
+	ImTextureID defaultCrosshairTextureDX12Handle = 0;
 public:
 	CustomCrosshair() : Module("Custom Crosshair", "Allows for dynamic crosshair colors.",
 		IDR_CROSSHAIR_PNG, "") {

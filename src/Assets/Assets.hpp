@@ -154,6 +154,11 @@
 #define IDR_F3_PNG                     255
 #define IDR_DELETE_PNG                 256
 #define IDR_RENDER_DRAGON_PNG          257
+#define IDR_PING_AMAZING               258
+#define IDR_PING_GOOD                  259
+#define IDR_PING_OKAY                  260
+#define IDR_PING_BAD                   261
+#define IDR_PING_QUIT                  262
 #define IDR_SKINSTEALER_PNG            263
 #define IDR_CINEMATICCAMERA_PNG        264
 #define IDR_DEATHLOGGER_PNG            265
@@ -186,11 +191,6 @@
 
 // MAKE SURE YOU ALWAYS UPDATE THIS!
 
-#define MAX_IMAGE_ID                   262
+#define MAX_IMAGE_ID                   291
 
-#define IDR_PING_AMAZING               258
-#define IDR_PING_GOOD                  259
-#define IDR_PING_OKAY                  260
-#define IDR_PING_BAD                   261
-#define IDR_PING_QUIT                  262
 

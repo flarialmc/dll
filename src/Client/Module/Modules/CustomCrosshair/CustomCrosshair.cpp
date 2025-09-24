@@ -289,7 +289,7 @@ void CustomCrosshair::renderImGuiCrosshair() {
     if (!crosshairTexture) {
         if (SwapchainHook::isDX12) {
             if (!defaultCrosshairTextureDX12) loadDefaultCrosshairTextureDX12();
-            crosshairTexture = reinterpret_cast<ImTextureID>(defaultCrosshairTextureDX12.get());
+            crosshairTexture = defaultCrosshairTextureDX12Handle;
         } else {
             crosshairTexture = reinterpret_cast<ImTextureID>(defaultCrosshairTexture.get());
         }
@@ -438,8 +438,7 @@ ImTextureID CustomCrosshair::loadCrosshairTextureDX12(const std::string& crossha
 void CustomCrosshair::loadDefaultCrosshairTextureDX12() {
     if (!SwapchainHook::d3d12Device5 || !SwapchainHook::d3d12DescriptorHeapImGuiRender) return;
 
-    std::vector<unsigned char> blankData(16 * 16 * 4, 0);
-
+    // Create a temporary 16x16 transparent PNG in memory and use FlarialGUI::LoadImageFromFile
     D3D12_CPU_DESCRIPTOR_HANDLE cpu;
     D3D12_GPU_DESCRIPTOR_HANDLE gpu;
 
@@ -447,96 +446,47 @@ void CustomCrosshair::loadDefaultCrosshairTextureDX12() {
         return;
     }
 
-    UINT uploadPitch = (16 * 4 + D3D12_TEXTURE_DATA_PITCH_ALIGNMENT - 1u) & ~(D3D12_TEXTURE_DATA_PITCH_ALIGNMENT - 1u);
-    UINT uploadSize = 16 * uploadPitch;
+    // Create a simple 1x1 transparent texture instead of complex manual creation
+    std::vector<uint8_t> transparentPixel = {0, 0, 0, 0}; // RGBA transparent
 
-    D3D12_RESOURCE_DESC uploadDesc = {};
-    uploadDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-    uploadDesc.Alignment = 0;
-    uploadDesc.Width = uploadSize;
-    uploadDesc.Height = 1;
-    uploadDesc.DepthOrArraySize = 1;
-    uploadDesc.MipLevels = 1;
-    uploadDesc.Format = DXGI_FORMAT_UNKNOWN;
-    uploadDesc.SampleDesc.Count = 1;
-    uploadDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-    uploadDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+    // Create texture resource directly in PIXEL_SHADER_RESOURCE state (no copy needed)
+    D3D12_HEAP_PROPERTIES heapProps = {};
+    heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
 
-    D3D12_HEAP_PROPERTIES uploadProps = {};
-    uploadProps.Type = D3D12_HEAP_TYPE_UPLOAD;
+    D3D12_RESOURCE_DESC texDesc = {};
+    texDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+    texDesc.Width = 1;
+    texDesc.Height = 1;
+    texDesc.DepthOrArraySize = 1;
+    texDesc.MipLevels = 1;
+    texDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    texDesc.SampleDesc.Count = 1;
+    texDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+    texDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
-    winrt::com_ptr<ID3D12Resource> uploadBuffer;
-    HRESULT hr = SwapchainHook::d3d12Device5->CreateCommittedResource(&uploadProps, D3D12_HEAP_FLAG_NONE, &uploadDesc, D3D12_RESOURCE_STATE_GENERIC_READ, NULL, IID_PPV_ARGS(uploadBuffer.put()));
+    winrt::com_ptr<ID3D12Resource> texture;
+    HRESULT hr = SwapchainHook::d3d12Device5->CreateCommittedResource(
+        &heapProps,
+        D3D12_HEAP_FLAG_NONE,
+        &texDesc,
+        D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
+        nullptr,
+        IID_PPV_ARGS(texture.put())
+    );
+
     if (FAILED(hr)) return;
 
-    void* mapped = nullptr;
-    D3D12_RANGE range = { 0, uploadSize };
-    if (FAILED(uploadBuffer->Map(0, &range, &mapped))) return;
-
-    for (int y = 0; y < 16; y++)
-        memcpy((void*)((uintptr_t)mapped + y * uploadPitch), blankData.data() + y * 16 * 4, 16 * 4);
-    uploadBuffer->Unmap(0, &range);
-
-    D3D12_HEAP_PROPERTIES props = {};
-    props.Type = D3D12_HEAP_TYPE_DEFAULT;
-
-    D3D12_RESOURCE_DESC desc = {};
-    desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-    desc.Width = 16;
-    desc.Height = 16;
-    desc.DepthOrArraySize = 1;
-    desc.MipLevels = 1;
-    desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    desc.SampleDesc.Count = 1;
-    desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-    desc.Flags = D3D12_RESOURCE_FLAG_NONE;
-
-    winrt::com_ptr<ID3D12Resource> pTexture;
-    hr = SwapchainHook::d3d12Device5->CreateCommittedResource(&props, D3D12_HEAP_FLAG_NONE, &desc, D3D12_RESOURCE_STATE_COPY_DEST, NULL, IID_PPV_ARGS(pTexture.put()));
-    if (FAILED(hr)) return;
-
-    winrt::com_ptr<ID3D12CommandAllocator> allocator;
-    SwapchainHook::d3d12Device5->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(allocator.put()));
-
-    winrt::com_ptr<ID3D12GraphicsCommandList> cmdList;
-    SwapchainHook::d3d12Device5->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, allocator.get(), NULL, IID_PPV_ARGS(cmdList.put()));
-
-    D3D12_TEXTURE_COPY_LOCATION srcLocation = {};
-    srcLocation.pResource = uploadBuffer.get();
-    srcLocation.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
-    srcLocation.PlacedFootprint.Footprint.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    srcLocation.PlacedFootprint.Footprint.Width = 16;
-    srcLocation.PlacedFootprint.Footprint.Height = 16;
-    srcLocation.PlacedFootprint.Footprint.Depth = 1;
-    srcLocation.PlacedFootprint.Footprint.RowPitch = uploadPitch;
-
-    D3D12_TEXTURE_COPY_LOCATION dstLocation = {};
-    dstLocation.pResource = pTexture.get();
-    dstLocation.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
-    dstLocation.SubresourceIndex = 0;
-
-    D3D12_RESOURCE_BARRIER barrier = {};
-    barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-    barrier.Transition.pResource = pTexture.get();
-    barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-    barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
-    barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-
-    cmdList->CopyTextureRegion(&dstLocation, 0, 0, 0, &srcLocation, NULL);
-    cmdList->ResourceBarrier(1, &barrier);
-    cmdList->Close();
-
-    ID3D12CommandList* cmdListPtr = cmdList.get();
-    SwapchainHook::d3d12CommandQueue->ExecuteCommandLists(1, &cmdListPtr);
-
+    // Create SRV directly since texture is already in correct state
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
     srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-    srvDesc.Texture2D.MipLevels = desc.MipLevels;
+    srvDesc.Texture2D.MipLevels = 1;
     srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-    SwapchainHook::d3d12Device5->CreateShaderResourceView(pTexture.get(), &srvDesc, cpu);
 
-    defaultCrosshairTextureDX12 = pTexture;
+    SwapchainHook::d3d12Device5->CreateShaderResourceView(texture.get(), &srvDesc, cpu);
+
+    defaultCrosshairTextureDX12 = texture;
+    defaultCrosshairTextureDX12Handle = (ImTextureID)gpu.ptr;
     defaultCrosshairSize = Vec2<int>(16, 16);
 }
 
@@ -549,6 +499,7 @@ void CustomCrosshair::cleanupTexturesDX12() {
     }
     crosshairTexturesDX12.clear();
     defaultCrosshairTextureDX12 = nullptr;
+    defaultCrosshairTextureDX12Handle = 0;
 }
 
 void CustomCrosshair::reinitializeAfterResize() {
@@ -560,6 +511,7 @@ void CustomCrosshair::reinitializeAfterResize() {
 
     defaultCrosshairTexture = nullptr;
     defaultCrosshairTextureDX12 = nullptr;
+    defaultCrosshairTextureDX12Handle = 0;
 
     pointSampler = nullptr;
 }
