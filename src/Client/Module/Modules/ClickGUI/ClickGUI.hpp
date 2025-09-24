@@ -353,8 +353,6 @@ public:
         if (this->active) {
             SDK::clientInstance->releaseMouse(); // release mouse lets cursor move
 
-            // Logger::debug("{} {}", FlarialGUI::TextBoxes[0].text.empty(), isKeyPartOfAdditionalKeybind(event.key, this->settings.getSettingByName<std::string>("editmenubind")->value));
-
             if (FlarialGUI::TextBoxes[0].text.empty() && isKeyPartOfAdditionalKeybind(event.key, this->settings.getSettingByName<std::string>("editmenubind")->value)) {
                 FlarialGUI::TextBoxes[0].isActive = false;
                 event.setKey(MouseButton::None);
