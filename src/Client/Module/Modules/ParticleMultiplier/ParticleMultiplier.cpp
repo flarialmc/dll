@@ -44,11 +44,21 @@ void ParticleMultiplier::settingsRender(float settingsOffset) {
 }
 
 void ParticleMultiplier::onRender(RenderEvent &event) {
+    if (SDK::currentScreen != "hud_screen")
+    {
+        stolenDispatcher = nullptr;
+        stolenIdentifier = nullptr;
+        stolenCallback = nullptr;
+    }
 }
 
 void ParticleMultiplier::onPacketReceive(PacketEvent& event)
 {
     if (!this->isEnabled()) return;
+
+    Logger::debug(SDK::currentScreen);
+
+
     MinecraftPacketIds id = event.getPacket()->getId();
 
     if (!stolenDispatcher)
@@ -79,7 +89,7 @@ void ParticleMultiplier::onPacketReceive(PacketEvent& event)
 void ParticleMultiplier::onAttack(AttackEvent& event)
 {
 
-    if (!stolenDispatcher || !isEnabled() || !getOps<bool>("normalhitcrit")) return;
+    if (!stolenDispatcher || !stolenIdentifier || !stolenCallback || !isEnabled() || !getOps<bool>("normalhitcrit")) return;
     std::shared_ptr<Packet> packet = SDK::createPacket(static_cast<int>(MinecraftPacketIds::Animate));
     std::shared_ptr<AnimatePacket> pkt = std::static_pointer_cast<AnimatePacket>(packet);
 

@@ -63,8 +63,6 @@ void SwingAnimations::onItemInHandRender(RenderItemInHandEvent &event) {
 
 void SwingAnimations::onSwingDuration(SwingDurationEvent &event) {
     if (!this->isEnabled()) return;
-    if (!cgui) return;
-    if (cgui->active) return;
 
     float swingSpeed = getOps<float>("swingSpeed");
     int originalDuration = event.getDuration();
