@@ -6,16 +6,19 @@
 #include "Client.hpp"
 #include "Modules/ClickGUI/ClickGUI.hpp"
 
+std::vector<Sound> Subtitles::sounds;
 
 void Subtitles::onEnable() {
     Listen(this, RenderEvent, &Subtitles::onRender)
     Listen(this, SoundEnginePlayEvent, &Subtitles::onSoundEnginePlay)
+    Listen(this, TickEvent, &Subtitles::onTick)
     Module::onEnable();
 }
 
 void Subtitles::onDisable() {
     Deafen(this, RenderEvent, &Subtitles::onRender)
     Deafen(this, SoundEnginePlayEvent, &Subtitles::onSoundEnginePlay)
+    Deafen(this, TickEvent, &Subtitles::onTick)
     Module::onDisable();
 }
 
@@ -130,12 +133,14 @@ void Subtitles::onSoundEnginePlay(SoundEnginePlayEvent &event) {
     }
 }
 
+void Subtitles::onTick(TickEvent &event) {
+    updateSoundVec(sounds, getOps<float>("lifetime"));
+}
+
 void Subtitles::onRender(RenderEvent &event) {
     if (!this->isEnabled()) return;
     if (SDK::getCurrentScreen() != "hud_screen") return;
     if (sounds.empty() && !ClickGUI::editmenu) return;
-
-    updateSoundVec(sounds, getOps<float>("lifetime"));
 
     std::vector<Sound> soundList = {};
     float longestStringWidth = 0;
@@ -365,7 +370,7 @@ void Subtitles::onRender(RenderEvent &event) {
         curCol_S.a *= sound.currentAlpha;
 
         if (!getOps<bool>("disableAnimations") && getOps<bool>("lifetimeFade")) {
-            float lifetimeFadeAlpha = 1.f - (Utils::Microtime() - sound.timestamp) / getOps<float>("lifetime");
+            float lifetimeFadeAlpha = smoothen(1.f - (Utils::Microtime() - sound.timestamp) / getOps<float>("lifetime"));
             curCol.a *= lifetimeFadeAlpha;
             curCol_S.a *= lifetimeFadeAlpha;
         }

@@ -30,9 +30,6 @@ struct Sound {
 class Subtitles : public Module {
 
 private:
-
-    std::vector<Sound> sounds;
-
     static float lerp(float a, float b, float t) {
         return a + t * (b - a);
     }
@@ -44,6 +41,7 @@ private:
     float targetRectHeight = 0.0f;
 
 public:
+    static std::vector<Sound> sounds;
     Subtitles() : Module("Subtitles", "Adds Audio Subtitles.",
         IDR_CAPTIONS_PNG, "", false, {"audiosubtitles", "audio subtitles", "java", "caption"}) {
     };
@@ -60,7 +58,11 @@ public:
 
     void onSoundEnginePlay(SoundEnginePlayEvent& event);
 
-    // void normalRenderCore(int index, std::string& text) override;
+    void onTick(TickEvent& event);
 
     void onRender(RenderEvent& event);
+
+    static float smoothen(float progress) {
+        return pow(3.f * progress, 2.f) - pow(2.f * progress, 3.f);
+    }
 };

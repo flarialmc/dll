@@ -21,6 +21,7 @@
 #include "Utils/WinrtUtils.hpp"
 #include "GUI/Engine/Constraints.hpp"
 #include "Hook/Hooks/Render/DirectX/DXGI/SwapchainHook.hpp"
+#include "Modules/Subtitles/Subtitles.hpp"
 #include "Utils/Utils.hpp"
 
 
@@ -76,9 +77,10 @@ void JavaDebugMenu::defaultConfig() {
 
     setDef("showBlock2", true);; // E, T, Dimension, Biome
 
-    setDef("showBlock3", true); // Coords, Chunk, Direction, Weather
+    setDef("showBlock3", true); // Coords, Chunk, Direction, Weather, Sounds
     setDef("showCoords", true);
     setDef("showWeather", true);
+    setDef("showSoundCounter", true);
 
     setDef("showBlock4", true); // Speed, Velocity, Break Progress
     setDef("alwaysShowBreakProg", true);
@@ -154,6 +156,7 @@ void JavaDebugMenu::settingsRender(float settingsOffset) {
     addConditionalToggle(c, "Block 3", "Coordinates, Weather", "showBlock3");
     addConditionalToggle(c && getOps<bool>("showBlock3"), "Show Coordinates", "", "showCoords");
     addConditionalToggle(c && getOps<bool>("showBlock3"), "Show Weather", "", "showWeather");
+    addConditionalToggle(c && getOps<bool>("showBlock3"), "Show Sounds Counter", "", "showSoundCounter");
     if (c && getOps<bool>("showBlock3")) extraPadding();
 
     addConditionalToggle(c, "Block 4", "Speed, Velocity, Break Progress", "showBlock4");
@@ -518,6 +521,8 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
                     left.emplace_back(std::format("Rain / Lightning: {:.0f}% / {:.0f}%", weatherInfo.second[0] * 100, weatherInfo.second[1] * 100));
                 }
             }
+
+            if (this->isOnSetting("showSoundCounter")) left.emplace_back(std::format("Sounds: {}", Subtitles::sounds.size()));
 
             left.emplace_back("");
         }

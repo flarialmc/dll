@@ -164,6 +164,9 @@
 #define IDR_SUBTITLES_PNG              270
 #define IDR_TOTEM_PNG                  271
 #define IDR_BETTERHUNGERBAR_PNG        272
+#define IDR_INSTANTHEALTH_PNG          273
+#define IDR_INSTANTDAMAGE_PNG          274
+#define IDR_SATURATION_PNG             275
 #define IDR_CLEARBG_PNG                276
 #define IDR_CROSSHAIR_PNG              277
 #define IDR_COMPASS_PNG                278
@@ -173,18 +176,13 @@
 #define IDR_BOWSENS_PNG                282
 #define IDR_CAPTIONS_PNG               283
 #define IDR_MULTIPLIER_PNG             284
-
-#define IDR_INSTANTHEALTH_PNG          273
-#define IDR_INSTANTDAMAGE_PNG          274
-#define IDR_SATURATION_PNG             275
-
-#define IDR_NX_LOGO_PNG                276
-#define IDR_SONY_LOGO_PNG              277
-#define IDR_XBOX_LOGO_PNG              278
-#define IDR_APPLE_LOGO_PNG             279
-#define IDR_ANDROID_LOGO_PNG           280
-#define IDR_WIN10_LOGO_PNG             281
-#define IDR_CHROMEOS_LOGO_PNG          282
+#define IDR_NX_LOGO_PNG                285
+#define IDR_SONY_LOGO_PNG              286
+#define IDR_XBOX_LOGO_PNG              287
+#define IDR_APPLE_LOGO_PNG             288
+#define IDR_ANDROID_LOGO_PNG           289
+#define IDR_WIN10_LOGO_PNG             290
+#define IDR_CHROMEOS_LOGO_PNG          291
 
 // MAKE SURE YOU ALWAYS UPDATE THIS!
 
