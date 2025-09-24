@@ -54,6 +54,7 @@
 #include "Hooks/Visual/TintColorHook.hpp"
 #include "Hooks/Visual/Level_addParticleEffect.hpp"
 #include "Hooks/Visual/Level_sendServerLegacyParticle.hpp"
+#include "Hooks/Game/ActorDropItem.hpp"
 
 std::vector<std::shared_ptr<Hook>> HookManager::hooks;
 
@@ -144,6 +145,7 @@ void HookManager::initialize() {
     //addHook<Level_sendServerLegacyParticle>();
     addHook<SoundEnginePlayHook>();
     addHook<getCurrentSwingDurationHook>();
+    addHook<ActorDropItem>();
     if(VersionUtils::checkAboveOrEqual(21, 40)) {
         addHook<UpdatePlayerHook>();
     }

@@ -2,12 +2,15 @@
 
 #include "SoundDescriptions.hpp"
 #include "Events/Game/SoundEnginePlayEvent.hpp"
+#include "Utils/Utils.hpp"
 
 struct Sound {
     std::string name;
     Vec3<float> pos;
     std::string formatted;
     double timestamp;
+    float currentAlpha = 0.0f;
+    float targetAlpha = 1.0f;
 
     [[nodiscard]] std::pair<std::string, std::string> getSides() const {
         Vec3<float> diff = SDK::clientInstance->getLocalPlayer()->getPosition()->sub(pos).normalize();
@@ -30,23 +33,19 @@ private:
 
     std::vector<Sound> sounds;
 
-    static double Microtime() {
-        return (double(std::chrono::duration_cast<std::chrono::microseconds>(
-            std::chrono::system_clock::now().time_since_epoch()).count()) / double(1000000));
-    }
-
-    static void updateSoundVec(std::vector<Sound> &vec, float diff) {
-        double microTime = Microtime();
-        std::erase_if(vec, [microTime, diff](const Sound &obj) {
-            return (microTime - obj.timestamp) > diff;
-        });
+    static float lerp(float a, float b, float t) {
+        return a + t * (b - a);
     }
 private:
     int prevYAlign = -1; // 0 top | 1 middle | 2 bottom
+    float currentRectWidth = 0.0f;
+    float currentRectHeight = 0.0f;
+    float targetRectWidth = 0.0f;
+    float targetRectHeight = 0.0f;
 
 public:
     Subtitles() : Module("Subtitles", "Adds Audio Subtitles.",
-        IDR_ANIMATIONS_PNG, "", false, {"audiosubtitles", "audio subtitles", "java", "caption"}) {
+        IDR_CAPTIONS_PNG, "", false, {"audiosubtitles", "audio subtitles", "java", "caption"}) {
     };
 
     void onEnable() override;
@@ -56,6 +55,8 @@ public:
 	void defaultConfig() override;
 
 	void settingsRender(float settingsOffset) override;
+
+    void updateSoundVec(std::vector<Sound>& soundVec, float diff);
 
     void onSoundEnginePlay(SoundEnginePlayEvent& event);
 

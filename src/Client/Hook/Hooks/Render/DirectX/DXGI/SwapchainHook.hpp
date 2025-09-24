@@ -51,6 +51,9 @@ public:
 
     static winrt::com_ptr<ID3D11Texture2D> GetBackbuffer();
     static void SaveBackbuffer(bool underui = false);
+    static void InitializeBackbufferStorage(int maxFrames);
+    static void CleanupBackbufferStorage();
+    static winrt::com_ptr<ID3D11ShaderResourceView> GetCurrentBackbufferSRV(bool underUI = false);
     static void SaveDepthmap(ID3D11DeviceContext* pContext, ID3D11DepthStencilView* pDepthStencilView);
 
     typedef HRESULT(__thiscall *SwapchainOriginal)(IDXGISwapChain3 *, UINT, UINT);
@@ -70,9 +73,27 @@ public:
 
     static bool currentVsyncState;
     static winrt::com_ptr<ID3D11Texture2D> SavedD3D11BackBuffer;
+    // Backbuffer storage system for MotionBlur
+    struct BackbufferStorage {
+        winrt::com_ptr<ID3D11Texture2D> texture;
+        winrt::com_ptr<ID3D11ShaderResourceView> srv;
+    };
+    static std::vector<BackbufferStorage> backbufferStorage;
+    static std::vector<BackbufferStorage> backbufferStorageUnderUI;
+    static int currentBackbufferIndex;
+    static int currentBackbufferIndexUnderUI;
+    static int maxBackbufferFrames;
     static winrt::com_ptr<ID3D11Texture2D> ExtraSavedD3D11BackBuffer;
     static UINT lastBackbufferWidth;
     static UINT lastBackbufferHeight;
+
+    // Depth map storage system
+    static winrt::com_ptr<ID3D11Texture2D> cachedDepthMapTexture;
+    static winrt::com_ptr<ID3D11ShaderResourceView> cachedDepthMapSRV;
+    static UINT lastDepthMapWidth;
+    static UINT lastDepthMapHeight;
+    static UINT lastDepthMapSampleCount;
+    static DXGI_FORMAT lastDepthMapFormat;
 
     static winrt::com_ptr<ID3D12CommandQueue> queue;
     static HANDLE fenceEvent;

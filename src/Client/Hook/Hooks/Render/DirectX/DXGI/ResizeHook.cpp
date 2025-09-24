@@ -17,6 +17,7 @@
 #include "../../../../../Module/Modules/MotionBlur/AvgPixelMotionBlurHelper.hpp"
 #include "../../../../../Module/Modules/MotionBlur/RealMotionBlurHelper.hpp"
 #include "../../../../../Module/Modules/DepthOfField/DepthOfFieldHelper.hpp"
+#include "../../../../../Module/Modules/CustomCrosshair/CustomCrosshair.hpp"
 
 void ResizeHook::enableHook() {
     int index;
@@ -57,6 +58,7 @@ void ResizeHook::cleanShit(bool fullReset) {
 
     SwapchainHook::SavedD3D11BackBuffer = nullptr;
     SwapchainHook::ExtraSavedD3D11BackBuffer = nullptr;
+    SwapchainHook::CleanupBackbufferStorage();
 
     SwapchainHook::lastBackbufferWidth = 0;
     SwapchainHook::lastBackbufferHeight = 0;
@@ -165,6 +167,16 @@ void ResizeHook::cleanShit(bool fullReset) {
 
     // Reinitialize async loading after cleanup so player heads continue to load
     TabList::ReinitializeAfterResize();
+
+    auto customCrosshairModule = ModuleManager::getModule("Custom Crosshair");
+    if (customCrosshairModule) {
+        auto customCrosshair = std::dynamic_pointer_cast<CustomCrosshair>(customCrosshairModule);
+        if (customCrosshair) {
+            customCrosshair->cleanupTextures();
+            customCrosshair->cleanupTexturesDX12();
+            customCrosshair->reinitializeAfterResize();
+        }
+    }
 
     if (fullReset) {
         FlarialGUI::hasLoadedAll = false;

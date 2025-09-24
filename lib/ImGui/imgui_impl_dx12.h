@@ -62,6 +62,10 @@ IMGUI_IMPL_API bool     ImGui_ImplDX12_Init(ID3D12Device* device, int num_frames
 IMGUI_IMPL_API bool     ImGui_ImplDX12_CreateDeviceObjects();
 IMGUI_IMPL_API void     ImGui_ImplDX12_InvalidateDeviceObjects();
 
+// NEW: Helper functions to access sampler handles for dynamic sampler switching
+IMGUI_IMPL_API D3D12_GPU_DESCRIPTOR_HANDLE ImGui_ImplDX12_GetLinearSamplerHandle();
+IMGUI_IMPL_API D3D12_GPU_DESCRIPTOR_HANDLE ImGui_ImplDX12_GetPointSamplerHandle();
+
 // [BETA] Selected render state data shared with callbacks.
 // This is temporarily stored in GetPlatformIO().Renderer_RenderState during the ImGui_ImplDX12_RenderDrawData() call.
 // (Please open an issue if you feel you need access to more data)

@@ -20,6 +20,7 @@ void MotionBlur::onDisable() {
     Deafen(this, RenderUnderUIEvent, &MotionBlur::onRender)
     Deafen(this, RenderEvent, &MotionBlur::onRenderNormal)
     previousFrames.clear();
+    SwapchainHook::CleanupBackbufferStorage();
     Module::onDisable();
 }
 
@@ -93,7 +94,10 @@ void MotionBlur::onRender(RenderUnderUIEvent &event) {
                                  previousFrames.begin() + (previousFrames.size() - maxFrames));
         }
 
-        auto buffer = BackbufferToSRVExtraMode();
+        // Initialize storage if needed
+        SwapchainHook::InitializeBackbufferStorage(maxFrames);
+
+        auto buffer = BackbufferToSRVExtraMode(true);
         if (buffer) {
             previousFrames.push_back(std::move(buffer));
         }
@@ -140,7 +144,10 @@ void MotionBlur::onRenderNormal(RenderEvent &event) {
                                  previousFrames.begin() + (previousFrames.size() - maxFrames));
         }
 
-        auto buffer = BackbufferToSRVExtraMode();
+
+        SwapchainHook::InitializeBackbufferStorage(maxFrames);
+
+        auto buffer = BackbufferToSRVExtraMode(false);
         if (buffer) {
             previousFrames.push_back(std::move(buffer));
         }
@@ -149,7 +156,7 @@ void MotionBlur::onRenderNormal(RenderEvent &event) {
         else if (getOps<std::string>("blurType") == "Ghost Frames") {
             float alpha = 0.3f;
             for (const auto &frame: previousFrames) {
-                if (!SwapchainHook::queue) {
+                if (!SwapchainHook::isDX12) {
                     ImageWithOpacity(frame, {MC::windowSize.x, MC::windowSize.y}, alpha);
                 }
                 alpha *= this->settings.getSettingByName<float>("intensity_bleed")->value;
@@ -174,11 +181,18 @@ void MotionBlur::ImageWithOpacity(const winrt::com_ptr<ID3D11ShaderResourceView>
     ImGui::SetCursorScreenPos(ImVec2(pos.x + size.x, pos.y));
 }
 
-winrt::com_ptr<ID3D11ShaderResourceView> MotionBlur::BackbufferToSRVExtraMode() {
+winrt::com_ptr<ID3D11ShaderResourceView> MotionBlur::BackbufferToSRVExtraMode(bool underui) {
     if (!FlarialGUI::needsBackBuffer) return nullptr;
-    if (SwapchainHook::isDX12) return BackbufferToSRV();
-    HRESULT hr;
+    if (SwapchainHook::isDX12) return BackbufferToSRV(underui);
 
+    auto srv = SwapchainHook::GetCurrentBackbufferSRV(underui);
+    if (srv) {
+        return srv;
+    }
+
+    if (!SwapchainHook::ExtraSavedD3D11BackBuffer) return nullptr;
+
+    HRESULT hr;
     D3D11_TEXTURE2D_DESC d;
     SwapchainHook::ExtraSavedD3D11BackBuffer->GetDesc(&d);
     winrt::com_ptr<ID3D11ShaderResourceView> outSRV;
@@ -195,7 +209,7 @@ winrt::com_ptr<ID3D11ShaderResourceView> MotionBlur::BackbufferToSRVExtraMode() 
     return outSRV;
 }
 
-winrt::com_ptr<ID3D11ShaderResourceView> MotionBlur::BackbufferToSRV() {
+winrt::com_ptr<ID3D11ShaderResourceView> MotionBlur::BackbufferToSRV(bool underui) {
     HRESULT hr;
 
     D3D11_TEXTURE2D_DESC d;

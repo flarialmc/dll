@@ -101,6 +101,7 @@ namespace FlarialGUI {
 	float Slider(int index, float x, float y, float& value, float maxValue = 100.0f, float minValue = 0.0f, bool zerosafe = true, std::string moduleName = "", std::string settingName = "");
 	int SliderInt(int index, float x, float y, int& value, int maxValue = 100, int minValue = 0, std::string moduleName = "", std::string settingName = "");
 
+	inline int TextCursorPosition = 0; //Cursor position from right
 	std::string TextBox(int index, std::string& text, int limit, float x, float y, float width, float height, int special = 0, std::string moduleName = "", std::string settingName = "");
 	std::string TextBoxVisual(int index, std::string& text, int limit, float x, float y, const std::string& real = "", std::string moduleName = "", std::string settingName = "");
 

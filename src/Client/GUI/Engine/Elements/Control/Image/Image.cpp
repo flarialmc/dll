@@ -71,6 +71,61 @@ std::optional<ImageDataDX11> LoadImageDataDX11FromResource(int resourceId, LPCTS
     return result;
 }
 
+std::optional<ImageDataDX11> LoadImageDataDX11FromFile(const std::string& filePath) {
+    int width, height, channels;
+    unsigned char* image_data = stbi_load(filePath.c_str(), &width, &height, &channels, 4);
+    if (!image_data) return std::nullopt;
+
+    ImageDataDX11 result;
+    result.width = width;
+    result.height = height;
+    result.data.assign(image_data, image_data + (width * height * 4));
+    stbi_image_free(image_data);
+    return result;
+}
+
+bool FlarialGUI::LoadImageFromFile(const std::string& filePath, ID3D11ShaderResourceView** out_srv) {
+    if (!SwapchainHook::d3d11Device) return false;
+
+    // Load image data
+    auto image_data_opt = LoadImageDataDX11FromFile(filePath);
+    if (!image_data_opt) return false;
+    const auto& image_data = *image_data_opt;
+
+    // Create texture on main thread
+    D3D11_TEXTURE2D_DESC desc;
+    ZeroMemory(&desc, sizeof(desc));
+    desc.Width = image_data.width;
+    desc.Height = image_data.height;
+    desc.MipLevels = 1;
+    desc.ArraySize = 1;
+    desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    desc.SampleDesc.Count = 1;
+    desc.Usage = D3D11_USAGE_DEFAULT;
+    desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+    desc.CPUAccessFlags = 0;
+
+    winrt::com_ptr<ID3D11Texture2D> pTexture;
+    D3D11_SUBRESOURCE_DATA subResource;
+    subResource.pSysMem = image_data.data.data();
+    subResource.SysMemPitch = desc.Width * 4;
+    subResource.SysMemSlicePitch = 0;
+    HRESULT r = SwapchainHook::d3d11Device->CreateTexture2D(&desc, &subResource, pTexture.put());
+    if (FAILED(r)) return false;
+
+    // Create shader resource view
+    D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+    ZeroMemory(&srvDesc, sizeof(srvDesc));
+    srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.Texture2D.MipLevels = desc.MipLevels;
+    srvDesc.Texture2D.MostDetailedMip = 0;
+    r = SwapchainHook::d3d11Device->CreateShaderResourceView(pTexture.get(), &srvDesc, out_srv);
+    if (FAILED(r)) return false;
+
+    return true;
+}
+
 bool FlarialGUI::LoadImageFromResource(int resourceId, ID3D11ShaderResourceView** out_srv, LPCTSTR type) {
     // Load image data on a background thread
     auto future = std::async(std::launch::async, LoadImageDataDX11FromResource, resourceId, type);
@@ -122,6 +177,59 @@ struct ImageData {
     UINT uploadPitch;
     UINT uploadSize;
 };
+
+std::optional<ImageData> LoadImageDataFromFile(const std::string& filePath, ID3D12Device* device) {
+    int width, height, channels;
+    unsigned char* image_data = stbi_load(filePath.c_str(), &width, &height, &channels, 4);
+    if (!image_data) return std::nullopt;
+
+    // Prepare upload buffer
+    UINT uploadPitch = (width * 4 + D3D12_TEXTURE_DATA_PITCH_ALIGNMENT - 1u) & ~(D3D12_TEXTURE_DATA_PITCH_ALIGNMENT - 1u);
+    UINT uploadSize = height * uploadPitch;
+
+    D3D12_RESOURCE_DESC desc = {};
+    desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+    desc.Alignment = 0;
+    desc.Width = uploadSize;
+    desc.Height = 1;
+    desc.DepthOrArraySize = 1;
+    desc.MipLevels = 1;
+    desc.Format = DXGI_FORMAT_UNKNOWN;
+    desc.SampleDesc.Count = 1;
+    desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+    desc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+    D3D12_HEAP_PROPERTIES props = {};
+    props.Type = D3D12_HEAP_TYPE_UPLOAD;
+
+    winrt::com_ptr<ID3D12Resource> uploadBuffer;
+    HRESULT hr = device->CreateCommittedResource(&props, D3D12_HEAP_FLAG_NONE, &desc, D3D12_RESOURCE_STATE_GENERIC_READ, NULL, IID_PPV_ARGS(uploadBuffer.put()));
+    if (FAILED(hr) || !uploadBuffer) {
+        stbi_image_free(image_data);
+        return std::nullopt;
+    }
+
+    void* mapped = nullptr;
+    D3D12_RANGE range = { 0, uploadSize };
+    if (FAILED(uploadBuffer->Map(0, &range, &mapped)) || !mapped) {
+        stbi_image_free(image_data);
+        return std::nullopt;
+    }
+
+    for (int y = 0; y < height; y++)
+        memcpy((void*)((uintptr_t)mapped + y * uploadPitch), image_data + y * width * 4, width * 4);
+    uploadBuffer->Unmap(0, &range);
+
+    ImageData result;
+    result.width = width;
+    result.height = height;
+    result.data.assign(image_data, image_data + (width * height * 4));
+    result.uploadBuffer = std::move(uploadBuffer);
+    result.uploadPitch = uploadPitch;
+    result.uploadSize = uploadSize;
+    stbi_image_free(image_data);
+    return result;
+}
 
 std::optional<ImageData> LoadImageDataFromResource(int resourceId, LPCTSTR type, ID3D12Device* device) {
     HRSRC imageResHandle = FindResource(Client::currentModule, MAKEINTRESOURCE(resourceId), type);
@@ -218,6 +326,105 @@ bool FlarialGUI::LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HAND
     // Load image data and prepare upload buffer on background thread
     auto future = std::async(std::launch::async, LoadImageDataFromResource, resourceId, type, SwapchainHook::d3d12Device5.get());
     auto image_data_opt = future.get();
+    if (!image_data_opt) return false;
+    const auto& image_data = *image_data_opt;
+
+    // Create texture resource
+    D3D12_HEAP_PROPERTIES props = {};
+    props.Type = D3D12_HEAP_TYPE_DEFAULT;
+
+    D3D12_RESOURCE_DESC desc = {};
+    desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+    desc.Width = image_data.width;
+    desc.Height = image_data.height;
+    desc.DepthOrArraySize = 1;
+    desc.MipLevels = 1;
+    desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    desc.SampleDesc.Count = 1;
+    desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+    desc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+    winrt::com_ptr<ID3D12Resource> pTexture;
+    HRESULT hr = SwapchainHook::d3d12Device5->CreateCommittedResource(&props, D3D12_HEAP_FLAG_NONE, &desc, D3D12_RESOURCE_STATE_COPY_DEST, NULL, IID_PPV_ARGS(pTexture.put()));
+    if (FAILED(hr) || !pTexture) {
+        return false;
+    }
+
+    // Set up command list
+    uploadCommandAllocator->Reset();
+    winrt::com_ptr<ID3D12GraphicsCommandList> cmdList;
+    hr = SwapchainHook::d3d12Device5->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, uploadCommandAllocator.get(), NULL, IID_PPV_ARGS(cmdList.put()));
+    if (FAILED(hr) || !cmdList) {
+        return false;
+    }
+
+    D3D12_TEXTURE_COPY_LOCATION srcLocation = {};
+    srcLocation.pResource = image_data.uploadBuffer.get();
+    srcLocation.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
+    srcLocation.PlacedFootprint.Footprint.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    srcLocation.PlacedFootprint.Footprint.Width = image_data.width;
+    srcLocation.PlacedFootprint.Footprint.Height = image_data.height;
+    srcLocation.PlacedFootprint.Footprint.Depth = 1;
+    srcLocation.PlacedFootprint.Footprint.RowPitch = image_data.uploadPitch;
+
+    D3D12_TEXTURE_COPY_LOCATION dstLocation = {};
+    dstLocation.pResource = pTexture.get();
+    dstLocation.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+    dstLocation.SubresourceIndex = 0;
+
+    D3D12_RESOURCE_BARRIER barrier = {};
+    barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+    barrier.Transition.pResource = pTexture.get();
+    barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+    barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+    barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+
+    cmdList->CopyTextureRegion(&dstLocation, 0, 0, 0, &srcLocation, NULL);
+    cmdList->ResourceBarrier(1, &barrier);
+    cmdList->Close();
+
+    ID3D12CommandList* cmdListPtr = cmdList.get();
+    uploadCommandQueue->ExecuteCommandLists(1, &cmdListPtr);
+    uploadCommandQueue->Signal(uploadFence.get(), ++uploadFenceValue);
+    uploadFence->SetEventOnCompletion(uploadFenceValue, uploadEvent);
+    WaitForSingleObject(uploadEvent, INFINITE);
+
+    // Create shader resource view
+    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+    srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.Texture2D.MipLevels = desc.MipLevels;
+    srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    SwapchainHook::d3d12Device5->CreateShaderResourceView(pTexture.get(), &srvDesc, srv_cpu_handle);
+
+    *out_tex_resource = pTexture.detach();
+
+    return true;
+}
+
+bool FlarialGUI::LoadImageFromFile(const std::string& filePath, D3D12_CPU_DESCRIPTOR_HANDLE srv_cpu_handle, ID3D12Resource** out_tex_resource) {
+    if (!SwapchainHook::swapchain || !SwapchainHook::d3d12Device5) return false;
+
+    // Initialize static resources (reuse existing ones)
+    if (!uploadCommandQueue) {
+        D3D12_COMMAND_QUEUE_DESC queueDesc = {};
+        queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+        queueDesc.NodeMask = 1;
+        if (FAILED(SwapchainHook::d3d12Device5->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(uploadCommandQueue.put())))) return false;
+    }
+    if (!uploadCommandAllocator) {
+        if (FAILED(SwapchainHook::d3d12Device5->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(uploadCommandAllocator.put())))) return false;
+    }
+    if (!uploadFence) {
+        if (FAILED(SwapchainHook::d3d12Device5->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(uploadFence.put())))) return false;
+    }
+    if (!uploadEvent) {
+        uploadEvent = CreateEvent(0, 0, 0, 0);
+        if (!uploadEvent) return false;
+    }
+
+    // Load image data and prepare upload buffer
+    auto image_data_opt = LoadImageDataFromFile(filePath, SwapchainHook::d3d12Device5.get());
     if (!image_data_opt) return false;
     const auto& image_data = *image_data_opt;
 

@@ -49,3 +49,4 @@
 #include "Render/BobHurtEvent.hpp"
 #include "Render/Render3DEvent.hpp"
 #include "Render/ItemRendererEvent.hpp"
+#include "Game/ItemDropEvent.hpp"

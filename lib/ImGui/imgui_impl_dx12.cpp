@@ -86,6 +86,11 @@ struct ImGui_ImplDX12_Data
     ImGui_ImplDX12_Texture      FontTexture;
     bool                        LegacySingleDescriptorUsed;
 
+    // NEW: Sampler descriptor heap and handles for dynamic sampling
+    ID3D12DescriptorHeap*       pd3dSamplerDescHeap;
+    D3D12_GPU_DESCRIPTOR_HANDLE linearSamplerHandle;
+    D3D12_GPU_DESCRIPTOR_HANDLE pointSamplerHandle;
+
     ImGui_ImplDX12_Data()       { memset((void*)this, 0, sizeof(*this)); frameIndex = UINT_MAX; }
 };
 
@@ -162,6 +167,13 @@ static void ImGui_ImplDX12_SetupRenderState(ImDrawData* draw_data, ID3D12Graphic
     command_list->SetPipelineState(bd->pPipelineState);
     command_list->SetGraphicsRootSignature(bd->pRootSignature);
     command_list->SetGraphicsRoot32BitConstants(0, 16, &vertex_constant_buffer, 0);
+
+    // NEW: Set sampler descriptor heap and bind default linear sampler
+    if (bd->pd3dSamplerDescHeap) {
+        ID3D12DescriptorHeap* samplerHeaps[] = { bd->pd3dSamplerDescHeap };
+        command_list->SetDescriptorHeaps(1, samplerHeaps);
+        command_list->SetGraphicsRootDescriptorTable(2, bd->linearSamplerHandle);  // Bind default linear at slot 2
+    }
 
     // Setup blend factor
     const float blend_factor[4] = { 0.f, 0.f, 0.f, 0.f };
@@ -490,7 +502,15 @@ bool    ImGui_ImplDX12_CreateDeviceObjects()
         descRange.RegisterSpace = 0;
         descRange.OffsetInDescriptorsFromTableStart = 0;
 
-        D3D12_ROOT_PARAMETER param[2] = {};
+        // NEW: Add descriptor range for sampler table
+        D3D12_DESCRIPTOR_RANGE samplerRange = {};
+        samplerRange.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER;
+        samplerRange.NumDescriptors = 1;
+        samplerRange.BaseShaderRegister = 0;
+        samplerRange.RegisterSpace = 0;
+        samplerRange.OffsetInDescriptorsFromTableStart = 0;
+
+        D3D12_ROOT_PARAMETER param[3] = {};
 
         param[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;
         param[0].Constants.ShaderRegister = 0;
@@ -503,27 +523,17 @@ bool    ImGui_ImplDX12_CreateDeviceObjects()
         param[1].DescriptorTable.pDescriptorRanges = &descRange;
         param[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 
-        // Bilinear sampling is required by default. Set 'io.Fonts->Flags |= ImFontAtlasFlags_NoBakedLines' or 'style.AntiAliasedLinesUseTex = false' to allow point/nearest sampling.
-        D3D12_STATIC_SAMPLER_DESC staticSampler = {};
-        staticSampler.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
-        staticSampler.AddressU = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
-        staticSampler.AddressV = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
-        staticSampler.AddressW = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
-        staticSampler.MipLODBias = 0.f;
-        staticSampler.MaxAnisotropy = 0;
-        staticSampler.ComparisonFunc = D3D12_COMPARISON_FUNC_ALWAYS;
-        staticSampler.BorderColor = D3D12_STATIC_BORDER_COLOR_TRANSPARENT_BLACK;
-        staticSampler.MinLOD = 0.f;
-        staticSampler.MaxLOD = 0.f;
-        staticSampler.ShaderRegister = 0;
-        staticSampler.RegisterSpace = 0;
-        staticSampler.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+        // NEW: param[2] for sampler table (replaces static sampler)
+        param[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+        param[2].DescriptorTable.pDescriptorRanges = &samplerRange;
+        param[2].DescriptorTable.NumDescriptorRanges = 1;
+        param[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 
         D3D12_ROOT_SIGNATURE_DESC desc = {};
         desc.NumParameters = _countof(param);
         desc.pParameters = param;
-        desc.NumStaticSamplers = 1;
-        desc.pStaticSamplers = &staticSampler;
+        desc.NumStaticSamplers = 0;  // Remove static sampler
+        desc.pStaticSamplers = nullptr;
         desc.Flags =
             D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
             D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |
@@ -562,6 +572,39 @@ bool    ImGui_ImplDX12_CreateDeviceObjects()
 
         bd->pd3dDevice->CreateRootSignature(0, blob->GetBufferPointer(), blob->GetBufferSize(), IID_PPV_ARGS(&bd->pRootSignature));
         blob->Release();
+    }
+
+    // NEW: Create shader-visible sampler descriptor heap with linear and point samplers
+    {
+        D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {};
+        heapDesc.NumDescriptors = 2;  // One for linear, one for point
+        heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER;
+        heapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+
+        if (SUCCEEDED(bd->pd3dDevice->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&bd->pd3dSamplerDescHeap)))) {
+            D3D12_CPU_DESCRIPTOR_HANDLE samplerCPU = bd->pd3dSamplerDescHeap->GetCPUDescriptorHandleForHeapStart();
+            UINT samplerIncrement = bd->pd3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
+
+            // Linear sampler (default for fonts/UI)
+            D3D12_SAMPLER_DESC linearDesc = {};
+            linearDesc.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;  // Bilinear
+            linearDesc.AddressU = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+            linearDesc.AddressV = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+            linearDesc.AddressW = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+            linearDesc.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
+            linearDesc.MinLOD = 0;
+            linearDesc.MaxLOD = D3D12_FLOAT32_MAX;
+            bd->pd3dDevice->CreateSampler(&linearDesc, samplerCPU);
+            bd->linearSamplerHandle = bd->pd3dSamplerDescHeap->GetGPUDescriptorHandleForHeapStart();
+
+            // Point sampler (nearest-neighbor)
+            D3D12_CPU_DESCRIPTOR_HANDLE pointCPU = samplerCPU;
+            pointCPU.ptr += samplerIncrement;
+            D3D12_SAMPLER_DESC pointDesc = linearDesc;  // Copy base
+            pointDesc.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;  // Nearest
+            bd->pd3dDevice->CreateSampler(&pointDesc, pointCPU);
+            bd->pointSamplerHandle.ptr = bd->linearSamplerHandle.ptr + samplerIncrement;
+        }
     }
 
     // By using D3DCompile() from <d3dcompiler.h> / d3dcompiler.lib, we introduce a dependency to a given version of d3dcompiler_XX.dll (see D3DCOMPILER_DLL_A)
@@ -717,6 +760,9 @@ void    ImGui_ImplDX12_InvalidateDeviceObjects()
     SafeRelease(bd->pRootSignature);
     SafeRelease(bd->pPipelineState);
 
+    // NEW: Release sampler descriptor heap
+    SafeRelease(bd->pd3dSamplerDescHeap);
+
     // Free SRV descriptor used by texture
     ImGuiIO& io = ImGui::GetIO();
     ImGui_ImplDX12_Texture* font_tex = &bd->FontTexture;
@@ -730,6 +776,27 @@ void    ImGui_ImplDX12_InvalidateDeviceObjects()
         SafeRelease(fr->IndexBuffer);
         SafeRelease(fr->VertexBuffer);
     }
+}
+
+// NEW: Helper functions to access sampler handles for dynamic sampler switching
+D3D12_GPU_DESCRIPTOR_HANDLE ImGui_ImplDX12_GetLinearSamplerHandle()
+{
+    ImGui_ImplDX12_Data* bd = ImGui_ImplDX12_GetBackendData();
+    if (bd && bd->pd3dSamplerDescHeap) {
+        return bd->linearSamplerHandle;
+    }
+    D3D12_GPU_DESCRIPTOR_HANDLE nullHandle = {};
+    return nullHandle;
+}
+
+D3D12_GPU_DESCRIPTOR_HANDLE ImGui_ImplDX12_GetPointSamplerHandle()
+{
+    ImGui_ImplDX12_Data* bd = ImGui_ImplDX12_GetBackendData();
+    if (bd && bd->pd3dSamplerDescHeap) {
+        return bd->pointSamplerHandle;
+    }
+    D3D12_GPU_DESCRIPTOR_HANDLE nullHandle = {};
+    return nullHandle;
 }
 
 bool ImGui_ImplDX12_Init(ImGui_ImplDX12_InitInfo* init_info)

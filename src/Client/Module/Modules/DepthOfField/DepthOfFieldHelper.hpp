@@ -7,14 +7,13 @@ using namespace DirectX;
 struct DepthOfFieldInputBuffer
 {
     XMFLOAT2 resolution;
-    XMFLOAT2 offset;
     XMFLOAT2 halfpixel;
     float intensity;
     float focusRange;
     float focusDistance;
     float autoFocus;
-    float _padding;
-    float _padding2;
+    float useMSAADepth;
+    float _padding[3];
 };
 
 
@@ -22,10 +21,8 @@ class DepthOfFieldHelper
 {
 public:
 
-    static inline ID3D11PixelShader* pGaussianBlurHorizontalShader = nullptr;
-    static inline ID3D11PixelShader* pGaussianBlurVerticalShader = nullptr;
-    static inline ID3D11PixelShader* pDepthBlurHorizontalShader = nullptr;
-    static inline ID3D11PixelShader* pDepthBlurVerticalShader = nullptr;
+    static inline ID3D11PixelShader* pHorizontalShader = nullptr;
+    static inline ID3D11PixelShader* pVerticalShader = nullptr;
     static inline ID3D11VertexShader* pVertexShader = nullptr;
     static inline ID3D11InputLayout* pInputLayout = nullptr;
 
@@ -50,16 +47,9 @@ public:
     static inline ID3D11BlendState* pBlendState = nullptr;
     static inline ID3D11RasterizerState* pRasterizerState = nullptr;
 
-    // Keep the depth map SRV for depth of field calculations
     static inline ID3D11ShaderResourceView* pDepthMapSRV = nullptr;
-
-    // Depth blur intermediate textures
-    static inline ID3D11Texture2D* pDepthBlurTexture1 = nullptr;
-    static inline ID3D11Texture2D* pDepthBlurTexture2 = nullptr;
-    static inline ID3D11RenderTargetView* pDepthBlurRTV1 = nullptr;
-    static inline ID3D11RenderTargetView* pDepthBlurRTV2 = nullptr;
-    static inline ID3D11ShaderResourceView* pDepthBlurSRV1 = nullptr;
-    static inline ID3D11ShaderResourceView* pDepthBlurSRV2 = nullptr;
+    static inline bool isMSAADepth = false;
+    static inline int msaaSampleCount = 1;
 
 
     // RAII
@@ -68,10 +58,9 @@ public:
 
     static void RenderToRTV(ID3D11RenderTargetView*, ID3D11ShaderResourceView*, XMFLOAT2);
 
-    static void RenderDepthOfField(ID3D11RenderTargetView*, int, float, float, float, bool, float);
+    static void RenderDepthOfField(ID3D11RenderTargetView*, float, float, float, bool);
 
 
 private:
-    static bool EnsureIntermediateTextures(UINT width, UINT height);
-    static void ReleaseIntermediateTextures();
+    static void SetupShaderResources(ID3D11DeviceContext* pContext, ID3D11ShaderResourceView* pColorSRV);
 };

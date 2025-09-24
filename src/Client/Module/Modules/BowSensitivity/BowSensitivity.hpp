@@ -13,7 +13,7 @@ private:
 public:
 
 	BowSensitivity() : Module("Bow Sensitivity", "Lowers sensitivity when aiming with a bow",
-		IDR_FIELD_OF_VIEW_PNG, "") {
+		IDR_BOWSENS_PNG, "") {
 	}
 
 	void onEnable() override;

@@ -42,8 +42,6 @@ void DepthOfField::defaultConfig() {
     if (settings.getSettingByName<bool>("autoFocus") == nullptr)
         settings.addSetting("autoFocus", false);
 
-    if (settings.getSettingByName<float>("depthBlur") == nullptr)
-        settings.addSetting("depthBlur", 1.0f);
 
 
     Module::defaultConfig("core");
@@ -67,7 +65,6 @@ void DepthOfField::settingsRender(float settingsOffset) {
     addSlider("Amount", "Maximum blur for out-of-focus areas", "amount", 5.0f);
     addSlider("Quality", "Higher values = smoother blur", "quality", 5.0f, 1.0f);
     addSlider("Focus", "Adjust what distance is in focus", "focus", 1.0f);
-    addSlider("Depth Blur", "Smoothness of focus transitions", "depthBlur", 3.0f);
 
     FlarialGUI::UnsetScrollView();
 
@@ -80,25 +77,14 @@ void DepthOfField::onRender(RenderUnderUIEvent &event) {
     }
     if (SwapchainHook::isDX12) return;
 
-    static bool initialized = false;
-    if (!initialized) {
-        try {
-            DepthOfFieldHelper::InitializePipeline();
-            initialized = true;
-        } catch (const std::exception& e) {
-            return;
-        }
-    }
-
     auto strengthSetting = settings.getSettingByName<float>("strength");
     auto qualitySetting = settings.getSettingByName<float>("quality");
     auto rangeSetting = settings.getSettingByName<float>("range");
     auto amountSetting = settings.getSettingByName<float>("amount");
     auto focusSetting = settings.getSettingByName<float>("focus");
     auto autoFocusSetting = settings.getSettingByName<bool>("autoFocus");
-    auto depthBlurSetting = settings.getSettingByName<float>("depthBlur");
 
-    if (!strengthSetting || !qualitySetting || !rangeSetting || !amountSetting || !focusSetting || !autoFocusSetting || !depthBlurSetting) {
+    if (!strengthSetting || !qualitySetting || !rangeSetting || !amountSetting || !focusSetting || !autoFocusSetting) {
         return;
     }
 
@@ -108,18 +94,16 @@ void DepthOfField::onRender(RenderUnderUIEvent &event) {
     float maxBlur = amountSetting->value;
     float focusDistance = focusSetting->value;
     bool autoFocus = autoFocusSetting->value;
-    float depthBlurAmount = depthBlurSetting->value;
 
     intensity = std::max(0.0f, std::min(intensity, 3.0f));
     iterations = std::max(1, std::min(iterations, 5));
     focusRange = std::max(0.1f, std::min(focusRange, 5.0f));
     maxBlur = std::max(1.0f, std::min(maxBlur, 5.0f));
     focusDistance = std::max(0.0f, std::min(focusDistance, 1.0f));
-    depthBlurAmount = std::max(0.0f, std::min(depthBlurAmount, 3.0f));
 
     if (intensity <= 0.01f) {
         return;
     }
 
-    DepthOfFieldHelper::RenderDepthOfField(event.RTV, iterations, intensity, focusRange, focusDistance, autoFocus, depthBlurAmount);
+    DepthOfFieldHelper::RenderDepthOfField(event.RTV, intensity * maxBlur, focusRange, focusDistance, autoFocus);
 }

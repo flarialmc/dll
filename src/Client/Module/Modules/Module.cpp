@@ -1054,7 +1054,7 @@ void Module::defaultAddSettings(std::string type) {
         addToggle("Glow", "", "glow");
         addConditionalSlider(getOps<bool>("glow"), "Glow Amount", "", "glowAmount", 100.f);
     } else if (type == "text") {
-        addTextBox("Format", "", 0, "text");
+        addTextBox("Format", "Use {value} for the value.", 0, "text");
         addSlider("Text Scale", "", "textscale", 2.0f);
         addDropdown("Text Alignment", "", std::vector<std::string>{"Left", "Center", "Right"}, "textalignment", true);
         addToggle("Text Shadow", "Displays a shadow under the text", "textShadow");
@@ -1075,6 +1075,21 @@ void Module::defaultAddSettings(std::string type) {
         addSlider("Rectangle Width", "", "rectwidth", 2.f, 0.001f);
         addSlider("Rectangle Height", "", "rectheight", 2.f, 0.001f);
         addSlider("Rotation", "", "rotation", 360.f, 0, false);
+    } else if (type == "all") {
+        addHeader("Main");
+        defaultAddSettings("main");
+        extraPadding();
+
+        addHeader("Text");
+        defaultAddSettings("text");
+        extraPadding();
+
+        addHeader("Colors");
+        defaultAddSettings("colors");
+        extraPadding();
+
+        addHeader("Misc");
+        defaultAddSettings("misc");
     }
 }
 

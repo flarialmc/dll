@@ -50,20 +50,8 @@ void UnderUIHooks::ClearDepthStencilViewCallbackDX11(
     FLOAT Depth,
     UINT8 Stencil) {
 
-    static int index = 0;
-    index++;
-
     if (ClearFlags == D3D11_CLEAR_DEPTH && SwapchainHook::init) {
-        underUI = true;
-    }
-
-    // Only capture depth if underUI flag is set
-    if (underUI) {
-        // Save depth map using the new function
         SwapchainHook::SaveDepthmap(pContext, pDepthStencilView);
-
-        // Reset underUI flag and call DX11Render after depth map processing
-        underUI = false;
         SwapchainHook::DX11Render(true);
     }
 

@@ -390,3 +390,4 @@ void SwapchainHook::ResetDescriptorAllocation() {
     nextAvailableDescriptorIndex = IMGUI_FONT_DESCRIPTORS;
     Logger::custom(fg(fmt::color::yellow), "DescriptorAlloc", "Reset descriptor allocation, next available index: {}", nextAvailableDescriptorIndex);
 }
+

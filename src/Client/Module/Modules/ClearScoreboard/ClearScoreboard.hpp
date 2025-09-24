@@ -5,7 +5,7 @@
 class ClearScoreboard : public Module {
 public:
     ClearScoreboard() : Module("Clear Scoreboard", "Clears the scoreboard from the screen.",
-                               IDR_MOVABLE_PNG, "") {
+        IDR_CLEARBG_PNG, "") {
     }
 
     void onEnable() override;

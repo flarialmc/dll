@@ -128,6 +128,7 @@
 #include "Modules/SwingAnimations/SwingAnimations.hpp"
 #include "Modules/Subtitles/Subtitles.hpp"
 #include "Modules/SensMultiplier/SensMultiplier.hpp"
+#include "Modules/Stopwatch/Stopwatch.hpp"
 
 #ifdef COMPILE_DOOM
 	#include "Modules/Doom/Doom.hpp"
@@ -306,6 +307,7 @@ void ModuleManager::initialize() {
 
 	addModule<Subtitles>();
 	addModule<SensMultiplier>();
+	addModule<Stopwatch>();
 
 	addModule<DepthOfField>();
 
