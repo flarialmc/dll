@@ -32,6 +32,7 @@ public:
 	CrosshairImage() {};
 	const unsigned char* getImageData();
 	void SaveImage(std::string name);
+	bool isValid() const { return valid && !PixelData.empty() && Size > 0; }
 };
 
 class CustomCrosshair : public Module
@@ -94,6 +95,7 @@ public:
 	void cleanupTextures();
 	void cleanupTexturesDX12();
 	void reinitializeAfterResize();
+	void reloadCrosshairFromFile(const std::string& crosshairName);
 
 private:
 	ImTextureID loadCrosshairTexture(const std::string& crosshairName);

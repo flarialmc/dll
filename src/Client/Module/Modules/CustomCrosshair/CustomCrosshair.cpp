@@ -4,6 +4,7 @@
 #include "Utils/Render/PositionUtils.hpp"
 #include "GUI/Engine/Engine.hpp"
 #include "Hook/Hooks/Render/DirectX/DXGI/SwapchainHook.hpp"
+#include "GUI/Engine/Constraints.hpp"
 #include <thread>
 #include <chrono>
 
@@ -179,10 +180,21 @@ void CustomCrosshair::onRender(RenderEvent &event) {
     actuallyRenderWindow = false;
     if (!blankWindow) CurrentSelectedCrosshair = settings.getSettingByName<std::string>("CurrentCrosshair")->value;
 
+    // Handle crosshair reload
+    if (CrosshairReloaded) {
+        std::string currentCrosshair = settings.getSettingByName<std::string>("CurrentCrosshair")->value;
+        if (!currentCrosshair.empty()) {
+            reloadCrosshairFromFile(currentCrosshair);
+        }
+        CrosshairReloaded = false;
+    }
+
     renderImGuiCrosshair();
 }
 
 ImTextureID CustomCrosshair::loadCrosshairTexture(const std::string& crosshairName) {
+    if (!isRenderingSafe) return 0;
+
     std::string filePath = Utils::getClientPath() + "\\Crosshairs\\" + crosshairName + ".png";
 
     if (!std::filesystem::exists(filePath)) {
@@ -190,16 +202,16 @@ ImTextureID CustomCrosshair::loadCrosshairTexture(const std::string& crosshairNa
     }
 
     auto it = crosshairTextures.find(crosshairName);
-    if (it != crosshairTextures.end()) {
+    if (it != crosshairTextures.end() && it->second) {
         return reinterpret_cast<ImTextureID>(it->second.get());
     }
 
     ID3D11ShaderResourceView* texture = nullptr;
-    if (FlarialGUI::LoadImageFromFile(filePath, &texture)) {
+    if (FlarialGUI::LoadImageFromFile(filePath, &texture) && texture) {
         crosshairTextures[crosshairName].attach(texture);
 
         auto chIt = crosshairs.find(crosshairName);
-        if (chIt != crosshairs.end() && chIt->second != nullptr) {
+        if (chIt != crosshairs.end() && chIt->second != nullptr && chIt->second->isValid()) {
             crosshairSizes[crosshairName] = Vec2<int>(chIt->second->Size, chIt->second->Size);
         } else {
             crosshairSizes[crosshairName] = Vec2<int>(16, 16);
@@ -257,7 +269,7 @@ void CustomCrosshair::cleanupTextures() {
 }
 
 void CustomCrosshair::renderImGuiCrosshair() {
-    if (!isRenderingSafe || !isValidPlayer || !isHudScreen) return;
+    if (!isRenderingSafe || !isValidPlayer || !isHudScreen || ModuleManager::getModule("ClickGUI")->isEnabled()) return;
 
     auto renderInThirdPerson = settings.getSettingByName<bool>("renderInThirdPerson")->value;
     if (!renderInThirdPerson && currentPerspective != Perspective::FirstPerson) return;
@@ -288,9 +300,14 @@ void CustomCrosshair::renderImGuiCrosshair() {
 
     if (!crosshairTexture) {
         if (SwapchainHook::isDX12) {
-            if (!defaultCrosshairTextureDX12) loadDefaultCrosshairTextureDX12();
+            if (!defaultCrosshairTextureDX12 || defaultCrosshairTextureDX12Handle == 0) {
+                loadDefaultCrosshairTextureDX12();
+            }
             crosshairTexture = defaultCrosshairTextureDX12Handle;
         } else {
+            if (!defaultCrosshairTexture) {
+                loadDefaultCrosshairTexture();
+            }
             crosshairTexture = reinterpret_cast<ImTextureID>(defaultCrosshairTexture.get());
         }
         crosshairPixelSize = defaultCrosshairSize;
@@ -301,9 +318,9 @@ void CustomCrosshair::renderImGuiCrosshair() {
     float scale = settings.getSettingByName<float>("uiscale")->value;
     Vec2<float> crosshairSize = Vec2<float>(crosshairPixelSize.x * scale, crosshairPixelSize.y * scale);
 
-    ImVec2 screenCenter = ImVec2(ImGui::GetIO().DisplaySize.x * 0.5f, ImGui::GetIO().DisplaySize.y * 0.5f);
+    ImVec2 screenCenter = ImVec2(Constraints::PercentageConstraint(1.f, "left"), Constraints::PercentageConstraint(1.f, "top"));
     // Round to integer pixel coordinates for crisp rendering
-    ImVec2 crosshairPos = ImVec2(floorf(screenCenter.x - crosshairSize.x * 0.5f), floorf(screenCenter.y - crosshairSize.y * 0.5f));
+    ImVec2 crosshairPos = ImVec2(floorf((screenCenter.x - crosshairSize.x) * 0.5f), floorf((screenCenter.y - crosshairSize.y) * 0.5f));
 
     auto useSolidColor = settings.getSettingByName<bool>("solidColor")->value;
     auto useSolidColorWhenHighlighted = settings.getSettingByName<bool>("solidColorWhenHighlighted")->value;
@@ -376,25 +393,29 @@ void CustomCrosshair::renderImGuiCrosshair() {
 }
 
 void CustomCrosshair::invalidateCrosshairTexture(const std::string& crosshairName) {
+    // Clean up DX11 textures
     auto it = crosshairTextures.find(crosshairName);
     if (it != crosshairTextures.end()) {
-        if (SwapchainHook::isDX12) {
-            auto dx12It = crosshairTexturesDX12.find(crosshairName);
-            if (dx12It != crosshairTexturesDX12.end()) {
-                if (dx12It->second.second) {
-                    dx12It->second.second->Release();
-                }
-                crosshairTexturesDX12.erase(dx12It);
-            }
-        } else {
-            it->second = nullptr;
-        }
+        it->second = nullptr;
         crosshairTextures.erase(it);
     }
+
+    // Clean up DX12 textures
+    auto dx12It = crosshairTexturesDX12.find(crosshairName);
+    if (dx12It != crosshairTexturesDX12.end()) {
+        if (dx12It->second.second) {
+            dx12It->second.second = nullptr;
+        }
+        crosshairTexturesDX12.erase(dx12It);
+    }
+
+    // Remove size information
     crosshairSizes.erase(crosshairName);
 }
 
 ImTextureID CustomCrosshair::loadCrosshairTextureDX12(const std::string& crosshairName) {
+    if (!isRenderingSafe) return 0;
+
     std::string filePath = Utils::getClientPath() + "\\Crosshairs\\" + crosshairName + ".png";
 
     if (!std::filesystem::exists(filePath)) {
@@ -402,7 +423,7 @@ ImTextureID CustomCrosshair::loadCrosshairTextureDX12(const std::string& crossha
     }
 
     auto it = crosshairTexturesDX12.find(crosshairName);
-    if (it != crosshairTexturesDX12.end()) {
+    if (it != crosshairTexturesDX12.end() && it->second.first != 0) {
         return it->second.first;
     }
 
@@ -418,12 +439,12 @@ ImTextureID CustomCrosshair::loadCrosshairTextureDX12(const std::string& crossha
     }
 
     ID3D12Resource* texture = nullptr;
-    if (FlarialGUI::LoadImageFromFile(filePath, cpu, &texture)) {
+    if (FlarialGUI::LoadImageFromFile(filePath, cpu, &texture) && texture) {
         crosshairTexturesDX12[crosshairName].first = (ImTextureID)gpu.ptr;
         crosshairTexturesDX12[crosshairName].second.attach(texture);
 
         auto chIt = crosshairs.find(crosshairName);
-        if (chIt != crosshairs.end() && chIt->second != nullptr) {
+        if (chIt != crosshairs.end() && chIt->second != nullptr && chIt->second->isValid()) {
             crosshairSizes[crosshairName] = Vec2<int>(chIt->second->Size, chIt->second->Size);
         } else {
             crosshairSizes[crosshairName] = Vec2<int>(16, 16);
@@ -519,4 +540,24 @@ void CustomCrosshair::reinitializeAfterResize() {
 
 void CustomCrosshair::cleanupSamplerStates() {
 
+}
+
+void CustomCrosshair::reloadCrosshairFromFile(const std::string& crosshairName) {
+    if (!isRenderingSafe || crosshairName.empty()) return;
+
+    std::string filePath = Utils::getClientPath() + "\\Crosshairs\\" + crosshairName + ".png";
+    if (!std::filesystem::exists(filePath)) return;
+
+    // Clean up existing crosshair
+    auto it = crosshairs.find(crosshairName);
+    if (it != crosshairs.end() && it->second != nullptr) {
+        delete it->second;
+        it->second = nullptr;
+    }
+
+    // Invalidate cached textures
+    invalidateCrosshairTexture(crosshairName);
+
+    // Load new crosshair from file
+    crosshairs[crosshairName] = new CrosshairImage(filePath);
 }

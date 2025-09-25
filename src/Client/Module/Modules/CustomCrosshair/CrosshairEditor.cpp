@@ -69,19 +69,29 @@ const unsigned char* CrosshairImage::getImageData()
 
 void CrosshairImage::SaveImage(std::string name)
 {
+    if (!valid || PixelData.empty() || Size <= 0) {
+        return;
+    }
+
+    // Ensure directory exists
+    std::string crosshairDir = Utils::getClientPath() + "\\Crosshairs";
+    if (!std::filesystem::exists(crosshairDir)) {
+        std::filesystem::create_directories(crosshairDir);
+    }
+
     // Get the image data
     const unsigned char* data = getImageData();
 
-    // Use stb_image_write to save the PNG
-    int result = stbi_write_png((Utils::getClientPath() + "//Crosshairs//" + name + ".png").c_str(), Size, Size, 4, data, Size * 4);
+    if (data != nullptr) {
+        // Use stb_image_write to save the PNG
+        int result = stbi_write_png((Utils::getClientPath() + "\\Crosshairs\\" + name + ".png").c_str(), Size, Size, 4, data, Size * 4);
 
-    // Clean up the allocated memory
-    delete[] data;
+        // Clean up the allocated memory
+        delete[] data;
 
-    // Optional: Log error if save fails
-    if (!result) {
-        // Add error handling (e.g., log to console or UI)
-        // std::cerr << "Failed to save crosshair: " << name << std::endl;
+        if (!result) {
+            valid = false;
+        }
     }
 }
 
