@@ -125,10 +125,12 @@
 #include "Modules/ParticleMultiplier/ParticleMultiplier.hpp"
 #include "Modules/BowSensitivity/BowSensitivity.hpp"
 #include "Modules/DepthOfField/DepthOfField.hpp"
+#include "Modules/InventoryLock/InventoryLock.hpp"
 #include "Modules/SwingAnimations/SwingAnimations.hpp"
 #include "Modules/Subtitles/Subtitles.hpp"
 #include "Modules/SensMultiplier/SensMultiplier.hpp"
 #include "Modules/Stopwatch/Stopwatch.hpp"
+#include "Modules/InventoryLock/InventoryLock.hpp"
 
 #ifdef COMPILE_DOOM
 	#include "Modules/Doom/Doom.hpp"
@@ -310,6 +312,8 @@ void ModuleManager::initialize() {
 	addModule<Stopwatch>();
 
 	addModule<DepthOfField>();
+
+	addModule<InventoryLock>();
 
 #ifdef COMPILE_DOOM
 	addModule<DoomModule>();
