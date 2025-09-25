@@ -1,6 +1,8 @@
 #include "HiveUtils.hpp"
 
 #include "Client.hpp"
+#include "SDK/Client/Network/Packet/ModalFormRequestPacket.hpp"
+#include "SDK/Client/Network/Packet/ModalFormResponsePacket.hpp"
 
 #include "SDK/Client/Network/Packet/SetTitlePacket.hpp"
 
@@ -45,6 +47,18 @@ void HiveUtils::defaultConfig() {
     setDef("partyaccept", false);
     setDef("deathcountenabled", false);
     setDef("deathcount", 5);
+
+    // auto select
+    setDef("bedwarsenabled", false);
+    setDef("bedwars", (std::string) "Solos");
+    setDef("skywarsenabled", false);
+    setDef("skywars", (std::string) "Solos");
+    setDef("buildbattleenabled", false);
+    setDef("buildbattle", (std::string) "Solos");
+    setDef("survivalgamesenabled", false);
+    setDef("survivalgames", (std::string) "Solos");
+    setDef("thebridgeenabled", false);
+    setDef("thebridge", (std::string) "Solos");
 }
 
 void HiveUtils::settingsRender(float settingsOffset) {
@@ -122,6 +136,17 @@ void HiveUtils::settingsRender(float settingsOffset) {
     addToggle("Friend request", "Automatically accept incoming friend requests.", "friendaccept");
     addToggle("Party request", "Automatically accept incoming party requests.", "partyaccept");
 
+    addHeader("Auto Select Variants");
+    addToggle("BedWars", "Choose between solos, duos, squads etc.", "bedwarsenabled");
+    addConditionalDropdown(getOps<bool>("bedwarsenabled"), "BedWars: Choose Variant", "trans", std::vector<std::string>{"Solos", "Duos", "Squads", "Manor", "MEGA"}, "bedwars", true);
+    addToggle("SkyWars", "Choose between solos, duos, squads etc.", "skywarsenabled");
+    addConditionalDropdown(getOps<bool>("skywarsenabled"), "SkyWars: Choose Variant", "rights", std::vector<std::string>{"Solos", "Duos", "Squads", "MEGA LTM"}, "skywars", true);
+    addToggle("Build Battle", "Choose between solos, duos, etc.", "buildbattleenabled");
+    addConditionalDropdown(getOps<bool>("buildbattleenabled"), "Build Battle: Choose Variant", "are", std::vector<std::string>{"Solos", "Duos", "Speed Builders (LTM)", "Solos (Double Build Time)", "Duos (Double Build Time)"}, "buildbattle", true);
+    addToggle("Survival Games", "Choose between solos, duos, squads etc.", "survivalgamesenabled");
+    addConditionalDropdown(getOps<bool>("survivalgamesenabled"), "Survival Games: Choose Variant", "human", std::vector<std::string>{"Solos", "Duos"}, "survivalgames", true);
+    addToggle("The Bridge", "Choose between solo and duos.", "thebridgeenabled");
+    addConditionalDropdown(getOps<bool>("thebridgeenabled"), "The Bridge: Choose Variant", "rights", std::vector<std::string>{"Solos", "Duos"}, "thebridge", true);
     FlarialGUI::UnsetScrollView();
     resetPadding();
 }
@@ -348,6 +373,135 @@ void HiveUtils::onPacketReceive(PacketEvent &event) {
             }
         }
     }
+    if (id == MinecraftPacketIds::ShowModalForm) {
+        auto smf = reinterpret_cast<ModalFormRequestPacket*>(event.getPacket());
+        std::string formJsonStr = smf->mFormJSON;
+        int formId = smf->mFormId;
+
+        if (formJsonStr.empty()) return;
+
+        try {
+            auto dialog = nlohmann::json::parse(formJsonStr);
+
+            // clean up "garbage"
+            auto norm = [](const std::string &s_in)->std::string {
+                std::string s = String::removeColorCodes(s_in);
+                for (char &c : s) c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+                size_t a = s.find_first_not_of(" \t\r\n");
+                if (a == std::string::npos) return std::string();
+                size_t b = s.find_last_not_of(" \t\r\n");
+                return s.substr(a, b - a + 1);
+            };
+
+            std::string rawTitle;
+            if (dialog.contains("title") && dialog["title"].is_string()) rawTitle = dialog["title"].get<std::string>();
+            else if (dialog.contains("header") && dialog["header"].is_string()) rawTitle = dialog["header"].get<std::string>();
+            else if (dialog.contains("content") && dialog["content"].is_string()) rawTitle = dialog["content"].get<std::string>();
+
+            std::string titleNoColor = String::removeColorCodes(rawTitle);
+            std::string titleNorm = norm(rawTitle);
+
+            std::vector<std::pair<int,std::string>> options;
+            const std::vector<std::string> candidateArrays = {"buttons","options","choices","entries","elements","content"};
+            for (auto &name : candidateArrays) {
+                if (dialog.contains(name) && dialog[name].is_array()) {
+                    int idx = 0;
+                    for (auto &elem : dialog[name]) {
+                        std::string label;
+                        if (elem.is_string()) label = elem.get<std::string>();
+                        else if (elem.contains("text") && elem["text"].is_string()) label = elem["text"].get<std::string>();
+                        else if (elem.contains("label") && elem["label"].is_string()) label = elem["label"].get<std::string>();
+                        else try { label = elem.dump(); } catch(...) { label = std::string(); }
+                        options.emplace_back(idx, label);
+                        ++idx;
+                    }
+                    break;
+                }
+            }
+
+            // for (size_t i = 0; i < options.size() && i < 6; ++i) {
+            //     Logger::debug("  opt[{}] = \"{}\"", options[i].first, String::removeColorCodes(options[i].second));
+            // }
+            // if (options.size() > 6) Logger::debug("  ... ({} more)", options.size() - 6);
+
+            if (options.empty()) return;
+
+            // craft the packet, cancel out dialog popup
+            auto sendResponseAndCancel = [&](int chosenIdx, const std::string &chosenLabel, const std::string &notifyMsg) -> void {
+                event.cancel();
+                if (!notifyMsg.empty()) FlarialGUI::Notify(notifyMsg);
+                std::shared_ptr<Packet> packet = SDK::createPacket(static_cast<int>(MinecraftPacketIds::ModalFormResponse));
+                auto* formResponsePacket = reinterpret_cast<ModalFormResponsePacket*>(packet.get());
+                formResponsePacket->mFormId = formId;
+                MinecraftJson::Value json;
+                json.mType = MinecraftJson::ValueType::Int;
+                json.mValue.mInt = chosenIdx;
+                formResponsePacket->mFormResponse = json;
+                // Logger::info("sel index={} label=\"{}\"", chosenIdx, chosenLabel);
+                SDK::clientInstance->getPacketSender()->sendToServer(formResponsePacket);
+            };
+
+            // find btn with something...
+            auto findOptionContaining = [&](const std::string &targetRaw)->int {
+                if (targetRaw.empty()) return -1;
+                std::string target = norm(targetRaw);
+                for (auto &p : options) {
+                    std::string labelNorm = norm(p.second);
+                    if (!target.empty() && labelNorm.find(target) != std::string::npos) return p.first;
+                }
+                return -1;
+            };
+
+            // try to auto-select based on title and config
+            auto tryAuto = [&](const std::string &gameTitleToken,
+                               const std::function<bool()> &isEnabled,
+                               const std::function<std::string()> &getWant,
+                               const std::string &notifyPrefix)->bool {
+                std::string gnorm = gameTitleToken;
+                if (titleNorm.find(gnorm) == std::string::npos) return false;
+                if (!isEnabled()) return false;
+
+                std::string want = getWant();
+                int idx = findOptionContaining(want);
+                if (idx >= 0) {
+                    std::string chosenLabel = String::removeColorCodes(options[idx].second);
+                    sendResponseAndCancel(idx, chosenLabel, notifyPrefix + want);
+                    return true;
+                }
+                return false;
+            };
+
+            bool handled = false;
+
+            handled = tryAuto("bedwars",
+                [&](){ return getOps<bool>("bedwarsenabled"); },
+                [&](){ return getOps<std::string>("bedwars"); },
+                "Selecting BedWars ");
+
+            if (!handled) handled = tryAuto("skywars",
+                [&](){ return getOps<bool>("skywarsenabled"); },
+                [&](){ return getOps<std::string>("skywars"); },
+                "Selecting SkyWars ");
+
+            if (!handled) handled = tryAuto("build",
+                [&](){ return getOps<bool>("buildbattleenabled"); },
+                [&](){ return getOps<std::string>("buildbattle"); },
+                "Selecting Build Battle ");
+
+            if (!handled) handled = tryAuto("bridge",
+                [&](){ return getOps<bool>("thebridgeenabled"); },
+                [&](){ return getOps<std::string>("thebridge"); },
+                "Selecting The Bridge ");
+
+            if (!handled) handled = tryAuto("survival",
+                [&](){ return getOps<bool>("survivalgamesenabled"); },
+                [&](){ return getOps<std::string>("survivalgames"); },
+                "Selecting Survival Games ");
+
+        } catch (const std::exception &e) {
+            Logger::error("can't parse modal json: {}", e.what());
+        }
+    }
 }
 
 void HiveUtils::reQ() {
@@ -383,8 +537,5 @@ void HiveUtils::reQ() {
 void HiveUtils::onKey(KeyEvent& event)
 {
     if (!this->isEnabled()) return;
-    if (isKeybind(event.keys) && isKeyPartOfKeybind(event.key) &&
-        (SDK::getCurrentScreen() == "hud_screen" || SDK::getCurrentScreen() == "f3_screen" || SDK::getCurrentScreen() == "zoom_screen")
-    )
-        reQ();
+    if (isKeybind(event.keys) && isKeyPartOfKeybind(event.key) && (SDK::getCurrentScreen() == "hud_screen" || SDK::getCurrentScreen() == "f3_screen" || SDK::getCurrentScreen() == "zoom_screen")) reQ();
 }
