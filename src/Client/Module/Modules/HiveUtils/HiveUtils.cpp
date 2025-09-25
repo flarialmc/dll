@@ -138,15 +138,15 @@ void HiveUtils::settingsRender(float settingsOffset) {
 
     addHeader("Auto Select Variants");
     addToggle("BedWars", "Choose between solos, duos, squads etc.", "bedwarsenabled");
-    addConditionalDropdown(getOps<bool>("bedwarsenabled"), "BedWars: Choose Variant", "trans", std::vector<std::string>{"Solos", "Duos", "Squads", "Manor", "MEGA"}, "bedwars", true);
+    addConditionalDropdown(getOps<bool>("bedwarsenabled"), "BedWars: Choose Variant", "Select from the drop-down.", std::vector<std::string>{"Solos", "Duos", "Squads", "Manor", "MEGA"}, "bedwars", true);
     addToggle("SkyWars", "Choose between solos, duos, squads etc.", "skywarsenabled");
-    addConditionalDropdown(getOps<bool>("skywarsenabled"), "SkyWars: Choose Variant", "rights", std::vector<std::string>{"Solos", "Duos", "Squads", "MEGA LTM"}, "skywars", true);
+    addConditionalDropdown(getOps<bool>("skywarsenabled"), "SkyWars: Choose Variant", "Select from the drop-down.", std::vector<std::string>{"Solos", "Duos", "Squads", "MEGA LTM"}, "skywars", true);
     addToggle("Build Battle", "Choose between solos, duos, etc.", "buildbattleenabled");
-    addConditionalDropdown(getOps<bool>("buildbattleenabled"), "Build Battle: Choose Variant", "are", std::vector<std::string>{"Solos", "Duos", "Speed Builders (LTM)", "Solos (Double Build Time)", "Duos (Double Build Time)"}, "buildbattle", true);
+    addConditionalDropdown(getOps<bool>("buildbattleenabled"), "Build Battle: Choose Variant", "Select from the drop-down.", std::vector<std::string>{"Solos", "Duos", "Speed Builders (LTM)", "Solos (Double Build Time)", "Duos (Double Build Time)"}, "buildbattle", true);
     addToggle("Survival Games", "Choose between solos, duos, squads etc.", "survivalgamesenabled");
-    addConditionalDropdown(getOps<bool>("survivalgamesenabled"), "Survival Games: Choose Variant", "human", std::vector<std::string>{"Solos", "Duos"}, "survivalgames", true);
+    addConditionalDropdown(getOps<bool>("survivalgamesenabled"), "Survival Games: Choose Variant", "Select from the drop-down.", std::vector<std::string>{"Solos", "Duos"}, "survivalgames", true);
     addToggle("The Bridge", "Choose between solo and duos.", "thebridgeenabled");
-    addConditionalDropdown(getOps<bool>("thebridgeenabled"), "The Bridge: Choose Variant", "rights", std::vector<std::string>{"Solos", "Duos"}, "thebridge", true);
+    addConditionalDropdown(getOps<bool>("thebridgeenabled"), "The Bridge: Choose Variant", "Select from the drop-down.", std::vector<std::string>{"Solos", "Duos"}, "thebridge", true);
     FlarialGUI::UnsetScrollView();
     resetPadding();
 }
