@@ -188,9 +188,10 @@
 #define IDR_ANDROID_LOGO_PNG           289
 #define IDR_WIN10_LOGO_PNG             290
 #define IDR_CHROMEOS_LOGO_PNG          291
+#define IDR_INVENTORYLOCK_PNG          292
 
 // MAKE SURE YOU ALWAYS UPDATE THIS!
 
-#define MAX_IMAGE_ID                   291
+#define MAX_IMAGE_ID                   292
 
 

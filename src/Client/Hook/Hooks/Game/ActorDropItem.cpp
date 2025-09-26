@@ -13,7 +13,7 @@ void ActorDropItem::enableHook() {
     int offset = *reinterpret_cast<int *>(base + 3);
     auto **vft = reinterpret_cast<uintptr_t **>(base + offset + 7);
 
-    static auto vftOffset = 117;
+    static auto vftOffset = GET_OFFSET("Actor::drop");
 
     this->manualHook(vft[vftOffset], (void *) callback, (void **) &funcOriginal);
 
@@ -29,12 +29,7 @@ bool ActorDropItem::callback(Actor *actor, ItemStack *item, const bool randomly)
         eventMgr.trigger(event);
     }
 
-    if (!event->isCancelled())
-        return DropItem;
-    else
-    {
-        return event->getDropItem();
-    }
+    return event->getDropItem();
 
 }
 

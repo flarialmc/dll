@@ -596,4 +596,6 @@ void OffsetInit::init2030() {
     ADD_OFFSET("BlockSource::getBlock", 2); // might be incorrect, bounds of versions unknown
 
     //ADD_OFFSET("ContainerScreenController::_handlePlaceAll", X);
+
+    ADD_OFFSET("Actor::drop", 117);
 }

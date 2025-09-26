@@ -5,7 +5,7 @@
 #include <Utils/Memory/Memory.hpp>
 #include <SDK/SDK.hpp>
 
-Item *ContainerScreenController::getContainerItem(ContainerEnum type, int slot) {
+ItemStack *ContainerScreenController::getContainerItem(ContainerEnum type, int slot) {
     auto lp = SDK::clientInstance->getLocalPlayer();
     if(!lp) return nullptr;
 
@@ -21,7 +21,7 @@ Item *ContainerScreenController::getContainerItem(ContainerEnum type, int slot) 
 
     auto itemStack = inventory->getItem(startSlot + slot);
 
-    return itemStack->getItem();
+    return itemStack;
 }
 
 ContainerEnum ContainerScreenController::getContainerType(std::string name) {
@@ -48,8 +48,8 @@ void ContainerScreenController::swap(std::string srcCollectionName, int32_t srcS
         auto srcContainerType = getContainerType(srcCollectionName);
         auto dstContainerType = getContainerType(dstCollectionName);
 
-        auto srcItem = getContainerItem(srcContainerType, srcSlot);
-        auto dstItem = getContainerItem(dstContainerType, dstSlot);
+        auto srcItem = getContainerItem(srcContainerType, srcSlot)->getItem();
+        auto dstItem = getContainerItem(dstContainerType, dstSlot)->getItem();
 
         if(srcContainerType == ContainerEnum::CONTAINER_OUTPUT) {
             _handleTakeAll(srcCollectionName, srcSlot);
