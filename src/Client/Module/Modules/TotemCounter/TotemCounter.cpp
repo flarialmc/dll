@@ -37,8 +37,10 @@ void TotemCounter::defaultConfig() {
 void TotemCounter::settingsRender(float settingsOffset) {
     initSettingsPage();
 
-    addDropdown("Mode", "Choose the working mode.", std::vector<std::string>{"Default", "Pops"}, "mode", true);
-    addToggle("Only render when holding totem.", "", "onlyRenderWhenHoldingTotem");
+    // THERE'S THIS DROP-DOWN HERE????
+    // addDropdown("Mode", "Choose the working mode.", std::vector<std::string>{"Default", "Pops"}, "mode", true);
+    addToggle("Text Label: Also Show Popped", "Also show the amount of totems used.", "showPopped");
+    addToggle("Text Label: Totem Held Only", "Only show the label text when holding a totem.", "onlyRenderWhenHoldingTotem");
     defaultAddSettings("main");
     extraPadding();
 
@@ -151,10 +153,10 @@ void TotemCounter::onPacketEvent(PacketEvent& event)
 
         int pops = ++popsById[id];
 
-        const std::string name = Utils::sanitizeName(actor->getNametag() ? *actor->getNametag() : std::string("blahaj"));
+        const std::string baseName = Utils::sanitizeName(actor->getNametag() ? *actor->getNametag() : std::string("blahaj"));
+        const std::string name = (id == SDK::clientInstance->getLocalPlayer()->getRuntimeIDComponent()->runtimeID) ? std::string("You") : baseName;
 
-        if (id == SDK::clientInstance->getLocalPlayer()->getRuntimeIDComponent()->runtimeID) SDK::clientInstance->getGuiData()->displayClientMessage("[§bTo§dte§fm Co§dunt§ber§r] You popped §7" + std::to_string(pops) + "§r totem" + (pops > 1 ? "s" : "") + ".");
-        else if (getOps<bool>("listenForOthers")) SDK::clientInstance->getGuiData()->displayClientMessage("[§bTo§dte§fm Co§dunt§ber§r] " + name + " popped §7" + std::to_string(pops) + "§r totem" + (pops > 1 ? "s" : "") + "!");
+        SDK::clientInstance->getGuiData()->displayClientMessage("[§bTo§dte§fm Co§dunt§ber§r] " + name +  "popped §7" + std::to_string(pops) + "§r totem" + (pops > 1 ? "s" : "") + ".");
     } else if (eep->EventID == ActorEvent::Death)
     {
         SDK::clientInstance->getGuiData()->displayClientMessage(name + " died after popping " + std::to_string(popsById[id]) + " totems.");
@@ -193,7 +195,7 @@ void TotemCounter::onRender(RenderEvent& event) {
 
         size_t pos1 = uppercaseSentence.find(search1);
         if (pos1 != std::string::npos) {
-            text1.replace(pos1, search1.length(), "pops?");
+            text1.replace(pos1, search1.length(), SDK::clientInstance->getLocalPlayer() ? std::to_string(popsById[SDK::clientInstance->getLocalPlayer()->getRuntimeIDComponent()->runtimeID]) : "0");
         }
 
         text += "\n" + text1;
