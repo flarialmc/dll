@@ -182,7 +182,7 @@ void TotemCounter::onRender(RenderEvent& event) {
 
     if (getOps<bool>("showPopped")) {
         std::string text1{};
-        if (this->settings.getSettingByName<std::string>("text") != nullptr) text1 = getOps<std::string>("text");
+        if (this->settings.getSettingByName<std::string>("textUsed") != nullptr) text1 = getOps<std::string>("textUsed");
 
         std::string uppercaseSentence1;
         std::string search1 = "{VALUE}";
