@@ -10,7 +10,6 @@ void TotemCounter::onEnable() {
     Listen(this, RenderEvent, &TotemCounter::onRender)
     Listen(this, PacketEvent, &TotemCounter::onPacketEvent)
 
-    // flush pops map
     popsById.clear();
 
     Module::onEnable();
@@ -25,7 +24,6 @@ void TotemCounter::onDisable() {
 
 void TotemCounter::defaultConfig() {
     setDef("text", (std::string)"Totems: {value}");
-    setDef("showPopped", true);
     setDef("textUsed", (std::string)"Pops: {value}");
     setDef("onlyRenderWhenHoldingTotem", false);
     setDef("mode", (std::string)"Current");
@@ -37,15 +35,12 @@ void TotemCounter::defaultConfig() {
 void TotemCounter::settingsRender(float settingsOffset) {
     initSettingsPage();
 
-    // THERE'S THIS DROP-DOWN HERE????
-    // addDropdown("Mode", "Choose the working mode.", std::vector<std::string>{"Default", "Pops"}, "mode", true);
-    addToggle("Text Label: Also Show Popped", "Also show the amount of totems used.", "showPopped");
+    addDropdown("Mode", "Choose the working mode.", std::vector<std::string>{"Current", "Pop", "Both"}, "mode", true);
     addToggle("Text Label: Totem Held Only", "Only show the label text when holding a totem.", "onlyRenderWhenHoldingTotem");
     defaultAddSettings("main");
     extraPadding();
 
     addHeader("Text");
-    // defaultAddSettings("text");
     addTextBox("Normal Format", "Use {value} for the value.", 0, "text");
     addTextBox("Pops Format", "Use {value} for the value.", 0, "textUsed");
     addSlider("Text Scale", "", "textscale", 2.0f);
@@ -143,7 +138,6 @@ void TotemCounter::onPacketEvent(PacketEvent& event)
 
     if (eep->EventID == ActorEvent::TalismanActivate)
     {
-
         // Workaround until I figure out how to properly filter packets.
         static std::unordered_map<uint64_t, std::chrono::steady_clock::time_point> lastPopAt;
         const auto now = std::chrono::steady_clock::now();
@@ -167,39 +161,38 @@ void TotemCounter::onPacketEvent(PacketEvent& event)
 void TotemCounter::onRender(RenderEvent& event) {
     if (!this->isEnabled() || !shouldRender || SDK::getCurrentScreen() != "hud_screen") return;
 
-    std::string text{};
-    if (this->settings.getSettingByName<std::string>("text") != nullptr) text = getOps<std::string>("text");
+    // you wanted this
+    auto replaceValueToken = [](const std::string& tmpl, const std::string& val) -> std::string {
+        std::string upper;
+        upper.reserve(tmpl.size());
+        for (char c: tmpl) upper += (char)std::toupper(c);
+        const std::string search = "{VALUE}";
+        size_t pos = upper.find(search);
+        std::string out = tmpl;
+        if (pos != std::string::npos) out.replace(pos, search.length(), val);
+        return out;
+    };
 
-    std::string uppercaseSentence;
-    std::string search = "{VALUE}";
+    std::string mode = "Current";
+    if (this->settings.getSettingByName<std::string>("mode") != nullptr) mode = getOps<std::string>("mode");
 
-    for (char c: text) {
-        uppercaseSentence += (char) std::toupper(c);
+    std::string finalText;
+
+    const std::string playerPops = SDK::clientInstance->getLocalPlayer() ? std::to_string(popsById[SDK::clientInstance->getLocalPlayer()->getRuntimeIDComponent()->runtimeID]) : "0";
+
+    if (mode == "Current") {
+        std::string tmpl = this->settings.getSettingByName<std::string>("text") != nullptr ? getOps<std::string>("text") : std::string();
+        finalText = replaceValueToken(tmpl, FlarialGUI::cached_to_string(totems));
+    } else if (mode == "Pop") {
+        std::string popsTmpl = this->settings.getSettingByName<std::string>("textUsed") != nullptr ? getOps<std::string>("textUsed") : std::string();
+        finalText = replaceValueToken(popsTmpl, playerPops);
+    } else { // Both
+        std::string tmpl = this->settings.getSettingByName<std::string>("text") != nullptr ? getOps<std::string>("text") : std::string();
+        std::string popsTmpl = this->settings.getSettingByName<std::string>("textUsed") != nullptr ? getOps<std::string>("textUsed") : std::string();
+        finalText = replaceValueToken(tmpl, FlarialGUI::cached_to_string(totems));
+        finalText += "
+" + replaceValueToken(popsTmpl, playerPops);
     }
 
-    size_t pos = uppercaseSentence.find(search);
-    if (pos != std::string::npos) {
-        text.replace(pos, search.length(), FlarialGUI::cached_to_string(totems));
-    }
-
-    if (getOps<bool>("showPopped")) {
-        std::string text1{};
-        if (this->settings.getSettingByName<std::string>("textUsed") != nullptr) text1 = getOps<std::string>("textUsed");
-
-        std::string uppercaseSentence1;
-        std::string search1 = "{VALUE}";
-
-        for (char c: text) {
-            uppercaseSentence1 += (char) std::toupper(c);
-        }
-
-        size_t pos1 = uppercaseSentence.find(search1);
-        if (pos1 != std::string::npos) {
-            text1.replace(pos1, search1.length(), SDK::clientInstance->getLocalPlayer() ? std::to_string(popsById[SDK::clientInstance->getLocalPlayer()->getRuntimeIDComponent()->runtimeID]) : "0");
-        }
-
-        text += "\n" + text1;
-    }
-
-    normalRenderCore(35, text);
+    normalRenderCore(35, finalText);
 }
