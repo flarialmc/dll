@@ -159,16 +159,6 @@ void TotemCounter::onPacketEvent(PacketEvent& event)
         SDK::clientInstance->getGuiData()->displayClientMessage(name + " died after popping " + std::to_string(popsById[id]) + " totems.");
         popsById[id] = 0;
     }
-
-    // todo: remove this
-    if (event.getPacket()->getId() == MinecraftPacketIds::SetActorMotion)
-    {
-        auto pkt = reinterpret_cast<SetActorMotionPacket*>(event.getPacket());
-        if (pkt->mRuntimeID == SDK::clientInstance->getLocalPlayer()->getRuntimeIDComponent()->runtimeID)
-        {
-            SDK::clientInstance->getGuiData()->displayClientMessage("Received Motion: " + std::to_string(pkt->mMotion.x) + ", " + std::to_string(pkt->mMotion.y) + ", " + std::to_string(pkt->mMotion.z));
-        }
-    }
 }
 
 // I GIVE UP!!
