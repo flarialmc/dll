@@ -3,6 +3,7 @@
 
 #include "Events/Game/TickEvent.hpp"
 #include "SDK/Client/Network/Packet/EntityEventPacket.hpp"
+#include "Modules/ClickGUI/ClickGUI.hpp"
 
 void TotemCounter::onEnable() {
     Listen(this, TickEvent, &TotemCounter::onTick)
@@ -24,6 +25,7 @@ void TotemCounter::onDisable() {
 
 void TotemCounter::defaultConfig() {
     setDef("text", (std::string)"Totems: {value}");
+    setDef("showPopped", true);
     setDef("textUsed", (std::string)"Pops: {value}");
     setDef("onlyRenderWhenHoldingTotem", false);
     setDef("mode", (std::string)"Current");
@@ -160,10 +162,42 @@ void TotemCounter::onPacketEvent(PacketEvent& event)
     }
 }
 
-// I GIVE UP!!
 void TotemCounter::onRender(RenderEvent& event) {
-    if (!this->isEnabled() || !shouldRender) return;
+    if (!this->isEnabled() || !shouldRender || SDK::getCurrentScreen() != "hud_screen") return;
 
-    auto totemsStr = FlarialGUI::cached_to_string(totems);
-    this->normalRender(35, totemsStr);
+    std::string text{};
+    if (this->settings.getSettingByName<std::string>("text") != nullptr) text = getOps<std::string>("text");
+
+    std::string uppercaseSentence;
+    std::string search = "{VALUE}";
+
+    for (char c: text) {
+        uppercaseSentence += (char) std::toupper(c);
+    }
+
+    size_t pos = uppercaseSentence.find(search);
+    if (pos != std::string::npos) {
+        text.replace(pos, search.length(), FlarialGUI::cached_to_string(totems));
+    }
+
+    if (getOps<bool>("showPopped")) {
+        std::string text1{};
+        if (this->settings.getSettingByName<std::string>("text") != nullptr) text1 = getOps<std::string>("text");
+
+        std::string uppercaseSentence1;
+        std::string search1 = "{VALUE}";
+
+        for (char c: text) {
+            uppercaseSentence1 += (char) std::toupper(c);
+        }
+
+        size_t pos1 = uppercaseSentence.find(search1);
+        if (pos1 != std::string::npos) {
+            text1.replace(pos1, search1.length(), "pops?");
+        }
+
+        text += "\n" + text1;
+    }
+
+    normalRenderCore(35, text);
 }

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "Events/Game/HandleEntityEvent.hpp"
 #include "Events/Game/TickEvent.hpp"
 #include "Events/Render/RenderEvent.hpp"
 #include "SDK/Client/Network/Packet/EntityEventPacket.hpp"
