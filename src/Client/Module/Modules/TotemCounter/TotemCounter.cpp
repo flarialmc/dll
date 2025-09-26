@@ -3,7 +3,6 @@
 
 #include "Events/Game/TickEvent.hpp"
 #include "SDK/Client/Network/Packet/EntityEventPacket.hpp"
-#include "SDK/Client/Network/Packet/SetActorMotionPacket.hpp"
 
 void TotemCounter::onEnable() {
     Listen(this, TickEvent, &TotemCounter::onTick)
