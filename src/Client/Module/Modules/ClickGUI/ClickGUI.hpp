@@ -7,6 +7,7 @@
 #include "Utils/APIUtils.hpp"
 #include "Utils/WinrtUtils.hpp"
 #include <chrono>
+#include <algorithm>
 #include <Modules/Misc/Input/GUIMouseListener.hpp>
 #include "../../../GUI/Engine/Constraints.hpp"
 #include "../../../GUI/D2D.hpp"
@@ -353,7 +354,11 @@ public:
         if (this->active) {
             SDK::clientInstance->releaseMouse(); // release mouse lets cursor move
 
-            if (FlarialGUI::TextBoxes[0].text.empty() && isKeyPartOfAdditionalKeybind(event.key, this->settings.getSettingByName<std::string>("editmenubind")->value)) {
+            // Check if any textbox is active to prevent Edit Menu from opening when typing
+            bool anyTextBoxActive = std::any_of(FlarialGUI::TextBoxes.begin(), FlarialGUI::TextBoxes.end(),
+                                              [](const auto& pair) { return pair.second.isActive; });
+
+            if (!anyTextBoxActive && FlarialGUI::TextBoxes[0].text.empty() && isKeyPartOfAdditionalKeybind(event.key, this->settings.getSettingByName<std::string>("editmenubind")->value)) {
                 FlarialGUI::TextBoxes[0].isActive = false;
                 event.setKey(MouseButton::None);
                 event.setAction(MouseAction::Release);
