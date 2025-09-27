@@ -150,7 +150,7 @@ void TotemCounter::onPacketEvent(PacketEvent& event)
         const std::string baseName = Utils::sanitizeName(actor->getNametag() ? *actor->getNametag() : std::string("blahaj"));
         const std::string name = (id == SDK::clientInstance->getLocalPlayer()->getRuntimeIDComponent()->runtimeID) ? std::string("You") : baseName;
 
-        SDK::clientInstance->getGuiData()->displayClientMessage("[§bTo§dte§fm Co§dunt§ber§r] " + name +  "popped §7" + std::to_string(pops) + "§r totem" + (pops > 1 ? "s" : "") + ".");
+        SDK::clientInstance->getGuiData()->displayClientMessage("[§cTotem Counter§r] " + name +  " popped §7" + std::to_string(pops) + "§r totem" + (pops > 1 ? "s" : "") + ".");
     } else if (eep->EventID == ActorEvent::Death)
     {
         SDK::clientInstance->getGuiData()->displayClientMessage(name + " died after popping " + std::to_string(popsById[id]) + " totems.");
@@ -190,6 +190,7 @@ void TotemCounter::onRender(RenderEvent& event) {
         std::string tmpl = this->settings.getSettingByName<std::string>("text") != nullptr ? getOps<std::string>("text") : std::string();
         std::string popsTmpl = this->settings.getSettingByName<std::string>("textUsed") != nullptr ? getOps<std::string>("textUsed") : std::string();
         finalText = replaceValueToken(tmpl, FlarialGUI::cached_to_string(totems));
+        finalText += "\n"; // genius
         finalText += replaceValueToken(popsTmpl, playerPops);
     }
 
