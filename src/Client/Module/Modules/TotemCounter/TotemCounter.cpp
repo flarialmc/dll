@@ -150,10 +150,11 @@ void TotemCounter::onPacketEvent(PacketEvent& event)
 
         int pops = ++popsById[id];
 
-        SDK::clientInstance->getGuiData()->displayClientMessage("[§bTo§dte§fm Co§dunt§ber§r] " + playerName +  " popped §7" + std::to_string(pops) + "§r totem" + (pops > 1 ? "s" : "") + ".");
+        SDK::clientInstance->getGuiData()->displayClientMessage("[§cTotem Counter§r] " + playerName +  " popped §7" + std::to_string(pops) + "§r totem" + (pops > 1 ? "s" : "") + ".");
     } else if (eep->EventID == ActorEvent::Death)
     {
-        SDK::clientInstance->getGuiData()->displayClientMessage("[§bTo§dte§fm Co§dunt§ber§r] " + playerName + " died after popping §7" + std::to_string(popsById[id]) + "§r totems.");
+        if (popsById[id] == 0 || (!getOps<bool>("listenForOthers") && id != SDK::clientInstance->getLocalPlayer()->getRuntimeIDComponent()->runtimeID)) return;
+        SDK::clientInstance->getGuiData()->displayClientMessage("[§cTotem Counter§r] " + playerName + " died after popping §7" + std::to_string(popsById[id]) + "§r totems.");
         popsById[id] = 0;
     }
 }
