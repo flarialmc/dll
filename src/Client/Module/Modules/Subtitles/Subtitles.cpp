@@ -138,7 +138,7 @@ void Subtitles::onTick(TickEvent &event) {
 }
 
 void Subtitles::onRender(RenderEvent &event) {
-    if (!SDK::clientInstance)
+    if (!SDK::clientInstance) return;
     if (!this->isEnabled() || !SDK::clientInstance->getLocalPlayer()) return;
     if (SDK::getCurrentScreen() != "hud_screen") return;
     if (sounds.empty() && !ClickGUI::editmenu) return;
