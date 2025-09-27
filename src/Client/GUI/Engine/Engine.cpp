@@ -735,12 +735,28 @@ ImVec2 FlarialGUI::getFlarialTextSize(const wchar_t* text, const float width, co
 
 	std::string font = Client::settings.getSettingByName<std::string>(moduleFont ? "mod_fontname" : "fontname")->value;
 
-	const std::vector<int> fontSizeBuckets = { 16, 32, 64, 128, 256 };
 	float guiScale = Client::settings.getSettingByName<float>(moduleFont ? "modules_font_scale" : "gui_font_scale")->value;
+
+	// Check if font scale is out of bounds (0.5 - 2.0) and reset to 1.0 if needed
+	if (guiScale < 0.5f || guiScale > 2.0f) {
+		guiScale = 1.0f;
+		Client::settings.getSettingByName<float>(moduleFont ? "modules_font_scale" : "gui_font_scale")->value = 1.0f;
+		Client::SavePrivate();
+	}
+
 	float targetFontSize = (fontSize * guiScale) * 0.18f;
-	int baseFontSize = fontSizeBuckets.back();
 
 	if (pixelate && targetFontSize > 1.f) targetFontSize = floor(targetFontSize);
+
+	const std::vector<int> fontSizeBuckets = { 16, 32, 64, 128, 256 };
+
+	int baseFontSize = fontSizeBuckets.back();
+	for (size_t i = 0; i < fontSizeBuckets.size(); i++) {
+		if (targetFontSize <= fontSizeBuckets[i]) {
+			baseFontSize = fontSizeBuckets[i];
+			break;
+		}
+	}
 
 	float scaleFactor = targetFontSize / static_cast<float>(baseFontSize);
 
@@ -765,9 +781,6 @@ ImVec2 FlarialGUI::getFlarialTextSize(const wchar_t* text, const float width, co
 		DoLoadFontLater = true;
 	}
 
-	if (!FontMap[fontK]) return ImVec2{ 0, 0 };
-	if (FontMap[fontK]->Scale <= 0.0f || !FontMap[fontK]->IsLoaded()) return ImVec2{ 0, 0 };
-
 	ImGuiStyle& style = ImGui::GetStyle();
 	if (pixelate) {
 		style.AntiAliasedLines = false; // Default is true
@@ -782,11 +795,6 @@ ImVec2 FlarialGUI::getFlarialTextSize(const wchar_t* text, const float width, co
 
 	ImGui::SetWindowFontScale(1.0);
 	ImGui::PopFont();
-
-	if (pixelate) {
-		style.AntiAliasedLines = true; // Default is true
-		style.AntiAliasedFill = true;  // Default is true
-	}
 
 	return size;
 }
@@ -826,6 +834,14 @@ std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t* tex
 	std::string font = Client::settings.getSettingByName<std::string>(moduleFont ? "mod_fontname" : "fontname")->value;
 
 	float guiScale = Client::settings.getSettingByName<float>(moduleFont ? "modules_font_scale" : "gui_font_scale")->value;
+
+	// Check if font scale is out of bounds (0.5 - 2.0) and reset to 1.0 if needed
+	if (guiScale < 0.5f || guiScale > 2.0f) {
+		guiScale = 1.0f;
+		Client::settings.getSettingByName<float>(moduleFont ? "modules_font_scale" : "gui_font_scale")->value = 1.0f;
+		Client::SavePrivate();
+	}
+
 	float targetFontSize = (fontSize * guiScale) * 0.18f;
 
 	if (pixelate && targetFontSize > 1.f) targetFontSize = floor(targetFontSize);
@@ -1471,8 +1487,8 @@ Vec2<float> FlarialGUI::CalculateMovedXY(float x, float y, int num, float rectWi
 	if (x - WindowRects[num].fixer < 0) x = 0.001f - WindowRects[num].fixer;
 	if (y < 0) y = 0;
 
-	if (x + rectWidth - WindowRects[num].fixer > MC::windowSize.x) x = MC::windowSize.x + WindowRects[num].fixer;
-	if (y + rectHeight > MC::windowSize.y) y = MC::windowSize.y;
+	if (x + rectWidth - WindowRects[num].fixer > MC::windowSize.x) x = MC::windowSize.x - rectWidth + WindowRects[num].fixer;
+	if (y + rectHeight > MC::windowSize.y) y = MC::windowSize.y - rectHeight;
 
 	if (x == 0) x = 0.0001f;
 	if (y == 0) y = 0.0001f;

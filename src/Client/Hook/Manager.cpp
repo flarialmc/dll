@@ -19,6 +19,7 @@
 #include "Hooks/Visual/DimensionFogColorHook.hpp"
 #include "Hooks/Visual/OverworldFogColorHook.hpp"
 #include "Hooks/Visual/TimeChangerHook.hpp"
+#include "Hooks/Render/ItemRendererHook.hpp"
 #include "Hooks/Game/getSensHook.hpp"
 #include "Hooks/Game/ContainerScreenControllerHook.hpp"
 #include "Hooks/Render/TextureGroup_getTextureHook.hpp"
@@ -44,11 +45,16 @@
 #include "Hooks/Game/ApplyTurnDeltaHook.hpp"
 #include "Hooks/Game/ChatScreenControllerHook.hpp"
 #include "Hooks/Game/HudScreenControllerHook.hpp"
+#include "Hooks/Game/SoundEnginePlayHook.hpp"
+#include "Hooks/Game/getCurrentSwingDurationHook.hpp"
 
 #include "Hooks/Render/BobHurt.hpp"
 #include "Hooks/Render/RenderLevelHook.hpp"
 #include "Hooks/Visual/ActorShaderParams.hpp"
 #include "Hooks/Visual/TintColorHook.hpp"
+#include "Hooks/Visual/Level_addParticleEffect.hpp"
+#include "Hooks/Visual/Level_sendServerLegacyParticle.hpp"
+#include "Hooks/Game/ActorDropItem.hpp"
 
 std::vector<std::shared_ptr<Hook>> HookManager::hooks;
 
@@ -94,6 +100,7 @@ void HookManager::initialize() {
     addHook<DimensionFogColorHook>();
     addHook<OverworldFogColorHook>();
     addHook<TimeChangerHook>();
+    addHook<ItemRendererHook>();
     addHook<SendPacketHook>();
     addHook<ApplyTurnDeltaHook>();
     //addHook<getSensHook>();
@@ -105,15 +112,12 @@ void HookManager::initialize() {
         addHook<TickingTextureStageRenderHook>(); // due to mv
     }
     addHook<UIControl_updateCachedPositionHook>();
-    addHook<GeneralSettingsScreenControllerCtorHook>();
 
     if (VersionUtils::checkAboveOrEqual(21, 40)) {
         addHook<ContainerScreenControllerHook>();
     }
 
-    if(!VersionUtils::checkAboveOrEqual(21, 80)) { //needed for MaterialBinLoader/shader loader
-        addHook<_composeFullStackHook>();
-    }
+    addHook<_composeFullStackHook>();
 
     // likely packchanger hooks, im not sure!
     if(!VersionUtils::checkAboveOrEqual(21, 60))
@@ -122,8 +126,8 @@ void HookManager::initialize() {
 
         addHook<RenderOrderExecuteHook>();
         addHook<RenderChunkCoordinatorHandleVisibilityUpdatesHook>();
-//
         addHook<SettingsScreenOnExitHook>();
+        addHook<GeneralSettingsScreenControllerCtorHook>();
     }
 
     addHook<ItemInHandRendererRenderItem>();
@@ -137,7 +141,11 @@ void HookManager::initialize() {
     addHook<ActorShaderParamsHook>();
     addHook<ChatScreenControllerHook>();
     addHook<HudScreenControllerHook>();
-
+    //addHook<Level_addParticleEffect>();
+    //addHook<Level_sendServerLegacyParticle>();
+    addHook<SoundEnginePlayHook>();
+    addHook<getCurrentSwingDurationHook>();
+    addHook<ActorDropItem>();
     if(VersionUtils::checkAboveOrEqual(21, 40)) {
         addHook<UpdatePlayerHook>();
     }

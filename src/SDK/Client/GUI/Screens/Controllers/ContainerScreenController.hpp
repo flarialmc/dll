@@ -10,10 +10,9 @@ enum class ContainerEnum {
 class Item;
 
 class ContainerScreenController {
-private:
-    ContainerEnum getContainerType(std::string name);
-    Item* getContainerItem(ContainerEnum type, int slot);
 public:
+    ContainerEnum getContainerType(std::string name);
+    ItemStack* getContainerItem(ContainerEnum type, int slot);
     void _handlePlaceAll(std::string collectionName, int32_t slot);
     void _handleTakeAll(std::string collectionName, int32_t slot);
 

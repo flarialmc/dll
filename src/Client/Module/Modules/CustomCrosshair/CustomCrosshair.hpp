@@ -9,7 +9,6 @@
 #include "Events/Game/PerspectiveEvent.hpp"
 #include "Events/Render/HudCursorRendererRenderEvent.hpp"
 
-
 #include "Events/Game/PerspectiveEvent.hpp"
 #include "Utils/Render/PositionUtils.hpp"
 #include <filesystem>
@@ -40,8 +39,8 @@ private:
 	bool actuallyRenderWindow = false;
 public:
 	CustomCrosshair() : Module("Custom Crosshair", "Allows for dynamic crosshair colors.",
-		IDR_SPEED_PNG, "") {
-		
+		IDR_CROSSHAIR_PNG, "") {
+
 	};
 
 

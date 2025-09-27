@@ -28,7 +28,7 @@ float4 main(VS_INPUT input) : SV_POSITION {\
     return input.pos;\
 }";
 
-const char *gaussianBlurHorizontalShaderSrc = R"(
+const char *kawaseBlurDownsampleShaderSrc = R"(
 cbuffer BlurInputBuffer : register(b0)
 {
     float2 resolution;
@@ -44,33 +44,22 @@ Texture2D texture0 : register(t0);
 float4 main(float4 screenSpace : SV_Position) : SV_TARGET
 {
     float2 uv = screenSpace.xy / resolution;
-    float4 colorSum = float4(0.0, 0.0, 0.0, 0.0);
-    
-    // Adaptive sampling based on intensity
-    int sampleCount = clamp((int)(intensity * 2.0 + 3.0), 3, 7);
-    float weightSum = 0.0;
-    
-    // Calculate gaussian weights dynamically
-    float sigma = intensity * 1.5 + 0.5;
-    float twoSigmaSq = 2.0 * sigma * sigma;
-    
-    int halfSamples = sampleCount / 2;
-    
-    for (int i = -halfSamples; i <= halfSamples; i++)
-    {
-        float x = (float)i;
-        float weight = exp(-(x * x) / twoSigmaSq);
-        float2 sampleOffset = float2(x * halfPixel.x * intensity, 0.0);
-        
-        colorSum += texture0.Sample(sampler0, uv + sampleOffset) * weight;
-        weightSum += weight;
-    }
-    
-    return colorSum / weightSum;
+
+    // Clean Kawase blur implementation
+    float2 texelSize = halfPixel * intensity;
+
+    // Standard Kawase sampling pattern - 4 samples + center
+    float4 color = texture0.Sample(sampler0, uv) * 0.25;
+    color += texture0.Sample(sampler0, uv + float2(texelSize.x, 0.0)) * 0.1875;
+    color += texture0.Sample(sampler0, uv + float2(-texelSize.x, 0.0)) * 0.1875;
+    color += texture0.Sample(sampler0, uv + float2(0.0, texelSize.y)) * 0.1875;
+    color += texture0.Sample(sampler0, uv + float2(0.0, -texelSize.y)) * 0.1875;
+
+    return color;
 }
 )";
 
-const char *gaussianBlurVerticalShaderSrc = R"(
+const char *kawaseBlurUpsampleShaderSrc = R"(
 cbuffer BlurInputBuffer : register(b0)
 {
     float2 resolution;
@@ -86,29 +75,26 @@ Texture2D texture0 : register(t0);
 float4 main(float4 screenSpace : SV_Position) : SV_TARGET
 {
     float2 uv = screenSpace.xy / resolution;
-    float4 colorSum = float4(0.0, 0.0, 0.0, 0.0);
-    
-    // Adaptive sampling based on intensity
-    int sampleCount = clamp((int)(intensity * 2.0 + 3.0), 3, 7);
-    float weightSum = 0.0;
-    
-    // Calculate gaussian weights dynamically
-    float sigma = intensity * 1.5 + 0.5;
-    float twoSigmaSq = 2.0 * sigma * sigma;
-    
-    int halfSamples = sampleCount / 2;
-    
-    for (int i = -halfSamples; i <= halfSamples; i++)
-    {
-        float y = (float)i;
-        float weight = exp(-(y * y) / twoSigmaSq);
-        float2 sampleOffset = float2(0.0, y * halfPixel.y * intensity);
-        
-        colorSum += texture0.Sample(sampler0, uv + sampleOffset) * weight;
-        weightSum += weight;
-    }
-    
-    return colorSum / weightSum;
+
+    // Kawase blur upsample with tent filter
+    float2 texelSize = halfPixel * intensity;
+
+    // 9-tap tent filter for smooth upsampling
+    float4 color = texture0.Sample(sampler0, uv) * 0.25;
+
+    // Cross pattern
+    color += texture0.Sample(sampler0, uv + float2(0.0, texelSize.y)) * 0.125;
+    color += texture0.Sample(sampler0, uv + float2(0.0, -texelSize.y)) * 0.125;
+    color += texture0.Sample(sampler0, uv + float2(texelSize.x, 0.0)) * 0.125;
+    color += texture0.Sample(sampler0, uv + float2(-texelSize.x, 0.0)) * 0.125;
+
+    // Diagonal pattern
+    color += texture0.Sample(sampler0, uv + float2(texelSize.x, texelSize.y)) * 0.0625;
+    color += texture0.Sample(sampler0, uv + float2(-texelSize.x, texelSize.y)) * 0.0625;
+    color += texture0.Sample(sampler0, uv + float2(texelSize.x, -texelSize.y)) * 0.0625;
+    color += texture0.Sample(sampler0, uv + float2(-texelSize.x, -texelSize.y)) * 0.0625;
+
+    return color;
 }
 )";
 
@@ -173,10 +159,10 @@ void Blur::InitializePipeline()
         &vertexBufferData,
         pVertexBuffer.put());
 
-    ID3DBlob *shaderBlob = TryCompileShader(gaussianBlurHorizontalShaderSrc, "ps_4_0");
+    ID3DBlob *shaderBlob = TryCompileShader(kawaseBlurDownsampleShaderSrc, "ps_4_0");
     SwapchainHook::d3d11Device->CreatePixelShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, pGaussianBlurHorizontalShader.put());
 
-    shaderBlob = TryCompileShader(gaussianBlurVerticalShaderSrc, "ps_4_0");
+    shaderBlob = TryCompileShader(kawaseBlurUpsampleShaderSrc, "ps_4_0");
     SwapchainHook::d3d11Device->CreatePixelShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, pGaussianBlurVerticalShader.put());
 
     shaderBlob = TryCompileShader(vertexShaderSrc, "vs_4_0");
@@ -358,19 +344,20 @@ void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iteratio
 {
     if(intensity <= 0) return;
 
-    if (!SwapchainHook::GetBackbuffer()) return;
+    intensity *= 3.5f;
 
+    if (!SwapchainHook::GetBackbuffer()) return;
 
     winrt::com_ptr<ID3D11ShaderResourceView> pOrigShaderResourceView = MotionBlur::BackbufferToSRVExtraMode();
     if (!pOrigShaderResourceView) {
         return;
     }
-    
+
     if (!SwapchainHook::context) return;
 
     D3D11_TEXTURE2D_DESC desc;
     SwapchainHook::GetBackbuffer()->GetDesc(&desc);
-    
+
     // Ensure intermediate textures are available and correct size
     if (!EnsureIntermediateTextures(desc.Width, desc.Height)) {
         return;
@@ -378,39 +365,50 @@ void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iteratio
 
     XMFLOAT2 renderSize = XMFLOAT2(static_cast<float>(desc.Width), static_cast<float>(desc.Height));
 
-    // Setup intensity and offset for blur
-    constantBuffer.intensity = intensity;
+    // Calculate number of passes based on intensity to reduce boxiness
+    int numPasses = std::max(1, std::min(6, (int)(intensity * 2.0f + 1.0f)));
+
+    // Distribute intensity across passes - each pass gets a fraction
+    float passIntensity = intensity / (float)numPasses * 0.8f;
+
     constantBuffer.offset = XMFLOAT2(1.0f, 1.0f);
 
-    // Use iterations parameter
-    int actualIterations = std::max(1, iterations);
-    
-    ID3D11ShaderResourceView* currentSRV = pOrigShaderResourceView.get();
-    
-    for (int i = 0; i < actualIterations; i++)
-    {
-        // Clear shader resource binding to avoid conflicts
-        ID3D11ShaderResourceView* nullSRV = nullptr;
-        SwapchainHook::context->PSSetShaderResources(0, 1, &nullSRV);
-        
-        // Horizontal pass
-        SwapchainHook::context->PSSetShader(pGaussianBlurHorizontalShader.get(), nullptr, 0);
-        RenderToRTV(pIntermediateRTV1.get(), currentSRV, renderSize);
-        
-        // Clear binding again
-        SwapchainHook::context->PSSetShaderResources(0, 1, &nullSRV);
-        
-        // Vertical pass
-        SwapchainHook::context->PSSetShader(pGaussianBlurVerticalShader.get(), nullptr, 0);
-        if (i == actualIterations - 1) {
-            // Last iteration: render to final destination
-            RenderToRTV(pDstRenderTargetView, pIntermediateSRV1.get(), renderSize);
+    // Clear shader resource binding to avoid conflicts
+    ID3D11ShaderResourceView* nullSRV = nullptr;
+    SwapchainHook::context->PSSetShaderResources(0, 1, &nullSRV);
+
+    // Multi-pass blur with ping-pong between textures
+    ID3D11ShaderResourceView* currentInput = pOrigShaderResourceView.get();
+    ID3D11RenderTargetView* currentOutput = nullptr;
+    ID3D11ShaderResourceView* currentOutputSRV = nullptr;
+
+    for(int pass = 0; pass < numPasses; pass++) {
+        // Update intensity for this pass
+        constantBuffer.intensity = passIntensity;
+
+        // Ping-pong between intermediate textures
+        if(pass % 2 == 0) {
+            currentOutput = pIntermediateRTV1.get();
+            currentOutputSRV = pIntermediateSRV1.get();
         } else {
-            // Intermediate iteration: render to second buffer for next iteration
-            RenderToRTV(pIntermediateRTV2.get(), pIntermediateSRV1.get(), renderSize);
-            currentSRV = pIntermediateSRV2.get();
+            currentOutput = pIntermediateRTV2.get();
+            currentOutputSRV = pIntermediateSRV2.get();
         }
+
+        // Use downsample shader for all intermediate passes
+        SwapchainHook::context->PSSetShader(pGaussianBlurHorizontalShader.get(), nullptr, 0);
+        RenderToRTV(currentOutput, currentInput, renderSize);
+
+        // Clear binding
+        SwapchainHook::context->PSSetShaderResources(0, 1, &nullSRV);
+
+        // Next pass uses current output as input
+        currentInput = currentOutputSRV;
     }
+
+    // Final upsample pass to destination
+    SwapchainHook::context->PSSetShader(pGaussianBlurVerticalShader.get(), nullptr, 0);
+    RenderToRTV(pDstRenderTargetView, currentInput, renderSize);
 }
 
 static std::chrono::high_resolution_clock::time_point frameTimestamp = std::chrono::high_resolution_clock::now();
@@ -468,7 +466,7 @@ void FlarialGUI::PrepareBlur(float intensity) {
         auto shouldUpdate = (shouldLimit && elapsed.count() >= timeBetweenFrames) || !shouldLimit;
         auto isLerping = delta > 0.001 || delta < -0.1;
 
-        if (isLerping || shouldUpdate || FlarialGUI::blur_bitmap_cache) {
+        if (isLerping || shouldUpdate) {
             if (SwapchainHook::isDX12)
                 FlarialGUI::CopyBitmap(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap].get(),
                                        &FlarialGUI::screen_bitmap_cache);
@@ -478,6 +476,8 @@ void FlarialGUI::PrepareBlur(float intensity) {
             FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, intensity);
             FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_OPTIMIZATION,
                                        getOptimizationLevel(MC::fps, highQualityBlur, dynamicBlurQuality));
+
+
             FlarialGUI::blur->GetOutput(&FlarialGUI::blur_bitmap_cache);
 
             frameTimestamp = std::chrono::high_resolution_clock::now();

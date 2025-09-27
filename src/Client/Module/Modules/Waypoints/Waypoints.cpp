@@ -49,7 +49,6 @@ void Waypoints::addWaypoint(int index, std::string name, std::string color, Vec3
 		setDef("dimension" + end, (std::string)SDK::clientInstance->getBlockSource()->getDimension()->getName());
 		setDef("showInnerBeam" + end, true);
 		setDef("showOuterBeam" + end, true);
-		this->settings.setValue("total", getOps<float>("total") + 1);
 		Client::SaveSettings();
 
 		Waypoint wp(position, false, 100.0f, index, state);
@@ -65,14 +64,29 @@ Vec3<float> Waypoints::getPos(int index) {
 	return Vec3{ getOps<float>("x-" + FlarialGUI::cached_to_string(index)), getOps<float>("y-" + FlarialGUI::cached_to_string(index)), getOps<float>("z-" + FlarialGUI::cached_to_string(index)) };
 }
 
+int Waypoints::getNextAvailableIndex() {
+	int index = 0;
+	while (this->settings.getSettingByName<std::string>("waypoint-" + FlarialGUI::cached_to_string(index)) != nullptr) {
+		index++;
+		// Safety check to prevent infinite loop
+		if (index > 10000) {
+			break;
+		}
+	}
+	return index;
+}
+
 
 void Waypoints::onSetup() {
 	keybindActions.clear();
+	// Clear WaypointList to avoid conflicts with stale data when config reloads
+	WaypointList.clear();
+	
 	keybindActions.push_back([this](std::vector<std::any> args) -> std::any {
 		std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - last_used;
 		if (duration.count() >= 0.1) {
 			KeyEvent event = std::any_cast<KeyEvent>(args[0]);
-			int index = WaypointList.size();
+			int index = getNextAvailableIndex();
 			std::string col = "FFFFFF";
 			if (settings.getSettingByName<bool>("randomizeColor") != nullptr) {
 				if (getOps<bool>("randomizeColor")) col = FlarialGUI::ColorFToHex(D2D1_COLOR_F(random(), random(), random(), 1.f));
@@ -91,27 +105,27 @@ void Waypoints::onSetup() {
 			last_used = std::chrono::high_resolution_clock::now();
 		}
 		return {};
-		});
+	});
 
-	if (getOps<float>("total") > 0) {
-		for (int i = 0; i < getOps<float>("total"); i++) {
-			std::string end = "-" + FlarialGUI::cached_to_string(i);
-			if (!this->settings.getSettingByName<std::string>("waypoint" + end)) continue;
-			addWaypoint(
-				i,
-				getOps<std::string>("waypoint" + end),
-				getOps<std::string>("color" + end),
-				Vec3 {
-					getOps<float>("x" + end),
-					getOps<float>("y" + end),
-					getOps<float>("z" + end)
-				},
-				getOps<bool>("state" + end),
-				false,
-				getOps<bool>("rgb" + end),
-				getOps<float>("opacity" + end)
-			);
-		}
+	// Load all existing waypoints by scanning all possible indices
+	// This handles cases where waypoints were deleted from the middle
+	for (int i = 0; i < 10000; i++) {
+		std::string end = "-" + FlarialGUI::cached_to_string(i);
+		if (!this->settings.getSettingByName<std::string>("waypoint" + end)) continue;
+		addWaypoint(
+			i,
+			getOps<std::string>("waypoint" + end),
+			getOps<std::string>("color" + end),
+			Vec3 {
+				getOps<float>("x" + end),
+				getOps<float>("y" + end),
+				getOps<float>("z" + end)
+			},
+			getOps<bool>("state" + end),
+			false,
+			getOps<bool>("rgb" + end),
+			getOps<float>("opacity" + end)
+		);
 	}
 
 }
@@ -157,16 +171,10 @@ void Waypoints::defaultConfig() {
 void Waypoints::settingsRender(float settingsOffset) {
 	initSettingsPage();
 
-	addHeader("Waypoints");
 	addButton("Add another Waypoint", "", "Add", [this] {
 
-		int index = WaypointList.size();
+		int index = getNextAvailableIndex();
 		std::string indexStr = FlarialGUI::cached_to_string(index);
-		while (true) {
-			SettingType<std::string>* s = this->settings.getSettingByName<std::string>("waypoint-" + indexStr);
-			if (s == nullptr) break;
-			index++;
-		}
 		std::string col = "FFFFFF";
 		if (settings.getSettingByName<bool>("randomizeColor") != nullptr) {
 			if (getOps<bool>("randomizeColor")) col = FlarialGUI::ColorFToHex(D2D1_COLOR_F(random(), random(), random(), 1.f));
@@ -218,7 +226,9 @@ void Waypoints::settingsRender(float settingsOffset) {
 	addSlider("Outer Beam Radius", "", "outerBeamRadius", 1.f, 0.2f);
 	extraPadding();
 
-	for (auto pair : WaypointList) {
+	// Create a copy of the waypoint list to iterate over safely
+	auto waypointListCopy = WaypointList;
+	for (auto pair : waypointListCopy) {
 		std::string end = "-" + FlarialGUI::cached_to_string(pair.second.index);
 		if (!this->settings.getSettingByName<std::string>("waypoint" + end)) continue;
 		if (getOps<std::string>("world" + end) != SDK::clientInstance->getLocalPlayer()->getLevel()->getWorldFolderName()) continue;
@@ -232,8 +242,10 @@ void Waypoints::settingsRender(float settingsOffset) {
 		addToggle("Show Inner Beam", "", "showInnerBeam" + end);
 		addToggle("Show Outer Beam", "", "showOuterBeam" + end);
 
-		addButton("Delete Waypoint", "", "Delete", [this, index = pair.second.index]() {
+		addButton("Delete Waypoint", "", "Delete", [this, index = pair.second.index, waypointName = pair.first]() {
 			std::string end = "-" + FlarialGUI::cached_to_string(index);
+
+			// Remove from settings
 			this->settings.deleteSetting("waypoint" + end);
 			this->settings.deleteSetting("color" + end);
 			this->settings.deleteSetting("x" + end);
@@ -246,6 +258,10 @@ void Waypoints::settingsRender(float settingsOffset) {
 			this->settings.deleteSetting("dimension" + end);
 			this->settings.deleteSetting("showInnerBeam" + end);
 			this->settings.deleteSetting("showOuterBeam" + end);
+
+			// Remove from WaypointList in memory
+			WaypointList.erase(waypointName);
+
 			Client::SaveSettings();
 		});
 	}
@@ -253,6 +269,43 @@ void Waypoints::settingsRender(float settingsOffset) {
 	FlarialGUI::UnsetScrollView();
 
 	resetPadding();
+}
+
+bool Waypoints::deleteWaypoint(std::string name) {
+	auto waypointListCopy = WaypointList;
+	for (auto pair : waypointListCopy) {
+		std::string end = "-" + FlarialGUI::cached_to_string(pair.second.index);
+		if (!this->settings.getSettingByName<std::string>("waypoint" + end)) continue;
+
+		std::string wpName = name[0] == '"' ? name.substr(1, name.length() - 2) : name;
+
+		if (wpName == getOps<std::string>("waypoint" + end)) {
+
+			this->settings.deleteSetting("waypoint" + end);
+			this->settings.deleteSetting("color" + end);
+			this->settings.deleteSetting("x" + end);
+			this->settings.deleteSetting("y" + end);
+			this->settings.deleteSetting("z" + end);
+			this->settings.deleteSetting("state" + end);
+			this->settings.deleteSetting("rgb" + end);
+			this->settings.deleteSetting("opacity" + end);
+			this->settings.deleteSetting("world" + end);
+			this->settings.deleteSetting("dimension" + end);
+			this->settings.deleteSetting("showInnerBeam" + end);
+			this->settings.deleteSetting("showOuterBeam" + end);
+
+			WaypointList.erase(pair.first);
+
+			Client::SaveSettings();
+
+			FlarialGUI::Notify(std::format("Deleted waypoint <{}>!", wpName));
+
+			return true;
+		}
+
+	}
+
+	return false;
 }
 
 

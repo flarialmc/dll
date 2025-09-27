@@ -38,6 +38,10 @@ void SwapchainHook::DX12Init() {
     }
 
     IUnknown* queueAsUnknown = queue.get();
+    if (!queue || !queueAsUnknown) {
+        Logger::error("Failed to get D3D12 command queue");
+        return;
+    }
     HRESULT hr = D3D11On12CreateDevice(
         d3d12Device5.get(),
         D3D11_CREATE_DEVICE_BGRA_SUPPORT,
@@ -348,7 +352,7 @@ bool SwapchainHook::AllocateImageDescriptor(UINT imageId, D3D12_CPU_DESCRIPTOR_H
     }
 
     UINT descriptorIndex = (imageId - 100) + IMGUI_FONT_DESCRIPTORS;
-
+//
     if (descriptorIndex >= TOTAL_CONSOLIDATED_DESCRIPTORS) {
         Logger::custom(fg(fmt::color::red), "DescriptorAlloc", "ERROR: Image ID {} would exceed descriptor heap capacity (index {} >= {})",
                        imageId, descriptorIndex, TOTAL_CONSOLIDATED_DESCRIPTORS);
@@ -374,6 +378,42 @@ bool SwapchainHook::AllocateImageDescriptor(UINT imageId, D3D12_CPU_DESCRIPTOR_H
     return true;
 }
 
+UINT SwapchainHook::AllocateNextImageDescriptor(D3D12_CPU_DESCRIPTOR_HANDLE* out_cpu_handle, D3D12_GPU_DESCRIPTOR_HANDLE* out_gpu_handle) {
+    std::lock_guard<std::mutex> lock(descriptorAllocationMutex);
+
+    if (!d3d12DescriptorHeapImGuiRender || !d3d12Device5) {
+        Logger::custom(fg(fmt::color::red), "DescriptorAlloc", "ERROR: Consolidated descriptor heap or device not available");
+        return 0;
+    }
+
+    // Generate next available imageId (starting from 100 as expected by the system)
+    UINT imageId = nextAvailableDescriptorIndex + 100;
+    UINT descriptorIndex = nextAvailableDescriptorIndex;
+
+    if (descriptorIndex >= TOTAL_CONSOLIDATED_DESCRIPTORS) {
+        Logger::custom(fg(fmt::color::red), "DescriptorAlloc", "ERROR: No more descriptor slots available (index {} >= {})",
+                       descriptorIndex, TOTAL_CONSOLIDATED_DESCRIPTORS);
+        return 0;
+    }
+
+    UINT handle_increment = d3d12Device5->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+    D3D12_CPU_DESCRIPTOR_HANDLE cpu = d3d12DescriptorHeapImGuiRender->GetCPUDescriptorHandleForHeapStart();
+    cpu.ptr += (handle_increment * descriptorIndex);
+
+    D3D12_GPU_DESCRIPTOR_HANDLE gpu = d3d12DescriptorHeapImGuiRender->GetGPUDescriptorHandleForHeapStart();
+    gpu.ptr += (handle_increment * descriptorIndex);
+
+    *out_cpu_handle = cpu;
+    *out_gpu_handle = gpu;
+
+    nextAvailableDescriptorIndex++;
+
+    Logger::custom(fg(fmt::color::green), "DescriptorAlloc", "Allocated auto descriptor ID {} at index {}", imageId, descriptorIndex);
+
+    return imageId;
+}
+
 void SwapchainHook::FreeImageDescriptor(UINT imageId) {
     std::lock_guard<std::mutex> lock(descriptorAllocationMutex);
 
@@ -386,3 +426,4 @@ void SwapchainHook::ResetDescriptorAllocation() {
     nextAvailableDescriptorIndex = IMGUI_FONT_DESCRIPTORS;
     Logger::custom(fg(fmt::color::yellow), "DescriptorAlloc", "Reset descriptor allocation, next available index: {}", nextAvailableDescriptorIndex);
 }
+

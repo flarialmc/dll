@@ -125,5 +125,7 @@ namespace FlarialGUI {
 	void LoadImageFromFile(const wchar_t* filename, ID2D1Bitmap** bitmap);
 	void LoadImageFromResource(int resourceId, ID2D1Bitmap** bitmap, LPCTSTR type = "PNG");
 	bool LoadImageFromResource(int resourceId, ID3D11ShaderResourceView** out_srv, LPCTSTR type);
+	bool LoadImageFromFile(const std::string& filePath, ID3D11ShaderResourceView** out_srv);
+	bool LoadImageFromFile(const std::string& filePath, D3D12_CPU_DESCRIPTOR_HANDLE srv_cpu_handle, ID3D12Resource** out_tex_resource);
 	bool LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HANDLE srv_cpu_handle, ID3D12Resource** out_tex_resource, LPCTSTR type);
 }

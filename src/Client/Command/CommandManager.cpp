@@ -1,7 +1,9 @@
 #include "CommandManager.hpp"
+#include "Utils/UserActionLogger.hpp"
 
 #include "../../SDK/Client/Network/Packet/TextPacket.hpp"
 #include "Commands/BindCommand.hpp"
+#include "Commands/UnbindCommand.hpp"
 #include "Commands/ConfigCommand.hpp"
 #include "Commands/PrefixCommand.hpp"
 #include "Commands/HelpCommand.hpp"
@@ -13,7 +15,8 @@
 #include "Commands/SpotifyCommand/SpotifyCommand.hpp"
 #include "Commands/WikiCommand.hpp"
 #include "Commands/FixFontCommand.hpp"
-#include "Commands/IRCChat.hpp"
+#include "Commands/WaypointCommand.hpp"
+// #include "Commands/IRCChat.hpp"
 #include "../Client.hpp"
 #include "Events/Network/PacketSendEvent.hpp"
 
@@ -33,8 +36,10 @@ void CommandManager::initialize() {
     Commands.push_back(std::make_unique<ConfigCommand>());
     Commands.push_back(std::make_unique<SpotifyCommand>());
     Commands.push_back(std::make_unique<BindCommand>());
+    Commands.push_back(std::make_unique<UnbindCommand>());
     Commands.push_back(std::make_unique<WikiCommand>());
     Commands.push_back(std::make_unique<FixFontCommand>());
+    Commands.push_back(std::make_unique<WaypointCommand>());
     //Commands.push_back(std::make_unique<IRCChat>());
 Listen(&CommandManager::instance, PacketSendEvent, &CommandManager::onPacket);
 }
@@ -68,9 +73,14 @@ void CommandManager::onPacket(PacketSendEvent &event) {
     });
 
     if (it == Commands.end()) {
+        // Log invalid command attempt
+        UserActionLogger::logCommandExecution(std::string(commandName), false, "invalid_command");
         SDK::clientInstance->getGuiData()->displayClientMessage("§cInvalid command. Use §b" + Client::settings.getSettingByName<std::string>("dotcmdprefix")->value + "help §cto see all available commands.");
         return;
     }
+
+    // Log successful command execution
+    UserActionLogger::logCommandExecution(std::string(commandName), true, "executed");
 
     // Exclude command name from args
     // Example: .prefix *

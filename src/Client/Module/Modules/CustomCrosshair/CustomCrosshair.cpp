@@ -54,7 +54,7 @@ void CustomCrosshair::defaultConfig() {
 
     getOps<std::string>("CurrentSelectedColorCol") = "FFFFFF";
     getOps<float>("CurrentSelectedColorOpacity") = 1.f;
-    
+
 }
 
 void CustomCrosshair::settingsRender(float settingsOffset) {
@@ -125,28 +125,38 @@ void CustomCrosshair::onHudCursorRendererRender(HudCursorRendererRenderEvent &ev
     bool isDefault = !settings.getSettingByName<bool>("CustomCrosshair")->value;
 
     auto screenContext = event.getMinecraftUIRenderContext()->getScreenContext();
+    std::string CurrentCrosshairName = settings.getSettingByName<std::string>("CurrentCrosshair")->value;
 
-    const ResourceLocation loc("textures/ui/cross_hair", false);
-    TexturePtr ptr = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc, false);
+    static const ResourceLocation loc("textures/ui/cross_hair", false);
+    static TexturePtr ptr = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc, false);
     if (ptr.clientTexture == nullptr || ptr.clientTexture->clientTexture.resourcePointerBlock == nullptr) {
+        ptr = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc, false);
         return;
     }
 
-    TexturePtr ptr2;
+    static TexturePtr ptr2;
+    static std::string CurrentLoadedCrosshairName;
 
-    if (std::filesystem::exists(
-        Utils::getClientPath() + "//Crosshairs//" + settings.getSettingByName<std::string>("CurrentCrosshair")->value +
-        ".png")) {
-        const ResourceLocation loc2(
-            Utils::getClientPath() + "//Crosshairs//" + settings.getSettingByName<std::string>("CurrentCrosshair")->
-            value + ".png", true);
-        ptr2 = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc2, CrosshairReloaded);
-        CrosshairReloaded = false;
-        if (ptr2.clientTexture == nullptr || ptr2.clientTexture->clientTexture.resourcePointerBlock == nullptr) {
+    if (CurrentLoadedCrosshairName != CurrentCrosshairName)
+    {
+        if (std::filesystem::exists(
+            Utils::getClientPath() + "//Crosshairs//" + CurrentCrosshairName + ".png"))
+        {
+            const ResourceLocation loc2(Utils::getClientPath() + "//Crosshairs//" + CurrentCrosshairName + ".png", true);
+            ptr2 = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc2, true);
+
+            if (ptr2.clientTexture == nullptr || ptr2.clientTexture->clientTexture.resourcePointerBlock == nullptr)
+            {
+                isDefault = true;
+            }
+            else
+            {
+                CurrentLoadedCrosshairName = CurrentCrosshairName;
+            }
+        } else
+        {
             isDefault = true;
         }
-    } else {
-        isDefault = true;
     }
 
     const auto tess = screenContext->getTessellator();

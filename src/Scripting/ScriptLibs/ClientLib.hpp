@@ -34,6 +34,10 @@ public:
                     if (!SDK::clientInstance) return "";
                     return SDK::clientInstance->getScreenName();
                 })
+                .addFunction("displayLocalMessage", [](const std::string& message) {
+                    if (message.empty()) return;
+                    SDK::clientInstance->getGuiData()->displayClientMessage(message);
+                })
 /*
                 .addFunction("commands", [](lua_State* L) {
 

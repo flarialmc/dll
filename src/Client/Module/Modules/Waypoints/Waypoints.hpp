@@ -38,6 +38,8 @@ public:
 
 	void addWaypoint(int index, std::string name, std::string color, Vec3<float> position, bool state, bool config, bool rgb, float opacity);
 
+	int getNextAvailableIndex();
+
 	Vec3<float> getPos(int index);
 
 	void onSetup() override;
@@ -45,6 +47,8 @@ public:
 	void defaultConfig() override;
 
 	void settingsRender(float settingsOffset) override;
+
+	bool deleteWaypoint(std::string name);
 
 	void onRender(RenderEvent& event);
 	//get waypoint color D2D1_COLOR_F color = FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("color-" + FlarialGUI::cached_to_string(pair.second.index))->value);

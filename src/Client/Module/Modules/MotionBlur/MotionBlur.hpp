@@ -40,8 +40,8 @@ public:
 
 	void ImageWithOpacity(const winrt::com_ptr<ID3D11ShaderResourceView>& srv, ImVec2 size, float opacity);
 
-	static winrt::com_ptr<ID3D11ShaderResourceView> BackbufferToSRVExtraMode();
+	static winrt::com_ptr<ID3D11ShaderResourceView> BackbufferToSRVExtraMode(bool underui = false);
 
 
-	static winrt::com_ptr<ID3D11ShaderResourceView> BackbufferToSRV();
+	static winrt::com_ptr<ID3D11ShaderResourceView> BackbufferToSRV(bool underui = false);
 };

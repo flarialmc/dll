@@ -92,7 +92,7 @@ void SkinStealer::cloneSkin(std::string targetName) {
             if (std::shared_ptr<SkinStealer> ssmod = std::dynamic_pointer_cast<SkinStealer>(mod)) {
                 if (ssmod->clone) {
                     SkinStealCommand::SaveSkin(val.name, val.playerSkin.mSkinImage, val.playerSkin.mCapeImage);
-                    SDK::clientInstance->getGuiData()->displayClientMessage("§aSaved skin locally");
+                    SDK::clientInstance->getGuiData()->displayClientMessage("§aSaved skin and cape locally: Use <.path skin> to open the folder.");
                 }
             }
         }
@@ -131,18 +131,6 @@ void SkinStealer::cloneSkin(std::string targetName) {
             pSkinPacket->mSkin.impl->mObject.mGeometryData = sourceSkin.mGeometryData;
             pSkinPacket->mSkin.impl->mObject.mGeometryDataMinEngineVersion = sourceSkin.mGeometryDataMinEngineVersion;
             pSkinPacket->mSkin.impl->mObject.mGeometryDataMutable = sourceSkin.mGeometryDataMutable;
-            pSkinPacket->mSkin.impl->mObject.mAnimationData = sourceSkin.mAnimationData;
-            pSkinPacket->mSkin.impl->mObject.mCapeId = sourceSkin.mCapeId;
-            pSkinPacket->mSkin.impl->mObject.mPersonaPieces = sourceSkin.mPersonaPieces;
-            pSkinPacket->mSkin.impl->mObject.mArmSizeType = sourceSkin.mArmSizeType;
-            pSkinPacket->mSkin.impl->mObject.mPieceTintColors = sourceSkin.mPieceTintColors;
-            pSkinPacket->mSkin.impl->mObject.mSkinColor = sourceSkin.mSkinColor;
-            pSkinPacket->mSkin.impl->mObject.mIsTrustedSkin = sourceSkin.mIsTrustedSkin;
-            pSkinPacket->mSkin.impl->mObject.mIsPremium = sourceSkin.mIsPremium;
-            pSkinPacket->mSkin.impl->mObject.mIsPersona = sourceSkin.mIsPersona;
-            pSkinPacket->mSkin.impl->mObject.mIsPersonaCapeOnClassicSkin = sourceSkin.mIsPersonaCapeOnClassicSkin;
-            pSkinPacket->mSkin.impl->mObject.mIsPrimaryUser = sourceSkin.mIsPrimaryUser;
-            pSkinPacket->mSkin.impl->mObject.mOverridesPlayerAppearance = sourceSkin.mOverridesPlayerAppearance;
 
             SDK::clientInstance->getPacketSender()->sendToServer(pSkinPacket.get());
             inFlightPackets.push_back(pSkinPacket);

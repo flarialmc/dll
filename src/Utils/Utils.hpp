@@ -214,6 +214,23 @@ public:
         return Vec3<T>(this->x * v, this->y * v, this->z * v);
     };
 
+    auto normalize() const -> Vec3<T> {
+        float length = std::sqrt(this->x * this->x + this->y * this->y + this->z * this->z);
+        if (length == 0) {
+            return Vec3<T>(0, 0, 0); // or handle zero vector differently
+        }
+        return Vec3<T>(this->x / length, this->y / length, this->z / length);
+    }
+
+    auto cross(const Vec3<T> &other) const -> Vec3<T> {
+        return Vec3<T>(
+            this->y * other.z - this->z * other.y,  // x component
+            this->z * other.x - this->x * other.z,  // y component
+            this->x * other.y - this->y * other.x   // z component
+        );
+    }
+
+
 public:
     auto dist(const Vec3<T> pos) const -> float {
         return sqrt((std::pow(this->x - pos.x, 2)) + (std::pow(this->y - pos.y, 2)) + (std::pow(this->z - pos.z, 2)));
@@ -336,6 +353,8 @@ public:
     static void extractFromFile(const std::string &zipFilePath, const std::string &destinationFolder);
 
     static std::string intToRoman(int n);
+
+    static double Microtime();
 };
 
 class String {

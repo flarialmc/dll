@@ -17,7 +17,7 @@ void SendPacketHook::receiveCallbackText(void *packetHandlerDispatcher, void *ne
                                          const std::shared_ptr<Packet>& packet) {
     SendPacketHook::setVariables(packetHandlerDispatcher, networkIdentifier, netEventCallback);
 
-    auto event = nes::make_holder<PacketEvent>(packet.get());
+    auto event = nes::make_holder<PacketEvent>(packet, packetHandlerDispatcher, networkIdentifier, netEventCallback);
     eventMgr.trigger(event);
     if (!event->isCancelled())
         receiveTextPacketOriginal(packetHandlerDispatcher, networkIdentifier, netEventCallback, packet);
@@ -29,7 +29,7 @@ SendPacketHook::receiveCallbackSetTitle(void *packetHandlerDispatcher, void *net
 
     SendPacketHook::setVariables(packetHandlerDispatcher, networkIdentifier, netEventCallback);
 
-    auto event = nes::make_holder<PacketEvent>(packet.get());
+    auto event = nes::make_holder<PacketEvent>(packet, packetHandlerDispatcher, networkIdentifier, netEventCallback);
     eventMgr.trigger(event);
     if (!event->isCancelled())
         receiveSetTitlePacketOriginal(packetHandlerDispatcher, networkIdentifier, netEventCallback, packet);
@@ -39,7 +39,7 @@ void
 SendPacketHook::receiveCallbackPlaySound(void *packetHandlerDispatcher, void *networkIdentifier, void *netEventCallback,
                                          const std::shared_ptr<Packet>& packet) {
     SendPacketHook::setVariables(packetHandlerDispatcher, networkIdentifier, netEventCallback);
-    auto event = nes::make_holder<PacketEvent>(packet.get());
+    auto event = nes::make_holder<PacketEvent>(packet, packetHandlerDispatcher, networkIdentifier, netEventCallback);
     eventMgr.trigger(event);
     if (!event->isCancelled())
         receivePacketPlaySoundOriginal(packetHandlerDispatcher, networkIdentifier, netEventCallback, packet);
@@ -48,7 +48,7 @@ SendPacketHook::receiveCallbackPlaySound(void *packetHandlerDispatcher, void *ne
 void SendPacketHook::receiveCallbackEntityEvent(void *packetHandlerDispatcher, void *networkIdentifier,
                                                 void *netEventCallback, const std::shared_ptr<Packet> &packet) {
     SendPacketHook::setVariables(packetHandlerDispatcher, networkIdentifier, netEventCallback);
-    auto event = nes::make_holder<PacketEvent>(packet.get());
+    auto event = nes::make_holder<PacketEvent>(packet, packetHandlerDispatcher, networkIdentifier, netEventCallback);
     eventMgr.trigger(event);
     if (!event->isCancelled())
         receivePacketEntityEventOriginal(packetHandlerDispatcher, networkIdentifier, netEventCallback, packet);
@@ -58,7 +58,7 @@ void SendPacketHook::receiveCallbackEntityEvent(void *packetHandlerDispatcher, v
 void SendPacketHook::receiveCallbackInteract(void *packetHandlerDispatcher, void *networkIdentifier, void *netEventCallback,
                                              const std::shared_ptr<Packet> &packet) {
     SendPacketHook::setVariables(packetHandlerDispatcher, networkIdentifier, netEventCallback);
-    auto event = nes::make_holder<PacketEvent>(packet.get());
+    auto event = nes::make_holder<PacketEvent>(packet, packetHandlerDispatcher, networkIdentifier, netEventCallback);
     eventMgr.trigger(event);
     if (!event->isCancelled())
         receivePacketInteractOriginal(packetHandlerDispatcher, networkIdentifier, netEventCallback, packet);
@@ -67,7 +67,7 @@ void SendPacketHook::receiveCallbackInteract(void *packetHandlerDispatcher, void
 void SendPacketHook::receiveCallbackContainerOpen(void *packetHandlerDispatcher, void *networkIdentifier,
                                                   void *netEventCallback, const std::shared_ptr<Packet> &packet) {
     SendPacketHook::setVariables(packetHandlerDispatcher, networkIdentifier, netEventCallback);
-    auto event = nes::make_holder<PacketEvent>(packet.get());
+    auto event = nes::make_holder<PacketEvent>(packet, packetHandlerDispatcher, networkIdentifier, netEventCallback);
     eventMgr.trigger(event);
     if (!event->isCancelled())
         receivePacketContainerOpenOriginal(packetHandlerDispatcher, networkIdentifier, netEventCallback, packet);
@@ -76,7 +76,7 @@ void SendPacketHook::receiveCallbackContainerOpen(void *packetHandlerDispatcher,
 void SendPacketHook::receiveCallbackContainerClose(void *packetHandlerDispatcher, void *networkIdentifier,
                                                    void *netEventCallback, const std::shared_ptr<Packet> &packet) {
     SendPacketHook::setVariables(packetHandlerDispatcher, networkIdentifier, netEventCallback);
-    auto event = nes::make_holder<PacketEvent>(packet.get());
+    auto event = nes::make_holder<PacketEvent>(packet, packetHandlerDispatcher, networkIdentifier, netEventCallback);
     eventMgr.trigger(event);
     if (!event->isCancelled())
         receivePacketContainerCloseOriginal(packetHandlerDispatcher, networkIdentifier, netEventCallback, packet);
@@ -85,7 +85,7 @@ void SendPacketHook::receiveCallbackContainerClose(void *packetHandlerDispatcher
 void SendPacketHook::receiveCallbackChangeDimension(void *packetHandlerDispatcher, void *networkIdentifier, void *netEventCallback,
                                                     const std::shared_ptr<Packet>& packet) {
     SendPacketHook::setVariables(packetHandlerDispatcher, networkIdentifier, netEventCallback);
-    auto event = nes::make_holder<PacketEvent>(packet.get());
+    auto event = nes::make_holder<PacketEvent>(packet, packetHandlerDispatcher, networkIdentifier, netEventCallback);
     eventMgr.trigger(event);
     if (!event->isCancelled())
         receivePacketChangeDimensionOriginal(packetHandlerDispatcher, networkIdentifier, netEventCallback, packet);
@@ -94,7 +94,7 @@ void SendPacketHook::receiveCallbackChangeDimension(void *packetHandlerDispatche
 void SendPacketHook::receiveCallbackModalFormRequest(void *packetHandlerDispatcher, void *networkIdentifier, void *netEventCallback,
                                                     const std::shared_ptr<Packet>& packet) {
     SendPacketHook::setVariables(packetHandlerDispatcher, networkIdentifier, netEventCallback);
-    auto event = nes::make_holder<PacketEvent>(packet.get());
+    auto event = nes::make_holder<PacketEvent>(packet, packetHandlerDispatcher, networkIdentifier, netEventCallback);
     eventMgr.trigger(event);
     if (!event->isCancelled())
         receivePacketModalFormRequestOriginal(packetHandlerDispatcher, networkIdentifier, netEventCallback, packet);
@@ -103,7 +103,7 @@ void SendPacketHook::receiveCallbackModalFormRequest(void *packetHandlerDispatch
 void SendPacketHook::receiveCallbackPlayerSkin(void *packetHandlerDispatcher, void *networkIdentifier, void *netEventCallback,
                                                     const std::shared_ptr<Packet>& packet) {
     SendPacketHook::setVariables(packetHandlerDispatcher, networkIdentifier, netEventCallback);
-    auto event = nes::make_holder<PacketEvent>(packet.get());
+    auto event = nes::make_holder<PacketEvent>(packet, packetHandlerDispatcher, networkIdentifier, netEventCallback);
     eventMgr.trigger(event);
     if (!event->isCancelled())
         receivePacketPlayerSkinOriginal(packetHandlerDispatcher, networkIdentifier, netEventCallback, packet);
@@ -112,10 +112,20 @@ void SendPacketHook::receiveCallbackPlayerSkin(void *packetHandlerDispatcher, vo
 void SendPacketHook::receiveCallbackLevelSoundEvent(void *packetHandlerDispatcher, void *networkIdentifier, void *netEventCallback,
                                                     const std::shared_ptr<Packet>& packet) {
     SendPacketHook::setVariables(packetHandlerDispatcher, networkIdentifier, netEventCallback);
-    auto event = nes::make_holder<PacketEvent>(packet.get());
+    auto event = nes::make_holder<PacketEvent>(packet, packetHandlerDispatcher, networkIdentifier, netEventCallback);
     eventMgr.trigger(event);
     if (!event->isCancelled())
         receivePacketLevelSoundEventOriginal(packetHandlerDispatcher, networkIdentifier, netEventCallback, packet);
+}
+
+void SendPacketHook::receiveCallbackAnimate(void *packetHandlerDispatcher, void *networkIdentifier, void *netEventCallback,
+                                           const std::shared_ptr<Packet>& packet) {
+
+    SendPacketHook::setVariables(packetHandlerDispatcher, networkIdentifier, netEventCallback);
+    auto event = nes::make_holder<PacketEvent>(packet, packetHandlerDispatcher, networkIdentifier, netEventCallback);
+    eventMgr.trigger(event);
+    if (!event->isCancelled())
+        receivePacketAnimateOriginal(packetHandlerDispatcher, networkIdentifier, netEventCallback, packet);
 }
 
 void SendPacketHook::enableHook() {
@@ -171,6 +181,10 @@ void SendPacketHook::enableHook() {
     std::shared_ptr<Packet> LevelSoundEventPacket = SDK::createPacket((int) MinecraftPacketIds::LevelSoundEvent);
     Memory::hookFunc((void *) LevelSoundEventPacket->packetHandler->vTable[1], (void *)receiveCallbackLevelSoundEvent,
                      (void **) &receivePacketLevelSoundEventOriginal, "Level Sound Event ReceivePacketHook");
+
+    std::shared_ptr<Packet> AnimatePacket = SDK::createPacket((int) MinecraftPacketIds::Animate);
+    Memory::hookFunc((void *) AnimatePacket->packetHandler->vTable[1], (void *)receiveCallbackAnimate,
+                     (void **) &receivePacketAnimateOriginal, "Animate ReceivePacketHook");
 
     this->autoHook((void *) callback, (void **) &sendPacketOriginal);
 }

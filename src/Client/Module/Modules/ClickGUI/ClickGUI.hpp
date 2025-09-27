@@ -7,6 +7,7 @@
 #include "Utils/APIUtils.hpp"
 #include "Utils/WinrtUtils.hpp"
 #include <chrono>
+#include <algorithm>
 #include <Modules/Misc/Input/GUIMouseListener.hpp>
 #include "../../../GUI/Engine/Constraints.hpp"
 #include "../../../GUI/D2D.hpp"
@@ -60,28 +61,29 @@ public:
     static bool inline isAnimatingModSet = false;
     static std::chrono::time_point<std::chrono::high_resolution_clock> favoriteStart;
 
-    static constexpr uint8_t section1stPart{ 0xC2 }, section2ndPart{ 0xA7 };
+    static constexpr uint8_t section1stPart{0xC2}, section2ndPart{0xA7};
 
-    static constexpr auto roleColors = std::to_array<std::pair<std::string_view, std::string_view>>({
-            {"Dev", "§b"},
-            {"Staff", "§f"},
-            {"Gamer", "§u"},
-            {"Booster", "§d"},
-            {"Supporter", "§5"},
-            {"Regular", "§4"}
-        });
+    static constexpr auto roleColors = std::to_array<std::pair<std::string_view, std::string_view> >({
+        {"Dev", "§b"},
+        {"Staff", "§f"},
+        {"Gamer", "§u"},
+        {"Booster", "§d"},
+        {"Supporter", "§5"},
+        {"Regular", "§4"}
+    });
 
-    static inline D2D_COLOR_F getColor(const std::string& text);
+    static inline D2D_COLOR_F getColor(const std::string &text);
 
 private:
     template<typename WordContainer>
-    static std::optional<std::pair<std::string_view /*first word match*/, size_t /*text index*/>> findFirstOf(std::string_view text, WordContainer&& words);
+    static std::optional<std::pair<std::string_view /*first word match*/, size_t /*text index*/> > findFirstOf(std::string_view text, WordContainer &&words);
 
     static size_t sanitizedToRawIndex(std::string_view raw, size_t sanIdx);
+
     // static std::string& getMutableTextForWatermark(TextPacket& pkt);
 
 public:
-    void onPacketReceive(PacketEvent& event);
+    void onPacketReceive(PacketEvent &event);
 
     ClickGUI();
 
@@ -133,9 +135,9 @@ public:
         setDef("editmenubind", (std::string) "L");
         setDef("custom_logo", false);
         setDef("globalText", (std::string) "ffffff", 1.f, false);
-        setDef("headerText", (std::string)"ffffff", 1.f, false);
-        setDef("settingsText", (std::string)"ffffff", 1.f, false);
-        setDef("settingsSubtext", (std::string)"473b3d", 1.f, false);
+        setDef("headerText", (std::string) "ffffff", 1.f, false);
+        setDef("settingsText", (std::string) "ffffff", 1.f, false);
+        setDef("settingsSubtext", (std::string) "473b3d", 1.f, false);
         setDef("modNameText", (std::string) "8b767a", 1.f, false);
         setDef("modCardEnabled", (std::string) "188830", 1.f, false);
         setDef("modCardDisabled", (std::string) "7d1820", 1.f, false);
@@ -228,8 +230,7 @@ public:
     //void fov(FOVEvent& event);
 
     void onKey(KeyEvent &event) {
-
-        std::string& clickguiKey = getOps<std::string>("keybind");
+        std::string &clickguiKey = getOps<std::string>("keybind");
         if (!this->active && clickguiKey.empty()) {
             clickguiKey = "k";
             FlarialGUI::Notify("To change it to a different key, go to ClickGUI settings or use \'.bind <key>\'");
@@ -237,7 +238,7 @@ public:
             Client::SaveSettings();
         }
 
-        SettingType<std::string>* ejectKey = Client::settings.getSettingByName<std::string>("ejectKeybind");
+        SettingType<std::string> *ejectKey = Client::settings.getSettingByName<std::string>("ejectKeybind");
 
         if (!clickguiKey.empty() && clickguiKey == ejectKey->value) {
             ejectKey->value = "";
@@ -263,27 +264,23 @@ public:
 
         if (this->isKeybind(event.keys) && this->isKeyPartOfKeybind(event.key) && event.getAction() == ActionType::Pressed) {
 #if !defined(__DEBUG__)
-			if (SDK::getCurrentScreen() != "hud_screen" && SDK::getCurrentScreen() != "pause_screen" && SDK::getCurrentScreen() != "f3_screen" && SDK::getCurrentScreen() != "zoom_screen") {
-				WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType::Arrow);
-				this->active = false;
-			    SDK::clientInstance->releaseMouse();
-			}
-			else {
+            if (SDK::getCurrentScreen() != "hud_screen" && SDK::getCurrentScreen() != "pause_screen" && SDK::getCurrentScreen() != "f3_screen" && SDK::getCurrentScreen() != "zoom_screen") {
+                WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType::Arrow);
+                this->active = false;
+                SDK::clientInstance->releaseMouse();
+            } else {
 #endif
-            if (!editmenu) {
-                if (!Client::settings.getSettingByName<bool>("nochaticon")->value)
-                {
-                    Listen(this, PacketEvent, &ClickGUI::onPacketReceive);
+                if (!editmenu) {
+                    if (!Client::settings.getSettingByName<bool>("nochaticon")->value) {
+                        Listen(this, PacketEvent, &ClickGUI::onPacketReceive);
+                    } else {
+                        Deafen(this, PacketEvent, &ClickGUI::onPacketReceive);
+                    }
+                    ModuleManager::cguiRefresh = true;
+                    keybindActions[0]({});
                 }
-                else
-                {
-                    Deafen(this, PacketEvent, &ClickGUI::onPacketReceive);
-                }
-                ModuleManager::cguiRefresh = true;
-                keybindActions[0]({});
-            }
 #if !defined(__DEBUG__)
-			}
+            }
 #endif
 
 
@@ -305,8 +302,8 @@ public:
 # endif
 
                 if (Client::settings.getSettingByName<bool>("saveScrollPos")->value) {
-                     saved_acumilatedPos = accumilatedPos;
-                     saved_acumilatedBarPos = accumilatedBarPos;
+                    saved_acumilatedPos = accumilatedPos;
+                    saved_acumilatedBarPos = accumilatedBarPos;
                 }
 
                 FlarialGUI::ResetShit();
@@ -357,31 +354,36 @@ public:
         if (this->active) {
             SDK::clientInstance->releaseMouse(); // release mouse lets cursor move
 
-            if (page.type == "normal" && curr == "modules" &&
-                event.getAction() == ActionType::Pressed) {
-                if (Client::settings.getSettingByName<bool>("autosearch")->value && !FlarialGUI::TextBoxes[0].isActive) {
-                    FlarialGUI::TextBoxes[0].isActive = true;
-                    event.setKey(MouseButton::None);
-                    event.setAction(MouseAction::Release);
-                }
-                // you searching
-                if (FlarialGUI::TextBoxes[0].isActive) {
-                    FlarialGUI::scrollpos = 0;
-                    FlarialGUI::barscrollpos = 0;
+            // Check if any textbox is active to prevent Edit Menu from opening when typing
+            bool anyTextBoxActive = std::any_of(FlarialGUI::TextBoxes.begin(), FlarialGUI::TextBoxes.end(), [](const auto &pair) { return pair.second.isActive; });
 
-                    accumilatedPos = 0;
-                    accumilatedBarPos = 0;
-                    if (FlarialGUI::TextBoxes[0].text.empty() && Client::settings.getSettingByName<bool>("saveScrollPos")->value) {
-                        accumilatedPos = saved_acumilatedPos;
-                        accumilatedBarPos = saved_acumilatedBarPos;
+            if (page.type == "normal" && curr == "modules" && event.getAction() == ActionType::Pressed) {
+                if (!isKeyPartOfAdditionalKeybind(event.key, this->settings.getSettingByName<std::string>("editmenubind")->value) && !FlarialGUI::TextBoxes[0].text.empty()) {
+                    // auto search logic
+                    if (Client::settings.getSettingByName<bool>("autosearch")->value && !FlarialGUI::TextBoxes[0].isActive) {
+                        FlarialGUI::TextBoxes[0].isActive = true;
+                        event.setKey(MouseButton::None);
+                        event.setAction(MouseAction::Release);
                     }
-                }
+                    // you searching
+                    if (FlarialGUI::TextBoxes[0].isActive) {
+                        FlarialGUI::scrollpos = 0;
+                        FlarialGUI::barscrollpos = 0;
+
+                        accumilatedPos = 0;
+                        accumilatedBarPos = 0;
+                        if (FlarialGUI::TextBoxes[0].text.empty() && Client::settings.getSettingByName<bool>("saveScrollPos")->value) {
+                            accumilatedPos = saved_acumilatedPos;
+                            accumilatedBarPos = saved_acumilatedBarPos;
+                        }
+                    }
+                };
             }
 
-            if (this->isAdditionalKeybind(event.keys,
-                                          getOps<std::string>("editmenubind")) &&
-                Module::isKeyPartOfAdditionalKeybind(event.key, this->settings.getSettingByName<std::string>(
-                                                         "editmenubind")->value)) {
+            if (((!anyTextBoxActive && curr == "settings") || curr == "modules") && FlarialGUI::TextBoxes[0].text.empty() && isKeyPartOfAdditionalKeybind(event.key, this->settings.getSettingByName<std::string>("editmenubind")->value)) {
+                FlarialGUI::TextBoxes[0].isActive = false;
+                event.setKey(MouseButton::None);
+                event.setAction(MouseAction::Release);
                 if (!editmenu) {
                     MC::lastMouseScroll = MouseAction::Release;
                     WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType::Arrow);
@@ -393,11 +395,10 @@ public:
                 }
             }
             // switch back to ClickGUI if clicked on Edit Mode bind
-        } else if (editmenu && this->isAdditionalKeybind(event.keys, this->settings.getSettingByName<std::string>(
-                                                             "editmenubind")->value) && Module::isKeyPartOfAdditionalKeybind(event.key,
+        } else if (editmenu && this->isAdditionalKeybind(event.keys, this->settings.getSettingByName<std::string>("editmenubind")->value) && isKeyPartOfAdditionalKeybind(event.key,
                                                                                                                              this->settings.getSettingByName<std::string>(
                                                                                                                                  "editmenubind")->value) ||
-                   editmenu && this->isKeybind(event.keys) && Module::isKeyPartOfAdditionalKeybind(event.key,
+                   editmenu && this->isKeybind(event.keys) && isKeyPartOfAdditionalKeybind(event.key,
                                                                                                    this->settings.getSettingByName<std::string>(
                                                                                                        "editmenubind")->value)) {
             MC::lastMouseScroll = MouseAction::Release;
@@ -463,10 +464,9 @@ public:
         if (this->active) event.cancel();
 
 #if !defined(__DEBUG__)
-		if (SDK::getCurrentScreen() != "hud_screen" && SDK::getCurrentScreen() != "pause_screen" && SDK::getCurrentScreen() != "f3_screen" && SDK::getCurrentScreen() != "zoom_screen") {
-			if (this->active)
-				this->active = false;
-		}
+        if (SDK::getCurrentScreen() != "hud_screen" && SDK::getCurrentScreen() != "pause_screen" && SDK::getCurrentScreen() != "f3_screen" && SDK::getCurrentScreen() != "zoom_screen") {
+            if (this->active) this->active = false;
+        }
 #endif
 
         if ((this->active || editmenu) && (

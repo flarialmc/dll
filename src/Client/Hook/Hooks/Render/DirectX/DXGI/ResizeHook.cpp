@@ -16,6 +16,8 @@
 #include "../../../../../Module/Modules/MotionBlur/MotionBlur.hpp"
 #include "../../../../../Module/Modules/MotionBlur/AvgPixelMotionBlurHelper.hpp"
 #include "../../../../../Module/Modules/MotionBlur/RealMotionBlurHelper.hpp"
+#include "../../../../../Module/Modules/DepthOfField/DepthOfFieldHelper.hpp"
+#include "../../../../../Module/Modules/CustomCrosshair/CustomCrosshair.hpp"
 
 void ResizeHook::enableHook() {
     int index;
@@ -35,7 +37,7 @@ void ResizeHook::resizeCallback(IDXGISwapChain* pSwapChain, UINT bufferCount, UI
     if (module != nullptr && module->active && SDK::hasInstanced && SDK::clientInstance != nullptr)
         SDK::clientInstance->releaseMouse();
     GuiScale::fixResize = true;
-    if (SwapchainHook::currentVsyncState) flags |= DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
+    if (SwapchainHook::currentVsyncState) flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
     return funcOriginal(pSwapChain, bufferCount, width, height, newFormat, flags);
 }
 
@@ -54,9 +56,9 @@ void ResizeHook::cleanShit(bool fullReset) {
 
     //SwapchainHook::d3d11Device = nullptr;
 
-    SwapchainHook::swapchain = nullptr;
     SwapchainHook::SavedD3D11BackBuffer = nullptr;
     SwapchainHook::ExtraSavedD3D11BackBuffer = nullptr;
+    SwapchainHook::CleanupBackbufferStorage();
 
     SwapchainHook::lastBackbufferWidth = 0;
     SwapchainHook::lastBackbufferHeight = 0;
@@ -119,6 +121,7 @@ void ResizeHook::cleanShit(bool fullReset) {
     Blur::pIntermediateTexture2 = nullptr;
 
     Memory::SafeRelease(FlarialGUI::blur);
+    Memory::SafeRelease(FlarialGUI::blur);
     Memory::SafeRelease(FlarialGUI::shadow_blur);
     Memory::SafeRelease(FlarialGUI::blurbrush);
     Memory::SafeRelease(FlarialGUI::screen_bitmap_cache);
@@ -156,6 +159,15 @@ void ResizeHook::cleanShit(bool fullReset) {
     }
 
     ImagesClass::images.clear();
+
+    // Clean up TabList resources for both fullReset and normal resize
+    TabList::CleanupDX12Uploader();
+    TabList::CleanupPlayerHeadTextures();
+    TabList::ResetDescriptorState();
+
+    // Reinitialize async loading after cleanup so player heads continue to load
+    TabList::ReinitializeAfterResize();
+
     if (fullReset) {
         FlarialGUI::hasLoadedAll = false;
         for (auto& [id, texture] : ImagesClass::ImguiDX12Textures) {
@@ -174,8 +186,6 @@ void ResizeHook::cleanShit(bool fullReset) {
 
         ImagesClass::ImguiDX11Images.clear();
 
-
-        TabList::ResetDescriptorState();
         SwapchainHook::ResetDescriptorAllocation();
     }
 
@@ -194,6 +204,7 @@ void ResizeHook::cleanShit(bool fullReset) {
             SwapchainHook::initImgui = false;
             SwapchainHook::imguiCleanupInProgress = false;
         }
+        FlarialGUI::CleanupImageResources();
 
         SwapchainHook::queue = nullptr;
         SwapchainHook::d3d12CommandList = nullptr;
@@ -241,6 +252,8 @@ void ResizeHook::cleanShit(bool fullReset) {
         RealMotionBlurHelper::m_blendState = nullptr;
         RealMotionBlurHelper::m_rasterizerState = nullptr;
         RealMotionBlurHelper::m_samplerState = nullptr;
+
+        DepthOfFieldHelper::Cleanup();
         MotionBlur::initted = false;
         FlarialGUI::hasLoadedAll = false;
     }

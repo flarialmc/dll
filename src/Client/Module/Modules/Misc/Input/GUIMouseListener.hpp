@@ -5,6 +5,7 @@
 #include <unknwn.h>
 #include "../../../../Client.hpp"
 #include "../../../Manager.hpp"
+#include "Utils/Utils.hpp"
 
 class ClickData {
 public:
@@ -125,7 +126,7 @@ public:
 
     static void AddLeftClick() {
         ClickData click{};
-        click.timestamp = GUIMouseListener::Microtime();
+        click.timestamp = Utils::Microtime();
         GUIMouseListener::leftClickList.insert(GUIMouseListener::leftClickList.begin(), click);
 
         if (GUIMouseListener::leftClickList.size() >= 100) {
@@ -135,7 +136,7 @@ public:
 
     static void AddRightClick() {
         ClickData click{};
-        click.timestamp = GUIMouseListener::Microtime();
+        click.timestamp = Utils::Microtime();
         GUIMouseListener::rightClickList.insert(GUIMouseListener::rightClickList.begin(), click);
 
         if (GUIMouseListener::rightClickList.size() >= 100) {
@@ -143,17 +144,12 @@ public:
         }
     }
 
-    static double Microtime() {
-        return (double(std::chrono::duration_cast<std::chrono::microseconds>(
-            std::chrono::system_clock::now().time_since_epoch()).count()) / double(1000000));
-    }
-
     static int GetLeftCPS() {
         if (GUIMouseListener::leftClickList.empty()) {
             return 0;
         }
 
-        double currentMicros = GUIMouseListener::Microtime();
+        double currentMicros = Utils::Microtime();
         auto count = std::count_if(GUIMouseListener::leftClickList.begin(), GUIMouseListener::leftClickList.end(), [currentMicros](const ClickData& click) {
             return (currentMicros - click.timestamp <= 1.0);
             });
@@ -166,7 +162,7 @@ public:
             return 0;
         }
 
-        double currentMicros = GUIMouseListener::Microtime();
+        double currentMicros = Utils::Microtime();
         auto count = std::count_if(GUIMouseListener::rightClickList.begin(), GUIMouseListener::rightClickList.end(),
             [currentMicros](const ClickData& click) {
                 return (currentMicros - click.timestamp <= 1.0);

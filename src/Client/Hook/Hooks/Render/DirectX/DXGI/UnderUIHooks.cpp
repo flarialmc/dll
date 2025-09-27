@@ -1,5 +1,8 @@
 #include "UnderUIHooks.hpp"
 #include "SwapchainHook.hpp"
+#include "Modules/DepthOfField/DepthOfFieldHelper.hpp"
+#include "Utils/Logger/Logger.hpp"
+#include "SDK/Client/Options/OptionsParser.hpp"
 
 /*
  * THIS IS HOOKED THROUGH SWAPCHAIN!
@@ -38,21 +41,21 @@ void UnderUIHooks::callBackRenderContextD3D12Submit(
     funcoriginalRenderContextD3D12Submit(a1, a2, a3, a4);
 }
 
+bool underUI = false;
+
 void UnderUIHooks::ClearDepthStencilViewCallbackDX11(
     ID3D11DeviceContext* pContext,
-    ID3D11DepthStencilView *pDepthStencilView,
-    UINT                   ClearFlags,
-    FLOAT                  Depth,
-    UINT8                  Stencil) {
-
-    index++;
+    ID3D11DepthStencilView* pDepthStencilView,
+    UINT ClearFlags,
+    FLOAT Depth,
+    UINT8 Stencil) {
 
     if (ClearFlags == D3D11_CLEAR_DEPTH && SwapchainHook::init) {
+        SwapchainHook::SaveDepthmap(pContext, pDepthStencilView);
         SwapchainHook::DX11Render(true);
     }
 
     funcOriginalDX11(pContext, pDepthStencilView, ClearFlags, Depth, Stencil);
-
 }
 
 D3D12_CPU_DESCRIPTOR_HANDLE UnderUIHooks::savedpDethStencilView;
@@ -80,11 +83,11 @@ void UnderUIHooks::ClearDepthStencilViewCallbackDX12(
 void UnderUIHooks::enableHook() {
 
     bool queue;
-    if (SwapchainHook::queue) queue = true;
+    if (SwapchainHook::isDX12) queue = true;
     else queue = false;
     Logger::debug("Queue value: {}", queue);
 
-    if (!SwapchainHook::queue) {
+    if (!SwapchainHook::isDX12) {
 
         /* DX11 */
 

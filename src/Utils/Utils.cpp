@@ -448,6 +448,11 @@ std::string Utils::intToRoman(int n) {
     return res;
 }
 
+double Utils::Microtime() {
+    return (double(std::chrono::duration_cast<std::chrono::microseconds>(
+        std::chrono::system_clock::now().time_since_epoch()).count()) / double(1000000));
+}
+
 
 std::string String::replaceAll(std::string &string, std::string_view c1, std::string_view c2) {
     size_t pos = 0;
@@ -577,8 +582,9 @@ std::string String::removeNonNumeric(const std::string &string, bool integer) {
     std::string result;
     result.reserve(string.size());
 
-    for (char c: string) {
-        if ((c >= '0' && c <= '9') || (!integer && c == '.')) {
+    for (size_t i = 0; i < string.size(); ++i) {
+        char c = string[i];
+        if ((c >= '0' && c <= '9') || (!integer && c == '.') || (c == '-' && i == 0)) {
             result += c;
         }
     }

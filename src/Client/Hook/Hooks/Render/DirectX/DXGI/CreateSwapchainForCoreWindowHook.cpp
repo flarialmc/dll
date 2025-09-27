@@ -20,23 +20,6 @@ HRESULT CreateSwapchainForCoreWindowHook::CreateSwapChainForCoreWindowCallback(
     IDXGIOutput *pRestrictToOutput,
     IDXGISwapChain1 **ppSwapChain)
 {
-
-    ResizeHook::cleanShit(true);
-
-    winrt::com_ptr<ID3D12CommandQueue> pCommandQueue;
-    Logger::debug("Recreating Swapchain");
-    if (Client::settings.getSettingByName<bool>("killdx")->value) SwapchainHook::queue = nullptr;
-    if (Client::settings.getSettingByName<bool>("killdx")->value && SUCCEEDED(pDevice->QueryInterface(IID_PPV_ARGS(pCommandQueue.put())))) {
-        SwapchainHook::queue = nullptr;
-        Logger::success("Fell back to DX11");
-        return DXGI_ERROR_INVALID_CALL;
-    }
-
-    auto vsync = Client::settings.getSettingByName<bool>("vsync")->value;
-    SwapchainHook::currentVsyncState = vsync;
-
-    if (vsync) pDesc->Flags |= DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
-
     /* EXTRA RELEASING PRECAUTIONS */
 
     if (SwapchainHook::d3d11On12Device && !SwapchainHook::D3D11Resources.empty()) {
@@ -70,7 +53,25 @@ HRESULT CreateSwapchainForCoreWindowHook::CreateSwapChainForCoreWindowCallback(
     }
 
     /* EXTRA RELEASING PRECAUTIONS */
+    ResizeHook::cleanShit(true);
+    SwapchainHook::queue = nullptr;
+    SwapchainHook::swapchain = nullptr;
 
+    winrt::com_ptr<ID3D12CommandQueue> pCommandQueue;
+    Logger::debug("Recreating Swapchain");
+    if (Client::settings.getSettingByName<bool>("killdx")->value) SwapchainHook::queue = nullptr;
+    if (Client::settings.getSettingByName<bool>("killdx")->value && SUCCEEDED(pDevice->QueryInterface(IID_PPV_ARGS(pCommandQueue.put())))) {
+        SwapchainHook::queue = nullptr;
+        SwapchainHook::isDX12 = false;
+        Logger::success("Fell back to DX11");
+        return DXGI_ERROR_INVALID_CALL;
+    }
+
+    auto vsync = Client::settings.getSettingByName<bool>("vsync")->value;
+    SwapchainHook::currentVsyncState = vsync;
+
+    if (vsync) pDesc->Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
+//
     SwapchainHook::recreate = false;
     HRESULT hr = funcOriginal(This, pDevice, pWindow, pDesc, pRestrictToOutput, ppSwapChain);
     if (FAILED(hr)) {

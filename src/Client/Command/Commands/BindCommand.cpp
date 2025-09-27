@@ -22,7 +22,8 @@ void BindCommand::execute(const std::vector<std::string> &args) {
             "Waypoints",
             "SnapLook",
             "Skin_Stealer",
-            "Tab_List"
+            "Tab_List",
+            "Eject"
         };
         std::string modListText = "Keybindable Module List: (put _ in place of spaces)";
         for (int i = 0; i < modList.size(); i++) modListText += std::format("\n{}. {}", i + 1, modList[i]);
@@ -49,16 +50,25 @@ void BindCommand::execute(const std::vector<std::string> &args) {
         return;
     }
 
-    for (auto pair : ModuleManager::moduleMap) {
-        if (String::toLower(pair.second->name) == String::toLower(modName)) {
-            SettingType<std::string>* setting = pair.second->settings.getSettingByName<std::string>("keybind");
-            if (setting != nullptr) {
-                setting->value = keys;
-                Client::SaveSettings();
-                addCommandMessage("Successfully set <{}>'s keybind to <{}>", pair.second->name, keys);
+    if (String::toLower(modName) == "eject") {
+        Client::settings.getSettingByName<std::string>("ejectKeybind")->value = keys;
+        Client::SavePrivate();
+        Client::LoadPrivate();
+        addCommandMessage("Successfully set <Eject> keybind to {}", keys);
+        return;
+    }
+    else {
+        for (auto pair : ModuleManager::moduleMap) {
+            if (String::toLower(pair.second->name) == String::toLower(modName)) {
+                SettingType<std::string>* setting = pair.second->settings.getSettingByName<std::string>("keybind");
+                if (setting != nullptr) {
+                    setting->value = keys;
+                    Client::SaveSettings();
+                    addCommandMessage("Successfully set <{}>'s keybind to <{}>", pair.second->name, keys);
+                }
+                else addCommandMessage("This module isn't keybindable. Use §c.bind list §rfor the list of keybindable modules");
+                return;
             }
-            else addCommandMessage("This module isn't keybindable. Use §c.bind list §rfor the list of keybindable modules");
-            return;
         }
     }
 

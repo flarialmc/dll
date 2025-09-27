@@ -71,6 +71,7 @@ public:
     }
 
     void onGeneralSettingsScreenControllerOnCreate(GeneralSettingsScreenControllerOnCreateEvent &event) {
+
         event.unlockPackMenu();
     }
 
@@ -107,11 +108,13 @@ public:
 
     void onHandleVisibilityUpdates(HandleVisibilityUpdatesEvent &event) {
         // stops chunks from updating
+        //Logger::debug("canRender: {}, recreate: {}, forcePreGame: {}", canRender, recreate, forcePreGame);
         if(!canRender || recreate || forcePreGame) event.cancel();
     }
 
     void onRenderOrderExecute(RenderOrderExecuteEvent &event) {
         // stops most 3D level rendering
+        //Logger::debug("canRender: {}, recreate: {}, forcePreGame: {}", canRender, recreate, forcePreGame);
         if(!canRender || recreate || forcePreGame) event.cancel();
     }
 
@@ -121,6 +124,7 @@ public:
 
         auto name = SDK::clientInstance->getScreenName();
 
+        if (frameQueue > 0) frameQueue--;
         if(!canRender && enableFrameQueue) {
             if(frameQueue == 0) {
                 if(!recreate) {
@@ -167,7 +171,7 @@ public:
         if(name.find("screen_world_controls_and_settings - ") != std::string::npos) {
             last_tab = name;
         };
-        static std::string tab = "screen_world_controls_and_settings - global_texture_pack_tab";
+        static std::string tab = "screen_world_controls_and_settings";
         bool value = event.getState() || forcePreGame || name == tab || last_tab == tab && name == "screen";
         event.setState(value);
     }

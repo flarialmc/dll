@@ -81,6 +81,8 @@
 #include "Modules/MovableTitle/MovableTitle.hpp"
 #include "Modules/MovableBossbar/MovableBossbar.hpp"
 #include "Modules/MovableChat/MovableChat.hpp"
+#include "Modules/ClearScoreboard/ClearScoreboard.hpp"
+#include "Modules/ClearChat/ClearChat.hpp"
 #include "Modules/MovableCoordinates/MovableCoordinates.hpp"
 #include "Modules/MovableHotbar/MovableHotbar.hpp"
 #include "Modules/NullMovement/NullMovement.hpp"
@@ -94,6 +96,7 @@
 #include "Scripting/ScriptManager.hpp"
 #include "Modules/AutoPerspective/AutoPerspective.hpp"
 #include "Modules/BlockHit/BlockHit.hpp"
+#include "Modules/SwingAnimations/SwingAnimations.hpp"
 #include "Modules/CinematicCamera/CinematicCamera.hpp"
 #include "Modules/LowHealthIndicator/LowHealthIndicator.hpp"
 #include "Modules/PlayerNotifier/PlayerNotifier.hpp"
@@ -119,6 +122,15 @@
 #include "Modules/MessageLogger/MessageLogger.hpp"
 #include "Modules/TotemCounter/TotemCounter.hpp"
 #include "Modules/BetterHungerBar/BetterHungerBar.hpp"
+#include "Modules/ParticleMultiplier/ParticleMultiplier.hpp"
+#include "Modules/BowSensitivity/BowSensitivity.hpp"
+#include "Modules/DepthOfField/DepthOfField.hpp"
+#include "Modules/InventoryLock/InventoryLock.hpp"
+#include "Modules/SwingAnimations/SwingAnimations.hpp"
+#include "Modules/Subtitles/Subtitles.hpp"
+#include "Modules/SensMultiplier/SensMultiplier.hpp"
+#include "Modules/Stopwatch/Stopwatch.hpp"
+#include "Modules/InventoryLock/InventoryLock.hpp"
 
 #ifdef COMPILE_DOOM
 	#include "Modules/Doom/Doom.hpp"
@@ -231,19 +243,22 @@ void ModuleManager::initialize() {
 	addModule<MovableTitle>();
 	addModule<MovableBossbar>();
 	addModule<MovableChat>();
+	addModule<ClearScoreboard>();
+	addModule<ClearChat>();
 	addModule<MovableCoordinates>();
 	addModule<MovableHotbar>();
 	addModule<MovableDayCounter>();
 	// addModule<CompactChat>();
-	if(!VersionUtils::checkAboveOrEqual(21, 100)) {
-		addModule<ItemPhysics>();
-	}
+
+	addModule<ItemPhysics>();
+
 
 	addModule<Mousestrokes>();
 
 	if (VersionUtils::checkAboveOrEqual(21, 40)) {
 		addModule<JavaInventoryHotkeys>();
 		addModule<BlockHit>();
+		addModule<SwingAnimations>();
 	}
 
 
@@ -264,9 +279,7 @@ void ModuleManager::initialize() {
 	//addModule<ItemUseDelayFix>();
 	addModule<ZeqaUtils>();
 	addModule<MumbleLink>();
-	if(VersionUtils::checkAboveOrEqual(21, 50) && !VersionUtils::checkAboveOrEqual(21, 80)) {
-	    addModule<MaterialBinLoader>();
-	}
+	addModule<MaterialBinLoader>();
 
 	addModule<MinimalViewBobbing>();
 
@@ -282,10 +295,25 @@ void ModuleManager::initialize() {
 	addModule<Twerk>();
 	addModule<CinematicCamera>();
 	addModule<ChunkBorder>();
+	if(VersionUtils::checkAboveOrEqual(21, 70))
+	{
 	addModule<CompactChat>();
 	addModule<MessageLogger>();
+	}
 	addModule<TotemCounter>();
 	addModule<BetterHungerBar>();
+	addModule<ParticleMultiplier>();
+	addModule<BowSensitivity>();
+
+	if (VersionUtils::checkBelowOrEqual(21, 90)) addModule<SwingAnimations>();
+
+	addModule<Subtitles>();
+	addModule<SensMultiplier>();
+	addModule<Stopwatch>();
+
+	addModule<DepthOfField>();
+
+	addModule<InventoryLock>();
 
 #ifdef COMPILE_DOOM
 	addModule<DoomModule>();

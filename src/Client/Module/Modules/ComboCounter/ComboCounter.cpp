@@ -21,7 +21,7 @@ void ComboCounter::onDisable() {
 void ComboCounter::defaultConfig() {
     setDef("text", (std::string)"Combo: {value}");
     Module::defaultConfig("all");
-    
+    setDef("negatives", false);
 }
 
 void ComboCounter::settingsRender(float settingsOffset) {
@@ -41,7 +41,9 @@ void ComboCounter::settingsRender(float settingsOffset) {
     defaultAddSettings("colors");
 
     addHeader("Misc");
+    addToggle("Count to Negatives", "Allows the count to keep going down", "negatives");
     defaultAddSettings("misc");
+    
 
     FlarialGUI::UnsetScrollView();
 
@@ -51,20 +53,38 @@ void ComboCounter::settingsRender(float settingsOffset) {
 
 void ComboCounter::onAttack(AttackEvent &event) {
     if (!this->isEnabled()) return;
-    if (std::chrono::high_resolution_clock::now() - last_hit > std::chrono::milliseconds(480)) {
+
+    auto now = std::chrono::high_resolution_clock::now();
+
+    if (Combo < 0) {
+        Combo = 1;
+        last_hit = now;
+        return;
+    }
+
+    if (now - last_hit > std::chrono::milliseconds(480)) {
         Combo++;
-        last_hit = std::chrono::high_resolution_clock::now();
+        last_hit = now;
     }
 }
 
 void ComboCounter::onTick(TickEvent &event) {
     if (!this->isEnabled()) return;
-    if (!SDK::clientInstance->getLocalPlayer())
-        return;
 
-    auto LP = reinterpret_cast<LocalPlayer*>(event.getActor());
-    if (LP->getHurtTime() != 0)
-        Combo = 0;
+    if (!SDK::clientInstance->getLocalPlayer()) return;
+
+    int currentHurtTime = reinterpret_cast<LocalPlayer*>(event.getActor())->getHurtTime();
+    bool meow = getOps<bool>("negatives");
+
+    // just in case player toggles negatives off
+    if (!meow && Combo < 0) Combo = 0;
+
+    if (currentHurtTime > 0 && lastHurtTime == 0) {
+        if (Combo > 0) Combo = 0;
+        if (meow) Combo--;
+    }
+    lastHurtTime = currentHurtTime;
+
     std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - last_hit;
     if (duration.count() >= 15) Combo = 0;
 }
