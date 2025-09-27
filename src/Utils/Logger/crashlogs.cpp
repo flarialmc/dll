@@ -65,6 +65,9 @@ namespace glaiel::crashlogs {
     static void output_crash_log() {
         std::filesystem::path path = get_log_filepath();
         std::ofstream log(path);
+
+        log << "COMMIT_HASH: " << COMMIT_HASH << std::endl;
+
         if(!header_message.empty()) log << header_message << std::endl;
         if(crash_signal != 0) {
             log << "Received signal " << crash_signal << " " << try_get_signal_name(crash_signal) << std::endl;

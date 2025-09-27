@@ -162,6 +162,12 @@ std::string FlarialGUI::TextBoxVisual(int index, std::string& text, int limit, f
 }
 
 std::string FlarialGUI::TextBox(int index, std::string& text, int limit, float x, float y, float width, float height, int special, std::string moduleName, std::string settingName) {
+
+	/*
+	special = 2 for float slider
+	special = 4 for int slider
+	*/
+
 	if (isInScrollView) y += scrollpos;
 	if (!clickgui->active) return text;
 
@@ -180,7 +186,7 @@ std::string FlarialGUI::TextBox(int index, std::string& text, int limit, float x
 			mod->settings.deleteSetting(settingName);
 			mod->defaultConfig();
 			if (special == 2) text = std::to_string(mod->settings.getSettingByName<float>(settingName)->value);
-			else if (special == 3) text = std::to_string(mod->settings.getSettingByName<int>(settingName)->value);
+			else if (special == 4) text = std::to_string(mod->settings.getSettingByName<int>(settingName)->value);
 			else text = mod->settings.getSettingByName<std::string>(settingName)->value;
 			FlarialGUI::TextBoxes[index].text = text;
 		}
@@ -210,7 +216,7 @@ std::string FlarialGUI::TextBox(int index, std::string& text, int limit, float x
 	}
 
 	if (special == 1) FlarialGUI::TextBoxes[index].text = FlarialGUI::TextBoxes[index].text.substr(0, 6);
-	if (special == 2 || special == 3) FlarialGUI::TextBoxes[index].text = FlarialGUI::TextBoxes[index].text.substr(0, limit);
+	if (special == 2 || special == 4) FlarialGUI::TextBoxes[index].text = FlarialGUI::TextBoxes[index].text.substr(0, limit);
 	if ((size.x > (width - 0.35 * textWidth)) && !FlarialGUI::TextBoxes[index].text.empty() && special == 3) FlarialGUI::TextBoxes[index].text.pop_back();
 
 	return FlarialGUI::TextBoxes[index].text;

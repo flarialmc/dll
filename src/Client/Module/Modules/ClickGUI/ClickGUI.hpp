@@ -355,10 +355,32 @@ public:
             SDK::clientInstance->releaseMouse(); // release mouse lets cursor move
 
             // Check if any textbox is active to prevent Edit Menu from opening when typing
-            bool anyTextBoxActive = std::any_of(FlarialGUI::TextBoxes.begin(), FlarialGUI::TextBoxes.end(),
-                                              [](const auto& pair) { return pair.second.isActive; });
+            bool anyTextBoxActive = std::any_of(FlarialGUI::TextBoxes.begin(), FlarialGUI::TextBoxes.end(), [](const auto &pair) { return pair.second.isActive; });
 
-            if (!anyTextBoxActive && FlarialGUI::TextBoxes[0].text.empty() && isKeyPartOfAdditionalKeybind(event.key, this->settings.getSettingByName<std::string>("editmenubind")->value)) {
+            if (page.type == "normal" && curr == "modules" && event.getAction() == ActionType::Pressed) {
+                if (!isKeyPartOfAdditionalKeybind(event.key, this->settings.getSettingByName<std::string>("editmenubind")->value) && !FlarialGUI::TextBoxes[0].text.empty()) {
+                    // auto search logic
+                    if (Client::settings.getSettingByName<bool>("autosearch")->value && !FlarialGUI::TextBoxes[0].isActive) {
+                        FlarialGUI::TextBoxes[0].isActive = true;
+                        event.setKey(MouseButton::None);
+                        event.setAction(MouseAction::Release);
+                    }
+                    // you searching
+                    if (FlarialGUI::TextBoxes[0].isActive) {
+                        FlarialGUI::scrollpos = 0;
+                        FlarialGUI::barscrollpos = 0;
+
+                        accumilatedPos = 0;
+                        accumilatedBarPos = 0;
+                        if (FlarialGUI::TextBoxes[0].text.empty() && Client::settings.getSettingByName<bool>("saveScrollPos")->value) {
+                            accumilatedPos = saved_acumilatedPos;
+                            accumilatedBarPos = saved_acumilatedBarPos;
+                        }
+                    }
+                };
+            }
+
+            if (((!anyTextBoxActive && curr == "settings") || curr == "modules") && FlarialGUI::TextBoxes[0].text.empty() && isKeyPartOfAdditionalKeybind(event.key, this->settings.getSettingByName<std::string>("editmenubind")->value)) {
                 FlarialGUI::TextBoxes[0].isActive = false;
                 event.setKey(MouseButton::None);
                 event.setAction(MouseAction::Release);
@@ -372,46 +394,11 @@ public:
                     editmenu = true;
                 }
             }
-
-            if (page.type == "normal" && curr == "modules" &&
-                event.getAction() == ActionType::Pressed) {
-                // auto search logic
-                if (Client::settings.getSettingByName<bool>("autosearch")->value && !FlarialGUI::TextBoxes[0].isActive) {
-                    FlarialGUI::TextBoxes[0].isActive = true;
-                    event.setKey(MouseButton::None);
-                    event.setAction(MouseAction::Release);
-                }
-                // you searching
-                if (FlarialGUI::TextBoxes[0].isActive) {
-                    FlarialGUI::scrollpos = 0;
-                    FlarialGUI::barscrollpos = 0;
-
-                    accumilatedPos = 0;
-                    accumilatedBarPos = 0;
-                    if (FlarialGUI::TextBoxes[0].text.empty() && Client::settings.getSettingByName<bool>("saveScrollPos")->value) {
-                        accumilatedPos = saved_acumilatedPos;
-                        accumilatedBarPos = saved_acumilatedBarPos;
-                    }
-                }
-            }
-
-            if (this->isAdditionalKeybind(event.keys, getOps<std::string>("editmenubind")) && Module::isKeyPartOfAdditionalKeybind(event.key, this->settings.getSettingByName<std::string>("editmenubind")->value)) {
-                if (!editmenu) {
-                    MC::lastMouseScroll = MouseAction::Release;
-                    WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType::Arrow);
-                    this->active = false;
-                    FlarialGUI::Notify("Right click a module to directly go to their settings page.");
-                    FlarialGUI::Notify("To disable this menu press ESC or " +
-                                       getOps<std::string>("editmenubind"));
-                    editmenu = true;
-                }
-            }
             // switch back to ClickGUI if clicked on Edit Mode bind
-        } else if (editmenu && this->isAdditionalKeybind(event.keys, this->settings.getSettingByName<std::string>(
-                                                             "editmenubind")->value) && Module::isKeyPartOfAdditionalKeybind(event.key,
+        } else if (editmenu && this->isAdditionalKeybind(event.keys, this->settings.getSettingByName<std::string>("editmenubind")->value) && isKeyPartOfAdditionalKeybind(event.key,
                                                                                                                              this->settings.getSettingByName<std::string>(
                                                                                                                                  "editmenubind")->value) ||
-                   editmenu && this->isKeybind(event.keys) && Module::isKeyPartOfAdditionalKeybind(event.key,
+                   editmenu && this->isKeybind(event.keys) && isKeyPartOfAdditionalKeybind(event.key,
                                                                                                    this->settings.getSettingByName<std::string>(
                                                                                                        "editmenubind")->value)) {
             MC::lastMouseScroll = MouseAction::Release;

@@ -7,15 +7,15 @@
 
 ItemStack *ContainerScreenController::getContainerItem(ContainerEnum type, int slot) {
     auto lp = SDK::clientInstance->getLocalPlayer();
-    if(!lp) return nullptr;
+    if (!lp) return nullptr;
 
     auto inventory = lp->getSupplies()->getInventory();
-    if(inventory == nullptr) return nullptr;
+    if (inventory == nullptr) return nullptr;
 
     // src is where the item is
     bool srcAsDest = false;
 
-    if(type == ContainerEnum::OTHER) return nullptr;
+    if (type == ContainerEnum::OTHER) return nullptr;
 
     auto startSlot = type == ContainerEnum::HOTBAR ? 0 : 9;
 
@@ -25,9 +25,9 @@ ItemStack *ContainerScreenController::getContainerItem(ContainerEnum type, int s
 }
 
 ContainerEnum ContainerScreenController::getContainerType(std::string name) {
-    if(name == "hotbar_items") return ContainerEnum::HOTBAR;
-    if(name == "inventory_items") return ContainerEnum::INVENTORY;
-    if(name.find("_output") != std::string::npos) return ContainerEnum::CONTAINER_OUTPUT;
+    if (name == "hotbar_items") return ContainerEnum::HOTBAR;
+    if (name == "inventory_items") return ContainerEnum::INVENTORY;
+    if (name.find("_output") != std::string::npos) return ContainerEnum::CONTAINER_OUTPUT;
     return ContainerEnum::OTHER;
 }
 
@@ -37,35 +37,35 @@ void ContainerScreenController::_handlePlaceAll(std::string collectionName, int3
 }
 
 void ContainerScreenController::_handleTakeAll(std::string collectionName, int32_t slot) {
-
-    using func = void(__fastcall*)(ContainerScreenController*, std::string, int32_t);
+    using func = void(__fastcall*)(ContainerScreenController *, std::string, int32_t);
     static auto handlePlaceAll = reinterpret_cast<func>(Memory::offsetFromSig(GET_SIG_ADDRESS("ContainerScreenController::_handleTakeAll"), 1));
     return handlePlaceAll(this, collectionName, slot);
 }
 
 void ContainerScreenController::swap(std::string srcCollectionName, int32_t srcSlot, std::string dstCollectionName, int32_t dstSlot) {
+    auto srcContainerType = getContainerType(srcCollectionName);
+    auto dstContainerType = getContainerType(dstCollectionName);
 
-        auto srcContainerType = getContainerType(srcCollectionName);
-        auto dstContainerType = getContainerType(dstCollectionName);
+    auto srcItemStack = getContainerItem(srcContainerType, srcSlot);
+    auto dstItemStack = getContainerItem(dstContainerType, dstSlot);
 
-        auto srcItem = getContainerItem(srcContainerType, srcSlot)->getItem();
-        auto dstItem = getContainerItem(dstContainerType, dstSlot)->getItem();
+    Item* srcItem = srcItemStack ? srcItemStack->getItem() : nullptr;
+    Item* dstItem = dstItemStack ? dstItemStack->getItem() : nullptr;
 
-        if(srcContainerType == ContainerEnum::CONTAINER_OUTPUT) {
-            _handleTakeAll(srcCollectionName, srcSlot);
-            _handlePlaceAll(dstCollectionName, dstSlot);
-            return;
-        }
-
-        if(!srcItem && dstItem) {
-            _handleTakeAll(dstCollectionName, dstSlot);
-            _handlePlaceAll(srcCollectionName, srcSlot);
-            _handlePlaceAll(dstCollectionName, dstSlot);
-            return;
-        }
-
+    if (srcContainerType == ContainerEnum::CONTAINER_OUTPUT) {
         _handleTakeAll(srcCollectionName, srcSlot);
         _handlePlaceAll(dstCollectionName, dstSlot);
-        _handlePlaceAll(srcCollectionName, srcSlot);
+        return;
+    }
 
+    if (!srcItem && dstItem) {
+        _handleTakeAll(dstCollectionName, dstSlot);
+        _handlePlaceAll(srcCollectionName, srcSlot);
+        _handlePlaceAll(dstCollectionName, dstSlot);
+        return;
+    }
+
+    _handleTakeAll(srcCollectionName, srcSlot);
+    _handlePlaceAll(dstCollectionName, dstSlot);
+    _handlePlaceAll(srcCollectionName, srcSlot);
 }

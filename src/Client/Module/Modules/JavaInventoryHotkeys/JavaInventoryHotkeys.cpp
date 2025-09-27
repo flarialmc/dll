@@ -45,23 +45,23 @@ void JavaInventoryHotkeys::onMouseInput(MouseEvent &event) {
     std::string screen = SDK::getCurrentScreen();
     if (screen == "hud_screen" || screen == "pause_screen") return;
 
-    auto targetSlot = isSlotKeybind(FlarialGUI::cached_to_string(-100 + (int)event.getButton()));
+    auto targetSlot = isSlotKeybind(FlarialGUI::cached_to_string(-100 + (int) event.getButton()));
     if (targetSlot == -1) return;
 
-    moveRequests.push({ targetSlot, currentHoveredSlot, currentCollectionName });
+    moveRequests.push({targetSlot, currentHoveredSlot, currentCollectionName});
 }
 
 void JavaInventoryHotkeys::onKey(KeyEvent &event) {
     if (!this->isEnabled()) return;
     std::string screen = SDK::getCurrentScreen();
     if (screen == "hud_screen" || screen == "pause_screen") clearQueue();
-    
+
     if (event.getAction() != ActionType::Pressed) return;
 
     auto targetSlot = isSlotKeybind(FlarialGUI::cached_to_string(event.getKey()));
     if (targetSlot == -1) return;
 
-    moveRequests.push({ targetSlot, currentHoveredSlot, currentCollectionName });
+    moveRequests.push({targetSlot, currentHoveredSlot, currentCollectionName});
 }
 
 void JavaInventoryHotkeys::onContainerSlotHovered(ContainerSlotHoveredEvent &event) {
@@ -72,6 +72,7 @@ void JavaInventoryHotkeys::onContainerSlotHovered(ContainerSlotHoveredEvent &eve
 
 void JavaInventoryHotkeys::onContainerTick(ContainerScreenControllerTickEvent &event) {
     if (!this->isEnabled()) return;
+
     auto controller = event.getContainerScreenController();
     if (!controller) return;
     if (lastContainer != controller) {
@@ -83,6 +84,15 @@ void JavaInventoryHotkeys::onContainerTick(ContainerScreenControllerTickEvent &e
         auto request = moveRequests.front();
 
         if (!canSwap(request.collectionName)) continue;
+
+        std::string serverIP = SDK::getServerIP();
+        if (serverIP.find("nethergames") != std::string::npos) {
+            FlarialGUI::Notify("Can't use Java Hotkeys on " + serverIP);
+            this->restricted = true;
+        } else this->restricted = false;
+
+        if (this->restricted) return clearQueue();
+
         controller->swap(request.collectionName, request.hoveredSlot, "hotbar_items", request.destSlot);
     }
 }
@@ -95,5 +105,6 @@ bool JavaInventoryHotkeys::canSwap(std::string_view collectionName) {
 }
 
 void JavaInventoryHotkeys::clearQueue() {
-    for (moveRequests; !moveRequests.empty(); moveRequests.pop()) {}
+    for (moveRequests; !moveRequests.empty(); moveRequests.pop()) {
+    }
 }
