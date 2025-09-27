@@ -190,8 +190,7 @@ void TotemCounter::onRender(RenderEvent& event) {
         std::string tmpl = this->settings.getSettingByName<std::string>("text") != nullptr ? getOps<std::string>("text") : std::string();
         std::string popsTmpl = this->settings.getSettingByName<std::string>("textUsed") != nullptr ? getOps<std::string>("textUsed") : std::string();
         finalText = replaceValueToken(tmpl, FlarialGUI::cached_to_string(totems));
-        finalText += "
-" + replaceValueToken(popsTmpl, playerPops);
+        finalText += replaceValueToken(popsTmpl, playerPops);
     }
 
     normalRenderCore(35, finalText);
