@@ -2,6 +2,7 @@
 
 #include "Client.hpp"
 #include "Utils/Render/MaterialUtils.hpp"
+#include "Events/Render/DrawNameTagEvent.hpp"
 
 void BaseActorRendererRenderTextHook::drawLogo(ScreenContext* screenContext, const Vec3<float>& cameraPos,
                                                const Vec3<float>& cameraTargetPos, const std::string& nameTag, const Vec3<float>& tagPos, Font* font)
@@ -146,6 +147,9 @@ void BaseActorRendererRenderTextHook::BaseActorRenderer_renderTextCallback(Scree
 void BaseActorRendererRenderTextHook::BaseActorRenderer_renderTextCallback40(ScreenContext* screenContext,
     ViewRenderData* viewData, NameTagRenderObject* tagData, Font* font, void* mesh)
 {
+
+    auto event = nes::make_holder<DrawNameTagEvent>(tagData);
+    eventMgr.trigger(event);
 
     if (!Client::settings.getSettingByName<bool>("nologoicon")->value)
         drawLogo(screenContext, viewData->cameraPos, viewData->cameraTargetPos, tagData->nameTag, tagData->pos, font);
