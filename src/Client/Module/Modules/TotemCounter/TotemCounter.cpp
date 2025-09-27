@@ -154,7 +154,7 @@ void TotemCounter::onPacketEvent(PacketEvent& event)
     } else if (eep->EventID == ActorEvent::Death)
     {
         if (popsById[id] == 0 || (!getOps<bool>("listenForOthers") && id != SDK::clientInstance->getLocalPlayer()->getRuntimeIDComponent()->runtimeID)) return;
-        SDK::clientInstance->getGuiData()->displayClientMessage("[§cTotem Counter§r] " + playerName + " died after popping §7" + std::to_string(popsById[id]) + "§r totems.");
+        SDK::clientInstance->getGuiData()->displayClientMessage("[§cTotem Counter§r] " + playerName + " died after popping §7" + std::to_string(popsById[id]) + "§r totem" + (popsById[id] > 1 ? "s" : "") + ".");
         popsById[id] = 0;
     }
 }
