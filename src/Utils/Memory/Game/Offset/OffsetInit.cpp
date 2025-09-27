@@ -7,7 +7,6 @@
 void OffsetInit::init21100() {
     Logger::custom(fg(fmt::color::golden_rod), "Offsets", "Loading offsets for 1.21.10X");
 
-    ADD_OFFSET("Level::getRuntimeEntity", 60);
     ADD_OFFSET("Level::hitResult", 0x1E8);
     ADD_OFFSET("Level::getPlayerMap", 0x4E8);
 
