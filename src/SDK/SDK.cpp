@@ -1,6 +1,7 @@
 #pragma once
 
 #include "SDK.hpp"
+#include "Utils/UserActionLogger.hpp"
 #include "../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 #include <cctype>
 
@@ -50,7 +51,13 @@ std::shared_ptr<Packet> SDK::createPacket(int id) {
 
 // TODO: use CI::GetScreenName
 void SDK::setCurrentScreen(const std::string &layer) {
+    std::string previousScreen = SDK::currentScreen;
     SDK::currentScreen = layer;
+
+    // Log screen change for crash telemetry
+    if (previousScreen != layer) {
+        UserActionLogger::logScreenChange(previousScreen, layer);
+    }
 }
 
 std::string SDK::getCurrentScreen() {

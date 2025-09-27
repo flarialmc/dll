@@ -1,4 +1,5 @@
 #include "CommandManager.hpp"
+#include "Utils/UserActionLogger.hpp"
 
 #include "../../SDK/Client/Network/Packet/TextPacket.hpp"
 #include "Commands/BindCommand.hpp"
@@ -70,9 +71,14 @@ void CommandManager::onPacket(PacketSendEvent &event) {
     });
 
     if (it == Commands.end()) {
+        // Log invalid command attempt
+        UserActionLogger::logCommandExecution(std::string(commandName), false, "invalid_command");
         SDK::clientInstance->getGuiData()->displayClientMessage("§cInvalid command. Use §b" + Client::settings.getSettingByName<std::string>("dotcmdprefix")->value + "help §cto see all available commands.");
         return;
     }
+
+    // Log successful command execution
+    UserActionLogger::logCommandExecution(std::string(commandName), true, "executed");
 
     // Exclude command name from args
     // Example: .prefix *

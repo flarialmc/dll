@@ -2,6 +2,8 @@
 #include "../../../animations/fadeinout.hpp"
 #include "Modules/ClickGUI/ClickGUI.hpp"
 #include "Utils/WinrtUtils.hpp"
+#include "Utils/UserActionLogger.hpp"
+#include "Utils/Utils.hpp"
 
 static float maxDarkenAmount = 0.1;
 bool once;
@@ -100,6 +102,11 @@ bool FlarialGUI::RoundedButton(const int index, float x, float y, const D2D_COLO
     if (isAdditionalY) SetIsInAdditionalYMode();
 
     if (CursorInRect(x, y, width, height) && MC::mouseButton == MouseButton::Left && !MC::held) {
+        // Log button click
+        std::string buttonText = String::WStrToStr(text);
+        std::string position = std::to_string((int)x) + "," + std::to_string((int)y);
+        UserActionLogger::logButtonClick("button_" + std::to_string(index) + "_" + buttonText, position, true);
+
         MC::mouseButton = MouseButton::None;
         once = false;
         return true;

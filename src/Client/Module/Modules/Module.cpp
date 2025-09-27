@@ -1,4 +1,5 @@
 #include "Module.hpp"
+#include "Utils/UserActionLogger.hpp"
 
 #include "../../Client.hpp"
 
@@ -984,6 +985,7 @@ void Module::onSetup() {
 // TODO: rename to Enable/Disable?
 void Module::onEnable() {
     Telemetry::sendModuleEvent(this->name, "enable");
+    UserActionLogger::logModuleToggle(this->name, true, "enable");
 
     enabledState = true;
     if (settings.getSettingByName<bool>("enabled")) getOps<bool>("enabled") = true;
@@ -992,6 +994,7 @@ void Module::onEnable() {
 
 void Module::onDisable() {
     Telemetry::sendModuleEvent(this->name, "disable");
+    UserActionLogger::logModuleToggle(this->name, false, "disable");
 
     enabledState = false;
     active = false;

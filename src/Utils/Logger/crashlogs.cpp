@@ -2,6 +2,8 @@
 
 #include <Client/Module/Manager.hpp>
 #include <kiero/kiero.h>
+#include <Utils/CrashTelemetry.hpp>
+#include <Utils/UserActionLogger.hpp>
 
 //needed to get a stack trace
 #include <stacktrace>
@@ -76,6 +78,17 @@ namespace glaiel::crashlogs {
         }
 
         log.close();
+
+        // Send crash telemetry
+        try {
+            std::string signalName = try_get_signal_name(crash_signal);
+            CrashTelemetry::sendCrashReport(trace, crash_signal, signalName);
+
+            // Also export user actions to file for manual review
+            UserActionLogger::exportToFile();
+        } catch (const std::exception& e) {
+            // Don't let telemetry errors affect crash handling
+        }
 
         if(on_output_crashlog) on_output_crashlog(path.string());
     }
@@ -230,6 +243,10 @@ namespace glaiel::crashlogs {
 
     //set up all the callbacks needed to get into the crash handler during a crash (borrowed from backward.cpp)
     void begin_monitoring() {
+        // Initialize crash telemetry and user action logging
+        CrashTelemetry::initialize();
+        UserActionLogger::initialize();
+
         output_thread = std::thread(crash_handler_thread);
 
         SetUnhandledExceptionFilter(exception_handler);

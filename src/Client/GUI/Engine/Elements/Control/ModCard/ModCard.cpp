@@ -2,6 +2,7 @@
 #include "../../../../../../Assets/Assets.hpp"
 #include "../../../../../Module/Modules/ClickGUI/ClickGUI.hpp"
 #include "../Utils/WinrtUtils.hpp"
+#include "Utils/UserActionLogger.hpp"
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 
@@ -265,7 +266,13 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
     if (MC::mouseAction == Release) fix = false;
     if (FlarialGUI::CursorInRect(modiconx, modicony + FlarialGUI::scrollpos, paddingSize, paddingSize) && MC::mouseButton == Left && MC::mouseAction == Press && !fix) {
         fix = true;
-        mod->settings.getSettingByName<bool>("favorite")->value = !mod->settings.getSettingByName<bool>("favorite")->value;
+        bool newFavoriteState = !mod->settings.getSettingByName<bool>("favorite")->value;
+        mod->settings.getSettingByName<bool>("favorite")->value = newFavoriteState;
+
+        // Log favorite toggle
+        UserActionLogger::logGuiInteraction("module_favorite", "toggle",
+            mod->name + " favorite=" + (newFavoriteState ? "true" : "false"));
+
         FlarialGUI::Notify("Reopen this menu to view changes.");
         ClickGUI::favoriteStart = std::chrono::high_resolution_clock::now();
     }
@@ -273,6 +280,9 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
     if (FlarialGUI::CursorInRect(settingx, buttony - buttonHeight,
                                  paddingwidth + Constraints::RelativeConstraint(0.26), buttonHeight) && MC::mouseButton == MouseButton::Left &&
         !MC::held) {
+        // Log settings access
+        UserActionLogger::logSettingsAccess(mod->name, "open_settings");
+
         FlarialGUI::TextBoxes[0].isActive = false;
         MC::mouseButton = MouseButton::None;
         ClickGUI::page.type = "settings";
