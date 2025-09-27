@@ -85,10 +85,12 @@ namespace glaiel::crashlogs {
         // Send crash telemetry
         try {
             std::string signalName = try_get_signal_name(crash_signal);
-            CrashTelemetry::sendCrashReport(trace, crash_signal, signalName);
+            // CrashTelemetry::sendCrashReport(trace, crash_signal, signalName);
 
-            // Also export user actions to file for manual review
-            UserActionLogger::exportToFile();
+#if defined(__DEBUG__)
+            // Also export user actions to file for manual review (debug only)
+            // UserActionLogger::exportToFile();
+#endif
         } catch (const std::exception& e) {
             // Don't let telemetry errors affect crash handling
         }

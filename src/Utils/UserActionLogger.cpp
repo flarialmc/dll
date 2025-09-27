@@ -1,6 +1,8 @@
 #include "UserActionLogger.hpp"
 #include "Logger/Logger.hpp"
 #include "Utils.hpp"
+#include "CrashTelemetry.hpp"
+#include "Telemetry.hpp"
 #include <json/json.hpp>
 #include <algorithm>
 #include <sstream>
@@ -206,8 +208,6 @@ void UserActionLogger::setLogDirectory(const std::string& directory) {
 }
 
 void UserActionLogger::exportToFile(const std::string& filename) {
-    std::lock_guard<std::mutex> lock(s_mutex);
-
     try {
         // Create log directory if it doesn't exist
         std::filesystem::create_directories(s_logDirectory);
@@ -218,7 +218,7 @@ void UserActionLogger::exportToFile(const std::string& filename) {
             auto now = std::chrono::system_clock::now();
             auto time_t = std::chrono::system_clock::to_time_t(now);
             std::stringstream ss;
-            ss << "user_actions_" << std::put_time(std::localtime(&time_t), "%Y-%m-%d_%H-%M-%S") << ".txt";
+            ss << "user_actions_" << std::put_time(std::localtime(&time_t), "%Y-%m-%d_%H-%M-%S") << ".json";
             logFilename = ss.str();
         }
 
@@ -230,55 +230,74 @@ void UserActionLogger::exportToFile(const std::string& filename) {
             return;
         }
 
-        // Write header
-        file << "=== FLARIAL USER ACTION LOG ===" << std::endl;
-        file << "Generated: " << getCurrentTimestamp() << std::endl;
-        file << "Total Actions: " << s_actions.size() << std::endl;
-        file << "Current Screen: " << getCurrentScreen() << std::endl;
-        file << std::endl;
+        // Build a mock crash report with current data (same structure as API payload)
+        nlohmann::json exportData;
 
-        // Write current system state
-        file << "=== CURRENT SYSTEM STATE ===" << std::endl;
-        auto activeModules = getActiveModules();
-        file << "Active Modules (" << activeModules.size() << "):" << std::endl;
-        for (const auto& module : activeModules) {
-            file << "  - " << module << std::endl;
-        }
-        file << std::endl;
+        try {
+            auto now = std::chrono::system_clock::now();
+            auto timestamp = std::chrono::duration_cast<std::chrono::seconds>(
+                now.time_since_epoch()
+            ).count();
 
-        // Write all actions
-        file << "=== USER ACTIONS (Most Recent First) ===" << std::endl;
-        for (auto it = s_actions.rbegin(); it != s_actions.rend(); ++it) {
-            const auto& action = *it;
+            exportData = {
+                {"crashId", "export-" + std::to_string(timestamp)},
+                {"timestamp", timestamp},
+                {"clientInfo", CrashTelemetry::getClientInfo()},
+                {"crashInfo", {
+                    {"type", "export"},
+                    {"message", "Manual export - no crash"},
+                    {"stackTrace", "No crash occurred - this is a manual export"}
+                }},
+                {"systemInfo", CrashTelemetry::getSystemInfo()},
+                {"hardwareInfo", CrashTelemetry::getHardwareInfo()},
+                {"sessionInfo", CrashTelemetry::getSessionInfo()},
+                {"additionalData", {
+                    {"logFiles", nlohmann::json::array()},
+                    {"moduleStates", CrashTelemetry::getModuleStates()},
+                    {"userActions", nlohmann::json::array()},
+                    {"logs", CrashTelemetry::getLatestLogContent()}
+                }}
+            };
 
-            // Convert timestamp to readable format
-            auto time_t = std::chrono::system_clock::to_time_t(action.timestamp);
-            std::stringstream timeStr;
-            timeStr << std::put_time(std::localtime(&time_t), "%Y-%m-%d %H:%M:%S");
+            // Add the actual user actions
+            {
+                std::lock_guard<std::mutex> lock(s_mutex);
+                Logger::debug("Exporting {} user actions to file", s_actions.size());
 
-            file << "[" << timeStr.str() << "] ";
-            file << action.type << " | ";
-            file << action.target << " | ";
-            file << "Screen: " << action.screen << " | ";
-            file << "Input: " << action.inputMethod << " | ";
-            file << "Success: " << (action.success ? "Yes" : "No");
+                int maxActions = 100;
+                int startIndex = std::max(0, static_cast<int>(s_actions.size()) - maxActions);
 
-            if (!action.details.empty()) {
-                file << " | Details: " << action.details;
+                for (size_t i = startIndex; i < s_actions.size(); ++i) {
+                    const auto& action = s_actions[i];
+
+                    auto actionTimestamp = std::chrono::duration_cast<std::chrono::seconds>(
+                        action.timestamp.time_since_epoch()
+                    ).count();
+
+                    nlohmann::json actionJson = {
+                        {"timestamp", actionTimestamp},
+                        {"type", action.type},
+                        {"target", action.target},
+                        {"details", action.details},
+                        {"screen", action.screen},
+                        {"inputMethod", action.inputMethod},
+                        {"success", action.success},
+                        {"responseTimeMs", action.responseTimeMs}
+                    };
+
+                    exportData["additionalData"]["userActions"].push_back(actionJson);
+                }
             }
-
-            if (action.responseTimeMs > 0) {
-                file << " | Response: " << action.responseTimeMs << "ms";
-            }
-
-            file << std::endl;
+        } catch (const std::exception& e) {
+            exportData = nlohmann::json::object();
+            exportData["error"] = "Failed to build export data: " + std::string(e.what());
+            exportData["initialized"] = s_initialized;
         }
 
-        file << std::endl;
-        file << "=== END OF LOG ===" << std::endl;
+        file << exportData.dump(2); // Pretty print with 2-space indentation
         file.close();
 
-        Logger::info("User action log exported to: {}", fullPath);
+        Logger::info("User action log exported to: {} (contains {} actions)", fullPath, exportData.is_array() ? exportData.size() : 0);
 
     } catch (const std::exception& e) {
         Logger::warn("Failed to export user action log: {}", e.what());

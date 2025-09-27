@@ -52,6 +52,8 @@ void InventoryLock::onKey(KeyEvent& event)
 
     if (SDK::currentScreen == "hud_screen")
     {
+        ItemStack* itesstack = nullptr;
+        auto xoxo = itesstack->getItem();
         // Handle hotbar drops
         auto inventory = player->getSupplies()->getInventory();
         auto selectedSlot = player->getSupplies()->getSelectedSlot();

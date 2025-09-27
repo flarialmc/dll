@@ -3,6 +3,7 @@
 #include "Telemetry.hpp"
 #include "Logger/Logger.hpp"
 #include "UserActionLogger.hpp"
+#include "Utils.hpp"
 #include <json/json.hpp>
 #include <windows.h>
 #include <psapi.h>
@@ -13,7 +14,10 @@
 #include <chrono>
 #include <filesystem>
 #include <csignal>
+#include <fstream>
 #include "Client/Module/Manager.hpp"
+#include "Client/Client.hpp"
+#include "Client/Hook/Hooks/Render/DirectX/DXGI/SwapchainHook.hpp"
 
 #pragma comment(lib, "psapi.lib")
 #pragma comment(lib, "version.lib")
@@ -62,7 +66,8 @@ void CrashTelemetry::sendCrashReport(
             {"additionalData", {
                 {"logFiles", nlohmann::json::array()}, // Could be populated later
                 {"moduleStates", getModuleStates()},
-                {"userActions", UserActionLogger::getRecentActions(20)}
+                {"userActions", UserActionLogger::getRecentActions(20)},
+                {"logs", getLatestLogContent()}
             }}
         };
 
@@ -77,12 +82,32 @@ void CrashTelemetry::sendCrashReport(
 }
 
 nlohmann::json CrashTelemetry::getClientInfo() {
-    return {
+    nlohmann::json clientInfo = {
         {"version", Telemetry::getClientVersion()},
         {"platform", "windows"},
         {"architecture", getArchitecture()},
-        {"buildNumber", "dev"} // Could be made configurable
+        {"buildNumber", "dev"}, // Could be made configurable
+        {"commitHash", COMMIT_HASH},
+        {"DirectXVersion", SwapchainHook::isDX12 ? "DX12" : "DX11"}
     };
+
+    // Add client config settings
+    try {
+        clientInfo["config"] = {
+            {"killdx", Client::settings.getSettingByName<bool>("killdx")->value},
+            {"vsync", Client::settings.getSettingByName<bool>("vsync")->value},
+            {"recreateAtStart", Client::settings.getSettingByName<bool>("recreateAtStart")->value}
+        };
+    } catch (const std::exception& e) {
+        Logger::warn("Failed to get client config settings: {}", e.what());
+        clientInfo["config"] = {
+            {"killdx", "error"},
+            {"vsync", "error"},
+            {"recreateAtStart", "error"}
+        };
+    }
+
+    return clientInfo;
 }
 
 nlohmann::json CrashTelemetry::getCrashInfo(
@@ -321,6 +346,33 @@ nlohmann::json CrashTelemetry::getMemoryInfo() {
         {"usedPhysical", 0},
         {"memoryLoad", 0}
     };
+}
+
+std::string CrashTelemetry::getLatestLogContent() {
+    try {
+        std::string logPath = Utils::getClientPath() + "\\logs\\latest.log";
+        std::ifstream logFile(logPath);
+
+        if (!logFile.is_open()) {
+            return "Could not open latest.log file";
+        }
+
+        std::stringstream buffer;
+        buffer << logFile.rdbuf();
+        logFile.close();
+
+        std::string content = buffer.str();
+
+        // Limit log content to prevent huge payloads (last 50KB)
+        const size_t maxSize = 50 * 1024; // 50KB
+        if (content.size() > maxSize) {
+            content = "... [truncated] ...\n" + content.substr(content.size() - maxSize);
+        }
+
+        return content;
+    } catch (const std::exception& e) {
+        return "Error reading latest.log: " + std::string(e.what());
+    }
 }
 
 void CrashTelemetry::sendTelemetryAsync(const nlohmann::json& payload) {

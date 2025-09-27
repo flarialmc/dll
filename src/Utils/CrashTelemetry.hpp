@@ -38,7 +38,6 @@ public:
         const std::string& signalName
     );
 
-private:
     // Generate unique crash ID
     static std::string generateCrashId();
 
@@ -77,6 +76,9 @@ private:
 
     // Send telemetry asynchronously
     static void sendTelemetryAsync(const nlohmann::json& payload);
+
+    // Get latest log file content
+    static std::string getLatestLogContent();
 
     // Session start time
     static std::chrono::steady_clock::time_point s_sessionStart;
