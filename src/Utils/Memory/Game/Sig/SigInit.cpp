@@ -193,6 +193,7 @@ void SigInit::init2140() {
     ADD_SIG("Actor::getAABBShapeComponent", "C8 25 F2 C9 10 1B"); // 42 81 7C 09 08 + hash
     ADD_SIG("Actor::getStateVectorComponent", "C8 25 91 3C C9 0E");
     ADD_SIG("Actor::getActorRotationComponent", "10 BA CE 21 1E DC");
+	ADD_SIG("Actor::getSynchedActorDataComponent", "10 BA DC 1A 96 D4");
 
     ADD_SIG("Actor::getMobEffectsComponent", "48 89 5C 24 08 48 89 74 24 10 48 89 7C 24 18 4C 89 6C 24 20 55 41 56 41 57 48 8D 6C 24 B9 48 81 EC E0"); // 10 BA 2F B4 D6 F7
     DEPRECATE_SIG("Actor::getRuntimeIDComponent"); // 10 BA 14 14 A1 3C ?
@@ -512,6 +513,7 @@ void SigInit::init2030() {
     ADD_SIG("Actor::getStateVectorComponent", "DA BA 91 3C C9 0E");
     ADD_SIG("Actor::getMobEffectsComponent", "DA BA 2F B4 D6 F7");
     ADD_SIG("Actor::getActorRotationComponent", "DA BA CE 21 1E DC");
+	ADD_SIG("Actor::getSynchedActorDataComponent", "DA BA DC 1A 96 D4");
 
     ADD_SIG("ActorCollision::isOnGround", "40 53 48 83 EC ? 48 8B D9 BA E1 2D 1F 21"); // TODO: wrong
 

@@ -213,6 +213,18 @@ ActorRotationComponent *Actor::getActorRotationComponent() {
     return tryGet<ActorRotationComponent>(sig);
 }
 
+SynchedActorDataComponent* Actor::getSynchedActorDataComponent() {
+	static uintptr_t sig;
+
+	if (!VersionUtils::checkAboveOrEqual(21, 00)) {
+		if (sig == NULL) {
+			sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getSynchedActorDataComponent"));
+		}
+	}
+
+	return tryGet<SynchedActorDataComponent>(sig);
+}
+
 ItemStack *Actor::getOffhandSlot() {
     if(VersionUtils::checkAboveOrEqual(20, 80)) {
         return getOffhandContainer()->getItem(1);

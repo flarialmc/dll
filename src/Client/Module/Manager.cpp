@@ -131,6 +131,7 @@
 #include "Modules/SensMultiplier/SensMultiplier.hpp"
 #include "Modules/Stopwatch/Stopwatch.hpp"
 #include "Modules/InventoryLock/InventoryLock.hpp"
+#include "Modules/TNTTimer/TNTTimer.hpp"
 
 #ifdef COMPILE_DOOM
 	#include "Modules/Doom/Doom.hpp"
@@ -314,6 +315,8 @@ void ModuleManager::initialize() {
 	addModule<DepthOfField>();
 
 	addModule<InventoryLock>();
+
+	addModule<TNTTimer>();
 
 #ifdef COMPILE_DOOM
 	addModule<DoomModule>();
