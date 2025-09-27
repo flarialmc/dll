@@ -271,6 +271,43 @@ void Waypoints::settingsRender(float settingsOffset) {
 	resetPadding();
 }
 
+bool Waypoints::deleteWaypoint(std::string name) {
+	auto waypointListCopy = WaypointList;
+	for (auto pair : waypointListCopy) {
+		std::string end = "-" + FlarialGUI::cached_to_string(pair.second.index);
+		if (!this->settings.getSettingByName<std::string>("waypoint" + end)) continue;
+
+		std::string wpName = name[0] == '"' ? name.substr(1, name.length() - 2) : name;
+
+		if (wpName == getOps<std::string>("waypoint" + end)) {
+
+			this->settings.deleteSetting("waypoint" + end);
+			this->settings.deleteSetting("color" + end);
+			this->settings.deleteSetting("x" + end);
+			this->settings.deleteSetting("y" + end);
+			this->settings.deleteSetting("z" + end);
+			this->settings.deleteSetting("state" + end);
+			this->settings.deleteSetting("rgb" + end);
+			this->settings.deleteSetting("opacity" + end);
+			this->settings.deleteSetting("world" + end);
+			this->settings.deleteSetting("dimension" + end);
+			this->settings.deleteSetting("showInnerBeam" + end);
+			this->settings.deleteSetting("showOuterBeam" + end);
+
+			WaypointList.erase(pair.first);
+
+			Client::SaveSettings();
+
+			FlarialGUI::Notify(std::format("Deleted waypoint <{}>!", wpName));
+
+			return true;
+		}
+
+	}
+
+	return false;
+}
+
 
 void Waypoints::onRender(RenderEvent& event) {
     if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer() || SDK::getCurrentScreen() != "hud_screen" ||
