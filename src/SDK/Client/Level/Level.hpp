@@ -147,7 +147,6 @@ public:
 
     Actor* getRuntimeEntity(uint64_t actorId, bool getRemoved)
     {
-        Logger::info("boobs");
         static auto off = GET_OFFSET("Level::getRuntimeEntity");
         return Memory::CallVFuncI<Actor*>(off, this, actorId, getRemoved);
     }
