@@ -46,13 +46,11 @@ void ContainerScreenController::swap(std::string srcCollectionName, int32_t srcS
     auto srcContainerType = getContainerType(srcCollectionName);
     auto dstContainerType = getContainerType(dstCollectionName);
 
-    auto srcContainerItemPtr = getContainerItem(srcContainerType, srcSlot);
-    if (!srcContainerItemPtr) return;
-    auto srcItem = srcContainerItemPtr->getItem();
+    auto srcItemStack = getContainerItem(srcContainerType, srcSlot);
+    auto dstItemStack = getContainerItem(dstContainerType, dstSlot);
 
-    auto dstContainerItemPtr = getContainerItem(dstContainerType, dstSlot);
-    if (!dstContainerItemPtr) return;
-    auto dstItem = dstContainerItemPtr->getItem();
+    Item* srcItem = srcItemStack ? srcItemStack->getItem() : nullptr;
+    Item* dstItem = dstItemStack ? dstItemStack->getItem() : nullptr;
 
     if (srcContainerType == ContainerEnum::CONTAINER_OUTPUT) {
         _handleTakeAll(srcCollectionName, srcSlot);
