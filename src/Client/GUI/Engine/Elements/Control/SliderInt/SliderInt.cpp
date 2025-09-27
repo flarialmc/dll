@@ -35,7 +35,7 @@ int FlarialGUI::SliderInt(int index, float x, float y, int& startingPoint, const
 
 	Vec2<float> round = Constraints::RoundingConstraint(13, 13);
 
-	const float percWidth = Constraints::RelativeConstraint(0.056 + (std::max(0, (int)std::to_string(maxValue).length() - 2) * 0.01), "height", true);
+	const float percWidth = Constraints::RelativeConstraint(0.056, "height", true);
 	const float percHeight = Constraints::RelativeConstraint(0.029, "height", true);
 
 	y -= percHeight / 2.0f;
@@ -66,7 +66,7 @@ int FlarialGUI::SliderInt(int index, float x, float y, int& startingPoint, const
 
 	RoundedRect(x, y, TextBoxes[30 + index].curBgCol, percWidth, percHeight, round.x, round.x);
 
-	int limit = std::to_string(maxValue).length() + (minValue < 0 ? 1 : 0);
+	int limit = 3;//std::to_string(maxValue).length() + (minValue < 0 ? 1 : 0);
 
 	startingPoint = std::clamp(startingPoint, minValue, maxValue);
 	if (SliderIntRects[index].validInt == -1) SliderIntRects[index].validInt = std::clamp(startingPoint, minValue, maxValue);
@@ -75,7 +75,7 @@ int FlarialGUI::SliderInt(int index, float x, float y, int& startingPoint, const
 		text = std::to_string(startingPoint);
 	}
 
-	text = TextBox(30 + index, text, limit, x, y, percWidth, percHeight, 3, moduleName, settingName);
+	text = TextBox(30 + index, text, limit, x, y, percWidth, percHeight, 4, moduleName, settingName);
 	text = String::removeNonNumeric(text, true);
 
 	if (text.empty()) SliderIntRects[index].isValid = false;
