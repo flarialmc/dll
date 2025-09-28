@@ -9,7 +9,7 @@ class TNTTimer : public Module {
 public:
 
 	TNTTimer() : Module("TNT Timer", "Shows a countdown until TNT explodes",
-		IDR_TIME_PNG, "", false, { "Blast", "Fuse", "Explosion", "Countdown" }) {
+		IDR_TIME_PNG, "", false, { "blast", "fuse", "explosion", "countdown" }) {
 	}
 
 	void onEnable() override;
