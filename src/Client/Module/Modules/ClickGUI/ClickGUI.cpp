@@ -926,6 +926,9 @@ void ClickGUI::onRender(RenderEvent &event) {
                 c->extraPadding();
 
                 c->addHeader("Misc");
+                c->addToggle("Hide Modules when F1",
+                             "Hide Hud will also Hide Modules",
+                             Client::settings.getSettingByName<bool>("hideHudAndMods")->value);
                 c->addToggle("Save Scroll Position",
                              "Save scroll position in ClickGUI",
                              Client::settings.getSettingByName<bool>("saveScrollPos")->value);

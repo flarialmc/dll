@@ -131,6 +131,7 @@
 #include "Modules/SensMultiplier/SensMultiplier.hpp"
 #include "Modules/Stopwatch/Stopwatch.hpp"
 #include "Modules/InventoryLock/InventoryLock.hpp"
+#include "Modules/Misc/F1Listener/F1Listener.hpp"
 #include "Modules/TNTTimer/TNTTimer.hpp"
 
 #ifdef COMPILE_DOOM
@@ -335,6 +336,7 @@ void ModuleManager::initialize() {
 	addService<ImGUIMouseListener>();
 	addService<ImGUIKeyListener>();
 	addService<ScriptMarketplace>();
+	// addService<F1Listener>();
 
 	initialized = true;
 }
