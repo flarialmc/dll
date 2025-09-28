@@ -131,7 +131,12 @@
 #include "Modules/SensMultiplier/SensMultiplier.hpp"
 #include "Modules/Stopwatch/Stopwatch.hpp"
 #include "Modules/InventoryLock/InventoryLock.hpp"
+#include "Modules/TestModule/TestModule.hpp"
 #include "Modules/TNTTimer/TNTTimer.hpp"
+
+#ifdef _DEBUG
+	#include "Modules/TestModule/TestModule.hpp"
+#endif
 
 #ifdef COMPILE_DOOM
 	#include "Modules/Doom/Doom.hpp"
@@ -317,6 +322,10 @@ void ModuleManager::initialize() {
 	addModule<InventoryLock>();
 
 	addModule<TNTTimer>();
+
+
+	addModule<TestModule>();
+
 
 #ifdef COMPILE_DOOM
 	addModule<DoomModule>();

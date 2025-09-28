@@ -9,7 +9,7 @@ void OffsetInit::init21100() {
 
     ADD_OFFSET("Level::hitResult", 0x1E8);
     ADD_OFFSET("Level::getPlayerMap", 0x4E8);
-
+    ADD_OFFSET("BlockLegacy::getMapColor", 144);
     ADD_OFFSET("NetworkSystem::remoteConnectorComposite", 0xF0);
     ADD_OFFSET("MinecraftGame::textureGroup", 0x758);
     ADD_OFFSET("SwingAngle", 5);
@@ -135,6 +135,7 @@ void OffsetInit::init2160() {
     ADD_OFFSET("LevelData::worldName", 0x298);
 
     ADD_OFFSET("Dimension::weather", 0x1C8);
+    ADD_OFFSET("BlockLegacy::getMapColor", 143);
 }
 
 void OffsetInit::init2150() {

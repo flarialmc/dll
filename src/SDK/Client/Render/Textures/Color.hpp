@@ -1,7 +1,9 @@
 #pragma once
 
 namespace mce {
+
     class Color { // MCCColor
+    public:
         float r;
         float g;
         float b;
