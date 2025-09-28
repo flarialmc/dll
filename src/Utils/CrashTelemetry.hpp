@@ -80,6 +80,9 @@ public:
     // Get latest log file content
     static std::string getLatestLogContent();
 
+    // Get enabled modules as text (like in crash log file)
+    static std::string getEnabledModulesText();
+
     // Session start time
     static std::chrono::steady_clock::time_point s_sessionStart;
     static bool s_initialized;

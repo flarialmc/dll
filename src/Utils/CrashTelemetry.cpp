@@ -66,8 +66,10 @@ void CrashTelemetry::sendCrashReport(
             {"additionalData", {
                 {"logFiles", nlohmann::json::array()}, // Could be populated later
                 {"moduleStates", getModuleStates()},
-                {"userActions", UserActionLogger::getRecentActions(20)},
-                {"logs", getLatestLogContent()}
+                {"userActions", UserActionLogger::getRecentActions(100)}, // Match exportToFile behavior
+                {"logs", getLatestLogContent()},
+                {"commitHash", COMMIT_HASH}, // Add commit hash like in crash log file
+                {"enabledModulesText", getEnabledModulesText()} // Add enabled modules list like in crash log file
             }}
         };
 
@@ -372,6 +374,20 @@ std::string CrashTelemetry::getLatestLogContent() {
         return content;
     } catch (const std::exception& e) {
         return "Error reading latest.log: " + std::string(e.what());
+    }
+}
+
+std::string CrashTelemetry::getEnabledModulesText() {
+    try {
+        std::stringstream ss;
+        for (const auto& pair : ModuleManager::moduleMap) {
+            if (pair.second && pair.second->isEnabled()) {
+                ss << pair.second->name << "\n";
+            }
+        }
+        return ss.str();
+    } catch (const std::exception& e) {
+        return "Error getting enabled modules: " + std::string(e.what());
     }
 }
 
