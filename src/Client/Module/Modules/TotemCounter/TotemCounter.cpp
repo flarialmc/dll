@@ -2,7 +2,6 @@
 
 
 #include "Events/Game/TickEvent.hpp"
-#include "SDK/Client/Network/Packet/EntityEventPacket.hpp"
 #include "Modules/ClickGUI/ClickGUI.hpp"
 
 void TotemCounter::onEnable() {
