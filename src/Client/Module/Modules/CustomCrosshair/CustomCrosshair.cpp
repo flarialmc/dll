@@ -3,6 +3,8 @@
 
 #include "Utils/Render/PositionUtils.hpp"
 
+std::string CurrentLoadedCrosshairName;
+
 void CustomCrosshair::onEnable() {
     Listen(this, PerspectiveEvent, &CustomCrosshair::onGetViewPerspective)
     Listen(this, HudCursorRendererRenderEvent, &CustomCrosshair::onHudCursorRendererRender)
@@ -135,7 +137,6 @@ void CustomCrosshair::onHudCursorRendererRender(HudCursorRendererRenderEvent &ev
     }
 
     static TexturePtr ptr2;
-    static std::string CurrentLoadedCrosshairName;
 
     if (CurrentLoadedCrosshairName != CurrentCrosshairName)
     {
@@ -208,6 +209,12 @@ void CustomCrosshair::onHudCursorRendererRender(HudCursorRendererRenderEvent &ev
 
 void CustomCrosshair::onRender(RenderEvent &event) {
     if (!this->isEnabled()) return;
+    static std::string lastScreenName = "";
+    if (lastScreenName != SDK::currentScreen)
+    {
+        lastScreenName = SDK::currentScreen;
+        CurrentLoadedCrosshairName = "";
+    }
     if (actuallyRenderWindow)
         CrosshairEditorWindow();
     else {
