@@ -315,7 +315,7 @@ void ModuleManager::initialize() {
 
 	addModule<DepthOfField>();
 
-	addModule<InventoryLock>();
+	// addModule<InventoryLock>();
 
 	addModule<TNTTimer>();
 

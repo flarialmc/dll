@@ -5,8 +5,8 @@
 
 void ThirdPerson::defaultConfig() {
     Module::defaultConfig("core");
-    setDef("nameTagText", (std::string)"#ffffff", 1.f, false);
-    setDef("nameTagBg", (std::string)"#000000", 0.25f, false);
+    setDef("nameTagText", (std::string)"ffffff", 1.f, false);
+    setDef("nameTagBg", (std::string)"000000", 0.25f, false);
 }
 
 void ThirdPerson::onEnable() {
