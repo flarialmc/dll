@@ -28,7 +28,7 @@ void FasterInventory::defaultConfig() {
 void FasterInventory::onRaknetTick(RaknetTickEvent &event) {
     if (this->isEnabled()) {
         std::string serverIP = SDK::getServerIP();
-        if (serverIP.find("hive") != std::string::npos) {
+        if (serverIP.find("hive") != std::string::npos or serverIP.find("139.99.38.170") != std::string::npos) {
             if (!this->restricted) {
                 FlarialGUI::Notify("Can't use Faster Inventory on " + serverIP); // TODO: move restrictions to API
                 this->restricted = true;

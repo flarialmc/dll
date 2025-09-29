@@ -1876,7 +1876,8 @@ void TabList::onRender(RenderEvent& event)
                         if ((serverIP.find("hive") != std::string::npos ||
                             serverIP.find("inpvp") != std::string::npos ||
                             serverIP.find("play.enchanted") != std::string::npos ||
-                            serverIP.find("play.lbsg") != std::string::npos))
+                            serverIP.find("play.lbsg") != std::string::npos ||
+                            serverIP.find("139.99.38.170") != std::string::npos))
                         {
                             FlarialGUI::Notify("Can't use Show Platforms on " + serverIP);
                             isHiveDetcted = true;
@@ -1887,7 +1888,8 @@ void TabList::onRender(RenderEvent& event)
                         if (!(serverIP.find("hive") != std::string::npos ||
                             serverIP.find("inpvp") != std::string::npos ||
                             serverIP.find("play.enchanted") != std::string::npos ||
-                            serverIP.find("play.lbsg") != std::string::npos))
+                            serverIP.find("play.lbsg") != std::string::npos ||
+                            serverIP.find("139.99.38.170") != std::string::npos))
                         {
                             isHiveDetcted = false;
                         }
