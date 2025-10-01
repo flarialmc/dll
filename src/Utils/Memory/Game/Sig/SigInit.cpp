@@ -4,6 +4,10 @@
 #include <Utils/Logger/Logger.hpp>
 #include <Utils/Memory/Game/SignatureAndOffsetManager.hpp>
 
+void SigInit::init21110() {
+    Logger::custom(fg(fmt::color::gold), "Signatures", "Loading sigs for 1.21.11X");
+}
+
 void SigInit::init21100() {
     Logger::custom(fg(fmt::color::gold), "Signatures", "Loading sigs for 1.21.10X");
 

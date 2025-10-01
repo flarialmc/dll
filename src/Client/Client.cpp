@@ -190,6 +190,8 @@ void Client::initialize() {
 
 	VersionUtils::initialize();
 	version = VersionUtils::getFormattedVersion();
+
+#if !defined(__DEBUG__)
 	if (!VersionUtils::isSupported(Client::version)) {
 		LOG_FATAL("{} Unsupported Minecraft version", Client::version);
 		MessageBoxA(NULL, "Flarial: this version is not supported!", "", MB_OK);
@@ -197,6 +199,7 @@ void Client::initialize() {
 		Client::disable = true;
 		return;
 	}
+#endif
 
 
 	VersionUtils::addData();
