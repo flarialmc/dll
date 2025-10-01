@@ -84,7 +84,7 @@ ActorDataFlagComponent* Actor::getActorDataFlagComponent() {
     if(!VersionUtils::checkAboveOrEqual(21, 00)) {
         if (sig == NULL) {
             sig = Memory::findSig(
-                    std::string(GET_SIG("tryGetPrefix2")) + " " + GET_SIG("Actor::getActorDataFlagComponent"));
+                    std::string(GET_SIG("tryGetPrefix2")) + " " + GET_SIG("Actor::getActorDataFlagComponent"), "Actor::getActorDataFlagComponent");
         }
     }
 
@@ -115,7 +115,7 @@ SimpleContainer* Actor::getArmorContainer() {
     if(!VersionUtils::checkAboveOrEqual(21, 00)) {
         if (sig == NULL) {
             sig = Memory::findSig(
-                    std::string(GET_SIG("tryGetPrefix2")) + " " + GET_SIG("Actor::getActorEquipmentComponent"));
+                    std::string(GET_SIG("tryGetPrefix2")) + " " + GET_SIG("Actor::getActorEquipmentComponent"), "Actor::getActorEquipmentComponent (armor)");
         }
     }
 
@@ -130,7 +130,7 @@ SimpleContainer* Actor::getOffhandContainer() {
     if(!VersionUtils::checkAboveOrEqual(21, 00)) {
         if (sig == NULL) {
             sig = Memory::findSig(
-                    std::string(GET_SIG("tryGetPrefix2")) + " " + GET_SIG("Actor::getActorEquipmentComponent"));
+                    std::string(GET_SIG("tryGetPrefix2")) + " " + GET_SIG("Actor::getActorEquipmentComponent"), "Actor::getActorEquipmentComponent (offhand)");
         }
     }
 
@@ -157,7 +157,7 @@ MoveInputComponent *Actor::getMoveInputHandler() { //??$try_get@UMoveInputCompon
 
     if(!VersionUtils::checkAboveOrEqual(21, 00)) {
         if (sig == NULL) {
-            sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getMoveInputHandler"));
+            sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getMoveInputHandler"), "Actor::getMoveInputHandler");
         }
     }
 
@@ -170,7 +170,7 @@ ActorGameTypeComponent *Actor::getGameModeType() {
     if(!VersionUtils::checkAboveOrEqual(21, 00)) {
         if (sig == NULL) {
             sig = Memory::findSig(
-                    std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getActorGameTypeComponent"));
+                    std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getActorGameTypeComponent"), "Actor::getActorGameTypeComponent");
         }
     }
 
@@ -182,7 +182,7 @@ AABBShapeComponent *Actor::getAABBShapeComponent() {
 
     if(!VersionUtils::checkAboveOrEqual(21, 00)) {
         if (sig == NULL) {
-            sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getAABBShapeComponent"));
+            sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getAABBShapeComponent"), "Actor::getAABBShapeComponent");
         }
     }
 
@@ -194,7 +194,7 @@ StateVectorComponent *Actor::getStateVectorComponent() {
 
     if(!VersionUtils::checkAboveOrEqual(21, 00)) {
         if (sig == NULL) {
-            sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getStateVectorComponent"));
+            sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getStateVectorComponent"), "Actor::getStateVectorComponent");
         }
     }
 
@@ -206,7 +206,7 @@ ActorRotationComponent *Actor::getActorRotationComponent() {
 
     if(!VersionUtils::checkAboveOrEqual(21, 00)) {
         if (sig == NULL) {
-            sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getActorRotationComponent"));
+            sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getActorRotationComponent"), "Actor::getActorRotationComponent");
         }
     }
 
@@ -218,7 +218,7 @@ SynchedActorDataComponent* Actor::getSynchedActorDataComponent() {
 
 	if (!VersionUtils::checkAboveOrEqual(21, 00)) {
 		if (sig == NULL) {
-			sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getSynchedActorDataComponent"));
+			sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getSynchedActorDataComponent"), "Actor::getSynchedActorDataComponent");
 		}
 	}
 
@@ -246,10 +246,10 @@ RuntimeIDComponent *Actor::getRuntimeIDComponent() {
         if (sig == NULL) {
             if (VersionUtils::checkAboveOrEqual(20, 50) && !VersionUtils::checkAboveOrEqual(20, 60)) {
                 sig = Memory::findSig(
-                        std::string(GET_SIG("tryGetPrefix2")) + " " + GET_SIG("Actor::getRuntimeIDComponent"));
+                        std::string(GET_SIG("tryGetPrefix2")) + " " + GET_SIG("Actor::getRuntimeIDComponent"), "Actor::getRuntimeIDComponent");
             } else {
                 sig = Memory::findSig(
-                        std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getRuntimeIDComponent"));
+                        std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getRuntimeIDComponent"), "Actor::getRuntimeIDComponent");
             }
         }
     }
@@ -301,7 +301,7 @@ RenderPositionComponent *Actor::getRenderPositionComponent() { //??$try_get@URen
     if(!VersionUtils::checkAboveOrEqual(21, 00)) {
         if (sig == NULL) {
             sig = Memory::findSig(
-                    std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getRenderPositionComponent"));
+                    std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getRenderPositionComponent"), "Actor::getRenderPositionComponent");
         }
     }
 
@@ -314,7 +314,7 @@ std::vector<UnifiedMobEffectData> Actor::getMobEffects() {
     if(!VersionUtils::checkAboveOrEqual(21, 00)) {
         if (sig == NULL) {
             sig = Memory::findSig(
-                    std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getMobEffectsComponent"));
+                    std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getMobEffectsComponent"), "Actor::getMobEffectsComponent");
         }
     }
     std::vector<UnifiedMobEffectData> unifiedEffects;

@@ -110,6 +110,23 @@ public:
         return reinterpret_cast<uintptr_t>(result.get());
     }
 
+    static uintptr_t findSig(std::string_view signature, std::string_view name) {
+        auto parsed = hat::parse_signature(signature);
+        if (!parsed.has_value()) {
+            Logger::custom(fg(fmt::color::crimson), "Signatures", "Failed to parse signature: {} ", name);
+            return 0u;
+        }
+
+        auto result = hat::find_pattern(parsed.value(), ".text");
+
+        if (!result.has_result()) {
+            Logger::custom(fg(fmt::color::crimson), "Signatures", "Failed to find signature: {} ", name);
+            return 0u;
+        }
+
+        return reinterpret_cast<uintptr_t>(result.get());
+    }
+
 
     template<typename T>
     static void SafeRelease(T *&pPtr) {
