@@ -33,7 +33,7 @@ private:
     }
 
 public:
-    typedef void*(__fastcall* original)(void* a1, void* a2, Actor* a3, void* a4, bool a5, bool a6, bool a7, bool a8);
+    typedef void*(__fastcall* original)(void* a1, void* a2, Actor* a3, ItemStack* a4, bool a5, bool a6, bool a7, bool a8);
 
     static inline original funcOriginal = nullptr;
 
