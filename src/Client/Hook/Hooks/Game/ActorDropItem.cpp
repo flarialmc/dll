@@ -25,6 +25,8 @@ bool ActorDropItem::callback(Actor *actor, ItemStack *item, const bool randomly)
 
     bool DropItem = funcOriginal(actor, item, randomly);
     auto event = nes::make_holder<ItemDropEvent>(actor, item, DropItem);
+
+    if (SDK::clientInstance)
     if (actor == SDK::clientInstance->getLocalPlayer()) {
         eventMgr.trigger(event);
     }
