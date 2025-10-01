@@ -16,7 +16,7 @@ void SigInit::init21110() {
     ADD_SIG("Actor::baseTick", "48 8D 05 ?? ?? ?? ?? 48 89 81 88 0A 00 00 48 8B 81 08 0C 00 00 48 8B 48 50 48 8B 01 48 8B 80 F8 00 00 00");
     ADD_SIG("MinecraftPackets::createPacket", "48 89 5C 24 10 48 89 6C 24 18 48 89 74 24 20 57 48 83 EC 60 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 44 24 58 48 8B F9 48 89 4C 24 38");
     ADD_SIG("CameraYaw2", "F3 0F 11 08 F3 0F 11 40 04 48 8D BB 28 02 00 00");
-
+    ADD_SIG("FluxSwing", "E8 ?? ?? ?? ?? F3 0F 10 85 84 01 00 00");
 }
 
 void SigInit::init21100() {
