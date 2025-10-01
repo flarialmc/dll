@@ -11,7 +11,8 @@
 
 class ItemInHandRendererRenderItem : public Hook {
 private:
-    static void ItemInHandRendererRenderItemHook(void* a1, void* a2, Actor* entity, ItemStack* itemStack, bool a5, bool a6, bool a7, bool a8) {
+    static void* ItemInHandRendererRenderItemHook(void* a1, void* a2, Actor* entity, ItemStack* itemStack, bool a5, bool a6, bool a7, bool a8) {
+
         if(SDK::clientInstance && SDK::clientInstance->getLocalPlayer() && SDK::clientInstance->getLocalPlayer() == entity) {
 
             auto& stack = SDK::clientInstance->getCamera().getWorldMatrixStack();
@@ -22,17 +23,17 @@ private:
             eventMgr.trigger(event);
 
 
-            funcOriginal(a1, a2, entity, itemStack, a5, a6, a7, a8);
+            return funcOriginal(a1, a2, entity, itemStack, a5, a6, a7, a8);
 
             stack.pop();
         }
         else {
-            funcOriginal(a1, a2, entity, itemStack, a5, a6, a7, a8);
+            return funcOriginal(a1, a2, entity, itemStack, a5, a6, a7, a8);
         }
     }
 
 public:
-    typedef void(__thiscall* original)(void* a1, void* a2, Actor* a3, void* a4, bool a5, bool a6, bool a7, bool a8);
+    typedef void*(__fastcall* original)(void* a1, void* a2, Actor* a3, void* a4, bool a5, bool a6, bool a7, bool a8);
 
     static inline original funcOriginal = nullptr;
 
