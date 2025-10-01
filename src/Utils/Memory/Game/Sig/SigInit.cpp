@@ -60,7 +60,7 @@ void SigInit::init2190() {
     ADD_SIG("HurtColor", "E8 ? ? ? ? 0F 28 05 ? ? ? ? 0F 11 85 F8 01 00 00"); // RenderController::getOverlayColor
     ADD_SIG("Actor::baseTick", "48 8D 05 ? ? ? ? 48 89 01 BA 33 00 00 00 44 8D 4A 04 44 8D 42 02 66 C7 44 24 20 39 00 E8 ? ? ? ? 48 8D 8F E0 0D 00 00");
     ADD_SIG("CameraYaw2", "F3 0F 11 10 F3 0F 11 40 ? 48 8D 9F");
-    ADD_SIG("ItemInHandRenderer::renderItem", "E8 ? ? ? ? 41 0F 11 B6 ? ? ? ? C6 47");
+    ADD_SIG("ItemInHandRenderer::renderItem", "E8 ?? ?? ?? ?? 90 48 8B 4C 24 58 48 85 C9 74 2A");
     ADD_SIG("LocalPlayer::applyTurnDelta", "48 8B C4 48 89 58 ? 48 89 70 ? 48 89 78 ? 55 41 56 41 57 48 8D 6C 24 ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 44 0F 29 40 ? 44 0F 29 48 ? 44 0F 29 50");
     ADD_SIG("ResourcePackManager::_composeFullStack", "48 89 5C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 41 56 48 83 EC ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 44 24 ? 48 8B F9 40 B6"); // update notes in 2180
     ADD_SIG("ActorShaderManager::setupShaderParameter", "48 89 5C 24 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 0F 29 B4 24 ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 48 8B 85"); // 15 params | go to hurt color sig, go to func with 10 ish params, then go to func with 15 params (this)
