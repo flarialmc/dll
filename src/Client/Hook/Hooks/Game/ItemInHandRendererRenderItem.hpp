@@ -23,9 +23,9 @@ private:
             eventMgr.trigger(event);
 
 
-            return funcOriginal(a1, a2, entity, itemStack, a5, a6, a7, a8);
-
+            auto result = funcOriginal(a1, a2, entity, itemStack, a5, a6, a7, a8);
             stack.pop();
+            return result;
         }
         else {
             return funcOriginal(a1, a2, entity, itemStack, a5, a6, a7, a8);
