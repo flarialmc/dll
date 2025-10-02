@@ -23,6 +23,7 @@ void SigInit::init21110() {
     ADD_SIG("ClientInstance::grabMouse", "48 8B 80 ? ? ? ? FF 15 ? ? ? ? 48 8B 8F ? ? ? ? E8 ? ? ? ? 33 D2");
     ADD_SIG("Options::getGamma", "48 83 EC 28 48 8B 01 48 8D 54 24 30 41 B8 34 00 00 00");
     ADD_SIG("LocalPlayer::applyTurnDelta", "48 8B C4 48 89 58 10 48 89 70 18 55 57 41 54 41 56 41 57 48 8D 68 C8 48 81 EC 10 01 00 00 0F 29 70 C8 0F 29 78 B8");
+    ADD_SIG("ThirdPersonNametag", "0F 84 0A 05 00 00 49 8B 04 24");
 }
 
 void SigInit::init21100() {
