@@ -65,6 +65,7 @@ DWORD WINAPI init() {
 
     std::thread statusThread([]() {
     while (!Client::disable) {
+        return;
         auto now = std::chrono::steady_clock::now();
         auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - lastBeatTime);
         auto onlineUsersFetchElapsed = std::chrono::duration_cast<std::chrono::seconds>(now - lastOnlineUsersFetchTime);
@@ -78,7 +79,7 @@ DWORD WINAPI init() {
 
         if (elapsed >= std::chrono::seconds(60)) {
             std::string name = SDK::clientInstance->getLocalPlayer()->getPlayerName();
-            std::string ipToSend = SDK::getServerIP();
+            std::string ipToSend = "none"; //SDK::getServerIP();
 
             if (Client::settings.getSettingByName<bool>("anonymousApi")->value) {
                 ipToSend = "is.anonymous";
@@ -150,7 +151,7 @@ DWORD WINAPI init() {
     }
 });
 
-    statusThread.detach();
+    //statusThread.detach();
 
     while (!Client::disable) {
         ModuleManager::syncState();
