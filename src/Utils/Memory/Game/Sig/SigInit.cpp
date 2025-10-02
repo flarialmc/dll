@@ -21,8 +21,7 @@ void SigInit::init21110() {
     ADD_SIG("MeshHelpers::renderMeshImmediately", "40 53 55 56 57 41 56 41 57 48 81 EC ? ? ? ? 49 8B F1 4D 8B F0");
     ADD_SIG("MeshHelpers::renderMeshImmediately2", "40 55 53 56 57 41 54 41 55 41 56 41 57 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 49 8B F9 4D 8B F8");
     ADD_SIG("ClientInstance::grabMouse", "48 8B 80 ? ? ? ? FF 15 ? ? ? ? 48 8B 8F ? ? ? ? E8 ? ? ? ? 33 D2");
-    //ADD_SIG("Options::getGamma", "48 83 EC ? 48 8B 01 48 8D 54 24 ? 41 B8 ? ? ? ? 48 8B 40 ? FF 15 ? ? ? ? 48 8B 10 48 8B 42 ? 48 8B 88 ? ? ? ? 48 85 C9 74 ? E8 ? ? ? ? 48 83 C4 ? C3 0F B6 42 ? 48 83 C4 ? C3 CC CC CC CC CC CC CC CC CC CC CC CC CC CC 48 83 EC ? 48 8B 01 48 8D 54 24 ? 41 B8 ? ? ? ? 48 8B 80 ? ? ? ? FF 15 ? ? ? ? 48 8B 08");
-    //this shit does not work ^^^^^^
+    ADD_SIG("Options::getGamma", "48 83 EC 28 48 8B 01 48 8D 54 24 30 41 B8 34 00 00 00");
 }
 
 void SigInit::init21100() {
