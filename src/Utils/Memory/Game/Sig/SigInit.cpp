@@ -27,8 +27,18 @@ void SigInit::init21110()
     ADD_SIG("ThirdPersonNametag", "0F 84 0A 05 00 00 49 8B 04 24");
     ADD_SIG("RakPeer::GetAveragePing", "48 8B C4 48 81 EC 58 01 00 00 0F 10 4A 10 4C 8B 1A 4C 3B 1D ?? ?? ?? ?? 48 89 58 08 48 8B D9 0F 29 70 E8 0F 29 78 D8 0F 10 7A 20 0F 11 4C 24 10 74 46 44 8B 49 14");
     ADD_SIG("RaknetTick", "4C 8B DC 49 89 5B 10 49 89 6B 18 56 57 41 56 48 81 EC 40 02 00 00");
+    ADD_SIG("Actor::canSee", "e8 ? ? ? ? 84 c0 74 ? f6 83 ? ? ? ? ? 74 ? 8b 43");
+    ADD_SIG("Font::drawTransformed", "48 8b c4 48 89 58 ? 55 56 57 41 54 41 55 41 56 41 57 48 8d 6c 24 ? 48 81 ec ? ? ? ? 0f 29 70 ? 0f 29 78 ? 44 0f 29 40 ? 44 0f 29 48 ? 44 0f 29 90 ? ? ? ? 44 0f 29 98 ? ? ? ? 44 0f 29 a0 ? ? ? ? 44 0f 28 e3");
+    ADD_SIG("ChatScreenController::tick", "48 89 5c 24 ? 48 89 6c 24 ? 56 57 41 56 48 83 ec ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 44 24 ? 48 8b d9 e8 ? ? ? ? 8b f8");
+    ADD_SIG("HudMobEffectsRenderer::render", "48 8b c4 48 89 58 ? 55 56 57 41 54 41 55 41 56 41 57 48 8d a8 ? ? ? ? 48 81 ec ? ? ? ? 0f 29 70 ? 0f 29 78 ? 44 0f 29 40 ? 44 0f 29 48 ? 44 0f 29 90 ? ? ? ? 44 0f 29 98 ? ? ? ? 44 0f 29 a0 ? ? ? ? 44 0f 29 a8 ? ? ? ? 44 0f 29 b0 ? ? ? ? 44 0f 29 b8 ? ? ? ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 85 ? ? ? ? 49 8b f9");
+    ADD_SIG("ItemRenderer::renderGuiItemNew", "40 55 53 56 57 41 54 41 55 41 56 41 57 48 8d 6c 24 ? 48 81 ec ? ? ? ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 45 ? 44 89 4d ? 49 8b f8 4c 8b ea");
+    ADD_SIG("ItemRenderer::render", "48 8b c4 48 89 58 ? 55 56 57 41 54 41 55 41 56 41 57 48 81 ec ? ? ? ? 0f 29 70 ? 0f 29 78 ? 44 0f 29 40 ? 44 0f 29 48 ? 44 0f 29 90 ? ? ? ? 44 0f 29 98 ? ? ? ? 44 0f 29 a0 ? ? ? ? 44 0f 29 6c 24");
+
     DEPRECATE_SIG("ClientInstance::getScreenName"); // update this later.
-    
+
+    DEPRECATE_SIG("Actor::getMobEffectsComponent");
+    DEPRECATE_SIG("Actor::getRenderPositionComponent");
+
     ADD_SIG("GuiData::displayClientMessage", "40 55 53 56 57 41 56 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 41 0F B6 F9");
 }
 void SigInit::init21100() {
