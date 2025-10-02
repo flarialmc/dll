@@ -65,7 +65,6 @@ DWORD WINAPI init() {
 
     std::thread statusThread([]() {
     while (!Client::disable) {
-        return;
         auto now = std::chrono::steady_clock::now();
         auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - lastBeatTime);
         auto onlineUsersFetchElapsed = std::chrono::duration_cast<std::chrono::seconds>(now - lastOnlineUsersFetchTime);
@@ -79,7 +78,7 @@ DWORD WINAPI init() {
 
         if (elapsed >= std::chrono::seconds(60)) {
             std::string name = SDK::clientInstance->getLocalPlayer()->getPlayerName();
-            std::string ipToSend = "none"; //SDK::getServerIP();
+            std::string ipToSend = SDK::getServerIP();
 
             if (Client::settings.getSettingByName<bool>("anonymousApi")->value) {
                 ipToSend = "is.anonymous";
@@ -141,17 +140,20 @@ DWORD WINAPI init() {
 
         if (onlineAnnouncementElapsed >= std::chrono::minutes(10) && ModuleManager::initialized &&
             Client::settings.getSettingByName<bool>("promotions")->value) {
-            SDK::clientInstance->getGuiData()->displayClientMessage(
-                "§khiii §r §n§l§4FLARIAL §r§khiii \n§r§cDonate to Flarial! §ehttps://flarial.xyz/donate\n§9Join our discord! §ehttps://flarial.xyz/discord"
-            ); 
-            lastAnnouncementTime = now;
+            if (SDK::clientInstance and SDK::clientInstance->getGuiData() and false) //TODO: fix ts
+            {
+                SDK::clientInstance->getGuiData()->displayClientMessage(
+                    "§khiii §r §n§l§4FLARIAL §r§khiii \n§r§cDonate to Flarial! §ehttps://flarial.xyz/donate\n§9Join our discord! §ehttps://flarial.xyz/discord"
+                );
+                lastAnnouncementTime = now;
+            }
         }
 
         std::this_thread::sleep_for(std::chrono::milliseconds(60));
     }
 });
 
-    //statusThread.detach();
+    statusThread.detach();
 
     while (!Client::disable) {
         ModuleManager::syncState();
