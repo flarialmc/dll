@@ -219,7 +219,7 @@ or scan 40 53 48 83 EC 30 48 81 (1.21.30+) first res should be it
 \## BOTH OF THE FOLLOWING CHANGED IN 1.21.111!!! Much harder to track down now.
 
 48 89 5C 24 10 48 89 74 24 18 57 48 83 EC 40 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 44 24 30 8B
-2nd xref is it 
+2nd xref is it
 ?? ?? ?? ?? 48 8B 8B C0 10 00 00 or this and first one should be it
 
 ### Player::BaseTick
@@ -229,8 +229,24 @@ xref out, count to off\_, that -1 is func index
 
 ### RaknetTick
 
-Raknet tick calls this in "while" loop, before it could be found by searching for "Nat Punch timed out"
-40 56 57 48 83 EC 28 48 8B F9 4C 8B CA 48 8B 49 20 49 B8 00 00 00 00 00 00 00 80 48 8B 57 38 48 8B 47 30 48 2B C2 48 2B C1 49 3B C0 0F 86 D1 00 00 00 BE 01 00 00 00 90 8B CE F0 48 0F C1 4F 30 48 8B 47 20 90 48 2B C8 48 2B CA 49 3B C8 0F 86 AA 00 00 00 48 89 5C 24 50 8B DE 48 89 6C 24 58 4C 89 74 24 20 F0 48 0F C1 5F 28 4C 8B 47 60 90 49 8B 50 08 90 49 8B 40 18 48 8B 0C D0 48 8B 01 48 8B CB 48 83 E1 E0 83 E3 1F 48 2B C8 48 C1 E3 06
+Search for this function (RaknetTick calls this), that almost never changes:
+4C 8B DC 49 89 5B 10 49 89 6B 18 56 57 41 56 48 81 EC 40 02 00 00
+There are a few xrefs, but the one you need should be calling RaknetTick in an if statement that looks like this:
+***if ( \*(\_WORD \*)(a1 + 256) != 0xFFFF )***
+
+    {
+
+      v2 = \*(void (\_\_fastcall \*\*)(\_\_int64, \_\_int64, \_BYTE \*))(\*(\_QWORD \*)a1 + 80LL);
+
+      sub\_142BFF380((\_\_int64)v14);
+
+      v2(a1, a1 + 256, v14);
+
+      sub\_14089FBC0(v14);
+
+    }
+
+
 
 ### HudCursorRenderer::render
 
@@ -319,7 +335,7 @@ Then to 3rd func in vtable -> first 3arg func there (or 1 func deeper if below 1
 
 ## CameraYaw2
 
-4C 8B 49 08 41 BA 9F 0D AF DF 
+4C 8B 49 08 41 BA 9F 0D AF DF
 xref of this function contains CameraYaw2
 
 Near end of this function, you will see something like:
@@ -340,9 +356,29 @@ Above the first variable.is\_first\_person is the func.
 
 Inside of that func, sub\_140CC2260(a4\[1]) looking func, outside of if (!a6)
 
-## 
 
 
 
----
+
+## ItemInHandRenderer::renderItem
+
+This one's hard to reverse. This function contains the string "Error: accessing a variable that doesn't currently exist: %s"
+But this appears in 10 different places.
+Find a function that:
+
+* Has this string showing up in the first few lines of code in the function
+* Function that has exactly 8 parameters.
+
+## LocalPlayer::applyTurnDelta
+
+Search for this function sig: 48 83 EC 28 F3 0F 10 11 0F 57 E4
+Usually never changes.
+Xrefs to one of these is applyTurnDelta.
+The one you need should have following params: \_\_int64 \_\_fastcall sub\_14144C220(\_\_int64 a1, float \*a2)
+
+## RakPeer::GetAveragePing
+
+Search for this sig:
+74 0E 44 03 C0
+There should only be one xref. That function is it.
 
