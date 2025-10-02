@@ -6,6 +6,7 @@
 
 void OffsetInit::init21110() {
     Logger::custom(fg(fmt::color::golden_rod), "Offsets", "Loading offsets for 1.21.11X");
+    ADD_OFFSET("Player::playerName", 0xC18);
 }
 
 void OffsetInit::init21100() {
