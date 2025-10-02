@@ -40,6 +40,6 @@ public:
     ItemInHandRendererRenderItem() : Hook("ItemInHandRendererRenderItem", Memory::offsetFromSig(GET_SIG_ADDRESS("ItemInHandRenderer::renderItem"), 1)) {}
 
     void enableHook() override {
-        this->autoHook((void*)ItemInHandRendererRenderItemHook, (void**)&funcOriginal);
+        //this->autoHook((void*)ItemInHandRendererRenderItemHook, (void**)&funcOriginal);
     }
 };
