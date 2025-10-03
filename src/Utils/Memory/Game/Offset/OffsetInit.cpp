@@ -7,6 +7,7 @@
 void OffsetInit::init21110() {
     Logger::custom(fg(fmt::color::golden_rod), "Offsets", "Loading offsets for 1.21.11X");
     ADD_OFFSET("Player::playerName", 0xC18);
+    ADD_OFFSET("MinecraftGame::textureGroup", 0x778);
 }
 
 void OffsetInit::init21100() {
