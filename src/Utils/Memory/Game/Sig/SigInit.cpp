@@ -44,6 +44,7 @@ void SigInit::init21110()
 	ADD_SIG("LevelRendererPlayer::renderOutlineSelection", "40 55 53 56 57 41 54 41 55 41 56 41 57 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 49 8B F1 4C 89 4D ? 49 8B D8 48 89 5D"); // pretty unlikely to work, args have changed!
 	ADD_SIG("ActorShaderManager::setupShaderParameter", "40 55 53 56 57 41 55 41 56 41 57 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 44 0F 29 8C 24"); // open hurt color sig, go down, open the func with 9 args under the "else", open 10 arg func at bottom, the 15 arg func call (with 0.00026666667 and -0.00072727271) should be what you're looking for
 	ADD_SIG("MinimalViewBobbing", "FF 15 ? ? ? ? 80 7C 24 ? ? 0F 84 ? ? ? ? F3 0F 10 4C 24 ? 0F 29 B4 24");
+	ADD_SIG("blockHighlightColor", "66 0F 6F 05 ? ? ? ? ? ? ? C6 40 ? ? 45 33 C9"); // ? ? ? C6 40 ? ? 45 33 C9 45 33 C0 B2 ? 49 8B CC || sub_141E8F1C0(__int64 a1, __int64 a2, _WORD *a3, __int64 a4, int *a5, char a6, char a7)
 
     ADD_SIG("SwingAngle", "F3 44 0F 59 35 ?? ?? ?? ?? 4C 8D 4C 24 30");
 
