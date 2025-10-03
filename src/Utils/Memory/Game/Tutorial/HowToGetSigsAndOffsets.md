@@ -382,3 +382,14 @@ Search for this sig:
 74 0E 44 03 C0
 There should only be one xref. That function is it.
 
+## Tessellator::vertex
+
+Search seq. of bytes ``"Feedback Circle"`` then go into the func, scroll up until u see a func like ``sub_141132570(a1, 0.0, 0.0, 0.0);`` with a bunch of zeros as an argument, that's the func
+
+## LevelRenderer::renderLevel
+
+Search text ``"Untagged Tessellator Mesh"`` it's gonna show a list of occurences, now go through each one until you come across a function with 7 parameters and then the string gets used like 2 times idk check the structure using previous versions, the function is just an xref to the LevelRenderer::renderLevel. ok enough yapping, once ur in the func with 7 params, get the list of xrefs, go to the first one, then scroll up until you see a function with 3 parameters e.g., ``sub_141E63C30(v8, a2, a3);`` that's the func
+
+## ActorShaderManager::setupShaderParameter
+
+Open hurt color sig, go down, open the func with 9 args under the "else", open 10 arg func at bottom, the 15 arg func call (with 0.00026666667 and -0.00072727271) should be what you're looking for
