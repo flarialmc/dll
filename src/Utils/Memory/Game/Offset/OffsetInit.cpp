@@ -10,6 +10,8 @@ void OffsetInit::init21110() {
     ADD_OFFSET("MinecraftGame::textureGroup", 0x778);
     ADD_OFFSET("Player::playerInventory", 0x5B8);
     ADD_OFFSET("ScreenContext::tessellator", 0xB8);
+    ADD_OFFSET("LevelRender::getLevelRendererPlayer", 0x3E8);
+    ADD_OFFSET("LevelRendererPlayer::cameraPos", 0x6A0);
 }
 
 void OffsetInit::init21100() {
