@@ -87,7 +87,6 @@ void InventoryLock::onContainerSlotHovered(ContainerSlotHoveredEvent& event)
 {
     currentHoveredSlot = event.getHoveredSlot();
     currentCollectionName = event.getCollectionName();
-    Logger::debug("Container slot hovered: {}", currentHoveredSlot);
 }
 
 void InventoryLock::onContainerTick(ContainerScreenControllerTickEvent& event)
