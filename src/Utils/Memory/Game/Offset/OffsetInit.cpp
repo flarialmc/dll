@@ -16,7 +16,7 @@ void OffsetInit::init21110() {
     ADD_OFFSET("Actor::baseTickVft", 29);
     ADD_OFFSET("ContainerScreenController::_handlePlaceAll", 57);
     ADD_OFFSET("ClientInstance::camera", 0x288);
-
+//
 }
 
 void OffsetInit::init21100() {
