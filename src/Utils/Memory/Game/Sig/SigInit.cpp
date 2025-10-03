@@ -42,6 +42,8 @@ void SigInit::init21110()
 
     ADD_SIG("SwingAngle", "F3 44 0F 59 35 ?? ?? ?? ?? 4C 8D 4C 24 30");
 
+    ADD_SIG("ContainerScreenController::_onContainerSlotHovered", "48 89 5C 24 10 48 89 6C 24 18 48 89 7C 24 20 41 56 48 83 EC 20 45 33 F6 41 8B E8");
+
     DEPRECATE_SIG("ClientInstance::getScreenName"); // update this later.
     DEPRECATE_SIG("Actor::getMobEffectsComponent");
     DEPRECATE_SIG("Actor::getRenderPositionComponent");
