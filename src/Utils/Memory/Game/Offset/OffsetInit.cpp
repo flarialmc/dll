@@ -9,6 +9,7 @@ void OffsetInit::init21110() {
     ADD_OFFSET("Player::playerName", 0xC18);
     ADD_OFFSET("MinecraftGame::textureGroup", 0x778);
     ADD_OFFSET("Player::playerInventory", 0x5B8);
+    ADD_OFFSET("ScreenContext::tessellator", 0xB8);
 }
 
 void OffsetInit::init21100() {
