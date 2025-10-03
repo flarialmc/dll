@@ -390,3 +390,7 @@ Search text ``"Untagged Tessellator Mesh"`` it's gonna show a list of occurences
 ## ActorShaderManager::setupShaderParameter
 
 Open hurt color sig, go down, open the func with 9 args under the "else", open 10 arg func at bottom, the 15 arg func call (with 0.00026666667 and -0.00072727271) should be what you're looking for
+
+## SoundEngine::play
+Search for this sig: 72 0C F3 0F 5C C8 0F 2F C8 73 03 49 8B C1
+This should lead you to the function you need.
