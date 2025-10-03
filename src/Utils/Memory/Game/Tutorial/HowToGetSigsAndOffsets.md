@@ -216,11 +216,8 @@ or scan 40 53 48 83 EC 30 48 81 (1.21.30+) first res should be it
 
 ### Actor::baseTick
 
-\## BOTH OF THE FOLLOWING CHANGED IN 1.21.111!!! Much harder to track down now.
-
-48 89 5C 24 10 48 89 74 24 18 57 48 83 EC 40 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 44 24 30 8B
-2nd xref is it
-?? ?? ?? ?? 48 8B 8B C0 10 00 00 or this and first one should be it
+48 83 FA 0F 76 34 48 8B 8B 80 10 00 00 should lead you to the func u need. At the start, you will see:
+*a1 = off_xxxxxxx. Make a sig here.
 
 ### Player::BaseTick
 
