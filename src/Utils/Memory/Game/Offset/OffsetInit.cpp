@@ -100,7 +100,7 @@ void OffsetInit::init2170() {
     ADD_OFFSET("ClientInstance::guiData", 0x5B0);
     ADD_OFFSET("ClientInstance::getFovX", 0x748);
     ADD_OFFSET("ClientInstance::getFovY", 0x75C);
-
+//
     ADD_OFFSET("mce::Camera::worldMatrixStack", 0x40);
 
     ADD_OFFSET("MinecraftGame::textureGroup", 0x6C0);
