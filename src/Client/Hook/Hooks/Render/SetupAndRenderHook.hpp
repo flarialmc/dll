@@ -168,6 +168,7 @@ private:
 
         SDK::screenView = pScreenView;
         SDK::clientInstance = muirc->getClientInstance();
+        SDK::scn = muirc->getScreenContext();
         SDK::hasInstanced = true;
 
         if (funcOriginalText == nullptr || oDrawImage == nullptr) hookDrawTextAndDrawImage(muirc);
