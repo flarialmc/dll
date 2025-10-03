@@ -48,11 +48,21 @@ public:
     LevelRender *getLevelRender();
 
     float getFovX() {
-        return hat::member_at<float>(this, GET_OFFSET("ClientInstance::getFovX"));
+        if (!VersionUtils::checkAboveOrEqual(21, 110)) return hat::member_at<float>(this, GET_OFFSET("ClientInstance::getFovX"));
+
+        if (this->getLevelRender()) if (this->getLevelRender()->getLevelRendererPlayer())
+        return this->getLevelRender()->getLevelRendererPlayer()->getFovX();
+
+        return 0.0f;
     };
 
     float getFovY() {
-        return hat::member_at<float>(this, GET_OFFSET("ClientInstance::getFovY"));
+        if (!VersionUtils::checkAboveOrEqual(21, 110)) return hat::member_at<float>(this, GET_OFFSET("ClientInstance::getFovY"));
+
+        if (this->getLevelRender()) if (this->getLevelRender()->getLevelRendererPlayer())
+        return this->getLevelRender()->getLevelRendererPlayer()->getFovY();
+
+        return 0.0f;
     };
 
     Vec2<float> getFov() {
