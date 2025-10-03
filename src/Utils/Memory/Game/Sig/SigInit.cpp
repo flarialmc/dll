@@ -37,14 +37,19 @@ void SigInit::init21110()
 	ADD_SIG("ClientInstance::_updateScreenSizeVariables", "48 8B C4 48 89 58 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D 68 ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 44 0F 29 40 ? 44 0F 29 48 ? 44 0F 29 90 ? ? ? ? 44 0F 29 98 ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 ? 0F 28 FB");
     ADD_SIG("ItemStack::getMaxDamage", "48 8B 41 08 48 85 C0 74 19");
     ADD_SIG("ItemStack::getDamageValue", "48 83 EC 38 48 8B 41 08 48 85 C0");
+    ADD_SIG("ItemStack::isEnchanted", "48 83 EC 38 48 8B 49 10 48 85 C9 74 4B");
     ADD_SIG("ResourcePackManager::_composeFullStack", "48 89 5C 24 10 48 89 6C 24 18 56 57 41 56 48 83 EC 50 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 44 24 40 48 8B E9 40 B6 01");
 
 
     DEPRECATE_SIG("ClientInstance::getScreenName"); // update this later.
-    DEPRECATE_SIG("ResourcePackManager::_composeFullStack_Patch");
     DEPRECATE_SIG("Actor::getMobEffectsComponent");
     DEPRECATE_SIG("Actor::getRenderPositionComponent");
     DEPRECATE_SIG("Level::getRuntimeActorList");
+
+    // USED FOR PACK CHANGER!! This doesnt even exist in latest rn. so we ignore.
+    DEPRECATE_SIG("ResourcePackManager::_composeFullStack_Patch");
+    DEPRECATE_SIG("RenderChunkCoordinator::_handleVisibilityUpdates");
+    DEPRECATE_SIG("MinecraftGame::_onResumeWaitReloadActors");
 
     ADD_SIG("GuiData::displayClientMessage", "40 55 53 56 57 41 56 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 41 0F B6 F9");
 }
