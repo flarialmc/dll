@@ -41,6 +41,7 @@ void SigInit::init21110()
     ADD_SIG("ItemStack::getDamageValue", "48 83 EC 38 48 8B 41 08 48 85 C0");
     ADD_SIG("ItemStack::isEnchanted", "48 83 EC 38 48 8B 49 10 48 85 C9 74 4B");
     ADD_SIG("ResourcePackManager::_composeFullStack", "48 89 5C 24 10 48 89 6C 24 18 56 57 41 56 48 83 EC 50 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 44 24 40 48 8B E9 40 B6 01");
+	ADD_SIG("LevelRendererPlayer::renderOutlineSelection", "40 55 53 56 57 41 54 41 55 41 56 41 57 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 49 8B F1 4C 89 4D ? 49 8B D8 48 89 5D"); // pretty unlikely to work, args have changed!
 
     ADD_SIG("SwingAngle", "F3 44 0F 59 35 ?? ?? ?? ?? 4C 8D 4C 24 30");
 
