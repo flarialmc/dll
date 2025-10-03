@@ -12,7 +12,7 @@ void SigInit::init21110()
     ADD_SIG("Tessellator::vertex", "4C 8B DC 55 57 49 8D 6B ? 48 81 EC ? ? ? ? 45 0F 29 4B");
     ADD_SIG("mce::TextureGroup::getTexture", "40 55 53 56 57 41 54 41 55 41 56 41 57 48 8D 6C 24 ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 ? 45 0F B6 F9 44 88 4C 24");
     ADD_SIG("LevelRenderer::renderLevel", "48 8B C4 48 89 58 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 44 0F 29 40 ? 44 0F 29 48 ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 4D 8B E8 4C 8B E2 4C 8B F9");
-    ADD_SIG("ItemInHandRenderer::renderItem", "E8 ?? ?? ?? ?? 90 48 85 DB 74 20 F0 FF 4B 0C 8B 43 0C 90 85 C0 7F 14 48 83 3B 00 75 0E BA 10 00 00 00 48 8B CB E8 ?? ?? ?? ?? 90 80 7F 30 00"); //75% chance of this being correct and working
+    ADD_SIG("ItemInHandRenderer::renderItem", "E8 ?? ?? ?? ?? 90 48 8B 4C 24 58 48 85 C9 74 2A");
     ADD_SIG("glm_rotateRef", "E8 ?? ?? ?? ?? 48 8B D0 8B 08 89 0B 8B 48 04 89 4B 04 8B 48 08 89 4B 08 8B 48 0C 89 4B 0C 8B 48 10 89 4B 10 8B 40 14 89 43 14 8B 42 18 89 43 18 8B 42 1C 89 43 1C 8B 42 20 89 43 20 8B 42 24 89 43 24 8B 42 28 89 43 28 8B 42 2C 89 43 2C 8B 42 30 89 43 30 8B 42 34 89 43 34 8B 42 38 89 43 38 8B 42 3C 89 43 3C 48 83 C4 70");
     ADD_SIG("Actor::baseTick", "48 8D 05 ?? ?? ?? ?? 48 89 01 48 8D 05 ?? ?? ?? ?? 48 89 81 88 0A 00 00 48 8B 81 08 0C 00 00 48 8B 48 50 48 8B 01 48 8B 80 F8 00 00 00");
     ADD_SIG("MinecraftPackets::createPacket", "48 89 5C 24 10 48 89 6C 24 18 48 89 74 24 20 57 48 83 EC 60 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 44 24 58 48 8B F9 48 89 4C 24 38");
@@ -35,8 +35,8 @@ void SigInit::init21110()
     ADD_SIG("ItemRenderer::render", "48 8b c4 48 89 58 ? 55 56 57 41 54 41 55 41 56 41 57 48 81 ec ? ? ? ? 0f 29 70 ? 0f 29 78 ? 44 0f 29 40 ? 44 0f 29 48 ? 44 0f 29 90 ? ? ? ? 44 0f 29 98 ? ? ? ? 44 0f 29 a0 ? ? ? ? 44 0f 29 6c 24");
 
   	ADD_SIG("ClientInstance::_updateScreenSizeVariables", "48 8B C4 48 89 58 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D 68 ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 44 0F 29 40 ? 44 0F 29 48 ? 44 0F 29 90 ? ? ? ? 44 0F 29 98 ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 ? 0F 28 FB");
-  	ADD_SIG("HurtColor", "40 53 55 56 57 41 56 48 83 EC ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 44 24 ? 49 8B 78"); // i'm stupid...
-    DEPRECATE_SIG("ClientInstance::getScreenName"); // update this later.
+  	ADD_SIG("HurtColor", "E8 ? ? ? ? 44 0F 11 44 24 ? 4C 8D 4C 24");
+    ADD_SIG("ClientInstance::getScreenName", "48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 48 83 EC ? 48 8B EA 48 8B 01 48 8D 54 24 ? 48 8B 80 ? ? ? ? FF 15 ? ? ? ? 90 48 8B 48 ? 48 8B 01 48 8B D5 48 8B 80 ? ? ? ? FF 15 ? ? ? ? 90 48 C7 44 24 ? ? ? ? ? 48 8B 7C 24 ? 33 DB 48 89 5C 24 ? BE ? ? ? ? 48 85 FF 74 ? 8B C6 F0 0F C1 47 ? 83 F8 ? 75 ? 48 8B 07 48 8B CF 48 8B 00 FF 15 ? ? ? ? 8B C6 F0 0F C1 47 ? 83 F8 ? 75 ? 48 8B 07 48 8B CF 48 8B 40 ? FF 15 ? ? ? ? 48 8B 5C 24 ? 48 C7 44 24 ? ? ? ? ? 48 85 DB 74 ? 8B C6 F0 0F C1 43 ? 83 F8 ? 75 ? 48 8B 03 48 8B CB 48 8B 00 FF 15 ? ? ? ? F0 0F C1 73 ? 83 FE ? 75 ? 48 8B 03 48 8B CB 48 8B 40 ? FF 15 ? ? ? ? 48 8B C5 48 8B 5C 24 ? 48 8B 6C 24 ? 48 8B 74 24 ? 48 83 C4 ? 5F C3 CC CC CC CC CC 48 89 5C 24 ? 48 89 6C 24");
     ADD_SIG("ItemStack::getMaxDamage", "48 8B 41 08 48 85 C0 74 19");
     ADD_SIG("ItemStack::getDamageValue", "48 83 EC 38 48 8B 41 08 48 85 C0");
     ADD_SIG("ItemStack::isEnchanted", "48 83 EC 38 48 8B 49 10 48 85 C9 74 4B");
@@ -51,12 +51,14 @@ void SigInit::init21110()
     ADD_SIG("SwingAngle", "F3 44 0F 59 35 ?? ?? ?? ?? 4C 8D 4C 24 30");
 
     ADD_SIG("ContainerScreenController::_onContainerSlotHovered", "48 89 5C 24 10 48 89 6C 24 18 48 89 7C 24 20 41 56 48 83 EC 20 45 33 F6 41 8B E8");
+    ADD_SIG("Actor::getMobEffectsComponent", "48 89 5C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 55 41 54 41 55 41 56 41 57 48 8D 6C 24 ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 ? 48 8B DA 48 8B F9 48 8B CA");
+    // lowkey sig a bit fat V
+    ADD_SIG("Actor::getRenderPositionComponent", "48 83 EC ? 4C 8B 41 ? 41 BA ? ? ? ? 48 8B 41 ? 4C 8B 49 ? 49 2B C0 48 C1 F8 ? 48 FF C8 49 23 C2 49 8B 04 C0 48 83 F8 ? 74 ? 0F 1F 00 48 C1 E0 ? 49 03 C1 44 39 50 ? 74 ? 48 8B 00 48 83 F8 ? 75 ? 48 8B 41 ? 48 89 1C 24 48 3B 41 ? 0F 84 ? ? ? ? 4C 8B 40 ? 4D 85 C0 0F 84 ? ? ? ? 8B 02 8B D0 4D 8B 50 ? 81 E2 ? ? ? ? 49 8B 48 ? 44 8B CA 49 2B CA 49 C1 E9 ? 48 C1 F9 ? 4C 3B C9 73 ? 4A 8D 1C CD ? ? ? ? 4E 8B 0C 13 4D 85 C9 74 ? 8B CA 81 E1 ? ? ? ? 4D 8D 1C 89 4D 85 DB 74 ? 25 ? ? ? ? 41 33 03 3D ? ? ? ? 73 ? 49 8B 04 1A 81 E2 ? ? ? ? 8B 0C 90 49 8B 40 ? 81 E1 ? ? ? ? 8B D1 48 C1 EA ? 83 E1 ? 48 8B 04 D0 48 8D 0C 49 48 8D 04 88 48 8B 1C 24 48 83 C4 ? C3 48 8B 1C 24 33 C0 48 83 C4 ? C3 CC CC CC CC CC 48 83 EC ? 4C 8B 41 ? 4C 8B D1 48 8B 41 ? 4C 8B 49 ? 49 2B C0 8B 12 48 C1 F8 ? 48 FF C8 25 ? ? ? ? 49 8B 0C C0 48 83 F9 ? 74 ? 66 90 48 C1 E1 ? 42 81 7C 09 ? ? ? ? ? 4A 8D 04 09 74 ? 48 8B 08 48 83 F9 ? 75 ? 49 8B 42 ? 48 89 1C 24 49 3B 42 ? 0F 84 ? ? ? ? 4C 8B 40 ? 4D 85 C0 0F 84 ? ? ? ? 4D 8B 50 ? 8B CA 49 8B 40 ? 81 E1 ? ? ? ? 49 2B C2 44 8B C9 49 C1 E9 ? 48 C1 F8 ? 4C 3B C8 73 ? 4A 8D 1C CD ? ? ? ? 4E 8B 0C 13 4D 85 C9 74 ? 8B C1 25 ? ? ? ? 4D 8D 1C 81 4D 85 DB 74 ? 81 E2 ? ? ? ? 41 33 13 81 FA ? ? ? ? 73 ? 49 8B 40 ? 81 E1 ? ? ? ? 41 8B 14 89 81 E2 ? ? ? ? 8B CA 48 C1 E9 ? 83 E2 ? 48 8B 04 C8 48 8D 04 D0");
+    ADD_SIG("Level::getRuntimeActorList", "48 89 5C 24 ? 55 56 57 48 83 EC ? 48 8B F2 48 89 54 24 ? 33 D2");
+    ADD_SIG("BaseAttributeMap_getInstance", "4C 8B D1 44 0F B6 CA 49 BB ? ? ? ? ? ? ? ? 48 B8 ? ? ? ? ? ? ? ? 4C 33 C8 8B C2 4D 0F AF CB C1 E8 ? 44 0F B6 C0 8B C2 4D 33 C8 C1 E8 ? 4D 8B 42 ? 4D 0F AF CB 0F B6 C8 4C 33 C9 8B C2 49 8B 4A ? 4D 0F AF CB 48 C1 E8 ? 4C 33 C8 4D 0F AF CB 49 23 C9 48 C1 E1 ? 49 03 4A ? 48 8B 41 ? 49 3B C0 74 ? 48 8B 09 3B 50 ? 74 ? 48 3B C1 74 ? 48 8B 40 ? 3B 50 ? 75 ? EB ? 33 C0 48 85 C0 48 8D 15 ? ? ? ? 49 0F 44 C0 49 3B C0 48 8D 48 ? 48 0F 45 D1 48 8B C2 C3 CC CC CC CC CC CC CC CC CC CC CC CC CC CC CC 48 89 5C 24");
+    ADD_SIG("AppPlatform::readAssetFile", "48 89 5C 24 ? 48 89 74 24 ? 55 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 48 8B D9 48 89 4C 24");
 
-    DEPRECATE_SIG("ClientInstance::getScreenName"); // update this later.
-    DEPRECATE_SIG("Actor::getMobEffectsComponent");
-    DEPRECATE_SIG("Actor::getRenderPositionComponent");
-    DEPRECATE_SIG("Level::getRuntimeActorList");
-
+    // ADD_SIG("glm_translateRef", "") // looks like moved to a diff function
     // USED FOR PACK CHANGER!! This doesnt even exist in latest rn. so we ignore.
     DEPRECATE_SIG("ResourcePackManager::_composeFullStack_Patch");
     DEPRECATE_SIG("RenderChunkCoordinator::_handleVisibilityUpdates");
@@ -110,7 +112,7 @@ void SigInit::init2190() {
     ADD_SIG("HurtColor", "E8 ? ? ? ? 0F 28 05 ? ? ? ? 0F 11 85 F8 01 00 00"); // RenderController::getOverlayColor
     ADD_SIG("Actor::baseTick", "48 8D 05 ? ? ? ? 48 89 01 BA 33 00 00 00 44 8D 4A 04 44 8D 42 02 66 C7 44 24 20 39 00 E8 ? ? ? ? 48 8D 8F E0 0D 00 00");
     ADD_SIG("CameraYaw2", "F3 0F 11 10 F3 0F 11 40 ? 48 8D 9F");
-    ADD_SIG("ItemInHandRenderer::renderItem", "E8 ?? ?? ?? ?? 90 48 8B 4C 24 58 48 85 C9 74 2A");
+    ADD_SIG("ItemInHandRenderer::renderItem", "E8 ? ? ? ? 41 0F 11 B6 ? ? ? ? C6 47");
     ADD_SIG("LocalPlayer::applyTurnDelta", "48 8B C4 48 89 58 ? 48 89 70 ? 48 89 78 ? 55 41 56 41 57 48 8D 6C 24 ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 44 0F 29 40 ? 44 0F 29 48 ? 44 0F 29 50");
     ADD_SIG("ResourcePackManager::_composeFullStack", "48 89 5C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 41 56 48 83 EC ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 44 24 ? 48 8B F9 40 B6"); // update notes in 2180
     ADD_SIG("ActorShaderManager::setupShaderParameter", "48 89 5C 24 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 0F 29 B4 24 ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 48 8B 85"); // 15 params | go to hurt color sig, go to func with 10 ish params, then go to func with 15 params (this)
