@@ -9,43 +9,6 @@ void ItemPhysics::onEnable() {
     Listen(this, SetupAndRenderEvent, &ItemPhysics::onSetupAndRender)
     Listen(this, ItemRendererEvent, &ItemPhysics::onItemRenderer)
 
-
-
-    static auto posAddr = GET_SIG_ADDRESS("ItemPositionConst") + 4;
-    origPosRel = *reinterpret_cast<uint32_t*>(posAddr);
-    patched = true;
-
-    newPosRel = static_cast<float*>(AllocateBuffer(reinterpret_cast<void*>(posAddr)));
-    *newPosRel = 0.f;
-
-    const auto newRipRel = Memory::getRipRel(posAddr, reinterpret_cast<uintptr_t>(newPosRel));
-    Memory::patchBytes(reinterpret_cast<void*>(posAddr), newRipRel.data(), 4);
-
-    // Hook glm_rotate
-    static auto rotateAddr = reinterpret_cast<void*>(GET_SIG_ADDRESS("glm_rotateRef"));
-
-    if (!rotateHooked) {
-        if (VersionUtils::checkAboveOrEqual(21, 40)) {
-            MH_CreateHook(rotateAddr, (void*)glm_rotateHook2, &rotateTrampoline);
-        } else {
-            MH_CreateHook(rotateAddr, (void*)glm_rotateHook, &rotateTrampoline);
-        }
-        MH_EnableHook(rotateAddr);
-        Memory::patchBytes(rotateAddr, (BYTE*)"\xE8", 1);
-        rotateHooked = true;
-    }
-
-
-    static auto translateAddr = reinterpret_cast<void*>(GET_SIG_ADDRESS("glm_translateRef"));
-    Memory::copyBytes(translateAddr, translatePatch1, 5);
-    Memory::nopBytes(translateAddr, 5);
-
-    if (VersionUtils::checkAboveOrEqual(21, 0)) {
-        static auto translateAddr2 = reinterpret_cast<void*>(GET_SIG_ADDRESS("glm_translateRef2"));
-        Memory::copyBytes(translateAddr2, translatePatch2, 5);
-        Memory::nopBytes(translateAddr2, 5);
-    }
-
     Module::onEnable();
 }
 
@@ -54,28 +17,6 @@ void ItemPhysics::onDisable() {
     Deafen(this, ItemRendererEvent, &ItemPhysics::onItemRenderer)
 
     if (!Client::disable && patched) {
-
-        static auto posAddr = GET_SIG_ADDRESS("ItemPositionConst") + 4;
-        Memory::patchBytes(reinterpret_cast<void*>(posAddr), &origPosRel, 4);
-
-        if (newPosRel) {
-            FreeBuffer(newPosRel);
-            newPosRel = nullptr;
-        }
-
-        if (rotateHooked) {
-            static auto rotateAddr = reinterpret_cast<void*>(GET_SIG_ADDRESS("glm_rotateRef"));
-            MH_DisableHook(rotateAddr);
-        }
-
-        static auto translateAddr = reinterpret_cast<void*>(GET_SIG_ADDRESS("glm_translateRef"));
-        Memory::patchBytes(translateAddr, translatePatch1, 5);
-
-        if (VersionUtils::checkAboveOrEqual(21, 0)) {
-            static auto translateAddr2 = reinterpret_cast<void*>(GET_SIG_ADDRESS("glm_translateRef2"));
-            Memory::patchBytes(translateAddr2, translatePatch2, 5);
-        }
-
         actorData.clear();
         currentRenderData = nullptr;
         Module::onDisable();
@@ -127,7 +68,9 @@ void ItemPhysics::onItemRenderer(ItemRendererEvent& event) {
     if (!isEnabled())
         return;
 
+    auto& mat = SDK::clientInstance->getCamera().getWorldMatrixStack().top().matrix;
     currentRenderData = event.getRenderData();
+    this->applyTransformation(mat);
 }
 
 void __fastcall ItemPhysics::glm_rotateHook(glm::mat4x4& mat, float angle, float x, float y, float z) {
@@ -284,20 +227,7 @@ void ItemPhysics::applyTransformation(glm::mat4x4& mat) {
         pos.y = currentRenderData->position.y;
     }
 
-    mat = translate(mat, { pos.x, pos.y, pos.z });
-
-    if (VersionUtils::checkAboveOrEqual(21, 40)) {
-        mat = rotate(mat, glm::radians(renderVec.x), { 1.f, 0.f, 0.f });
-        mat = rotate(mat, glm::radians(renderVec.y), { 0.f, 1.f, 0.f });
-        mat = rotate(mat, glm::radians(renderVec.z), { 0.f, 0.f, 1.f });
-    }
-    else {
-        static auto rotateSig = GET_SIG_ADDRESS("glm_rotate");
-        using glm_rotate_t = void(__fastcall*)(glm::mat4x4&, float, float, float, float);
-        static auto glm_rotate = reinterpret_cast<glm_rotate_t>(rotateSig);
-
-        glm_rotate(mat, renderVec.x, 1.f, 0.f, 0.f);
-        glm_rotate(mat, renderVec.y, 0.f, 1.f, 0.f);
-        glm_rotate(mat, renderVec.z, 0.f, 0.f, 1.f);
-    }
+    mat = rotate(mat, glm::radians(renderVec.x), { 1.f, 0.f, 0.f });
+    mat = rotate(mat, glm::radians(renderVec.y), { 0.f, 1.f, 0.f });
+    mat = rotate(mat, glm::radians(renderVec.z), { 0.f, 0.f, 1.f });
 }

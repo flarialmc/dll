@@ -251,9 +251,7 @@ void ModuleManager::initialize() {
 	addModule<MovableDayCounter>();
 	// addModule<CompactChat>();
 
-	if (!VersionUtils::checkAboveOrEqual(21, 110))
 	addModule<ItemPhysics>();
-
 
 	addModule<Mousestrokes>();
 
