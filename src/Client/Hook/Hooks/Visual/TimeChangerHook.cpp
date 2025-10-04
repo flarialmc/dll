@@ -1,7 +1,4 @@
 #include "TimeChangerHook.hpp"
-#include "Events/EventManager.hpp"
-#include "Events/Events.hpp"
-#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 float TimeChangerHook::TimeChangerCallback(void* a1, void* a2, void* a3)
 {

@@ -4,8 +4,6 @@
 #include <windows.h>
 #include <unknwn.h>
 #include "../../../../Client.hpp"
-#include "Events/EventManager.hpp"
-#include "Events/Events.hpp"
 
 class ImGUIMouseListener : public Listener {
 public:

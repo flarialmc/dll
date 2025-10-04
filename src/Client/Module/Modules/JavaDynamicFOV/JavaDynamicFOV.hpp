@@ -3,8 +3,6 @@
 #include "../Module.hpp"
 #include "../../../../SDK/Client/Core/Options.hpp"
 #include "../Zoom/Zoom.hpp"
-#include "Assets/Assets.hpp"
-#include "Events/Events.hpp"
 
 class JavaDynamicFOV : public Module {
 private:

@@ -2,7 +2,6 @@
 
 #include "Client.hpp"
 #include "Modules/ClickGUI/ClickGUI.hpp"
-#include "Events/EventManager.hpp"
 
 
 void Mousestrokes::onEnable()

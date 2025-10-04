@@ -2,8 +2,6 @@
 
 #include "../Hook.hpp"
 #include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
-#include "Events/EventManager.hpp"
-#include "Events/Events.hpp"
 
 class RenderOrderExecuteHook : public Hook {
 private:

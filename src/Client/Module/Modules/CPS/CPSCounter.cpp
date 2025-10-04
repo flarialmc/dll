@@ -2,7 +2,6 @@
 
 #include "Client.hpp"
 #include <Modules/Misc/Input/GUIMouseListener.hpp>
-#include "Events/EventManager.hpp"
 
 void CPSCounter::onEnable() {
     Listen(this, RenderEvent, &CPSCounter::onRender)

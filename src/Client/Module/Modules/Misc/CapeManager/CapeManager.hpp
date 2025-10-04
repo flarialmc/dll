@@ -4,8 +4,6 @@
 #include "../../../../Client.hpp"
 #include "../../SDK/Client/Network/Packet/PlayerSkinPacket.hpp"
 #include "image_data.h"
-#include "Events/EventManager.hpp"
-#include "Events/Events.hpp"
 
 class CapeManager : public Listener {
 public:

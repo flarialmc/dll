@@ -1,5 +1,4 @@
 #include "getFovHook.hpp"
-#include "Events/EventManager.hpp"
 
 float getFovHook::getFovCallback(void* a1, float f, void* a3, void* a4)
 {

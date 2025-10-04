@@ -9,7 +9,6 @@
 #include <random>
 
 #include "GUI/Engine/Constraints.hpp"
-#include "Events/EventManager.hpp"
 
 
 void Waypoints::onEnable() {

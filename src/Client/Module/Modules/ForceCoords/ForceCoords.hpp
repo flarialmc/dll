@@ -5,8 +5,6 @@
 
 
 #include "Assets/Assets.hpp"
-#include "Events/Events.hpp"
-#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 class ForceCoords : public Module {
 private:

@@ -3,7 +3,6 @@
 #include "../Module.hpp"
 #include "Assets/Assets.hpp"
 #include "Events/Game/TurnDeltaEvent.hpp"
-#include "Events/Events.hpp"
 
 class SensMultiplier : public Module {
 

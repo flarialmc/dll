@@ -1,7 +1,6 @@
 #include "TNTTimer.hpp"
 
 #include "../Nick/NickModule.hpp"
-#include "Events/EventManager.hpp"
 
 void TNTTimer::onEnable() {
 	Listen(this, TickEvent, &TNTTimer::onTickEvent)

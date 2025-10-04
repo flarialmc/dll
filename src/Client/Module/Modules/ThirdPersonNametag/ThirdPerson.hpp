@@ -3,9 +3,6 @@
 #include "../Module.hpp"
 #include "Events/Game/PerspectiveEvent.hpp"
 #include "Events/Render/DrawNameTagEvent.hpp"
-#include "Assets/Assets.hpp"
-#include "Events/Events.hpp"
-#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 
 class ThirdPerson : public Module {

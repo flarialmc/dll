@@ -1,5 +1,4 @@
 #include "Zoom.hpp"
-#include "Events/EventManager.hpp"
 
 
 void Zoom::onEnable() {

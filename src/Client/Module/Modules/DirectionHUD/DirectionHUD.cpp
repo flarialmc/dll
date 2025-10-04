@@ -2,7 +2,6 @@
 
 #include "Modules/ClickGUI/ClickGUI.hpp"
 #include "Modules/Waypoints/Waypoints.hpp"
-#include "Events/EventManager.hpp"
 
 void DirectionHUD::onEnable() {
     Listen(this, RenderEvent, &DirectionHUD::onRender);

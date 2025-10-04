@@ -7,7 +7,6 @@
 #include <deque>
 
 #include "Assets/Assets.hpp"
-#include "Events/Events.hpp"
 
 
 class TimedObj {

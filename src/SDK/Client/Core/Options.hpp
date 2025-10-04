@@ -1,9 +1,6 @@
 #pragma once
 
 #include "../../../Client/Client.hpp"
-#include "../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
-#include "../../../Config/Settings.hpp"
-#include "../../../Utils/Memory/Memory.hpp"
 
 class OptionInfo {
 public:

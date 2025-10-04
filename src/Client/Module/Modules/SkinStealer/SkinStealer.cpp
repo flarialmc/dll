@@ -5,7 +5,6 @@
 #include "Command/Commands/SkinStealCommand.hpp"
 
 #include "SDK/Client/Network/Packet/PlayerSkinPacket.hpp"
-#include "Events/EventManager.hpp"
 
 std::vector<std::shared_ptr<Packet> > SkinStealer::inFlightPackets;
 

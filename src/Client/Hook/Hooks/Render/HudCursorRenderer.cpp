@@ -1,7 +1,5 @@
 #include "HudCursorRenderer.hpp"
 #include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
-#include "Events/EventManager.hpp"
-#include "Events/Events.hpp"
 
 HudCursorRendererHook::HudCursorRendererHook() : Hook("HudCursorRenderer_render", GET_SIG_ADDRESS("HudCursorRenderer::render")) {}
 

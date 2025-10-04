@@ -1,9 +1,6 @@
 #pragma once
 
 #include "src/Client/Module/Modules/Module.hpp"
-#include "Events/EventManager.hpp"
-#include "Events/Events.hpp"
-#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 class PackChanger : public Listener {
 private:

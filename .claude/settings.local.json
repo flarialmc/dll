@@ -21,15 +21,7 @@
       "WebSearch",
       "WebFetch(domain:www.gamedev.net)",
       "Bash(timeout:*)",
-      "Bash(.build.bat)",
-      "Bash(C:UsersadminAppDataLocalProgramsPythonPython313python.exe add_includes.py)",
-      "Bash(\"C:\\Users\\admin\\AppData\\Local\\Programs\\Python\\Python313\\python.exe\" add_includes.py)",
-      "Bash(build.bat D -nr)",
-      "Bash(./build.bat D -nr)",
-      "Bash(ninja:*)",
-      "Bash(clang-cl:*)",
-      "Bash(clang:*)",
-      "Bash(curl:*)"
+      "Bash(.build.bat)"
     ],
     "deny": []
   }

@@ -5,7 +5,6 @@
 
 #include "SDK/Client/Network/Packet/CommandRequestPacket.hpp"
 #include "SDK/Client/Network/Packet/TextPacket.hpp"
-#include "Events/EventManager.hpp"
 
 
 void ZeqaUtils::onEnable()

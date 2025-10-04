@@ -3,8 +3,6 @@
 #include "../Hook.hpp"
 #include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 #include "SDK/Client/GUI/Screens/Controllers/HudScreenController.hpp"
-#include "Events/EventManager.hpp"
-#include "Events/Events.hpp"
 // #include "Events/Game/HudScreenControllerTickEvent.hpp"
 
 class HudScreenControllerHook : public Hook {

@@ -1,5 +1,4 @@
 #include "MovableHotbar.hpp"
-#include "Events/EventManager.hpp"
 
 
 void MovableHotbar::onEnable() {

@@ -3,7 +3,6 @@
 #include "../Module.hpp"
 
 #include "../../../../Assets/Assets.hpp"
-#include "Events/Events.hpp"
 
 class BlockBreakIndicator : public Module {
 private:

@@ -2,7 +2,6 @@
 
 #include "glm/glm/ext/matrix_transform.hpp"
 #include "Manager.hpp"
-#include "Events/EventManager.hpp"
 
 void SwingAnimations::onEnable() {
     Module::onEnable();

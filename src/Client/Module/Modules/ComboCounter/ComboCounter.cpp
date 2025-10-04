@@ -3,7 +3,6 @@
 
 #include "Events/Game/TickEvent.hpp"
 #include "Events/Render/RenderEvent.hpp"
-#include "Events/EventManager.hpp"
 
 void ComboCounter::onEnable() {
     Listen(this, AttackEvent, &ComboCounter::onAttack)

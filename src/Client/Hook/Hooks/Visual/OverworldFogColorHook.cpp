@@ -1,7 +1,4 @@
 #include "OverworldFogColorHook.hpp"
-#include "Events/EventManager.hpp"
-#include "Events/Events.hpp"
-#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 MCCColor& OverworldFogColorHook::OverworldFogColorCallback(Dimension* _this, MCCColor& result,
     MCCColor const& baseColor, float brightness)

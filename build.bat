@@ -2,18 +2,13 @@
 setlocal EnableDelayedExpansion
 
 :: Build script for Flarial project
-:: Usage: build.bat [R|D] [-nr] where R=Release, D=Debug, -nr=no reconfigure
+:: Usage: build.bat [R|D] where R=Release, D=Debug
 
 echo.
 echo ===============================================
 echo             Flarial Build Script
 echo ===============================================
 echo.
-
-:: Check for -nr flag (no reconfigure)
-set NO_RECONFIGURE=0
-if "%2"=="-nr" set NO_RECONFIGURE=1
-if "%2"=="-NR" set NO_RECONFIGURE=1
 
 :: Get build type from user input
 set BUILD_TYPE=
@@ -126,49 +121,30 @@ echo.
 echo Creating build directory: %BUILD_DIR%
 if not exist "%BUILD_DIR%" mkdir "%BUILD_DIR%"
 
-:: Configure CMake with Ninja generator (skip if -nr flag is set)
-if %NO_RECONFIGURE%==0 (
+:: Configure CMake with Ninja generator
+echo.
+echo ===============================================
+echo              Configuring CMake
+echo ===============================================
+echo.
+
+cd "%BUILD_DIR%"
+
+cmake .. ^
+    -G "Ninja" ^
+    -DCMAKE_BUILD_TYPE=%BUILD_TYPE% ^
+    -DCMAKE_C_COMPILER=cl ^
+    -DCMAKE_CXX_COMPILER=cl ^
+    -DCMAKE_MAKE_PROGRAM=ninja ^
+    -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ^
+    -DCMAKE_VERBOSE_MAKEFILE=OFF
+
+if errorlevel 1 (
     echo.
-    echo ===============================================
-    echo              Configuring CMake
-    echo ===============================================
-    echo.
-
-    cd "%BUILD_DIR%"
-
-    cmake .. ^
-        -G "Ninja" ^
-        -DCMAKE_BUILD_TYPE=%BUILD_TYPE% ^
-        -DCMAKE_C_COMPILER=cl ^
-        -DCMAKE_CXX_COMPILER=cl ^
-        -DCMAKE_MAKE_PROGRAM=ninja ^
-        -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ^
-        -DCMAKE_VERBOSE_MAKEFILE=OFF
-
-    if errorlevel 1 (
-        echo.
-        echo ERROR: CMake configuration failed!
-        cd ..
-        pause
-        exit /b 1
-    )
-) else (
-    echo.
-    echo ===============================================
-    echo       Skipping CMake Reconfiguration
-    echo ===============================================
-    echo.
-    echo Using existing build cache for incremental build...
-
-    cd "%BUILD_DIR%"
-
-    if not exist "build.ninja" (
-        echo ERROR: No existing build cache found!
-        echo Please run without -nr flag first to configure the project.
-        cd ..
-        pause
-        exit /b 1
-    )
+    echo ERROR: CMake configuration failed!
+    cd ..
+    pause
+    exit /b 1
 )
 
 :: Build the project

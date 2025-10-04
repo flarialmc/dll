@@ -12,7 +12,6 @@
 #include "Events/Game/PerspectiveEvent.hpp"
 #include "Utils/Render/PositionUtils.hpp"
 #include <filesystem>
-#include "Events/Events.hpp"
 
 
 class CrosshairImage

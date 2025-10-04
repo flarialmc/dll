@@ -2,7 +2,6 @@
 
 #include "Modules/ClickGUI/ClickGUI.hpp"
 #include "Utils/Render/PositionUtils.hpp"
-#include "Events/EventManager.hpp"
 
 
 void MovableDayCounter::onEnable() {

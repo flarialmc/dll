@@ -7,7 +7,6 @@
 #include "../../../Client.hpp"
 #include "../../../Events/Game/FOVEvent.hpp"
 #include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
-#include "Events/Events.hpp"
 
 class RenderOutlineSelectionHook : public Hook {
 private:

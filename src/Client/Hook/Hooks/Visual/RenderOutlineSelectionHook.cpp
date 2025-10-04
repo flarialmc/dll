@@ -1,5 +1,4 @@
 #include "RenderOutlineSelectionHook.hpp"
-#include "Events/EventManager.hpp"
 
 void RenderOutlineSelectionHook::OutlineSelectioCallback(LevelRendererPlayer* obj, ScreenContext* scn, void* block,
     void* region, Vec3<int> pos)

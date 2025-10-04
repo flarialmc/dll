@@ -7,7 +7,6 @@
 #include <initializer_list>
 
 #include "../../../../Assets/Assets.hpp"
-#include "Events/Events.hpp"
 
 struct TabListEntry {
     bool valid = false;

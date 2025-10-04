@@ -18,8 +18,6 @@
 #include <imgui/imgui_impl_dx12.h>
 #include <imgui/imgui_impl_win32.h>
 #include "unknwnbase.h"
-#include "Events/EventManager.hpp"
-#include "Events/Events.hpp"
 using ::IUnknown;
 
 void SwapchainHook::DX12Init() {

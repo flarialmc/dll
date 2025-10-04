@@ -1,8 +1,5 @@
 #include "ActorShaderParams.hpp"
 #include "Events/Render/ActorShaderParamsEvent.hpp"
-#include "Events/EventManager.hpp"
-#include "Events/Events.hpp"
-#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 ActorShaderParamsHook::ActorShaderParamsHook(): Hook("Actor Shader Params Hook", GET_SIG_ADDRESS("ActorShaderManager::setupShaderParameter")) {
 }

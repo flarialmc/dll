@@ -3,7 +3,6 @@
 #include "../Module.hpp"
 #include "Assets/Assets.hpp"
 #include "Events/Game/TickEvent.hpp"
-#include "Events/Events.hpp"
 
 class TNTTimer : public Module {
 

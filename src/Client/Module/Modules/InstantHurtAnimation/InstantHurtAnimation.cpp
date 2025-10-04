@@ -2,7 +2,6 @@
 
 #include "Client.hpp"
 #include "SDK/Client/Network/Packet/EntityEventPacket.hpp"
-#include "Events/EventManager.hpp"
 
 void InstantHurtAnimation::onEnable() {
     Listen(this, PacketEvent, &InstantHurtAnimation::onPacketReceive)

@@ -1,9 +1,6 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "Assets/Assets.hpp"
-#include "Events/EventManager.hpp"
-#include "Events/Events.hpp"
 
 class Module202020 : public Module {
 public:

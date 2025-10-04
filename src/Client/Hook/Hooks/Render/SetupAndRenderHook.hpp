@@ -13,9 +13,6 @@
 #include "../../../../Utils/Render/MaterialUtils.hpp"
 #include "../../Hooks/Render/DirectX/DXGI/SwapchainHook.hpp"
 #include "../Visual/Level_addParticleEffect.hpp"
-#include "Events/EventManager.hpp"
-#include "Events/Events.hpp"
-#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 __int64 *oDrawImage = nullptr;
 __int64 *oDrawNineSlice = nullptr;

@@ -1,5 +1,4 @@
 #include "IPDisplay.hpp"
-#include "Events/EventManager.hpp"
 
 void IPDisplay::onEnable() {
     Listen(this, RenderEvent, &IPDisplay::onRender)

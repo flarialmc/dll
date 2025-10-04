@@ -1,7 +1,6 @@
 #include "Animations.hpp"
 
 #include "Client.hpp"
-#include "Events/EventManager.hpp"
 
 
 void Animations::onEnable() {

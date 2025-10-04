@@ -1,7 +1,6 @@
 #include "RenderOptions.hpp"
 
 #include "SDK/Client/Core/Options.hpp"
-#include "Events/EventManager.hpp"
 
 
 void RenderOptions::updateSetings()

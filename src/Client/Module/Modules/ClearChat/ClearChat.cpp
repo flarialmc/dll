@@ -1,5 +1,4 @@
 #include "ClearChat.hpp"
-#include "Events/EventManager.hpp"
 
 void ClearChat::onEnable() {
     Listen(this, SetupAndRenderEvent, &ClearChat::onSetupAndRender)

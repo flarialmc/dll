@@ -2,7 +2,6 @@
 
 
 #include "Modules/Waypoints/Waypoints.hpp"
-#include "Events/EventManager.hpp"
 
 void DeathLogger::onEnable() {
     Listen(this, TickEvent, &DeathLogger::onTick)

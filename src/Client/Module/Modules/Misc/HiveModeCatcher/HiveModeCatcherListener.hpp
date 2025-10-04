@@ -7,8 +7,6 @@
 #include "../../../../../SDK/Client/Network/Packet/TextPacket.hpp"
 #include "../../Client/Events/Listener.hpp"
 #include "../../Client/Events/Network/PacketEvent.hpp"
-#include "Events/EventManager.hpp"
-#include "Events/Events.hpp"
 
 
 class HiveModeCatcherListener : public Listener {

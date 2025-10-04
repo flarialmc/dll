@@ -8,8 +8,6 @@
 #define DOOMGENERIC_RESY 400
 #include "doomgeneric/doomgeneric.h"
 #include "doomgeneric/doomkeys.h"
-#include "Events/EventManager.hpp"
-#include "Events/Events.hpp"
 
 
 

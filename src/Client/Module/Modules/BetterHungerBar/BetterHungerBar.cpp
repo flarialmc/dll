@@ -13,7 +13,6 @@
 #include <cmath>
 #include <algorithm>
 #include <chrono>
-#include "Events/EventManager.hpp"
 
 void BetterHungerBar::onEnable() {
     Listen(this, TickEvent, &BetterHungerBar::onTick)

@@ -4,8 +4,6 @@
 #include <Utils/Memory/Game/Offset/OffsetInit.hpp>
 #include <Utils/Memory/Game/Sig/SigInit.hpp>
 #include <Utils/WinrtUtils.hpp>
-#include <Utils/Logger/Logger.hpp>
-#include <Utils/Memory/Game/SignatureAndOffsetManager.hpp>
 
 std::vector<std::pair<std::string, std::pair<std::function<void()>, std::function<void()>>>> VersionUtils::versions;
 

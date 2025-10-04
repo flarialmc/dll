@@ -2,8 +2,6 @@
 
 #include "../Module.hpp"
 #include "Events/Game/PerspectiveEvent.hpp"
-#include "Assets/Assets.hpp"
-#include "Events/Events.hpp"
 
 class SnapLook : public Module {
 

@@ -6,8 +6,6 @@
 #include <random>
 
 #include "Client.hpp"
-#include "Assets/Assets.hpp"
-#include "Events/Events.hpp"
 
 
 inline void saveMp3File(const unsigned char* byteArray, size_t size, const std::string& outputPath) {

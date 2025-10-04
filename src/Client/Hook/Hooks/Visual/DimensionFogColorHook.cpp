@@ -1,6 +1,4 @@
 #include "DimensionFogColorHook.hpp"
-#include "Events/EventManager.hpp"
-#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 MCCColor& DimensionFogColorHook::DimensionFogColorCallback(Dimension* _this, MCCColor& result,
     MCCColor const& baseColor, float brightness)

@@ -2,7 +2,6 @@
 
 
 #include "Events/Render/RenderOutlineSelectionEvent.hpp"
-#include "Events/EventManager.hpp"
 
 void BlockOutline::onEnable() {
     options.parseOptionsFile();

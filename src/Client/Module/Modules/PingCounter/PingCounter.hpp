@@ -2,8 +2,6 @@
 
 #include "../Module.hpp"
 #include "Events/Render/RenderEvent.hpp"
-#include "Assets/Assets.hpp"
-#include "Events/Events.hpp"
 
 class PingCounter : public Module {
 

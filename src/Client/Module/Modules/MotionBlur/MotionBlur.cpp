@@ -1,6 +1,5 @@
 #include "MotionBlur.hpp"
 #include "Client.hpp"
-#include "Events/EventManager.hpp"
 
 
 void MotionBlur::onEnable() {

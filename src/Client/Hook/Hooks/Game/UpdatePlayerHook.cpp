@@ -1,7 +1,5 @@
 #include "UpdatePlayerHook.hpp"
 #include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
-#include "Events/EventManager.hpp"
-#include "Events/Events.hpp"
 
 void UpdatePlayerHook::callback(void* a1, void* a2, void* a3) {
     //  Combo counter and reach counter logic will be done here in the next commit.

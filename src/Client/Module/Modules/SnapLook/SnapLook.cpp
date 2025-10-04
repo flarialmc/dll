@@ -1,5 +1,4 @@
 #include "SnapLook.hpp"
-#include "Events/EventManager.hpp"
 
 
 

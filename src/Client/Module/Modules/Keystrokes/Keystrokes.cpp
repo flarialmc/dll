@@ -4,7 +4,6 @@
 #include "Modules/ClickGUI/ClickGUI.hpp"
 #include "Modules/CPS/CPSCounter.hpp"
 #include <Modules/Misc/Input/GUIMouseListener.hpp>
-#include "Events/EventManager.hpp"
 
 void Keystrokes::onSetup() {
     defaultConfig();

@@ -9,8 +9,6 @@
 #include <unknwn.h>
 
 #include "Events/Render/RenderEvent.hpp"
-#include "Assets/Assets.hpp"
-#include "Events/Events.hpp"
 
 class Keystrokes : public Module {
 

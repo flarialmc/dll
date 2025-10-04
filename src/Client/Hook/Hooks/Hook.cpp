@@ -1,5 +1,5 @@
 #include "Hook.hpp"
-#include <Utils/Logger/Logger.hpp>
+#include <libhat/Scanner.hpp>
 #include <utility>
 
 Hook::Hook(std::string name, uintptr_t address) {

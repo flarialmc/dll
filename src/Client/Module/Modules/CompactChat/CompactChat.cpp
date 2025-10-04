@@ -3,7 +3,6 @@
 
 #include "SDK/Client/Render/GuiMessage.hpp"
 #include "Modules/Nick/NickModule.hpp"
-#include "Events/EventManager.hpp"
 
 void CompactChat::onEnable() {
     Listen(this, PacketEvent, &CompactChat::onPacketReceive)

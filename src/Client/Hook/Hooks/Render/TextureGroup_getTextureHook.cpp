@@ -1,8 +1,6 @@
 #include "TextureGroup_getTextureHook.hpp"
 #include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 #include "../../../Events/Render/GetTextureEvent.hpp"
-#include "Events/EventManager.hpp"
-#include "Events/Events.hpp"
 
 TextureGroup_getTextureHook::TextureGroup_getTextureHook() : Hook("TextureGroup_getTexture", GET_SIG_ADDRESS("mce::TextureGroup::getTexture")) {}
 

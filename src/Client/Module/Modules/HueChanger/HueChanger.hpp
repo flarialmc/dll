@@ -3,7 +3,6 @@
 #include "../Module.hpp"
 #include "Assets/Assets.hpp"
 #include "Events/Render/RenderEvent.hpp"
-#include "Events/Events.hpp"
 
 
 class HueChanger : public Module {

@@ -2,7 +2,6 @@
 
 
 #include "Events/Game/TickEvent.hpp"
-#include "Events/EventManager.hpp"
 
 
 void TotemCounter::onEnable() {

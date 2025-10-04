@@ -2,7 +2,6 @@
 
 #include "../Hook.hpp"
 #include "../../../../SDK/Client/Network/Raknet/RaknetConnector.hpp"
-#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 class RaknetTickHook : public Hook { //RaknetConnector::tick :)
 

@@ -1,5 +1,4 @@
 #include "MovableScoreboard.hpp"
-#include "Events/EventManager.hpp"
 
 
 void MovableScoreboard::onEnable() {

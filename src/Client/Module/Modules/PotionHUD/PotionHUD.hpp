@@ -5,8 +5,6 @@
 #include "Events/Render/RenderPotionHUDEvent.hpp"
 #include "Events/Render/SetupAndRenderEvent.hpp"
 #include "Utils/Render/PositionUtils.hpp"
-#include "Assets/Assets.hpp"
-#include "Events/Events.hpp"
 
 class PotionHUD : public Module {
 

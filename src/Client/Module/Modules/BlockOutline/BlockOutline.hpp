@@ -10,7 +10,6 @@
 #include "Events/Render/RenderOutlineSelectionEvent.hpp"
 #include "SDK/Client/Options/OptionsParser.hpp"
 #include "../../../../Assets/Assets.hpp"
-#include "Events/Events.hpp"
 
 class BlockOutline : public Module {
 

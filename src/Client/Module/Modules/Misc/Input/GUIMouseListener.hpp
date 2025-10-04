@@ -6,8 +6,6 @@
 #include "../../../../Client.hpp"
 #include "../../../Manager.hpp"
 #include "Utils/Utils.hpp"
-#include "Events/EventManager.hpp"
-#include "Events/Events.hpp"
 
 class ClickData {
 public:

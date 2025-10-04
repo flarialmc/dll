@@ -1,6 +1,5 @@
 #include "Coordinates.hpp"
 #include <cmath>
-#include "Events/EventManager.hpp"
 
 
 

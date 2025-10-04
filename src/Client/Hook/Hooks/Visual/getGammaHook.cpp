@@ -1,7 +1,4 @@
 #include "getGammaHook.hpp"
-#include "Events/EventManager.hpp"
-#include "Events/Events.hpp"
-#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 float getGammaHook::getGammaCallback(uintptr_t a1)
 {

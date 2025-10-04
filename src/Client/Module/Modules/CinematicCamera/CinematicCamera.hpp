@@ -5,7 +5,6 @@
 #include "Events/Render/RenderEvent.hpp"
 #include "../../../../Assets/Assets.hpp"
 #include "../../../../Utils/Utils.hpp"
-#include "Events/Events.hpp"
 
 class CinematicCamera : public Module {
 private:

@@ -3,8 +3,6 @@
 #include "../../../../Hook/Hooks/Input/MouseHook.hpp"
 #include "../../../../Client.hpp"
 #include "Events/Listener.hpp"
-#include "Events/EventManager.hpp"
-#include "Events/Events.hpp"
 
 class F1Listener : public Listener {
 public:

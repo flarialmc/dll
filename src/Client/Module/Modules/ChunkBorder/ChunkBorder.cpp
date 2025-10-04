@@ -5,7 +5,6 @@
 #include <Utils/Render/DrawUtil3D.hpp>
 #include "Utils/Render/MaterialUtils.hpp"
 #include <cmath>
-#include "Events/EventManager.hpp"
 
 void ChunkBorder::onEnable() {
     Listen(this, Render3DEvent, &ChunkBorder::onRender3D)

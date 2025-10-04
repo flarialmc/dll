@@ -5,7 +5,6 @@
 #include <dxgi1_4.h>
 #include <windows.h>
 #include "ResizeHook.hpp"
-#include "Events/Events.hpp"
 using ::IUnknown;
 
 

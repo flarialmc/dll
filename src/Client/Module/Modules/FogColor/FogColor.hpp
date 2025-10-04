@@ -3,7 +3,6 @@
 #include "../Module.hpp"
 #include "Assets/Assets.hpp"
 #include "Events/Render/FogColorEvent.hpp"
-#include "Events/Events.hpp"
 
 
 class FogColor : public Module {

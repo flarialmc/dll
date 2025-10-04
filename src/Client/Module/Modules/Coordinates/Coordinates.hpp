@@ -4,7 +4,6 @@
 #include "../Module.hpp"
 
 #include "../../../../Assets/Assets.hpp"
-#include "Events/Events.hpp"
 
 typedef std::unordered_map<std::string, std::string> StringMap;
 

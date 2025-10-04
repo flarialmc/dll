@@ -1,5 +1,4 @@
 #include "Memory.hpp"
-#include "Events/EventManager.hpp"
 
 
 void MEM::onEnable()

@@ -5,7 +5,6 @@
 #include "Client/GUI/Engine/Constraints.hpp"
 #include "Client.hpp"
 #include "Modules/ClickGUI/ClickGUI.hpp"
-#include "Events/EventManager.hpp"
 
 std::vector<Sound> Subtitles::sounds;
 

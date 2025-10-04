@@ -2,8 +2,6 @@
 
 #include "../../../../Hook/Hooks/Input/MouseHook.hpp"
 #include "../../../../Client.hpp"
-#include "Events/EventManager.hpp"
-#include "Events/Events.hpp"
 
 class CentreCursorListener : public Listener {
 public:

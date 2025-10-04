@@ -3,7 +3,6 @@
 #include "Manager.hpp"
 
 #include "Modules/ClickGUI/ClickGUI.hpp"
-#include "Events/EventManager.hpp"
 
 void ArmorHUD::onEnable() {
 	Listen(this, RenderEvent, &ArmorHUD::onRender)

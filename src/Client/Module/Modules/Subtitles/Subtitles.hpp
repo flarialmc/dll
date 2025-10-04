@@ -3,8 +3,6 @@
 #include "SoundDescriptions.hpp"
 #include "Events/Game/SoundEnginePlayEvent.hpp"
 #include "Utils/Utils.hpp"
-#include "Assets/Assets.hpp"
-#include "Events/Events.hpp"
 
 struct Sound {
     std::string name;

@@ -1,5 +1,4 @@
 #include "NoHurtCam.hpp"
-#include "Events/EventManager.hpp"
 
 
 

@@ -1,7 +1,5 @@
 #pragma once
 
-#include "../../../Item/ItemStack.hpp"
-
 enum class ContainerEnum {
     INVENTORY,
     HOTBAR,

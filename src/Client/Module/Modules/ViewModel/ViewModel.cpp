@@ -2,7 +2,6 @@
 #include "Client.hpp"
 
 #include "glm/glm/ext/matrix_transform.hpp"
-#include "Events/EventManager.hpp"
 
 
 void ViewModel::onEnable()

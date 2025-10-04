@@ -5,8 +5,6 @@
 #include "Events/Game/TickEvent.hpp"
 #include "Events/Network/PacketEvent.hpp"
 #include "Events/Render/RenderEvent.hpp"
-#include "Assets/Assets.hpp"
-#include "Events/Events.hpp"
 
 
 class OpponentReach : public Module {

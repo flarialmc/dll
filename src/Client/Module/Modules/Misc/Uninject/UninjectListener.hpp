@@ -2,8 +2,6 @@
 
 #include "../../../../Events/Listener.hpp"
 #include "../../../../Client.hpp"
-#include "Events/EventManager.hpp"
-#include "Events/Events.hpp"
 
 class UninjectListener : public Listener {
 private:

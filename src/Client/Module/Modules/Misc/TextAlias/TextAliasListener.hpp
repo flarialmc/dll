@@ -3,8 +3,6 @@
 #include "../../../../Hook/Hooks/Input/MouseHook.hpp"
 #include "../../../../Hook/Hooks/Render/DirectX/DXGI/SwapchainHook.hpp"
 #include "../../../../Client.hpp"
-#include "Events/EventManager.hpp"
-#include "Events/Events.hpp"
 
 class TextAliasListener : public Listener {
 private:

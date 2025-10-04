@@ -6,8 +6,6 @@
 #include "Events/Game/SwingDurationEvent.hpp"
 #include "../../../../Assets/Assets.hpp"
 #include "Modules/Doom/Doom.hpp"
-#include "Events/Events.hpp"
-#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 class SwingAnimations : public Module {
 

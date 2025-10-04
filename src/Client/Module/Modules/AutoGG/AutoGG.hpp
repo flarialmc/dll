@@ -6,7 +6,6 @@
 #include "../../../../SDK/Client/Network/Packet/SetTitlePacket.hpp"
 #include "Events/Network/PacketEvent.hpp"
 #include "../../../../Assets/Assets.hpp"
-#include "Events/Events.hpp"
 
 
 class AutoGG : public Module {

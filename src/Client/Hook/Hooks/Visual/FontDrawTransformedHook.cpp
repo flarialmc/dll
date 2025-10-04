@@ -1,6 +1,5 @@
 #include "FontDrawTransformedHook.hpp"
 #include "../../../Module/Modules/ClickGUI/ClickGui.hpp"
-#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 // C++
 void FontDrawTransformedHook::FontDrawTransformedCallback(void* _this, void* screenContext, std::string& str, float x,

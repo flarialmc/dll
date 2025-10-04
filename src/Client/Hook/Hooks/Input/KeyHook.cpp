@@ -4,8 +4,6 @@
 #include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 #include "../../../../Utils/UserActionLogger.hpp"
 #include "../../../Module/Manager.hpp"
-#include "Events/EventManager.hpp"
-#include "Events/Events.hpp"
 
 KeyHook::KeyHook() : Hook("key_hook", GET_SIG_ADDRESS("Keyboard::feed")) {}
 

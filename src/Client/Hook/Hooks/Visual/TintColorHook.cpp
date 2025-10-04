@@ -1,7 +1,4 @@
 #include "TintColorHook.hpp"
-#include "Events/EventManager.hpp"
-#include "Events/Events.hpp"
-#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 MCCColor *TintColorHook::TintColorCallback(void *a1, MCCColor *color, void *a3) {
     // auto event = nes::make_holder<HurtColorEvent>(funcOriginal(a1, color, a3));

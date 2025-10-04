@@ -6,8 +6,6 @@
 #include "Events/Game/TickEvent.hpp"
 #include "nes/event_dispatcher.hpp"
 #include "SDK/SDK.hpp"
-#include "Events/Events.hpp"
-#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 void ActorDropItem::enableHook() {
 

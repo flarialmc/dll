@@ -1,7 +1,6 @@
 #include "Lewis.hpp"
 
 #include "GUI/Engine/Constraints.hpp"
-#include "Events/EventManager.hpp"
 
 
 void Lewis::onEnable()

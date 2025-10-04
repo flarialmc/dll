@@ -3,9 +3,6 @@
 #include "../Module.hpp"
 #include "../../../Hook/Hooks/Game/ReadFileHook.hpp"
 #include "src/Client/Hook/Hooks/Game/composeFullStack.hpp"
-#include "Assets/Assets.hpp"
-#include "Events/EventManager.hpp"
-#include "Events/Events.hpp"
 
 class MaterialBinLoader : public Module {
 private:

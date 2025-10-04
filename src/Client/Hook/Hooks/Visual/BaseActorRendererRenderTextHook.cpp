@@ -3,9 +3,6 @@
 #include "Client.hpp"
 #include "Utils/Render/MaterialUtils.hpp"
 #include "Events/Render/DrawNameTagEvent.hpp"
-#include "Events/EventManager.hpp"
-#include "Events/Events.hpp"
-#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 void BaseActorRendererRenderTextHook::drawLogo(ScreenContext* screenContext, const Vec3<float>& cameraPos,
                                                const Vec3<float>& cameraTargetPos, const std::string& nameTag, const Vec3<float>& tagPos, Font* font)

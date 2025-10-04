@@ -3,7 +3,6 @@
 #include "Modules/ClickGUI/ClickGUI.hpp"
 #include "SDK/Client/Network/Packet/TextPacket.hpp"
 #include "Utils/Render/PositionUtils.hpp"
-#include "Events/EventManager.hpp"
 
 
 void MovableChat::onEnable() {
