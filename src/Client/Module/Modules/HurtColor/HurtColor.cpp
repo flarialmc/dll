@@ -1,4 +1,5 @@
 #include "HurtColor.hpp"
+#include "Events/EventManager.hpp"
 
 
 

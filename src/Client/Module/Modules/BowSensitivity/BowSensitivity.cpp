@@ -1,4 +1,5 @@
 #include "BowSensitivity.hpp"
+#include "Events/EventManager.hpp"
 
 
 void BowSensitivity::onEnable() {

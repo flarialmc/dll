@@ -1,4 +1,5 @@
 #include "JavaDynamicFOV.hpp"
+#include "Events/EventManager.hpp"
 
 void JavaDynamicFOV::onEnable() {
     Listen(this, FOVEvent, &JavaDynamicFOV::onGetFOV)

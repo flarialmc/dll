@@ -3,6 +3,7 @@
 #include "../Module.hpp"
 #include "Events/Render/GammaEvent.hpp"
 #include "../../../../Assets/Assets.hpp"
+#include "Events/Events.hpp"
 
 
 class Fullbright : public Module {

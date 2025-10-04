@@ -4,6 +4,7 @@
 #include "../../../Client.hpp"
 #include "../../../../Utils/Render/DrawUtils.hpp"
 #include "Assets/Assets.hpp"
+#include "Events/Events.hpp"
 
 struct AABBInfo {
 	AABB aabb;

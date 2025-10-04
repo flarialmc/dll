@@ -2,6 +2,8 @@
 
 #include "../Hook.hpp"
 #include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
+#include "Events/EventManager.hpp"
+#include "Events/Events.hpp"
 
 /* dont be misled by the name this function is still used for items
  * other than the ones in the players hands (mojang being weird ig)

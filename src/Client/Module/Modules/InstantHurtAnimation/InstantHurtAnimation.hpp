@@ -2,6 +2,8 @@
 
 #include "../Module.hpp"
 #include "../../../Hook/Hooks/Game/PacketHooks.hpp"
+#include "Assets/Assets.hpp"
+#include "Events/Events.hpp"
 
 
 class InstantHurtAnimation : public Module {

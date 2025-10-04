@@ -2,6 +2,8 @@
 
 #include "../Module.hpp"
 #include "../../../Client.hpp"
+#include "Assets/Assets.hpp"
+#include "Events/Events.hpp"
 
 class SpeedDisplay : public Module {
 

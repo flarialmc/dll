@@ -1,6 +1,8 @@
 #include "GameModeAttack.hpp"
 #include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 #include "Events/Game/AttackEvent.hpp"
+#include "Events/EventManager.hpp"
+#include "Events/Events.hpp"
 
 void GameModeAttackHook::callback(Gamemode *gamemode, Actor *actor) {
     if (SDK::clientInstance->getLocalPlayer() != nullptr) {

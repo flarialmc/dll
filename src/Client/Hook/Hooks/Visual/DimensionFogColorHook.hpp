@@ -5,6 +5,7 @@
 #include "../../../../Utils/Utils.hpp"
 #include "../../../Module/Manager.hpp"
 #include "../../../Events/Render/FogColorEvent.hpp"
+#include "Events/Events.hpp"
 
 class DimensionFogColorHook : public Hook {
 private:

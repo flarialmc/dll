@@ -5,6 +5,7 @@
 #include "Events/Game/TickEvent.hpp"
 #include "Events/Render/DrawTextEvent.hpp"
 #include "../../../../Assets/Assets.hpp"
+#include "Events/Events.hpp"
 
 class NickModule : public Module {
 private:

@@ -1,4 +1,5 @@
 #include "NickModule.hpp"
+#include "Events/EventManager.hpp"
 
 
 

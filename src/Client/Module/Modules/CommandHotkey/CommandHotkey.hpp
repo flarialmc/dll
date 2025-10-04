@@ -5,6 +5,7 @@
 #include "Assets/Assets.hpp"
 #include "../../../../Client/Events/Input/KeyEvent.hpp"
 #include "Events/Input/MouseEvent.hpp"
+#include "Events/Events.hpp"
 
 class CommandHotkey : public Module {
 

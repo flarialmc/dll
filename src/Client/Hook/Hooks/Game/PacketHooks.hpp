@@ -4,6 +4,7 @@
 #include "../../../../SDK/Client/Network/Packet/LoopbackPacketSender.hpp"
 #include "../../../../SDK/Client/Network/Packet/Packet.hpp"
 #include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
+#include "Events/Events.hpp"
 
 class SendPacketHook : public Hook {
 

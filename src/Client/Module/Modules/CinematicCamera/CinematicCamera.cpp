@@ -1,6 +1,7 @@
 #include "CinematicCamera.hpp"
 
 #include "SDK/Client/Core/Options.hpp"
+#include "Events/EventManager.hpp"
 
 void CinematicCamera::onEnable() {
     Listen(this, TurnDeltaEvent, &CinematicCamera::onTurnDelta)

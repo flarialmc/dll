@@ -6,6 +6,8 @@
 #include "../../../../SDK/Client/Options/OptionsParser.hpp"
 #include "Events/Game/ContainerScreenControllerTickEvent.hpp"
 #include "Events/Game/ContainerSlotHoveredEvent.hpp"
+#include "Assets/Assets.hpp"
+#include "Events/Events.hpp"
 
 struct MoveRequest {
 	int64_t destSlot;

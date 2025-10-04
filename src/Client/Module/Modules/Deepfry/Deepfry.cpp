@@ -1,4 +1,5 @@
 #include "Deepfry.hpp"
+#include "Events/EventManager.hpp"
 
 class RenderEvent;
 

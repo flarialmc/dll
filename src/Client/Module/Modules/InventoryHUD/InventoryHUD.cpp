@@ -4,6 +4,7 @@
 #include "Modules/ClickGUI/ClickGUI.hpp"
 #include "SDK/Client/Render/BaseActorRenderContext.hpp"
 #include "Utils/Render/PositionUtils.hpp"
+#include "Events/EventManager.hpp"
 
 void InventoryHUD::onEnable() {
     Listen(this, RenderEvent, &InventoryHUD::onRender)

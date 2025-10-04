@@ -3,6 +3,9 @@
 #include "../Module.hpp"
 #include "Events/Game/RaknetTickEvent.hpp"
 #include "Events/Game/TickEvent.hpp"
+#include "Assets/Assets.hpp"
+#include "Events/Events.hpp"
+#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 
 class NoHurtCam : public Module {

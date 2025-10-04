@@ -4,6 +4,8 @@
 #include "../../../Events/Render/ItemRendererEvent.hpp"
 #include <chrono>
 #include <minhook/MinHook.h>
+#include "Events/EventManager.hpp"
+#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 void ItemPhysics::onEnable() {
     Listen(this, SetupAndRenderEvent, &ItemPhysics::onSetupAndRender)

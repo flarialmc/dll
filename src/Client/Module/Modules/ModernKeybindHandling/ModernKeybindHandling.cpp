@@ -2,6 +2,7 @@
 
 
 #include "Hook/Hooks/Input/KeyHook.hpp"
+#include "Events/EventManager.hpp"
 
 
 void ModernKeybindHandling::onEnable()

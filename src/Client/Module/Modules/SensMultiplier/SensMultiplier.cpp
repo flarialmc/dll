@@ -1,4 +1,5 @@
 #include "SensMultiplier.hpp"
+#include "Events/EventManager.hpp"
 
 void SensMultiplier::onEnable() {
     Listen(this, TurnDeltaEvent, &SensMultiplier::onTurnDeltaEvent)

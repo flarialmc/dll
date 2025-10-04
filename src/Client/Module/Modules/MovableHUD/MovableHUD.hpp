@@ -1,6 +1,8 @@
 #pragma once
 
 #include "../Module.hpp"
+#include "Assets/Assets.hpp"
+#include "Utils/Utils.hpp"
 
 // TODO: combine into 1
 

@@ -3,6 +3,7 @@
 #include "../Module.hpp"
 #include "Events/Render/ActorShaderParamsEvent.hpp"
 #include "GlintColor.hpp"
+#include "Events/EventManager.hpp"
 
 
 

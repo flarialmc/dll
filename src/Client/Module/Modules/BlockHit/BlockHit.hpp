@@ -5,6 +5,7 @@
 #include "../../../Events/Game/RenderItemInHandEvent.hpp"
 #include "Events/Game/PerspectiveEvent.hpp"
 #include "../../../../Assets/Assets.hpp"
+#include "Events/Events.hpp"
 
 class BlockHit : public Module {
 public:

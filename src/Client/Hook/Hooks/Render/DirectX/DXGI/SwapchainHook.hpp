@@ -9,6 +9,7 @@
 #include <d3d11on12.h>
 #include <winrt/base.h>
 #include <windows.h>
+#include "Events/Events.hpp"
 
 // Expose the main window handle to DX11/DX12 implementation files
 extern HWND window2;

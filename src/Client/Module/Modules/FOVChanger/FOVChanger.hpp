@@ -5,6 +5,7 @@
 
 
 #include "Assets/Assets.hpp"
+#include "Events/Events.hpp"
 
 class FOVChanger : public Module {
 private:

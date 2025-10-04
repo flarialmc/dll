@@ -10,6 +10,7 @@
 #include "../../../../Assets/Assets.hpp"
 
 #include <string>
+#include "Events/Events.hpp"
 
 class BetterHungerBar : public Module {
 private:

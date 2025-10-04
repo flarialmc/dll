@@ -1,4 +1,5 @@
 #include "PlayerNotifier.hpp"
+#include "Events/EventManager.hpp"
 
 void PlayerNotifier::defaultConfig() {
 	getKeybind();

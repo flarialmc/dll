@@ -8,6 +8,7 @@
 
 #include "Events/Render/RenderEvent.hpp"
 #include "Modules/ClickGUI/ClickGUI.hpp"
+#include "Events/EventManager.hpp"
 
 void HiveStat::onEnable() {
     Listen(this, RenderEvent, &HiveStat::onRender)

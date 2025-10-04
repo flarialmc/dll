@@ -1,7 +1,9 @@
 #pragma once
 
-#include <array>
+
 #include "../Hook.hpp"
+#include "../../../../SDK/Client/Level/LevelRender/LevelRender.hpp"
+#include "../../../../SDK/Client/Render/ScreenContext.hpp"
 
 class RenderLevelHook : public Hook {
 private:

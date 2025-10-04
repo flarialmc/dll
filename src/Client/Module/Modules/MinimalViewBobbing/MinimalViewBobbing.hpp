@@ -1,6 +1,8 @@
 #pragma once
 
 #include "../Module.hpp"
+#include "Assets/Assets.hpp"
+#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 
 class MinimalViewBobbing : public Module {

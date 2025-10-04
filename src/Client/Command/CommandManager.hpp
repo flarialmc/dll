@@ -3,6 +3,7 @@
 #include "Command.hpp"
 
 #include "Events/Network/PacketSendEvent.hpp"
+#include "Events/Events.hpp"
 
 class CommandManager {
 public:

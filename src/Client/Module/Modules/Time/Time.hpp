@@ -3,6 +3,8 @@
 #include "../Module.hpp"
 #include "Events/Render/RenderEvent.hpp"
 #include <Events/Game/TimeEvent.hpp>
+#include "Assets/Assets.hpp"
+#include "Events/Events.hpp"
 
 inline std::tm localtime_xp(std::time_t timer) {
 	std::tm bt{};

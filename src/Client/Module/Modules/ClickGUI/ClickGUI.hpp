@@ -12,6 +12,8 @@
 #include "../../../GUI/Engine/Constraints.hpp"
 #include "../../../GUI/D2D.hpp"
 #include "../../../../Assets/Assets.hpp"
+#include "Events/EventManager.hpp"
+#include "Events/Events.hpp"
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 

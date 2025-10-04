@@ -4,6 +4,7 @@
 #include "Assets/Assets.hpp"
 #include "Events/Input/KeyEvent.hpp"
 #include "Events/Render/RenderEvent.hpp"
+#include "Events/Events.hpp"
 
 class Stopwatch : public Module {
 

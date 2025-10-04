@@ -5,6 +5,8 @@
 #include "../../../../SDK/Client/Network/Packet/ModalFormRequestPacket.hpp"
 
 #include "Events/Network/PacketEvent.hpp"
+#include "Assets/Assets.hpp"
+#include "Events/Events.hpp"
 
 class ZeqaUtils : public Module {
 

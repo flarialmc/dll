@@ -4,6 +4,7 @@
 #include "Events/Game/TickEvent.hpp"
 #include "Events/Render/RenderEvent.hpp"
 #include "../../../../Assets/Assets.hpp"
+#include "Events/Events.hpp"
 
 class ArrowCounter : public Module {
 private:

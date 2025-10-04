@@ -22,6 +22,8 @@
 #include "../DXGI/ResizeHook.hpp"
 #include "Modules/MotionBlur/MotionBlur.hpp"
 #include "Modules/DepthOfField/DepthOfFieldHelper.hpp"
+#include "Events/EventManager.hpp"
+#include "Events/Events.hpp"
 using ::IUnknown;
 
 void SwapchainHook::DX11Init() {

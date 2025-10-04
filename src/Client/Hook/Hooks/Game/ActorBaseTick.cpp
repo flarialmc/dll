@@ -2,6 +2,9 @@
 #include "ActorBaseTick.hpp"
 #include "../../../Client.hpp"
 #include "Events/Game/TickEvent.hpp"
+#include "Events/EventManager.hpp"
+#include "Events/Events.hpp"
+#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 void ActorBaseTick::enableHook() {
 

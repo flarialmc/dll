@@ -1,5 +1,7 @@
 #include "BobHurt.hpp"
 #include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
+#include "Events/EventManager.hpp"
+#include "Events/Events.hpp"
 
 BobHurtHook::BobHurtHook() : Hook("BobHurt", GET_SIG_ADDRESS("BobHurt")) {}
 

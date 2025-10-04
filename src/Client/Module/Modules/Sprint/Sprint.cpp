@@ -2,6 +2,7 @@
 
 
 #include "Modules/Sneak/Sneak.hpp"
+#include "Events/EventManager.hpp"
 
 void Sprint::onEnable() {
     Listen(this, KeyEvent, &Sprint::onKey)

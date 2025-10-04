@@ -8,6 +8,8 @@
 #include <algorithm>
 #include <thread>
 #include <chrono>
+#include "Events/EventManager.hpp"
+#include "Events/Events.hpp"
 
 // TODO: LIKELY REQ A FIX
 class GUIKeyListener : public Listener {

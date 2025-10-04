@@ -1,4 +1,5 @@
 #include "ForceCoords.hpp"
+#include "Events/EventManager.hpp"
 
 void ForceCoords::onEnable() {
     Listen(this, RenderEvent, &ForceCoords::onRender)

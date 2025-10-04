@@ -3,6 +3,7 @@
 #include "../Module.hpp"
 #include "Events/Render/SetupAndRenderEvent.hpp"
 #include "../../../../Assets/Assets.hpp"
+#include "Events/Events.hpp"
 
 class GuiScale : public Module {
 private:

@@ -1,4 +1,5 @@
 #include "SpeedDisplay.hpp"
+#include "Events/EventManager.hpp"
 
 
 void SpeedDisplay::onEnable()

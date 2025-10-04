@@ -2,6 +2,7 @@
 
 #include "../Module.hpp"
 #include "../../../../Assets/Assets.hpp"
+#include "Events/Events.hpp"
 
 class SkinStealer : public Module {
 private:

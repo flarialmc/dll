@@ -3,6 +3,7 @@
 #include "Modules/ClickGUI/ClickGUI.hpp"
 #include "SDK/Client/Core/Options.hpp"
 #include "Utils/Render/PositionUtils.hpp"
+#include "Events/EventManager.hpp"
 
 
 void MovableCoordinates::onEnable() {

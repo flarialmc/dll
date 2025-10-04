@@ -17,6 +17,7 @@
 #include "Modules/ClickGUI/ClickGUI.hpp"
 #include "Modules/Nick/NickModule.hpp"
 #include "../../Manager.hpp"
+#include "Events/EventManager.hpp"
 
 bool logDebug = false;
 

@@ -1,4 +1,5 @@
 #include "FogColor.hpp"
+#include "Events/EventManager.hpp"
 
 
 

@@ -1,6 +1,8 @@
 #include "MouseHook.hpp"
 #include "../../../Client.hpp"
 #include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
+#include "Events/EventManager.hpp"
+#include "Events/Events.hpp"
 
 MouseHook::MouseHook() : Hook("mouse_hook",GET_SIG_ADDRESS("MouseDevice::feed")) {
 }

@@ -5,6 +5,7 @@
 #include "../Events/Render/Render3DEvent.hpp"
 
 #include "../../../../Assets/Assets.hpp"
+#include "Events/Events.hpp"
 
 
 struct Waypoint {

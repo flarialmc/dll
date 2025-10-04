@@ -4,6 +4,8 @@
 #include <Utils/Render/MaterialUtils.hpp>
 
 #include "SDK/Client/Render/Tessellator/MeshHelpers.hpp"
+#include "Events/EventManager.hpp"
+#include "Events/Events.hpp"
 
 RenderLevelHook::RenderLevelHook() : Hook("RenderLevelHook", GET_SIG_ADDRESS("LevelRenderer::renderLevel")) {}
 

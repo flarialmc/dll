@@ -4,6 +4,7 @@
 #include "Events/Render/ActorShaderParamsEvent.hpp"
 #include "GlintColor.hpp"
 #include "Assets/Assets.hpp"
+#include "Events/Events.hpp"
 
 
 

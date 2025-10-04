@@ -3,6 +3,7 @@
 #include "Client.hpp"
 
 #include "SDK/Client/Network/Packet/SetTitlePacket.hpp"
+#include "Events/EventManager.hpp"
 
 void HiveUtils::onEnable() {
     Listen(this, PacketEvent, &HiveUtils::onPacketReceive)

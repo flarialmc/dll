@@ -7,6 +7,8 @@
 #include "Events/Game/ContainerScreenControllerTickEvent.hpp"
 #include "SDK/Client/Options/OptionsParser.hpp"
 #include <chrono>
+#include "Assets/Assets.hpp"
+#include "Events/Events.hpp"
 
 class InventoryLock : public Module {
     OptionsParser parser;

@@ -2,6 +2,8 @@
 
 #include "../Module.hpp"
 #include "Events/Game/TimeEvent.hpp"
+#include "Assets/Assets.hpp"
+#include "Events/Events.hpp"
 
 
 class TimeChanger : public Module {

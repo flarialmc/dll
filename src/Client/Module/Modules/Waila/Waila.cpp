@@ -1,5 +1,6 @@
 #include "Waila.hpp"
 #include "Client.hpp"
+#include "Events/EventManager.hpp"
 
 
 void Waila::onEnable()

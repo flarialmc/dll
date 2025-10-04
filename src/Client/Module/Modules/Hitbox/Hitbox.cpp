@@ -1,4 +1,5 @@
 #include "Hitbox.hpp"
+#include "Events/EventManager.hpp"
 
 void Hitbox::onEnable() {
     Listen(this, SetupAndRenderEvent, &Hitbox::onSetupAndRender)

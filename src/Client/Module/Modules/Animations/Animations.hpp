@@ -4,6 +4,7 @@
 #include "Events/Render/DrawImageEvent.hpp"
 #include "Events/Render/GetTextureEvent.hpp"
 #include "../../../../Assets/Assets.hpp"
+#include "Events/Events.hpp"
 
 
 class Animations : public Module {

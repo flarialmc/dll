@@ -1,6 +1,7 @@
 #include <fstream>
 #include "getTimeOfDayHook.hpp"
 #include "../../../Client.hpp"
+#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 void getTimeOfDayHook::enableHook() {
 	this->autoHook(callback, (void**)&funcOriginal);

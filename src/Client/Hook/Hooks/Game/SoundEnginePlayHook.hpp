@@ -1,6 +1,6 @@
 #pragma once
 #include "../Hook.hpp"
-
+#include <Utils/Utils.hpp>
 class SoundEnginePlayHook : public Hook {
 
 private:

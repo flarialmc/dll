@@ -2,6 +2,7 @@
 
 
 #include "GUI/Engine/Constraints.hpp"
+#include "Events/EventManager.hpp"
 
 
 void PatarHD::onEnable()

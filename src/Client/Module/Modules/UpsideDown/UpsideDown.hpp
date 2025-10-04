@@ -2,6 +2,8 @@
 
 #include "../Module.hpp"
 #include "Events/Game/FOVEvent.hpp"
+#include "Assets/Assets.hpp"
+#include "Events/Events.hpp"
 
 class UpsideDown : public Module {
 

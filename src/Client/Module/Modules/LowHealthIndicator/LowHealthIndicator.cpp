@@ -1,6 +1,7 @@
 #include "LowHealthIndicator.hpp"
 
 #include "GUI/Engine/Constraints.hpp"
+#include "Events/EventManager.hpp"
 
 
 void LowHealthIndicator::defaultConfig()

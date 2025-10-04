@@ -4,6 +4,7 @@
 #include "Client.hpp"
 #include "Modules/ClickGUI/ClickGUI.hpp"
 #include "Utils/Utils.hpp"
+#include "Events/EventManager.hpp"
 
 
 void Stopwatch::onSetup() {

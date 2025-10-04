@@ -4,6 +4,8 @@
 #include "../../../../Client.hpp"
 #include <windows.h>
 #include <unknwn.h>
+#include "Events/EventManager.hpp"
+#include "Events/Events.hpp"
 
 class ImGUIKeyListener : public Listener {
 public:

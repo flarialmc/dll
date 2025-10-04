@@ -1,4 +1,5 @@
 #include "PacketHooks.hpp"
+#include "Events/EventManager.hpp"
 
 // text
 void SendPacketHook::callback(LoopbackPacketSender *pSender, Packet *pPacket) {

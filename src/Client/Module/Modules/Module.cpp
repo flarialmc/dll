@@ -21,6 +21,7 @@
 #include "../../Events/Input/KeyEvent.hpp"
 #include <windows.h>
 #include <unknwn.h>
+#include "Events/Events.hpp"
 
 Module::Module(const std::string& ename, const std::string& edescription, int eicon, const std::string& ekey, bool isScripting, const std::vector<std::string>& ealiases)
     : name(ename), tooltip(edescription), description(edescription), icon(eicon), isScriptingModule(isScripting), defaultKeybind(ekey), aliases(ealiases), settings(Settings())

@@ -3,6 +3,8 @@
 #include "../../../Events/Render/ItemRendererEvent.hpp"
 #include "../../../Module/Modules/ItemPhysics/ItemPhysics.hpp"
 #include "../../../Module/Manager.hpp"
+#include "Events/Events.hpp"
+#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 void ItemRendererHook::ItemRendererCallback(ItemRenderer* _this, BaseActorRenderContext* renderCtx, ActorRenderData* renderData) {
     auto event = nes::make_holder<ItemRendererEvent>(_this, renderCtx, renderData);

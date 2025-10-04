@@ -5,6 +5,7 @@
 #include "../../../../Utils/Hive.hpp"
 #include "Assets/Assets.hpp"
 #include "Events/Render/RenderEvent.hpp"
+#include "Events/Events.hpp"
 
 
 class HiveStat : public Module {

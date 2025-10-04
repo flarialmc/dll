@@ -2,6 +2,7 @@
 #include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 #include "../../../Events/Game/SwingDurationEvent.hpp"
 #include "../../../Events/EventManager.hpp"
+#include "Events/Events.hpp"
 
 int getCurrentSwingDurationHook::callback(void* mob) {
     int originalDuration = funcOriginal(mob);

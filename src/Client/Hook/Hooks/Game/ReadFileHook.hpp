@@ -7,6 +7,8 @@
 #include <cstring>
 #include "filesystem"
 #include "src/Client/Events/Game/ReadFileEvent.hpp"
+#include "Events/EventManager.hpp"
+#include "Events/Events.hpp"
 
 class ReadFileHook : public Hook {
 private:

@@ -1,4 +1,5 @@
 #include "JavaInventoryHotkeys.hpp"
+#include "Events/EventManager.hpp"
 
 
 void JavaInventoryHotkeys::onEnable() {

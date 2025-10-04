@@ -1,4 +1,5 @@
 #include "MessageLogger.hpp"
+#include "Events/EventManager.hpp"
 
 
 void MessageLogger::onEnable() {

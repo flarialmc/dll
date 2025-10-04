@@ -1,6 +1,8 @@
 #pragma once
 
 #include "../Module.hpp"
+#include "Assets/Assets.hpp"
+#include "Events/Events.hpp"
 
 
 class Mousestrokes : public Module

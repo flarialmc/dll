@@ -1,4 +1,6 @@
 #include "getViewPerspective.hpp"
+#include "Events/EventManager.hpp"
+#include "Events/Events.hpp"
 
 int getViewPerspectiveHook::callback(uintptr_t *a1) {
     auto event = nes::make_holder<PerspectiveEvent>((Perspective)getViewPerspectiveOriginal(a1));

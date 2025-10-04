@@ -1,4 +1,5 @@
 #include "TextHotkey.hpp"
+#include "Events/EventManager.hpp"
 
 
 void TextHotkey::onEnable() {

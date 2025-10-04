@@ -4,6 +4,7 @@
 #include "Assets/Assets.hpp"
 #include "Events/Render/RenderEvent.hpp"
 #include "Events/Render/RenderUnderUIEvent.hpp"
+#include "Events/Events.hpp"
 
 class FPS : public Module {
 

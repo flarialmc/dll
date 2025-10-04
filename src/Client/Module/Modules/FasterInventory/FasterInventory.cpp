@@ -1,6 +1,7 @@
 #include "FasterInventory.hpp"
 
 #include "Hook/Hooks/Game/PacketHooks.hpp"
+#include "Events/EventManager.hpp"
 
 void FasterInventory::onEnable() {
     Listen(this, RaknetTickEvent, &FasterInventory::onRaknetTick)

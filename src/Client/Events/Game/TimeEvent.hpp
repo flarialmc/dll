@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../Event.hpp"
+
 class TimeEvent : public Event {
 private:
     float time;

@@ -2,6 +2,7 @@
 #include "Client.hpp"
 
 #include "Utils/Render/PositionUtils.hpp"
+#include "Events/EventManager.hpp"
 
 std::string CurrentLoadedCrosshairName;
 

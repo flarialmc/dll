@@ -5,6 +5,7 @@
 #include "Events/Network/PacketEvent.hpp"
 #include "Events/Game/ChatScreenControllerTickEvent.hpp"
 #include "../../../../Assets/Assets.hpp"
+#include "Events/Events.hpp"
 
 
 class CompactChat : public Module {

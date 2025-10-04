@@ -2,6 +2,9 @@
 #include "../Module.hpp"
 #include <chrono>
 #include <algorithm>
+#include "Assets/Assets.hpp"
+#include "Events/EventManager.hpp"
+#include "Events/Events.hpp"
 
 
 class JavaViewBobbing : public Module {

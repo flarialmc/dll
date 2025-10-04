@@ -1,4 +1,7 @@
 #include "HurtColorHook.hpp"
+#include "Events/EventManager.hpp"
+#include "Events/Events.hpp"
+#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 MCCColor* HurtColorHook::HurtColorCallback(void* a1, MCCColor* color, void* a3)
 {

@@ -1,6 +1,9 @@
 #pragma once
 
 #include "../Module.hpp"
+#include "Assets/Assets.hpp"
+#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
+#include "Utils/Memory/Memory.hpp"
 
 
 class ItemUseDelayFix : public Module {

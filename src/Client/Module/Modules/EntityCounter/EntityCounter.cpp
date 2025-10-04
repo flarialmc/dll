@@ -1,4 +1,5 @@
 #include "EntityCounter.hpp"
+#include "Events/EventManager.hpp"
 
 
 void EntityCounter::onEnable() {

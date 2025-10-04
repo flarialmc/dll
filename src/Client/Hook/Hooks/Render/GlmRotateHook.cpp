@@ -2,6 +2,8 @@
 #include "../../../Events/EventManager.hpp"
 #include "../../../Events/Render/GlmRotateEvent.hpp"
 #include <glm/glm/ext/matrix_transform.hpp>
+#include "Events/Events.hpp"
+#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 void GlmRotateHook::GlmRotateCallback(glm::mat4x4& mat, float angle, float x, float y, float z) {
     auto event = nes::make_holder<GlmRotateEvent>(mat, angle, glm::vec3(x, y, z));

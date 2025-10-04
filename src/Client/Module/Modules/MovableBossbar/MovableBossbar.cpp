@@ -1,4 +1,5 @@
 #include "MovableBossbar.hpp"
+#include "Events/EventManager.hpp"
 
 
 void MovableBossbar::onEnable() {

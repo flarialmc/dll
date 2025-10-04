@@ -5,6 +5,8 @@
 #include "../../../Events/Input/SensitivityEvent.hpp"
 #include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 #include <cmath>
+#include "Events/EventManager.hpp"
+#include "Events/Events.hpp"
 
 class getSensHook : public Hook {
 private:

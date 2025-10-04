@@ -3,6 +3,8 @@
 #include "ActorBaseTick.hpp"
 #include <filesystem>
 #include <fstream>
+#include "Events/EventManager.hpp"
+#include "Events/Events.hpp"
 
 std::string RaknetTickHook::towriteip = "";
 

@@ -7,6 +7,7 @@
 #include "Modules/MovableDayCounter/MovableDayCounter.hpp"
 #include "Modules/MovableHotbar/MovableHotbar.hpp"
 #include "Modules/MovableScoreboard/MovableScoreboard.hpp"
+#include "Events/EventManager.hpp"
 
 void GuiScale::onEnable() {
     restored = false;

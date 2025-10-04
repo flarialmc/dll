@@ -23,6 +23,7 @@
 #include "Hook/Hooks/Render/DirectX/DXGI/SwapchainHook.hpp"
 #include "Modules/Subtitles/Subtitles.hpp"
 #include "Utils/Utils.hpp"
+#include "Events/EventManager.hpp"
 
 
 void JavaDebugMenu::onEnable() {

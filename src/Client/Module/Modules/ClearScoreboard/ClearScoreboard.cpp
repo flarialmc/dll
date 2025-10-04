@@ -1,4 +1,5 @@
 #include "ClearScoreboard.hpp"
+#include "Events/EventManager.hpp"
 
 void ClearScoreboard::onEnable() {
     targetControl = nullptr;
