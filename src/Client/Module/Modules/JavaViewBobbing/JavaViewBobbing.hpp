@@ -1,5 +1,6 @@
 #pragma once
 #include "../Module.hpp"
+#include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
 #include <chrono>
 #include <algorithm>
 

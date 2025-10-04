@@ -1,4 +1,5 @@
 #include "PlayerNotifier.hpp"
+#include "SDK/Client/Actor/LocalPlayer.hpp"
 
 void PlayerNotifier::defaultConfig() {
 	getKeybind();

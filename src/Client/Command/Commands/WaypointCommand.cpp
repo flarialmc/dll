@@ -2,6 +2,7 @@
 
 #include "../../Module/Manager.hpp"
 #include "../../Module/Modules/Waypoints/Waypoints.hpp"
+#include "../../../SDK/Client/Actor/LocalPlayer.hpp"
 
 bool WaypointCommand::checkValid(const std::string& s) {
     if (s.empty()) return false;

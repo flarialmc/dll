@@ -1,4 +1,7 @@
 #include <numbers>
+#include "../../../../SDK/Client/Block/BlockSource.hpp"
+#include "../../../../SDK/Client/Render/GuiData.hpp"
+#include "../../../../SDK/Client/Level/Dimension.hpp"
 #include <cmath>
 #include <algorithm>
 #include <deque>

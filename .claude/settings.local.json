@@ -22,7 +22,19 @@
       "WebFetch(domain:www.gamedev.net)",
       "Bash(timeout:*)",
       "Bash(.build.bat)",
-      "Bash(\"C:\\Users\\admin\\AppData\\Local\\Programs\\Python\\Python313\\python.exe\" \"D:\\Documents\\New Github\\dll\\add_offset_include.py\")"
+      "Bash(\"C:\\Users\\admin\\AppData\\Local\\Programs\\Python\\Python313\\python.exe\" \"D:\\Documents\\New Github\\dll\\add_offset_include.py\")",
+      "Bash(build.bat D -nr)",
+      "Bash(./build.bat D -nr)",
+      "Bash(./build.bat D)",
+      "Bash(for file in \"HitPing\" \"InstantHurtAnimation\" \"InventoryHUD\" \"InventoryLock\" \"JavaDynamicFOV\" \"LowHealthIndicator\")",
+      "Bash(do)",
+      "Bash(filepath=\"D:/Documents/New Github/dll/src/Client/Module/Modules/$file/$file.cpp\")",
+      "Bash(if [ -f \"$filepath\" ])",
+      "Bash(then)",
+      "Bash(if ! grep -q \"SDK/Client/Actor/LocalPlayer.hpp\" \"$filepath\")",
+      "Bash(echo \"Fixed: $file\")",
+      "Bash(fi)",
+      "Bash(done)"
     ],
     "deny": []
   }

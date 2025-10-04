@@ -2,7 +2,8 @@
 
 #include "BetterHungerBar.hpp"
 
-
+#include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
+#include "../../../../SDK/Client/Render/GuiData.hpp"
 #include "Events/Game/TickEvent.hpp"
 #include <Client.hpp>
 #include "Utils/Render/PositionUtils.hpp"

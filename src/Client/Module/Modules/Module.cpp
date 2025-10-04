@@ -1,4 +1,5 @@
 #include "Module.hpp"
+#include "../../../SDK/Client/Render/GuiData.hpp"
 #include "Utils/UserActionLogger.hpp"
 
 #include "../../Client.hpp"

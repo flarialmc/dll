@@ -1,5 +1,6 @@
 #include "ZeqaUtils.hpp"
 #include "Client.hpp"
+#include "SDK/Client/Network/Packet/LoopbackPacketSender.hpp"
 
 #include <lib/json/json.hpp>
 

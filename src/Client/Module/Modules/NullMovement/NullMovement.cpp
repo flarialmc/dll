@@ -1,5 +1,5 @@
 #include "NullMovement.hpp"
-
+#include "SDK/Client/Actor/LocalPlayer.hpp"
 
 #include "Hook/Hooks/Input/KeyHook.hpp"
 

@@ -1,4 +1,5 @@
 #include "GuiScale.hpp"
+#include "../../../../SDK/Client/Render/GuiData.hpp"
 
 
 #include "Modules/MovableBossbar/MovableBossbar.hpp"

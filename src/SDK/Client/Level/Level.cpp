@@ -4,6 +4,7 @@
 
 #include "../../SDK.hpp"
 #include "../Actor/Components/ActorOwnerComponent.hpp"
+#include "SDK/Client/Actor/LocalPlayer.hpp"
 
 std::vector<Actor *> Level::getRuntimeActorList() {
     // TODO prevent crashing !!!

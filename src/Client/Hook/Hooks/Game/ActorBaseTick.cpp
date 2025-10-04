@@ -3,6 +3,7 @@
 #include "../../../Client.hpp"
 #include "Events/Game/TickEvent.hpp"
 #include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
+#include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
 
 void ActorBaseTick::enableHook() {
 

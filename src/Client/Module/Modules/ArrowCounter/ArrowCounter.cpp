@@ -1,6 +1,6 @@
 #include "ArrowCounter.hpp"
 
-
+#include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
 #include "Events/Game/TickEvent.hpp"
 
 

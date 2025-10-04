@@ -1,5 +1,6 @@
 #include "Waila.hpp"
 #include "Client.hpp"
+#include "SDK/Client/Actor/LocalPlayer.hpp"
 
 
 void Waila::onEnable()

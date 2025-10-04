@@ -1,6 +1,8 @@
+#include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
 #include "HitPing.hpp"
 
 
+#include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
 #include "SDK/Client/Network/Packet/EntityEventPacket.hpp"
 
 void HitPing::onEnable() {

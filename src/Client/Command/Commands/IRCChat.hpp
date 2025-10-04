@@ -6,6 +6,7 @@
 #include <iostream>
 #include <string>
 #include <thread>
+#include "../../../SDK/Client/Actor/LocalPlayer.hpp"
 
 #define SERVER_IP "150.136.39.248"
 #define SERVER_PORT 5010

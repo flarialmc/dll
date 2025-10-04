@@ -3,6 +3,7 @@
 #include "SDK.hpp"
 #include "Utils/UserActionLogger.hpp"
 #include "../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
+#include "Client/Network/Raknet/RaknetConnector.hpp"
 #include <cctype>
 
 ClientInstance *SDK::clientInstance = nullptr;

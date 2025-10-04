@@ -1,6 +1,7 @@
 #include "SkinStealCommand.hpp"
 
 #include <Utils/WinrtUtils.hpp>
+#include "../../../SDK/Client/Actor/LocalPlayer.hpp"
 
 #ifndef SVPNG_LINKAGE
 #define SVPNG_LINKAGE

@@ -1,4 +1,5 @@
 #include "EntityCounter.hpp"
+#include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
 
 
 void EntityCounter::onEnable() {

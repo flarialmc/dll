@@ -1,6 +1,9 @@
+#include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
+#include "../../../../SDK/Client/Render/GuiData.hpp"
 #include "InventoryHUD.hpp"
 
 
+#include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
 #include "Modules/ClickGUI/ClickGUI.hpp"
 #include "SDK/Client/Render/BaseActorRenderContext.hpp"
 #include "Utils/Render/PositionUtils.hpp"

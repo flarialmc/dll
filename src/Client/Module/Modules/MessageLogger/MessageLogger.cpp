@@ -1,4 +1,6 @@
 #include "MessageLogger.hpp"
+#include "../../../../SDK/Client/Render/GuiData.hpp"
+#include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
 
 
 void MessageLogger::onEnable() {

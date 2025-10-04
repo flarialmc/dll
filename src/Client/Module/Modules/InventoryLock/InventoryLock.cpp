@@ -1,4 +1,6 @@
+#include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
 #include "InventoryLock.hpp"
+#include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
 #include "Events/EventManager.hpp"
 #include "Events/Events.hpp"
 

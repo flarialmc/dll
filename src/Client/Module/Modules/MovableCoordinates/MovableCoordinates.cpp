@@ -1,4 +1,5 @@
 #include "MovableCoordinates.hpp"
+#include "../../../../SDK/Client/Render/GuiData.hpp"
 
 #include "Modules/ClickGUI/ClickGUI.hpp"
 #include "SDK/Client/Core/Options.hpp"

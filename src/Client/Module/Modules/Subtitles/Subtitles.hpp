@@ -3,6 +3,7 @@
 #include "SoundDescriptions.hpp"
 #include "Events/Game/SoundEnginePlayEvent.hpp"
 #include "Utils/Utils.hpp"
+#include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
 
 struct Sound {
     std::string name;

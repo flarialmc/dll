@@ -2,6 +2,7 @@
 
 #include <utility>
 #include "../../SDK/SDK.hpp"
+#include "../../SDK/Client/Render/GuiData.hpp"
 
 class Command {
 public:

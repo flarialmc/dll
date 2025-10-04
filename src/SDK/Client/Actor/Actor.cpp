@@ -8,6 +8,7 @@
 #include "Components/OnGroundFlagComponent.hpp"
 #include "EntityContext.hpp"
 #include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
+#include "LocalPlayer.hpp"
 
 template<typename Component>
 Component *Actor::tryGet(uintptr_t addr) {

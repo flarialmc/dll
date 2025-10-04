@@ -1,3 +1,4 @@
+#include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
 #include "JavaDynamicFOV.hpp"
 
 void JavaDynamicFOV::onEnable() {

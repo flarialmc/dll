@@ -1,4 +1,5 @@
 #include "AutoPerspective.hpp"
+#include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
 
 void AutoPerspective::onEnable() {
     Listen(this, PerspectiveEvent, &AutoPerspective::onGetViewPerspective)

@@ -1,4 +1,5 @@
 #include "Keystrokes.hpp"
+#include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
 
 
 #include "Modules/ClickGUI/ClickGUI.hpp"

@@ -1,4 +1,5 @@
 #include "RealMotionBlurHelper.hpp"
+#include "../../../../SDK/Client/Render/Matrix.hpp"
 #include <d3dcompiler.h>
 #include <windows.h>
 #include <unknwn.h>

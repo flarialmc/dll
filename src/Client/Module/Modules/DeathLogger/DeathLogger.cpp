@@ -1,4 +1,8 @@
 #include "DeathLogger.hpp"
+#include "../../../../SDK/Client/Level/Dimension.hpp"
+#include "../../../../SDK/Client/Render/GuiData.hpp"
+#include "../../../../SDK/Client/Block/BlockSource.hpp"
+#include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
 
 
 #include "Modules/Waypoints/Waypoints.hpp"

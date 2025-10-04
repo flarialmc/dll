@@ -1,4 +1,5 @@
 #include "Hitbox.hpp"
+#include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
 
 void Hitbox::onEnable() {
     Listen(this, SetupAndRenderEvent, &Hitbox::onSetupAndRender)

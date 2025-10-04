@@ -1,4 +1,5 @@
 #include "BowSensitivity.hpp"
+#include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
 
 
 void BowSensitivity::onEnable() {

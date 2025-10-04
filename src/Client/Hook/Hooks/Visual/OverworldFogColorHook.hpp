@@ -4,6 +4,8 @@
 #include "../../../../Utils/Memory/Memory.hpp"
 #include "../../../../Utils/Utils.hpp"
 
+class Dimension;
+
 class OverworldFogColorHook : public Hook {
 private:
 

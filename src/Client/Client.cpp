@@ -9,6 +9,7 @@
 #include <Utils/WinrtUtils.hpp>
 
 #include "Command/CommandManager.hpp"
+#include "../SDK/Client/Actor/LocalPlayer.hpp"
 
 #include <winrt/Windows.UI.Core.h>
 #include <winrt/Windows.Foundation.h>
@@ -22,6 +23,14 @@
 
 #include "../Assets/Assets.hpp"
 #include "Events/Misc/ProtocolEvent.hpp"
+#include "Hook/Manager.hpp"
+#include "Module/Manager.hpp"
+#include "Config/Settings.hpp"
+#include "Utils/Utils.hpp"
+#include <iostream>
+#include <fstream>
+#include <sstream>
+
 
 namespace winrt
 {
@@ -33,13 +42,6 @@ namespace winrt
 
 Settings Client::settings = Settings();
 Settings Client::legacySettings = Settings();
-#include "Hook/Manager.hpp"
-#include "Module/Manager.hpp"
-#include "Config/Settings.hpp"
-#include "Utils/Utils.hpp"
-#include <iostream>
-#include <fstream>
-#include <sstream>
 
 
 bool notifiedOfConnectionIssue = false;

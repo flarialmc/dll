@@ -1,4 +1,5 @@
 #include "ForceCoords.hpp"
+#include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
 
 void ForceCoords::onEnable() {
     Listen(this, RenderEvent, &ForceCoords::onRender)

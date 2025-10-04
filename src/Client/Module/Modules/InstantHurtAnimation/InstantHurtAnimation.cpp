@@ -1,5 +1,7 @@
+#include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
 #include "InstantHurtAnimation.hpp"
 
+#include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
 #include "Client.hpp"
 #include "SDK/Client/Network/Packet/EntityEventPacket.hpp"
 

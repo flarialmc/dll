@@ -1,7 +1,8 @@
 #include "ArmorHUD.hpp"
 
 #include "Manager.hpp"
-
+#include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
+#include "../../../../SDK/Client/Render/GuiData.hpp"
 #include "Modules/ClickGUI/ClickGUI.hpp"
 
 void ArmorHUD::onEnable() {

@@ -1,4 +1,5 @@
 #include "CompactChat.hpp"
+#include "../../../../SDK/Client/Render/GuiData.hpp"
 
 
 #include "SDK/Client/Render/GuiMessage.hpp"

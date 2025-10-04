@@ -1,4 +1,5 @@
 #include "MovableHotbar.hpp"
+#include "../../../../SDK/Client/Render/GuiData.hpp"
 
 
 void MovableHotbar::onEnable() {

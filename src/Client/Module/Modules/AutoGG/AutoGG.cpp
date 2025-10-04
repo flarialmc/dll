@@ -1,4 +1,6 @@
 #include "AutoGG.hpp"
+#include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
+#include "../../../../SDK/Client/Network/Packet/LoopbackPacketSender.hpp"
 
 
 

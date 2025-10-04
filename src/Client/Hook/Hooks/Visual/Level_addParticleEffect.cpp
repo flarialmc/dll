@@ -1,6 +1,7 @@
 #include "Level_addParticleEffect.hpp"
 
 #include "SDK/SDK.hpp"
+#include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
 
 #include <random> // for random offsets
 

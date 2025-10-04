@@ -1,4 +1,5 @@
 #include "SpeedDisplay.hpp"
+#include "SDK/Client/Actor/LocalPlayer.hpp"
 
 
 void SpeedDisplay::onEnable()

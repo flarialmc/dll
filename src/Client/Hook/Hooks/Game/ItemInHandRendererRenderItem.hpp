@@ -2,6 +2,8 @@
 
 #include "../Hook.hpp"
 #include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
+#include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
+#include "../../../../SDK/Client/Render/Camera.hpp"
 
 /* dont be misled by the name this function is still used for items
  * other than the ones in the players hands (mojang being weird ig)

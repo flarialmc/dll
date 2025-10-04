@@ -1,4 +1,6 @@
 #include "CustomCrosshair.hpp"
+#include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
+#include "../../../../SDK/Client/Core/MinecraftGame.hpp"
 #include "Client.hpp"
 
 #include "Utils/Render/PositionUtils.hpp"

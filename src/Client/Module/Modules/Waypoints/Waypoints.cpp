@@ -1,6 +1,9 @@
 #include "Waypoints.hpp"
 #include "Client.hpp"
 #include "Manager.hpp"
+#include "SDK/Client/Actor/LocalPlayer.hpp"
+#include "SDK/Client/Block/BlockSource.hpp"
+#include "SDK/Client/Render/Matrix.hpp"
 
 #include <Utils/Render/DrawUtil3D.hpp>
 #include "Utils/Render/MaterialUtils.hpp"

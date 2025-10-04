@@ -6,6 +6,7 @@
 
 #include "Hook/Hooks/Render/DirectX/DXGI/SwapchainHook.hpp"
 #include "Modules/Misc/ScriptMarketplace/ScriptMarketplace.hpp"
+#include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
 
 std::chrono::time_point<std::chrono::high_resolution_clock> ClickGUI::favoriteStart;
 

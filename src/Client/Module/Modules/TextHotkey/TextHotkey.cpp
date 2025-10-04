@@ -1,4 +1,6 @@
 #include "TextHotkey.hpp"
+#include "SDK/Client/Actor/LocalPlayer.hpp"
+#include "SDK/Client/Network/Packet/LoopbackPacketSender.hpp"
 
 
 void TextHotkey::onEnable() {

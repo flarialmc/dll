@@ -1,4 +1,5 @@
 #include "MovableBossbar.hpp"
+#include "../../../../SDK/Client/Render/GuiData.hpp"
 
 
 void MovableBossbar::onEnable() {

@@ -1,4 +1,7 @@
 #include "Coordinates.hpp"
+#include "../../../../SDK/Client/Block/BlockSource.hpp"
+#include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
+#include "../../../../SDK/Client/Block/BlockSource.hpp"
 #include <cmath>
 
 

@@ -1,4 +1,5 @@
 #include "HiveStat.hpp"
+#include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
 
 #include <thread>
 #include <vector>

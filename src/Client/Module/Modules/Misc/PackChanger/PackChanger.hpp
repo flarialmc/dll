@@ -1,6 +1,7 @@
 #pragma once
 
 #include "src/Client/Module/Modules/Module.hpp"
+#include "../../../../../SDK/Client/Core/MinecraftGame.hpp"
 
 class PackChanger : public Listener {
 private:

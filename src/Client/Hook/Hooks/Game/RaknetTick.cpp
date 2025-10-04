@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <fstream>
 #include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
+#include "../../../../SDK/Client/Network/Raknet/RakPeer.h"
 
 std::string RaknetTickHook::towriteip = "";
 

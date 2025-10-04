@@ -5,6 +5,7 @@
 #include <Utils/Memory/Memory.hpp>
 #include <SDK/Client/Actor/Components/ActorOwnerComponent.hpp>
 #include "../../SDK.hpp"
+#include "SDK/Client/Actor/LocalPlayer.hpp"
 
 Actor *HitResult::getEntity() {
     static uintptr_t sig = NULL;

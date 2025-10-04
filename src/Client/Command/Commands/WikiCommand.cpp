@@ -2,6 +2,7 @@
 #include "../../Module/Manager.hpp"
 
 #include <Utils/WinrtUtils.hpp>
+#include "../../../SDK/Client/Actor/LocalPlayer.hpp"
 
 
 void WikiCommand::execute(const std::vector<std::string> &args) {

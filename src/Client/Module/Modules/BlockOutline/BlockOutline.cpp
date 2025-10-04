@@ -1,6 +1,6 @@
 #include "BlockOutline.hpp"
 
-
+#include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
 #include "Events/Render/RenderOutlineSelectionEvent.hpp"
 
 void BlockOutline::onEnable() {

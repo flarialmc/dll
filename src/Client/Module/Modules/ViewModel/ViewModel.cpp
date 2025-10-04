@@ -1,5 +1,7 @@
 #include "ViewModel.hpp"
 #include "Client.hpp"
+#include "SDK/Client/Actor/LocalPlayer.hpp"
+#include "SDK/Client/Render/Camera.hpp"
 
 #include "glm/glm/ext/matrix_transform.hpp"
 

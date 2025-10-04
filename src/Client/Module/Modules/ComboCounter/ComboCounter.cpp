@@ -1,6 +1,6 @@
 #include "ComboCounter.hpp"
 
-
+#include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
 #include "Events/Game/TickEvent.hpp"
 #include "Events/Render/RenderEvent.hpp"
 

@@ -1,4 +1,5 @@
 #include "MumbleLink.hpp"
+#include "SDK/Client/Actor/LocalPlayer.hpp"
 
 
 void MumbleLink::onEnable()

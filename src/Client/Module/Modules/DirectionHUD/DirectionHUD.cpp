@@ -1,4 +1,6 @@
 #include "DirectionHUD.hpp"
+#include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
+#include "../../../../SDK/Client/Block/BlockSource.hpp"
 
 #include "Modules/ClickGUI/ClickGUI.hpp"
 #include "Modules/Waypoints/Waypoints.hpp"

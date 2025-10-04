@@ -3,6 +3,7 @@
 #include "GUI/Engine/EngineImGui.hpp"
 #include "Hook/Hooks/Game/PacketHooks.hpp"
 #include "SDK/Client/Network/Packet/AnimatePacket.hpp"
+#include "SDK/Client/Actor/LocalPlayer.hpp"
 
 
 void ParticleMultiplier::onEnable() {

@@ -1,6 +1,6 @@
 #include "ChunkBorder.hpp"
 
-
+#include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
 #include "Events/Render/Render3DEvent.hpp"
 #include <Utils/Render/DrawUtil3D.hpp>
 #include "Utils/Render/MaterialUtils.hpp"

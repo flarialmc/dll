@@ -1,4 +1,5 @@
 #include "TNTTimer.hpp"
+#include "SDK/Client/Actor/LocalPlayer.hpp"
 
 #include "../Nick/NickModule.hpp"
 

@@ -1,4 +1,5 @@
 #include "PotCounter.hpp"
+#include "SDK/Client/Actor/LocalPlayer.hpp"
 
 
 

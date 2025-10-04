@@ -1,6 +1,7 @@
 #include "BlockHit.hpp"
 
-
+#include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
+#include "../../../../SDK/Client/Render/Camera.hpp"
 #include "glm/glm/ext/matrix_transform.hpp"
 
 void BlockHit::onEnable() {

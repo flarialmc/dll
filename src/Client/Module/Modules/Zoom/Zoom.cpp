@@ -1,4 +1,5 @@
 #include "Zoom.hpp"
+#include "SDK/Client/Actor/LocalPlayer.hpp"
 
 
 void Zoom::onEnable() {

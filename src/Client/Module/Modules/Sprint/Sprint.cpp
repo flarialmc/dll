@@ -1,5 +1,5 @@
 #include "Sprint.hpp"
-
+#include "SDK/Client/Actor/LocalPlayer.hpp"
 
 #include "Modules/Sneak/Sneak.hpp"
 

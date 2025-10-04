@@ -5,6 +5,8 @@
 #include "Command/Commands/SkinStealCommand.hpp"
 
 #include "SDK/Client/Network/Packet/PlayerSkinPacket.hpp"
+#include "SDK/Client/Actor/LocalPlayer.hpp"
+#include "SDK/Client/Network/Packet/LoopbackPacketSender.hpp"
 
 std::vector<std::shared_ptr<Packet> > SkinStealer::inFlightPackets;
 

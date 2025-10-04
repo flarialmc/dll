@@ -7,6 +7,7 @@
 #include "nes/event_dispatcher.hpp"
 #include "SDK/SDK.hpp"
 #include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
+#include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
 
 void ActorDropItem::enableHook() {
 

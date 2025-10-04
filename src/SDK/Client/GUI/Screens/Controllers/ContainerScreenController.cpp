@@ -5,6 +5,7 @@
 #include <Utils/Memory/Memory.hpp>
 #include <SDK/SDK.hpp>
 #include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
+#include "SDK/Client/Actor/LocalPlayer.hpp"
 
 ItemStack *ContainerScreenController::getContainerItem(ContainerEnum type, int slot) {
     auto lp = SDK::clientInstance->getLocalPlayer();
