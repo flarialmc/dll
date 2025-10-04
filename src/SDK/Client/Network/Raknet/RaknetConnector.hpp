@@ -1,7 +1,11 @@
 #pragma once
 
-#include "RakPeer.h"
 #include <Utils/Memory/Memory.hpp>
+#include <string>
+#include <cstdint>
+
+// Forward declaration
+class RakPeer;
 
 class RaknetConnector {
 public:

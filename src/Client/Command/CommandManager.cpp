@@ -41,7 +41,7 @@ void CommandManager::initialize() {
     Commands.push_back(std::make_unique<FixFontCommand>());
     Commands.push_back(std::make_unique<WaypointCommand>());
     //Commands.push_back(std::make_unique<IRCChat>());
-Listen(&CommandManager::instance, PacketSendEvent, &CommandManager::onPacket);
+    Listen(&CommandManager::instance, PacketSendEvent, &CommandManager::onPacket);
 }
 
 void CommandManager::onPacket(PacketSendEvent &event) {

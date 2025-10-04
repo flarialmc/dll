@@ -1,37 +1,35 @@
 #pragma once
 
-#include "../Actor/LocalPlayer.hpp"
-#include "MinecraftGame.hpp"
-#include "../Block/BlockSource.hpp"
-#include "../Render/GuiData.hpp"
 #include <cstdint>
-#include "../../../Utils/Memory/Memory.hpp"
-#include "../Network/Packet/LoopbackPacketSender.hpp"
-#include "Minecraft.hpp"
-#include "../Render/GLMatrix.hpp"
-#include "../Level/LevelRender/LevelRender.hpp"
-#include "../Network/Raknet/RaknetConnector.hpp"
-#include "../Render/Camera.hpp"
+#include <string>
+
+// Forward declarations
+class LocalPlayer;
+class MinecraftGame;
+class BlockSource;
+class GuiData;
+class LoopbackPacketSender;
+class RaknetConnector;
+class LevelRender;
+
+struct GLMatrix;
+
+namespace mce {
+    class Camera;
+}
+
+template<typename T>
+struct Vec2;
 
 class ClientInstance {
 public:
-    MinecraftGame* getMinecraftGame() {
-        // if (!SDK::clientInstance) return nullptr;
-        return hat::member_at<MinecraftGame*>(this, GET_OFFSET("ClientInstance::minecraftGame"));
-    };
+    MinecraftGame* getMinecraftGame();
 
-    GuiData *getGuiData() {
-        return hat::member_at<GuiData*>(this, GET_OFFSET("ClientInstance::guiData"));
-    };
+    GuiData *getGuiData();
 
-    GLMatrix getViewMatrix() {
-        return hat::member_at<GLMatrix>(this, GET_OFFSET("ClientInstance::viewMatrix"));
-    };
+    GLMatrix getViewMatrix();
 
-    mce::Camera& getCamera() {
-        static int off = GET_OFFSET("ClientInstance::camera");
-        return hat::member_at<mce::Camera>(this, off);
-    }
+    mce::Camera& getCamera();
 
     LocalPlayer *getLocalPlayer();
 
@@ -47,38 +45,15 @@ public:
 
     LevelRender *getLevelRender();
 
-    float getFovX() {
-        if (!VersionUtils::checkAboveOrEqual(21, 110)) return hat::member_at<float>(this, GET_OFFSET("ClientInstance::getFovX"));
+    float getFovX();
 
-        if (this->getLevelRender()) if (this->getLevelRender()->getLevelRendererPlayer())
-        return this->getLevelRender()->getLevelRendererPlayer()->getFovX();
+    float getFovY();
 
-        return 0.0f;
-    };
+    Vec2<float> getFov();
 
-    float getFovY() {
-        if (!VersionUtils::checkAboveOrEqual(21, 110)) return hat::member_at<float>(this, GET_OFFSET("ClientInstance::getFovY"));
+    LoopbackPacketSender *getPacketSender();
 
-        if (this->getLevelRender()) if (this->getLevelRender()->getLevelRendererPlayer())
-        return this->getLevelRender()->getLevelRendererPlayer()->getFovY();
-
-        return 0.0f;
-    };
-
-    Vec2<float> getFov() {
-        return Vec2<float>{getFovX(), getFovY()};
-    };
-
-    LoopbackPacketSender *getPacketSender() {
-        return hat::member_at<LoopbackPacketSender *>(this, GET_OFFSET("ClientInstance::getPacketSender"));
-    }
-
-    RaknetConnector *getRakNetConnector() {
-        if (getPacketSender() == nullptr)
-            return nullptr;
-
-        return getPacketSender()->networkSystem->remoteConnectorComposite->rakNetConnector;
-    }
+    RaknetConnector *getRakNetConnector();
 
     void _updateScreenSizeVariables(Vec2<float> *totalScreenSize, Vec2<float> *safeZone, float forcedGuiScale);
 };
