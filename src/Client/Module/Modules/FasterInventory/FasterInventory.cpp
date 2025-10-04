@@ -1,4 +1,5 @@
 #include "FasterInventory.hpp"
+#include <GUI/Engine/EngineImGui.hpp>
 
 #include "Hook/Hooks/Game/PacketHooks.hpp"
 

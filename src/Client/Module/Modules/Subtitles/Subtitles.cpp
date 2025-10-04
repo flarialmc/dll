@@ -1,4 +1,5 @@
 #include "Subtitles.hpp"
+#include <GUI/Engine/Engine.hpp>
 #include "SoundDescriptions.hpp"
 
 #include "Events/Game/SoundEnginePlayEvent.hpp"

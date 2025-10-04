@@ -1,4 +1,5 @@
 #include "MessageLogger.hpp"
+#include <GUI/Engine/EngineImGui.hpp>
 #include "../../../../SDK/Client/Render/GuiData.hpp"
 #include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
 

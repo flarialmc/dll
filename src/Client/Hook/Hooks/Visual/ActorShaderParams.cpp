@@ -28,5 +28,5 @@ void ActorShaderParamsHook::ActorShaderParamsCallback(
     auto event = nes::make_holder<ActorShaderParamsEvent>(overlay, changeColor, glintColor);
     eventMgr.trigger(event);
 
-    return funcOriginal(screenContext, entityContext, entity, event->getOverlay(), event->getChangeColor(), changeColor2, event->getGlintColor(), uvOffset1, uvOffset2, uvRot1, uvRot2, glintUVScale, uvAnim, brightness, lightEmission);
+    //return funcOriginal(screenContext, entityContext, entity, event->getOverlay(), event->getChangeColor(), changeColor2, event->getGlintColor(), uvOffset1, uvOffset2, uvRot1, uvRot2, glintUVScale, uvAnim, brightness, lightEmission);
 }

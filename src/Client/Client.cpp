@@ -30,6 +30,8 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <GUI/D2D.hpp>
+#include <GUI/Engine/EngineImGui.hpp>
 
 
 namespace winrt

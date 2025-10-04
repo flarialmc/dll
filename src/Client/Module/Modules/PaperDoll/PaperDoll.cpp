@@ -1,4 +1,5 @@
 #include "PaperDoll.hpp"
+#include <GUI/Engine/EngineImGui.hpp>
 
 
 #include "Modules/ClickGUI/ClickGUI.hpp"

@@ -1,4 +1,7 @@
 #include "BowSensitivity.hpp"
+#include <SDK/Client/Item/Item.hpp>
+#include <SDK/Client/Container/PlayerInventory.hpp>
+#include <GUI/Engine/EngineImGui.hpp>
 #include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
 
 

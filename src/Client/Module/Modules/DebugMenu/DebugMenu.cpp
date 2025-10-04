@@ -1,4 +1,9 @@
 #include <numbers>
+#include <SDK/Client/Actor/Gamemode.hpp>
+#include <SDK/Client/Block/Block.hpp>
+#include <SDK/Client/Actor/Components/StateVectorComponent.hpp>
+#include <SDK/Client/Level/Level.hpp>
+#include <GUI/Engine/EngineImGui.hpp>
 #include "../../../../SDK/Client/Block/BlockSource.hpp"
 #include "../../../../SDK/Client/Render/GuiData.hpp"
 #include "../../../../SDK/Client/Level/Dimension.hpp"

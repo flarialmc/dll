@@ -1,4 +1,5 @@
 #include "SkinStealer.hpp"
+#include <GUI/Engine/EngineImGui.hpp>
 
 #include <utility>
 
@@ -7,6 +8,8 @@
 #include "SDK/Client/Network/Packet/PlayerSkinPacket.hpp"
 #include "SDK/Client/Actor/LocalPlayer.hpp"
 #include "SDK/Client/Network/Packet/LoopbackPacketSender.hpp"
+#include <SDK/Client/Level/Level.hpp>
+#include <SDK/Client/Level/HitResult.hpp>
 
 std::vector<std::shared_ptr<Packet> > SkinStealer::inFlightPackets;
 

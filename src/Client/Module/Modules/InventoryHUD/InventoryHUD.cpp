@@ -1,12 +1,16 @@
-#include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
-#include "../../../../SDK/Client/Render/GuiData.hpp"
 #include "InventoryHUD.hpp"
+#include <SDK/Client/Container/PlayerInventory.hpp>
+#include <SDK/Client/Render/MinecraftUIRenderContext.hpp>
+#include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
+#include <GUI/Engine/EngineImGui.hpp>
+#include "../../../../SDK/Client/Render/GuiData.hpp"
 
 
 #include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
 #include "Modules/ClickGUI/ClickGUI.hpp"
 #include "SDK/Client/Render/BaseActorRenderContext.hpp"
 #include "Utils/Render/PositionUtils.hpp"
+#include <SDK/Client/Item/ItemStack.hpp>
 
 void InventoryHUD::onEnable() {
     Listen(this, RenderEvent, &InventoryHUD::onRender)

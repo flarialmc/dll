@@ -1,4 +1,7 @@
 #include "ArmorHUD.hpp"
+#include <SDK/Client/Render/MinecraftUIRenderContext.hpp>
+#include <SDK/Client/Container/PlayerInventory.hpp>
+#include <GUI/Engine/Engine.hpp>
 
 #include "Manager.hpp"
 #include "../../../../SDK/Client/Actor/LocalPlayer.hpp"

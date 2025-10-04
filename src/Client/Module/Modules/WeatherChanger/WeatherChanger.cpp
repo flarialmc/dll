@@ -1,6 +1,8 @@
 #include "WeatherChanger.hpp"
+#include <GUI/Engine/EngineImGui.hpp>
 #include "Client.hpp"
 #include "SDK/Client/Block/BlockSource.hpp"
+#include <SDK/Client/Level/Dimension.hpp>
 
 
 

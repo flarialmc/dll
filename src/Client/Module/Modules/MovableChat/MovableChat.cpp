@@ -1,4 +1,5 @@
 #include "MovableChat.hpp"
+#include <GUI/Engine/EngineImGui.hpp>
 #include "../../../../SDK/Client/Render/GuiData.hpp"
 
 #include "Modules/ClickGUI/ClickGUI.hpp"

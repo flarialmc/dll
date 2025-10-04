@@ -5,8 +5,10 @@
 #include <vector>
 #include <algorithm>
 #include <initializer_list>
+#include <unordered_map>
 
 #include "../../../../Assets/Assets.hpp"
+#include "../../../../SDK/Client/Level/Level.hpp"
 
 struct TabListEntry {
     bool valid = false;

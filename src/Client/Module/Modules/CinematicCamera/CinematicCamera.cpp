@@ -1,4 +1,5 @@
 #include "CinematicCamera.hpp"
+#include <GUI/Engine/EngineImGui.hpp>
 
 #include "SDK/Client/Core/Options.hpp"
 

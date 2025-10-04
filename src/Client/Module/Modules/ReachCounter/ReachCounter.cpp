@@ -1,4 +1,6 @@
 #include "ReachCounter.hpp"
+#include <GUI/Engine/EngineImGui.hpp>
+#include <SDK/Client/Level/Level.hpp>
 
 
 

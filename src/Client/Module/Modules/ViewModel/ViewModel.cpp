@@ -1,4 +1,5 @@
 #include "ViewModel.hpp"
+#include <GUI/Engine/EngineImGui.hpp>
 #include "Client.hpp"
 #include "SDK/Client/Actor/LocalPlayer.hpp"
 #include "SDK/Client/Render/Camera.hpp"

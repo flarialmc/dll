@@ -1,4 +1,5 @@
 #include "BlockHit.hpp"
+#include <SDK/Client/Item/Item.hpp>
 
 #include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
 #include "../../../../SDK/Client/Render/Camera.hpp"

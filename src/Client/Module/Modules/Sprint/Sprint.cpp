@@ -1,7 +1,9 @@
 #include "Sprint.hpp"
+#include <GUI/Engine/EngineImGui.hpp>
 #include "SDK/Client/Actor/LocalPlayer.hpp"
 
 #include "Modules/Sneak/Sneak.hpp"
+#include <SDK/Client/Actor/Components/MoveInputComponent.hpp>
 
 void Sprint::onEnable() {
     Listen(this, KeyEvent, &Sprint::onKey)

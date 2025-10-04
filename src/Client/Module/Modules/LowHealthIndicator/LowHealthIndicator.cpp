@@ -1,8 +1,10 @@
 #include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
+#include <GUI/Engine/EngineImGui.hpp>
 #include "LowHealthIndicator.hpp"
 
 #include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
 #include "GUI/Engine/Constraints.hpp"
+#include <SDK/Client/Actor/Components/MobEffectsComponent.hpp>
 
 
 void LowHealthIndicator::defaultConfig()

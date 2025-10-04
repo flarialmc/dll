@@ -1,6 +1,13 @@
 // TODO: - only proceed if not in f1 screen (any idea how to do that?)
 
 #include "BetterHungerBar.hpp"
+#include <SDK/Client/Item/Item.hpp>
+#include <SDK/Client/Actor/Components/MobEffectsComponent.hpp>
+#include <SDK/Client/Actor/Components/ActorGameTypeComponent.hpp>
+#include <SDK/Client/Render/MinecraftUIRenderContext.hpp>
+#include <SDK/Client/Level/Level.hpp>
+#include <SDK/Client/Container/PlayerInventory.hpp>
+#include <GUI/Engine/EngineImGui.hpp>
 
 #include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
 #include "../../../../SDK/Client/Render/GuiData.hpp"

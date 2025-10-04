@@ -1,4 +1,5 @@
 #include "CPSCounter.hpp"
+#include <GUI/Engine/EngineImGui.hpp>
 
 #include "Client.hpp"
 #include <Modules/Misc/Input/GUIMouseListener.hpp>

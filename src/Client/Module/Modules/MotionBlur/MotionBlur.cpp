@@ -1,4 +1,5 @@
 #include "MotionBlur.hpp"
+#include <GUI/Engine/EngineImGui.hpp>
 #include "Client.hpp"
 
 

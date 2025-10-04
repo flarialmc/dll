@@ -1,4 +1,5 @@
 #include "Stopwatch.hpp"
+#include <GUI/Engine/Engine.hpp>
 
 #include "Client/GUI/Engine/Constraints.hpp"
 #include "Client.hpp"

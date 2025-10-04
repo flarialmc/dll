@@ -1,4 +1,5 @@
 #include "JavaInventoryHotkeys.hpp"
+#include <GUI/Engine/EngineImGui.hpp>
 
 
 void JavaInventoryHotkeys::onEnable() {

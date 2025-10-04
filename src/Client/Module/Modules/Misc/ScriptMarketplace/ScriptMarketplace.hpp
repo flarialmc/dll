@@ -15,6 +15,7 @@
 #include "../../../../../Utils/Logger/Logger.hpp"
 #include "curl/curl/curl.h"
 #include <Scripting/ScriptManager.hpp>
+#include <GUI/Engine/EngineImGui.hpp>
 
 class ScriptMarketplace : public Listener {
 

@@ -1,9 +1,13 @@
-#include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
 #include "InstantHurtAnimation.hpp"
+#include <SDK/Client/Actor/Components/RuntimeIDComponent.hpp>
+#include <GUI/Engine/EngineImGui.hpp>
+#include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
 
 #include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
 #include "Client.hpp"
 #include "SDK/Client/Network/Packet/EntityEventPacket.hpp"
+#include <SDK/Client/Actor/Components/ActorEquipmentComponent.hpp>
+#include <SDK/Client/Container/Inventory.hpp>
 
 void InstantHurtAnimation::onEnable() {
     Listen(this, PacketEvent, &InstantHurtAnimation::onPacketReceive)

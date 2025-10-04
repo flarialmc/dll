@@ -1,4 +1,5 @@
 #include "dvd.hpp"
+#include <GUI/Engine/EngineImGui.hpp>
 #include "Client.hpp"
 
 #include "../../../../Assets/Assets.hpp"

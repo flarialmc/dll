@@ -1,9 +1,11 @@
 #include "ParticleMultiplier.hpp"
+#include <GUI/Engine/EngineImGui.hpp>
 #include "Events/EventManager.hpp"
 #include "GUI/Engine/EngineImGui.hpp"
 #include "Hook/Hooks/Game/PacketHooks.hpp"
 #include "SDK/Client/Network/Packet/AnimatePacket.hpp"
 #include "SDK/Client/Actor/LocalPlayer.hpp"
+#include <SDK/Client/Actor/Components/RuntimeIDComponent.hpp>
 
 
 void ParticleMultiplier::onEnable() {

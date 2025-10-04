@@ -1,4 +1,5 @@
 #include "SwingAnimations.hpp"
+#include <GUI/Engine/EngineImGui.hpp>
 
 #include "glm/glm/ext/matrix_transform.hpp"
 #include "Manager.hpp"

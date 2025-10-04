@@ -1,4 +1,5 @@
 #include "DeathLogger.hpp"
+#include <GUI/Engine/EngineImGui.hpp>
 #include "../../../../SDK/Client/Level/Dimension.hpp"
 #include "../../../../SDK/Client/Render/GuiData.hpp"
 #include "../../../../SDK/Client/Block/BlockSource.hpp"

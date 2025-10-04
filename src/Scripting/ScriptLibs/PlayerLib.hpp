@@ -10,6 +10,10 @@
 #include <SDK/Client/Actor/LocalPlayer.hpp>
 #include <SDK/Client/Block/BlockSource.hpp>
 #include <SDK/Client/Network/Packet/LoopbackPacketSender.hpp>
+#include <SDK/Client/Item/Item.hpp>
+#include <SDK/Client/Container/Inventory.hpp>
+#include <SDK/Client/Container/PlayerInventory.hpp>
+#include <SDK/Client/Level/Dimension.hpp>
 
 // LuaBridge needs to link against this class.
 // Normal Actor class doesn't seem to work for me.

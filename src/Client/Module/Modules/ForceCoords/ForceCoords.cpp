@@ -1,4 +1,6 @@
 #include "ForceCoords.hpp"
+#include <SDK/Client/Actor/Components/AABBShapeComponent.hpp>
+#include <GUI/Engine/EngineImGui.hpp>
 #include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
 
 void ForceCoords::onEnable() {

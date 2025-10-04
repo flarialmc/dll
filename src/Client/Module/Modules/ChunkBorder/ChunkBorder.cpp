@@ -1,4 +1,5 @@
 #include "ChunkBorder.hpp"
+#include <GUI/Engine/EngineImGui.hpp>
 
 #include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
 #include "Events/Render/Render3DEvent.hpp"

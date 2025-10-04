@@ -1,4 +1,5 @@
 #include "ClickGUI.hpp"
+#include <SDK/Client/Level/Level.hpp>
 
 #include <random>
 #include <Scripting/ScriptManager.hpp>
@@ -7,6 +8,7 @@
 #include "Hook/Hooks/Render/DirectX/DXGI/SwapchainHook.hpp"
 #include "Modules/Misc/ScriptMarketplace/ScriptMarketplace.hpp"
 #include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
+#include <GUI/Engine/Engine.hpp>
 
 std::chrono::time_point<std::chrono::high_resolution_clock> ClickGUI::favoriteStart;
 

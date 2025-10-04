@@ -1,4 +1,5 @@
 #include "CustomCrosshair.hpp"
+#include <GUI/Engine/EngineImGui.hpp>
 #include "Manager.hpp"
 #include "../../../GUI/Engine/Engine.hpp"
 #include "Scripting/ScriptLibs/AudioLib.hpp"

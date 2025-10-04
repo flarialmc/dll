@@ -3,6 +3,9 @@
 
 #include <Utils/WinrtUtils.hpp>
 #include "../../../SDK/Client/Actor/LocalPlayer.hpp"
+#include <GUI/Engine/EngineImGui.hpp>
+#include "../../../SDK/Client/Container/PlayerInventory.hpp"
+#include "../../../SDK/Client/Item/Item.hpp"
 
 
 void WikiCommand::execute(const std::vector<std::string> &args) {

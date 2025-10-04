@@ -1,4 +1,6 @@
 #include "Keystrokes.hpp"
+#include <SDK/Client/Actor/Components/MoveInputComponent.hpp>
+#include <GUI/Engine/EngineImGui.hpp>
 #include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
 
 

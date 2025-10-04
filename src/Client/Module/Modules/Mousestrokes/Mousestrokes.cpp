@@ -1,4 +1,5 @@
 #include "Mousestrokes.hpp"
+#include <GUI/Engine/Engine.hpp>
 
 #include "Client.hpp"
 #include "Modules/ClickGUI/ClickGUI.hpp"

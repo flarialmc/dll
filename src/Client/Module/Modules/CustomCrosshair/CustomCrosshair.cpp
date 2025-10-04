@@ -1,7 +1,11 @@
 #include "CustomCrosshair.hpp"
+#include <SDK/Client/Level/HitResult.hpp>
+#include <SDK/Client/Render/MinecraftUIRenderContext.hpp>
+#include <SDK/Client/Level/Level.hpp>
 #include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
 #include "../../../../SDK/Client/Core/MinecraftGame.hpp"
 #include "Client.hpp"
+#include <GUI/Engine/EngineImGui.hpp>
 
 #include "Utils/Render/PositionUtils.hpp"
 

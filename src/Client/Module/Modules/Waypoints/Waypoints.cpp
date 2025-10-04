@@ -1,4 +1,5 @@
 #include "Waypoints.hpp"
+#include <GUI/Engine/EngineImGui.hpp>
 #include "Client.hpp"
 #include "Manager.hpp"
 #include "SDK/Client/Actor/LocalPlayer.hpp"
@@ -7,6 +8,8 @@
 
 #include <Utils/Render/DrawUtil3D.hpp>
 #include "Utils/Render/MaterialUtils.hpp"
+#include <SDK/Client/Level/Level.hpp>
+#include <SDK/Client/Level/Dimension.hpp>
 
 #include <numbers>
 #include <random>

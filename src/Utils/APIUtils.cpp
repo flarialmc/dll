@@ -12,6 +12,7 @@
 
 #include "SDK/SDK.hpp"
 #include "SDK/Client/Actor/LocalPlayer.hpp"
+#include <Client/GUI/Engine/Engine.hpp>
 
 size_t WriteCallback(void* contents, size_t size, size_t nmemb, std::string* output) {
     size_t totalSize = size * nmemb;

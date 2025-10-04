@@ -1,4 +1,5 @@
 #include "GuiScale.hpp"
+#include <GUI/Engine/EngineImGui.hpp>
 #include "../../../../SDK/Client/Render/GuiData.hpp"
 
 

@@ -1,4 +1,6 @@
 #include "EntityCounter.hpp"
+#include <SDK/Client/Level/Level.hpp>
+#include <GUI/Engine/EngineImGui.hpp>
 #include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
 
 

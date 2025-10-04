@@ -1,5 +1,7 @@
 #include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
+#include <GUI/Engine/EngineImGui.hpp>
 #include "JavaDynamicFOV.hpp"
+#include <SDK/Client/Item/ItemStack.hpp>
 
 void JavaDynamicFOV::onEnable() {
     Listen(this, FOVEvent, &JavaDynamicFOV::onGetFOV)

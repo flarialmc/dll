@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <thread>
 #include <chrono>
+#include "../../../../GUI/Engine/EngineImGui.hpp"
 
 // TODO: LIKELY REQ A FIX
 class GUIKeyListener : public Listener {

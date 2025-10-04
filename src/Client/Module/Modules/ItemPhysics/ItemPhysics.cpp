@@ -1,4 +1,5 @@
 #include "ItemPhysics.hpp"
+#include <GUI/Engine/EngineImGui.hpp>
 #include "Client.hpp"
 #include "glm/glm/ext/matrix_transform.hpp"
 #include "../../../Events/Render/ItemRendererEvent.hpp"

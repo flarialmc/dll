@@ -1,7 +1,10 @@
 #include "TNTTimer.hpp"
+#include <GUI/Engine/EngineImGui.hpp>
 #include "SDK/Client/Actor/LocalPlayer.hpp"
 
 #include "../Nick/NickModule.hpp"
+#include <SDK/Client/Level/Level.hpp>
+#include <SDK/Client/Actor/Components/SynchedActorDataComponent.hpp>
 
 void TNTTimer::onEnable() {
 	Listen(this, TickEvent, &TNTTimer::onTickEvent)

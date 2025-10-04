@@ -1,4 +1,5 @@
 #include "CommandHotkey.hpp"
+#include <GUI/Engine/EngineImGui.hpp>
 #include "../../../../SDK/Client/Network/Packet/LoopbackPacketSender.hpp"
 
 #include "Client.hpp"

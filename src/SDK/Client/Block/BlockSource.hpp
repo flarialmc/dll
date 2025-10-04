@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../../Utils/Utils.hpp"
+#include "../Level/HitResult.hpp"
 
 // Forward declarations
 class Block;

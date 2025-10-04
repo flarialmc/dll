@@ -3,6 +3,8 @@
 #include "../../../../../Module/Modules/ClickGUI/ClickGUI.hpp"
 #include "../Utils/WinrtUtils.hpp"
 #include "Utils/UserActionLogger.hpp"
+#include "../../../Engine.hpp"
+#include "../../../EngineDirectX.hpp"
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 

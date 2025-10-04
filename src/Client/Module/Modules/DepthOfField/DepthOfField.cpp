@@ -1,4 +1,5 @@
 #include "DepthOfField.hpp"
+#include <GUI/Engine/EngineImGui.hpp>
 #include "Events/EventManager.hpp"
 #include "DepthOfFieldHelper.hpp"
 #include "Hook/Hooks/Render/DirectX/DXGI/SwapchainHook.hpp"

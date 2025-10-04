@@ -1,9 +1,12 @@
 #include "PotionHUD.hpp"
+#include <GUI/Engine/EngineImGui.hpp>
 #include "SDK/Client/Actor/LocalPlayer.hpp"
 #include "SDK/Client/Render/GuiData.hpp"
 
 #include "Modules/ClickGUI/ClickGUI.hpp"
 #include "Utils/Render/PositionUtils.hpp"
+#include <SDK/Client/Actor/Components/MobEffectsComponent.hpp>
+#include <SDK/Client/Render/MinecraftUIRenderContext.hpp>
 
 
 void PotionHUD::onEnable()

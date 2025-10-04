@@ -5,6 +5,7 @@
 #include "../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 #include "Client/Network/Raknet/RaknetConnector.hpp"
 #include <cctype>
+#include <Client/GUI/Engine/Engine.hpp>
 
 ClientInstance *SDK::clientInstance = nullptr;
 ScreenView *SDK::screenView = nullptr;

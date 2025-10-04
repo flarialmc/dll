@@ -19,6 +19,8 @@
 #include <fstream>
 
 #include "Modules/Misc/ScriptMarketplace/ScriptMarketplace.hpp"
+#include <GUI/D2D.hpp>
+#include <GUI/Engine/EngineImGui.hpp>
 namespace winrt
 {
     using namespace Windows::Storage;

@@ -1,4 +1,5 @@
 #include "HiveUtils.hpp"
+#include <GUI/Engine/EngineImGui.hpp>
 
 #include "Client.hpp"
 

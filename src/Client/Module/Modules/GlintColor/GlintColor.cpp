@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Module.hpp"
+#include <GUI/Engine/EngineImGui.hpp>
 #include "Events/Render/ActorShaderParamsEvent.hpp"
 #include "GlintColor.hpp"
 
