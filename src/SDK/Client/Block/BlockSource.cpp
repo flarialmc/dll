@@ -1,4 +1,8 @@
 #include "BlockSource.hpp"
+#include "Block.hpp"
+#include "../Level/Dimension.hpp"
+#include "../Level/Biome.hpp"
+#include "../../../Utils/Memory/Memory.hpp"
 #include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 Block *BlockSource::getBlock(const BlockPos & pos) {

@@ -2,7 +2,8 @@
 
 #include "../Event.hpp"
 #include "../Cancellable.hpp"
-#include "../../../SDK/Client/Render/MinecraftUIRenderContext.hpp"
+
+class MinecraftUIRenderContext;
 
 class SetupAndRenderEvent : public Event {
 private:

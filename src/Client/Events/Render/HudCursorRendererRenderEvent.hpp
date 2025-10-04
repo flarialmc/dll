@@ -3,8 +3,9 @@
 #include "../Event.hpp"
 #include "../Cancellable.hpp"
 #include "../../../SDK/Client/GUI/RectangleArea.hpp"
-#include "../../../SDK/Client/Render/MinecraftUIRenderContext.hpp"
 #include <format>
+
+class MinecraftUIRenderContext;
 
 class HudCursorRendererRenderEvent : public Event, public Cancellable {
 private:

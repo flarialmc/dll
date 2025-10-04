@@ -1,9 +1,11 @@
 #pragma once
 
-#include "../Container/PlayerInventory.hpp"
 #include "Actor.hpp"
-#include "Gamemode.hpp"
 #include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
+
+// Forward declarations
+class PlayerInventory;
+class Gamemode;
 
 class Player : public Actor {
 public:

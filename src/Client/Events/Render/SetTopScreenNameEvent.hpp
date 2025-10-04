@@ -2,7 +2,6 @@
 
 #include "../Event.hpp"
 #include "../Cancellable.hpp"
-#include "../../../SDK/Client/Render/MinecraftUIRenderContext.hpp"
 #include "../../../SDK/SDK.hpp"
 
 class SetTopScreenNameEvent : public Event {

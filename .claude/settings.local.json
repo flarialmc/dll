@@ -34,7 +34,8 @@
       "Bash(if ! grep -q \"SDK/Client/Actor/LocalPlayer.hpp\" \"$filepath\")",
       "Bash(echo \"Fixed: $file\")",
       "Bash(fi)",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(pwsh:*)"
     ],
     "deny": []
   }

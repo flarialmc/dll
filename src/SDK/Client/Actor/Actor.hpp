@@ -2,24 +2,28 @@
 
 #include <cstdint>
 #include <string>
+#include <vector>
 #include <SDK/Client/Actor/Components/ActorRotationComponent.hpp>
-#include "../../../Utils/Memory/Memory.hpp"
-#include "../../../Utils/Logger/Logger.hpp"
-#include "Components/MoveInputComponent.hpp"
-#include "../Level/Level.hpp"
-#include "../Container/Inventory.hpp"
-#include "../../../Utils/Utils.hpp"
-#include "Components/StateVectorComponent.hpp"
-#include "Components/RenderPositionComponent.hpp"
-#include "Components/ActorEquipmentComponent.hpp"
 #include "EntityContext.hpp"
-#include "Components/ActorGameTypeComponent.hpp"
-#include "Components/AABBShapeComponent.hpp"
-#include "Components/RuntimeIDComponent.hpp"
-#include "Components/ActorDataFlagComponent.hpp"
-#include "Components/MobEffectsComponent.hpp"
-#include "Components/AttributesComponent.hpp"
-#include "Components/SynchedActorDataComponent.hpp"
+#include "../../../Utils/Utils.hpp"
+
+// Forward declarations
+class Level;
+class Inventory;
+class ItemStack;
+class SimpleContainer;
+struct MoveInputComponent;
+struct StateVectorComponent;
+struct RenderPositionComponent;
+struct ActorEquipmentComponent;
+struct ActorGameTypeComponent;
+struct AABBShapeComponent;
+struct RuntimeIDComponent;
+struct ActorDataFlagComponent;
+struct MobEffectsComponent;
+struct AttributesComponent;
+struct SynchedActorDataComponent;
+struct UnifiedMobEffectData;
 
 
 enum ActorFlags {

@@ -1,4 +1,5 @@
 #include "ItemStack.hpp"
+#include "Item.hpp"
 
 #include <Utils/VersionUtils.hpp>
 #include <Utils/Memory/Game/SignatureAndOffsetManager.hpp>

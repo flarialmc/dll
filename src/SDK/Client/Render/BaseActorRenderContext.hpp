@@ -1,9 +1,13 @@
 #pragma once
 
 #include "ItemRenderer.hpp"
-#include <SDK/Client/Core/ClientInstance.hpp>
 #include <Utils/Memory/Memory.hpp>
 #include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
+
+// Forward declarations
+class ScreenContext;
+class ClientInstance;
+class MinecraftGame;
 
 class BaseActorRenderContext {
 private:

@@ -1,4 +1,7 @@
 #include "BaseActorRenderContext.hpp"
+#include <SDK/Client/Core/ClientInstance.hpp>
+#include "ScreenContext.hpp"
+#include "../Core/MinecraftGame.hpp"
 
 BaseActorRenderContext::BaseActorRenderContext(class ScreenContext *screenCtx, ClientInstance *clientInstance,
                                                MinecraftGame *game) {

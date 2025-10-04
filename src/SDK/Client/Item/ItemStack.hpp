@@ -1,9 +1,12 @@
 #pragma once
 
-#include "Item.hpp"
 #include <SDK/Client/Core/Ref.hpp>
 #include <Utils/Memory/Memory.hpp>
 #include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
+
+// Forward declarations
+class Item;
+class Block;
 
 class ItemStack {
 public:

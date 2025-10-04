@@ -1,17 +1,17 @@
 #pragma once
 
-#include <SDK/Client/Core/ClientInstance.hpp>
 #include <SDK/Client/Core/HashedString.hpp>
-
 #include <Utils/Memory/Memory.hpp>
 #include <Utils/Utils.hpp>
-
 #include "TexturePtr.hpp"
 #include "TextureGroup.hpp"
-#include "ScreenContext.hpp"
+#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 #include <string>
-#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
+
+// Forward declarations
+class ClientInstance;
+class ScreenContext;
 
 class MinecraftUIRenderContext {
 public:
