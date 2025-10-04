@@ -394,3 +394,7 @@ Open hurt color sig, go down, open the func with 9 args under the "else", open 1
 ## SoundEngine::play
 Search for this sig: 72 0C F3 0F 5C C8 0F 2F C8 73 03 49 8B C1
 This should lead you to the function you need.
+
+## ChatScreenController::tick
+Search for this sig: 49 83 F9 0F 76 03 4C 8B 01
+This func xrefs to ChatScreenController::tick. 

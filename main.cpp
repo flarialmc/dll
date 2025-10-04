@@ -140,7 +140,7 @@ DWORD WINAPI init() {
 
         if (onlineAnnouncementElapsed >= std::chrono::minutes(10) && ModuleManager::initialized &&
             Client::settings.getSettingByName<bool>("promotions")->value) {
-            if (SDK::clientInstance and SDK::clientInstance->getGuiData() and false) //TODO: fix ts
+            if (SDK::clientInstance and SDK::clientInstance->getGuiData())
             {
                 SDK::clientInstance->getGuiData()->displayClientMessage(
                     "§khiii §r §n§l§4FLARIAL §r§khiii \n§r§cDonate to Flarial! §ehttps://flarial.xyz/donate\n§9Join our discord! §ehttps://flarial.xyz/discord"

@@ -17,7 +17,13 @@ void OffsetInit::init21110() {
     ADD_OFFSET("ContainerScreenController::_handlePlaceAll", 57);
     ADD_OFFSET("ClientInstance::camera", 0x288);
     ADD_OFFSET("ClientInstance::guiData", 0x578);
+
     ADD_OFFSET("ItemActor::stack", 0x3B0);
+    ADD_OFFSET("ClientInstance::getFovX", 0xF88);
+    ADD_OFFSET("ClientInstance::getFovY", 0xF9C);
+    ADD_OFFSET("ClientInstance::viewMatrix", 0x348);
+    ADD_OFFSET("MinecraftUIRenderContext::getTexture", 31);
+
 //
 }
 
@@ -99,7 +105,7 @@ void OffsetInit::init2170() {
     ADD_OFFSET("ClientInstance::guiData", 0x5B0);
     ADD_OFFSET("ClientInstance::getFovX", 0x748);
     ADD_OFFSET("ClientInstance::getFovY", 0x75C);
-
+//
     ADD_OFFSET("mce::Camera::worldMatrixStack", 0x40);
 
     ADD_OFFSET("MinecraftGame::textureGroup", 0x6C0);
@@ -187,6 +193,8 @@ void OffsetInit::init2150() {
     ADD_OFFSET("Dimension::weather", 0x1D0);
     ADD_OFFSET("Weather::rainLevel", 0x38);
     ADD_OFFSET("Weather::lightningLevel", 0x40);
+    ADD_OFFSET("MinecraftUIRenderContext::getTexture", 29);
+
 }
 
 void OffsetInit::init2140() {
