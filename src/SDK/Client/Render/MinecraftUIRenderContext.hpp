@@ -32,7 +32,7 @@ public:
     }
 
     TexturePtr& getTexture(TexturePtr& ptr, const ResourceLocation& location, bool forceReload) {
-        return Memory::CallVFuncI<TexturePtr&>(29, this, ptr, location, forceReload);
+        return Memory::CallVFuncI<TexturePtr&>(GET_OFFSET("MinecraftUIRenderContext::getTexture"), this, ptr, location, forceReload);
     }
 
     TexturePtr& createTexture(const std::string& path, bool external, bool forceReload) {

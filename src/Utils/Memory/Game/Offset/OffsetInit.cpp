@@ -20,6 +20,8 @@ void OffsetInit::init21110() {
     ADD_OFFSET("ClientInstance::getFovX", 0xF88);
     ADD_OFFSET("ClientInstance::getFovY", 0xF9C);
     ADD_OFFSET("ClientInstance::viewMatrix", 0x348);
+    ADD_OFFSET("MinecraftUIRenderContext::getTexture", 31);
+
 //
 }
 
@@ -189,6 +191,8 @@ void OffsetInit::init2150() {
     ADD_OFFSET("Dimension::weather", 0x1D0);
     ADD_OFFSET("Weather::rainLevel", 0x38);
     ADD_OFFSET("Weather::lightningLevel", 0x40);
+    ADD_OFFSET("MinecraftUIRenderContext::getTexture", 29);
+
 }
 
 void OffsetInit::init2140() {
