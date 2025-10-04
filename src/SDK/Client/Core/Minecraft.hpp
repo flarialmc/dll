@@ -1,3 +1,4 @@
+#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 #pragma once
 
 class Minecraft {

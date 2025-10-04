@@ -7,11 +7,11 @@
 #include "../Render/GuiData.hpp"
 #include "../../../Utils/Memory/Memory.hpp"
 #include "../Network/Packet/LoopbackPacketSender.hpp"
-#include "Minecraft.hpp"
 #include "../Render/GLMatrix.hpp"
 #include "../Level/LevelRender/LevelRender.hpp"
 #include "../Network/Raknet/RaknetConnector.hpp"
 #include "../Render/Camera.hpp"
+#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 LocalPlayer *ClientInstance::getLocalPlayer() {
     // Indig0r

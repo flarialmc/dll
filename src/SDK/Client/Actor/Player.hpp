@@ -3,6 +3,7 @@
 #include "../Container/PlayerInventory.hpp"
 #include "Actor.hpp"
 #include "Gamemode.hpp"
+#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 class Player : public Actor {
 public:

@@ -7,6 +7,7 @@
 #include "../../../Client/GUI/Engine/Engine.hpp"
 #include "Components/OnGroundFlagComponent.hpp"
 #include "EntityContext.hpp"
+#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 template<typename Component>
 Component *Actor::tryGet(uintptr_t addr) {

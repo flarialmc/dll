@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../../../Utils/Memory/Memory.hpp"
+#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 class UIComponent {
 public:

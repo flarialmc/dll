@@ -7,6 +7,7 @@
 
 #include "libhat/Access.hpp"
 #include <SDK/Client/Bedrock/EnableNonOwnerReferences.hpp>
+#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 class TextureGroup : public Bedrock::EnableNonOwnerReferences, public mce::TextureGroupBase {
 public:

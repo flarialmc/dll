@@ -3,6 +3,7 @@
 #include "Inventory.hpp"
 #include <Utils/Memory/Memory.hpp>
 #include <libhat/Access.hpp>
+#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 class PlayerInventory {
 public:

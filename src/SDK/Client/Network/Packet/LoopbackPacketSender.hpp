@@ -2,6 +2,7 @@
 
 #include "Packet.hpp"
 #include "../Raknet/RaknetConnector.hpp"
+#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 class LoopbackPacketSender {
 public:

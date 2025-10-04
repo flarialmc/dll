@@ -2,6 +2,7 @@
 
 #include "UIComponent.hpp"
 #include <Utils/VersionUtils.hpp>
+#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 class UIControl {
 public:

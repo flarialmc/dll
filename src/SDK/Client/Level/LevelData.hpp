@@ -6,6 +6,7 @@
 #include "libhat/Access.hpp"
 
 #include <Utils/Memory/Game/SignatureAndOffsetManager.hpp>
+#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 class LevelData {
 public:

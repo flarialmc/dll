@@ -2,7 +2,7 @@
 
 #include <SDK/Client/Core/ClientInstance.hpp>
 #include <SDK/Client/Core/HashedString.hpp>
-#include <Client/Module/Manager.hpp>
+
 #include <Utils/Memory/Memory.hpp>
 #include <Utils/Utils.hpp>
 
@@ -10,8 +10,8 @@
 #include "TextureGroup.hpp"
 #include "ScreenContext.hpp"
 
-#include <cstdint>
 #include <string>
+#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 class MinecraftUIRenderContext {
 public:

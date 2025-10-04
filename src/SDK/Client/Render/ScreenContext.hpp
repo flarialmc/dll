@@ -2,6 +2,7 @@
 
 #include "Tessellator/Tessellator.hpp"
 #include "libhat/Access.hpp"
+#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 class ScreenContext {
 public:

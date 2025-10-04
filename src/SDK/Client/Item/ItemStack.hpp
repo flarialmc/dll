@@ -3,6 +3,7 @@
 #include "Item.hpp"
 #include <SDK/Client/Core/Ref.hpp>
 #include <Utils/Memory/Memory.hpp>
+#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 class ItemStack {
 public:

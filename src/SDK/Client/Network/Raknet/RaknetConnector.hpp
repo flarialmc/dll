@@ -3,6 +3,7 @@
 #include <Utils/Memory/Memory.hpp>
 #include <string>
 #include <cstdint>
+#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 // Forward declaration
 class RakPeer;

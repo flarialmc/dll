@@ -1,6 +1,7 @@
 #pragma once
 
 #include "VisualTree.hpp"
+#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 
 class ScreenView {

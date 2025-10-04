@@ -1,5 +1,6 @@
 #pragma once
 #include "LevelRenderPlayer.hpp"
+#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 class LevelRender {
 public:

@@ -11,6 +11,7 @@
 #include <SDK/Client/Util/mce.hpp>
 
 #include "LevelData.hpp"
+#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 enum class BuildPlatform : int {
     Google = 1,

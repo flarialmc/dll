@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Render/TextureGroup.hpp"
+#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 class MinecraftGame {
 public:

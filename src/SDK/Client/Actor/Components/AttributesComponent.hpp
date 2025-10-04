@@ -1,6 +1,7 @@
 //#include "../../../Utils/Memory/Memory.hpp"
 #include "../../Core/HashedString.hpp"
 #include "../EntityContext.hpp"
+#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 class AttributeInstance{
 public:

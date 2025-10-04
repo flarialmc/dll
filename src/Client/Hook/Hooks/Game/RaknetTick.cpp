@@ -3,6 +3,7 @@
 #include "ActorBaseTick.hpp"
 #include <filesystem>
 #include <fstream>
+#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 std::string RaknetTickHook::towriteip = "";
 

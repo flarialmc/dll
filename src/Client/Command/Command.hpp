@@ -1,7 +1,6 @@
 #pragma once
 
 #include <utility>
-
 #include "../../SDK/SDK.hpp"
 
 class Command {

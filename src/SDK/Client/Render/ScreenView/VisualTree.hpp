@@ -1,6 +1,7 @@
 #pragma once
 
 #include "UIControl.hpp"
+#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 class VisualTree {
 public:

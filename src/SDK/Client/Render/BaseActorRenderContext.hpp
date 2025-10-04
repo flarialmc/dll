@@ -3,6 +3,7 @@
 #include "ItemRenderer.hpp"
 #include <SDK/Client/Core/ClientInstance.hpp>
 #include <Utils/Memory/Memory.hpp>
+#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 class BaseActorRenderContext {
 private:

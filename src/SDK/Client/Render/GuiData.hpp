@@ -4,6 +4,7 @@
 #include <Utils/Memory/Memory.hpp>
 #include <Utils/Memory/Game/SignatureAndOffsetManager.hpp>
 #include "./GuiMessage.hpp"
+#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 class GuiData {
 public:
