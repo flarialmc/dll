@@ -17,6 +17,8 @@ void OffsetInit::init21110() {
     ADD_OFFSET("ContainerScreenController::_handlePlaceAll", 57);
     ADD_OFFSET("ClientInstance::camera", 0x288);
     ADD_OFFSET("ClientInstance::guiData", 0x578);
+
+    ADD_OFFSET("ItemActor::stack", 0x3B0);
     ADD_OFFSET("ClientInstance::getFovX", 0xF88);
     ADD_OFFSET("ClientInstance::getFovY", 0xF9C);
     ADD_OFFSET("ClientInstance::viewMatrix", 0x348);
