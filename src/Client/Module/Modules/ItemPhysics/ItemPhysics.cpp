@@ -73,44 +73,6 @@ void ItemPhysics::onItemRenderer(ItemRendererEvent& event) {
     this->applyTransformation(mat);
 }
 
-void __fastcall ItemPhysics::glm_rotateHook(glm::mat4x4& mat, float angle, float x, float y, float z) {
-    // Don't use static - get fresh pointer each time
-    auto mod = ModuleManager::getModule("Item Physics");
-    if (!mod) {
-        // Fallback to original GLM rotate if module doesn't exist
-        static auto rotateSig = GET_SIG_ADDRESS("glm_rotate");
-        using glm_rotate_t = void(__fastcall*)(glm::mat4x4&, float, float, float, float);
-        static auto glm_rotate_original = reinterpret_cast<glm_rotate_t>(rotateSig);
-        if (glm_rotate_original) glm_rotate_original(mat, angle, x, y, z);
-        return;
-    }
-
-    auto itemPhysics = static_cast<ItemPhysics*>(mod.get());
-    if (!itemPhysics->isEnabled() || itemPhysics->currentRenderData == nullptr) {
-        using func_t = void(__fastcall*)(glm::mat4x4&, float, float, float, float);
-        auto original = reinterpret_cast<func_t>(itemPhysics->rotateTrampoline);
-        if (original) original(mat, angle, x, y, z);
-        return;
-    }
-
-    itemPhysics->applyTransformation(mat);
-}
-
-glm::mat4x4 __fastcall ItemPhysics::glm_rotateHook2(glm::mat4x4& mat, float angle, const glm::vec3& axis) {
-    auto mod = ModuleManager::getModule("Item Physics");
-    if (!mod) {
-        return rotate(mat, angle, axis);
-    }
-
-    auto itemPhysics = static_cast<ItemPhysics*>(mod.get());
-    if (!itemPhysics->isEnabled() || itemPhysics->currentRenderData == nullptr) {
-        return rotate(mat, angle, axis);
-    }
-
-    itemPhysics->applyTransformation(mat);
-    return mat;
-}
-
 void ItemPhysics::applyTransformation(glm::mat4x4& mat) {
     if (currentRenderData == nullptr || currentRenderData->actor == nullptr)
         return;
