@@ -1,7 +1,5 @@
 #pragma once
 
-#include <glm/glm/detail/type_quat.hpp>
-#include <glm/glm/gtx/matrix_decompose.hpp>
 #include "../Hook.hpp"
 #include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 #include "../../../Module/Modules/ItemPhysics/ItemPhysics.hpp"
@@ -32,33 +30,14 @@ private:
         }
         else if(SDK::clientInstance && SDK::clientInstance->getLocalPlayer()) {
 
-            auto itemPhysics = ModuleManager::getModule("Item Physics");
+            static auto itemPhysics = ModuleManager::getModule("Item Physics");
 
             ActorRenderData data;
             data.actor = entity;
             data.rotation = entity->getActorRotationComponent()->rot;
             data.position = *entity->getPosition();
 
-
             auto& stack = SDK::clientInstance->getCamera().getWorldMatrixStack();
-            auto& topMat = stack.top();
-
-            glm::vec3 scale, translation, skew;
-            glm::quat rotation;
-            glm::vec4 perspective;
-
-            glm::decompose(topMat.matrix, scale, rotation, translation, skew, perspective);
-
-            glm::mat4 newMat = glm::mat4(1.0f);
-
-            if(entity->isOnGround())
-                translation.y = entity->getPosition()->y - SDK::clientInstance->getLevelRender()->getOrigin().y;
-
-            newMat = glm::translate(glm::mat4(1.0f), translation);
-            newMat = glm::scale(newMat, scale);
-
-            topMat.matrix = newMat;
-
             stack.push();
 
             auto event = nes::make_holder<ItemRendererEvent>(&data);

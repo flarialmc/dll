@@ -4,6 +4,8 @@
 #include "../../../Events/Render/ItemRendererEvent.hpp"
 #include <chrono>
 #include <minhook/MinHook.h>
+#include <glm/glm/detail/type_quat.hpp>
+#include <glm/glm/gtx/matrix_decompose.hpp>
 
 void ItemPhysics::onEnable() {
     Listen(this, SetupAndRenderEvent, &ItemPhysics::onSetupAndRender)
@@ -67,7 +69,28 @@ void ItemPhysics::onItemRenderer(ItemRendererEvent& event) {
     if (!isEnabled())
         return;
 
+
     auto& mat = SDK::clientInstance->getCamera().getWorldMatrixStack().top().matrix;
+
+    auto& stack = SDK::clientInstance->getCamera().getWorldMatrixStack();
+    auto& topMat = stack.top();
+
+    glm::vec3 scale, translation, skew;
+    glm::quat rotation;
+    glm::vec4 perspective;
+
+    glm::decompose(topMat.matrix, scale, rotation, translation, skew, perspective);
+
+    if(event.getRenderData()->actor->isOnGround())
+        translation.y = event.getRenderData()->actor->getPosition()->y - SDK::clientInstance->getLevelRender()->getOrigin().y;
+
+    glm::mat4 newMat = glm::mat4(1.0f);
+
+    newMat = glm::translate(glm::mat4(1.0f), translation);
+    newMat = glm::scale(newMat, scale);
+
+    topMat.matrix = newMat;
+
     currentRenderData = event.getRenderData();
     this->applyTransformation(mat);
 }
@@ -196,7 +219,7 @@ void ItemPhysics::applyTransformation(glm::mat4x4& mat) {
         }
     }
 
-    if (isBlock && isOnGround && fallOffset == 0.f) {
+    if (!isBlock && isOnGround && fallOffset == 0.f) {
         mat = glm::translate(mat, glm::vec3(0.f, -0.075f, 0.f));
     }
 
