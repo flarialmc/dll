@@ -10,10 +10,6 @@
 #include <array>
 #include "../../../Config/Settings.hpp"
 
-// Minimal include for D2D types
-#include <d2d1.h>
-
-// Forward declare Windows types to avoid windows.h
 enum DWRITE_TEXT_ALIGNMENT : int;
 
 class Module {
