@@ -590,7 +590,9 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
             else {
                 if (this->cpuName.empty()) {
                     std::wstring temp(std::format(L"CPU: {}x {} ({} Cores)", this->GetCpuThreadCount(), this->GetCpuName(), this->GetCpuCoreCount()));
-                    this->cpuName = std::string(temp.begin(), temp.end());
+                    int size = WideCharToMultiByte(CP_UTF8, 0, temp.c_str(), -1, nullptr, 0, nullptr, nullptr);
+                    this->cpuName.resize(size - 1);
+                    WideCharToMultiByte(CP_UTF8, 0, temp.c_str(), -1, &this->cpuName[0], size, nullptr, nullptr);
                 }
                 right.emplace_back(this->cpuName);
             }

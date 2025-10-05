@@ -1160,7 +1160,7 @@ bool FlarialGUI::LoadFontFromFontFamily(FontKey fontK) {
 	}
 
 	std::string name = fontK.name;
-	std::ranges::transform(name, name.begin(), ::towlower);
+	std::ranges::transform(name, name.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
 	std::wstring fontName = to_wide(name);
 	std::wstring fontFilePath = GetFontFilePath(fontName, fontK.weight);
 	std::string path;

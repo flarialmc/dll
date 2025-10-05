@@ -27,7 +27,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
     }
 
     if (index > shadowsizesr.size() - 1 || index == 0) {
-        shadowsizesr.emplace_back(0.01, 0.01);
+        shadowsizesr.emplace_back(0.01f, 0.01f);
     }
 
     if (index > hoveringFav.size() - 1 || index == 0) {

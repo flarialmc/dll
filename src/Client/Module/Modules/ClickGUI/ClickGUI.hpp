@@ -73,7 +73,7 @@ public:
         {"Regular", "§4"}
     });
 
-    static inline D2D_COLOR_F getColor(const std::string &text);
+    static D2D_COLOR_F getColor(const std::string &text);
 
 private:
     template<typename WordContainer>
