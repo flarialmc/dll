@@ -2,6 +2,7 @@
 
 #include "../Module.hpp"
 #include "../../Utils/WinrtUtils.hpp"
+#include "../../../../Assets/Assets.hpp"
 
 
 class MovableChat : public Module {

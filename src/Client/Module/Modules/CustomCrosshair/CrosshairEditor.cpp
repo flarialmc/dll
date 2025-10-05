@@ -8,6 +8,7 @@
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image_write.h>
+#include "../../../../Assets/Assets.hpp"
 
 float BrushSize = 1;
 int CurrentSelectedCreateCrosshairSize = 16;

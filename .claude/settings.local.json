@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(for file in SDK/Client/Actor/Actor.hpp SDK/Client/Render/GuiData.hpp SDK/Client/Level/Level.hpp SDK/SDK.hpp)",
+      "Bash(do echo \"=== $file ===\")",
+      "Bash(grep:*)",
+      "Bash(done)",
+      "Bash(for header in \"SDK/Client/Render/GuiData.hpp\" \"SDK/Client/Actor/Actor.hpp\" \"SDK/Client/Level/Level.hpp\")",
+      "Bash(do echo \"=== Analyzing $header ===\")",
+      "Bash(find SDK/Client -name \"*.hpp\" -exec sh -c 'count=$(grep -l \"\"\"\"$1\"\"\"\" ../**/*.cpp 2>/dev/null | wc -l); echo \"\"\"\"$count $1\"\"\"\"' _ {})",
+      "Bash(powershell:*)",
+      "Bash(python:*)",
+      "Bash(py:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Module.hpp"
+#include "../../../../Assets/Assets.hpp"
 
 
 class MovableCoordinates : public Module {

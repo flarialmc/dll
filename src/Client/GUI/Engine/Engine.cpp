@@ -30,6 +30,7 @@
 //#include <misc/freetype/imgui_freetype.h>
 
 #include "../../Hook/Hooks/Render/DirectX/DXGI/SwapchainHook.hpp"
+#include "../../../Assets/Assets.hpp"
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 

@@ -3,6 +3,7 @@
 #include "../Module.hpp"
 #include "../../../Hook/Hooks/Game/ReadFileHook.hpp"
 #include "src/Client/Hook/Hooks/Game/composeFullStack.hpp"
+#include "../../../../Assets/Assets.hpp"
 
 class MaterialBinLoader : public Module {
 private:

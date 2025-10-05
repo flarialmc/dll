@@ -2,6 +2,7 @@
 
 #include "../Module.hpp"
 #include "Events/Game/TickEvent.hpp"
+#include "../../../../Assets/Assets.hpp"
 
 class Sneak : public Module {
 

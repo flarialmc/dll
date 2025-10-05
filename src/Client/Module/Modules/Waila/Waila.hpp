@@ -6,6 +6,7 @@
 #include "../../../../SDK/Client/Block/Block.hpp"
 #include "Events/Render/RenderEvent.hpp"
 #include "Events/Render/SetupAndRenderEvent.hpp"
+#include "../../../../Assets/Assets.hpp"
 
 class Waila : public Module {
 public:

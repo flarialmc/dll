@@ -5,6 +5,7 @@
 #include "Events/Game/TickEvent.hpp"
 #include "Events/Network/PacketEvent.hpp"
 #include "SDK/Client/Network/Packet/LoginPacket.hpp"
+#include "../../../../Assets/Assets.hpp"
 
 
 class PlayerNotifier : public Module {

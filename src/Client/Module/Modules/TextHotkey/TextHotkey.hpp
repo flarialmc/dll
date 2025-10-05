@@ -3,6 +3,7 @@
 #include <SDK/Client/Network/Packet/TextPacket.hpp>
 #include "../../../Client.hpp"
 #include "../Module.hpp"
+#include "../../../../Assets/Assets.hpp"
 
 class TextHotkey : public Module {
 	std::chrono::time_point<std::chrono::high_resolution_clock> last_used;

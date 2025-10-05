@@ -3,6 +3,7 @@
 #include "../Module.hpp"
 #include "Events/Game/RaknetTickEvent.hpp"
 #include "Events/Game/TickEvent.hpp"
+#include "../../../../Assets/Assets.hpp"
 
 
 class NoHurtCam : public Module {

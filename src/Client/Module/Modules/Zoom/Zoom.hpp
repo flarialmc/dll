@@ -1,6 +1,7 @@
 #pragma once
 #include "../Module.hpp"
 #include "../../../../SDK/Client/Core/Options.hpp"
+#include "../../../../Assets/Assets.hpp"
 
 
 class Zoom : public Module {

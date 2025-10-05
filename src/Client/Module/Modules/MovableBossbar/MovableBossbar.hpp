@@ -4,6 +4,7 @@
 
 #include "Modules/ClickGUI/ClickGUI.hpp"
 #include "Utils/Render/PositionUtils.hpp"
+#include "../../../../Assets/Assets.hpp"
 
 class MovableBossbar : public Module {
 

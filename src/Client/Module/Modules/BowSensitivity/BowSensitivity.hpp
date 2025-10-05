@@ -3,6 +3,7 @@
 #include "../Module.hpp"
 #include "Events/Game/TickEvent.hpp"
 #include "Events/Game/TurnDeltaEvent.hpp"
+#include "../../../../Assets/Assets.hpp"
 
 class BowSensitivity : public Module {
 

@@ -2,6 +2,7 @@
 
 #include "../Module.hpp"
 #include "../../../Client.hpp"
+#include "../../../../Assets/Assets.hpp"
 
 
 class IPDisplay : public Module {

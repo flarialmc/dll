@@ -39,7 +39,6 @@
 // ImGui headers frequently used
 #include <imgui/imgui.h>
 
-#include "Assets/Assets.hpp"
 #include "Events/EventManager.hpp"
 #include "Events/Events.hpp"
 

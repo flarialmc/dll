@@ -3,6 +3,7 @@
 #include "../Module.hpp"
 #include "Events/Game/TickEvent.hpp"
 #include <chrono>
+#include "../../../../Assets/Assets.hpp"
 
 class Twerk : public Module {
 

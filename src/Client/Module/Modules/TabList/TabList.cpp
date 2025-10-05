@@ -19,6 +19,7 @@
 #include "Modules/ClickGUI/ClickGUI.hpp"
 #include "Modules/Nick/NickModule.hpp"
 #include "../../Manager.hpp"
+#include "../../../../Assets/Assets.hpp"
 
 bool logDebug = false;
 

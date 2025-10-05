@@ -2,6 +2,7 @@
 #include <GUI/Engine/EngineImGui.hpp>
 
 #include "GUI/Engine/Constraints.hpp"
+#include "../../../../Assets/Assets.hpp"
 
 
 void Lewis::onEnable()

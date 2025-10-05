@@ -6,6 +6,7 @@
 #include "../../../../Utils/Memory/CustomAllocator/Buffer.hpp"
 #include "../../../../SDK/Client/Render/ActorRenderData.hpp"
 #include "../../../../SDK/Client/Render/ItemRenderer.hpp"
+#include "../../../../Assets/Assets.hpp"
 
 class ItemPhysics : public Module {
 private:

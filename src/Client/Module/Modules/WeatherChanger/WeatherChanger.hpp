@@ -3,6 +3,7 @@
 #include "../Module.hpp"
 #include "Events/Game/TickEvent.hpp"
 #include "SDK/Client/Level/Biome.hpp"
+#include "../../../../Assets/Assets.hpp"
 
 class WeatherChanger : public Module {
 public:

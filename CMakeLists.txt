@@ -51,6 +51,7 @@ add_compile_options($<$<CONFIG:Release>:/Ob2>)
 
 add_compile_options(/bigobj)
 add_compile_options(/utf-8)
+add_compile_options(/MP)
 if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "Test")
     # Optimize for performance
     add_compile_options(/O2 /Oi /Gy /Gw /GF /fp:fast /Gd /MT /Ob2)

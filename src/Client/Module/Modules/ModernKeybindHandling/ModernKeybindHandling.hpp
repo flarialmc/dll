@@ -5,6 +5,7 @@
 #include "Events/Input/KeyEvent.hpp"
 #include "Events/Render/SetTopScreenNameEvent.hpp"
 #include "SDK/Client/Options/OptionsParser.hpp"
+#include "../../../../Assets/Assets.hpp"
 
 class ModernKeybindHandling : public Module {
 

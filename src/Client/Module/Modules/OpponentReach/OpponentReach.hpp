@@ -5,6 +5,7 @@
 #include "Events/Game/TickEvent.hpp"
 #include "Events/Network/PacketEvent.hpp"
 #include "Events/Render/RenderEvent.hpp"
+#include "../../../../Assets/Assets.hpp"
 
 
 class OpponentReach : public Module {

@@ -2,6 +2,7 @@
 
 #include "../Module.hpp"
 #include "Events/Render/HurtColorEvent.hpp"
+#include "../../../../Assets/Assets.hpp"
 
 class HurtColor : public Module {
 

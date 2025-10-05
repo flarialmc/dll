@@ -3,6 +3,7 @@
 #include "../../../../../Module/Manager.hpp"
 #include "../../../../../Module/Modules/ClickGUI/ClickGUI.hpp"
 #include "../../Structs/HSV.hpp"
+#include "../../../../../../Assets/Assets.hpp"
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 

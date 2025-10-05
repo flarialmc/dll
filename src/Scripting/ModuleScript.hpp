@@ -8,6 +8,7 @@
 #include <Client/Module/Modules/Module.hpp>
 
 #include <lua.hpp>
+#include "../Assets/Assets.hpp"
 
 inline ScriptSettingManager gScriptSettingManager;
 

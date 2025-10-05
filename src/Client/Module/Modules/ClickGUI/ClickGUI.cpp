@@ -9,6 +9,7 @@
 #include "Modules/Misc/ScriptMarketplace/ScriptMarketplace.hpp"
 #include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
 #include <GUI/Engine/Engine.hpp>
+#include "../../../../Assets/Assets.hpp"
 
 std::chrono::time_point<std::chrono::high_resolution_clock> ClickGUI::favoriteStart;
 

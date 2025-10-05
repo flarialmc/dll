@@ -16,6 +16,7 @@
 #include <winsock2.h>
 #include <windows.h>
 #include <unknwn.h>
+#include "../../../../Assets/Assets.hpp"
 
 #pragma comment(lib, "Ws2_32.lib")
 

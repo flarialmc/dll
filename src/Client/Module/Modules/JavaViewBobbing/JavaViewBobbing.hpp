@@ -3,6 +3,7 @@
 #include "../../../../SDK/Client/Actor/LocalPlayer.hpp"
 #include <chrono>
 #include <algorithm>
+#include "../../../../Assets/Assets.hpp"
 
 
 class JavaViewBobbing : public Module {
