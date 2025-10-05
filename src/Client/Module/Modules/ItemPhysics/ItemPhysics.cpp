@@ -219,7 +219,7 @@ void ItemPhysics::applyTransformation(glm::mat4x4& mat) {
         }
     }
 
-    if (!isBlock && isOnGround && fallOffset == 0.f) {
+    if (isBlock && isOnGround && fallOffset == 0.f) {
         mat = glm::translate(mat, glm::vec3(0.f, -0.075f, 0.f));
     }
 
