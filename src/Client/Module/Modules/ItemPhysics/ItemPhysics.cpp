@@ -11,12 +11,39 @@ void ItemPhysics::onEnable() {
     Listen(this, SetupAndRenderEvent, &ItemPhysics::onSetupAndRender)
     Listen(this, ItemRendererEvent, &ItemPhysics::onItemRenderer)
 
+    if (!patched)
+    {
+        static auto posAddr = GET_SIG_ADDRESS("ItemPositionConst") + 4;
+        origPosRel = *reinterpret_cast<uint32_t*>(posAddr);
+        patched = true;
+
+        newPosRel = static_cast<float*>(AllocateBuffer(reinterpret_cast<void*>(posAddr)));
+        *newPosRel = 0.f;
+
+        const auto newRipRel = Memory::getRipRel(posAddr, reinterpret_cast<uintptr_t>(newPosRel));
+        Memory::patchBytes(reinterpret_cast<void*>(posAddr), newRipRel.data(), 4);
+        patched = true;
+    }
+
     Module::onEnable();
 }
 
 void ItemPhysics::onDisable() {
     Deafen(this, SetupAndRenderEvent, &ItemPhysics::onSetupAndRender)
     Deafen(this, ItemRendererEvent, &ItemPhysics::onItemRenderer)
+
+    if (patched)
+    {
+        static auto posAddr = GET_SIG_ADDRESS("ItemPositionConst") + 4;
+        Memory::patchBytes(reinterpret_cast<void*>(posAddr), &origPosRel, 4);
+
+        if (newPosRel) {
+            FreeBuffer(newPosRel);
+            newPosRel = nullptr;
+        }
+
+        patched = false;
+    }
 
     actorData.clear();
     currentRenderData = nullptr;
@@ -110,12 +137,8 @@ void ItemPhysics::applyTransformation(glm::mat4x4& mat) {
         std::uniform_real_distribution<float> angleDist(0.f, 360.f);
         std::uniform_int_distribution<int> signDist(0, 1);
 
-        Vec3<float> rotation(angleDist(gen), angleDist(gen), angleDist(gen));
-        Vec3<int> spinDir(
-            signDist(gen) * 2 - 1,
-            signDist(gen) * 2 - 1,
-            signDist(gen) * 2 - 1
-        );
+        Vec3<float> rotation(90.f, angleDist(gen), 0.f);
+        Vec3<int> spinDir(0, signDist(gen) * 2 - 1, 0);
 
         actorData.emplace(actor, std::tuple{ 0.5f, rotation, spinDir });
     }
@@ -123,99 +146,43 @@ void ItemPhysics::applyTransformation(glm::mat4x4& mat) {
     auto& [fallOffset, rotation, spinDirection] = actorData.at(actor);
     auto& settings = this->settings;
     const float speed = settings.getSettingByName<float>("speed")->value;
-    const float xMul = settings.getSettingByName<float>("xmul")->value;
     const float yMul = settings.getSettingByName<float>("ymul")->value;
-    const float zMul = settings.getSettingByName<float>("zmul")->value;
     const bool smoothRotations = settings.getSettingByName<bool>("smoothrots")->value;
     const bool preserveRotations = settings.getSettingByName<bool>("preserverots")->value;
 
     auto* itemActor = static_cast<ItemActor*>(actor);
     const bool isBlock = itemActor->getStack().block != nullptr;
-
     if (fallOffset > 0.f) {
         fallOffset -= 0.5f * deltaTime;
         if (fallOffset < 0.f) fallOffset = 0.f;
     }
 
     if (!isOnGround || fallOffset > 0.f) {
-        rotation.x += spinDirection.x * deltaTime * speed * xMul;
         rotation.y += spinDirection.y * deltaTime * speed * yMul;
-        rotation.z += spinDirection.z * deltaTime * speed * zMul;
-
-        rotation.x = fmodf(rotation.x + 360.f, 360.f);
         rotation.y = fmodf(rotation.y + 360.f, 360.f);
-        rotation.z = fmodf(rotation.z + 360.f, 360.f);
     }
 
     Vec3<float> renderRotation = rotation;
 
     if (isOnGround && fallOffset == 0.f) {
-        if (preserveRotations) {
-            renderRotation = rotation;
+        if (!preserveRotations && !smoothRotations) {
+            renderRotation = Vec3<float>(90.f, 0.f, 0.f);
         }
-        else if (smoothRotations) {
-            const float targetX = isBlock ? 0.f : 90.f;
-            const float targetY = 0.f;
-            const float targetZ = isBlock ? 0.f : rotation.z;
+        else if (smoothRotations && !preserveRotations) {
+            auto shortestAngle = [](float current, float target) -> float {
+                float diff = fmodf(target - current + 540.f, 360.f) - 180.f;
+                return diff;
+            };
 
-            const float settleSpeed = speed * 3.f;
-
-            if (isBlock) {
-                auto shortestAngle = [](float current, float target) -> float {
-                    float diff = fmodf(target - current + 540.f, 360.f) - 180.f;
-                    return diff;
-                };
-
-                float diffX = shortestAngle(rotation.x, targetX);
-                float diffZ = shortestAngle(rotation.z, targetZ);
-
-                if (fabsf(diffX) > 0.5f) {
-                    rotation.x += (diffX > 0 ? 1.f : -1.f) * deltaTime * settleSpeed * xMul;
-                } else {
-                    rotation.x = targetX;
-                    spinDirection.x = 0;
-                }
-
-                if (fabsf(diffZ) > 0.5f) {
-                    rotation.z += (diffZ > 0 ? 1.f : -1.f) * deltaTime * settleSpeed * zMul;
-                } else {
-                    rotation.z = targetZ;
-                    spinDirection.z = 0;
-                }
-            }
-            else {
-                auto shortestAngle = [](float current, float target) -> float {
-                    float diff = fmodf(target - current + 540.f, 360.f) - 180.f;
-                    return diff;
-                };
-
-                float diffX = shortestAngle(rotation.x, targetX);
-                float diffY = shortestAngle(rotation.y, targetY);
-
-                if (fabsf(diffX) > 0.5f) {
-                    rotation.x += (diffX > 0 ? 1.f : -1.f) * deltaTime * settleSpeed * xMul;
-                } else {
-                    rotation.x = targetX;
-                    spinDirection.x = 0;
-                }
-
-                if (fabsf(diffY) > 0.5f) {
-                    rotation.y += (diffY > 0 ? 1.f : -1.f) * deltaTime * settleSpeed * yMul;
-                } else {
-                    rotation.y = targetY;
-                    spinDirection.y = 0;
-                }
+            float diff = shortestAngle(rotation.y, 180.f);
+            if (fabsf(diff) > 0.5f) {
+                rotation.y += (diff > 0 ? 1.f : -1.f) * deltaTime * speed * 3.f * yMul;
+            } else {
+                rotation.y = 180.f;
+                spinDirection.y = 0;
             }
 
             renderRotation = rotation;
-        }
-        else {
-            if (isBlock) {
-                renderRotation = Vec3<float>(0.f, 0.f, 0.f);
-            }
-            else {
-                renderRotation = Vec3<float>(90.f, 0.f, 0.f);
-            }
         }
     }
 
