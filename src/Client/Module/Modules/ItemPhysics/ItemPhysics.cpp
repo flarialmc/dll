@@ -11,6 +11,19 @@ void ItemPhysics::onEnable() {
     Listen(this, SetupAndRenderEvent, &ItemPhysics::onSetupAndRender)
     Listen(this, ItemRendererEvent, &ItemPhysics::onItemRenderer)
 
+    if (!patched)
+    {
+        static auto posAddr = GET_SIG_ADDRESS("ItemPositionConst") + 4;
+        origPosRel = *reinterpret_cast<uint32_t*>(posAddr);
+        patched = true;
+
+        newPosRel = static_cast<float*>(AllocateBuffer(reinterpret_cast<void*>(posAddr)));
+        *newPosRel = 0.f;
+
+        const auto newRipRel = Memory::getRipRel(posAddr, reinterpret_cast<uintptr_t>(newPosRel));
+        Memory::patchBytes(reinterpret_cast<void*>(posAddr), newRipRel.data(), 4);
+        patched = true;
+    }
 
     Module::onEnable();
 }
@@ -18,6 +31,19 @@ void ItemPhysics::onEnable() {
 void ItemPhysics::onDisable() {
     Deafen(this, SetupAndRenderEvent, &ItemPhysics::onSetupAndRender)
     Deafen(this, ItemRendererEvent, &ItemPhysics::onItemRenderer)
+
+    if (patched)
+    {
+        static auto posAddr = GET_SIG_ADDRESS("ItemPositionConst") + 4;
+        Memory::patchBytes(reinterpret_cast<void*>(posAddr), &origPosRel, 4);
+
+        if (newPosRel) {
+            FreeBuffer(newPosRel);
+            newPosRel = nullptr;
+        }
+
+        patched = false;
+    }
 
     actorData.clear();
     currentRenderData = nullptr;
