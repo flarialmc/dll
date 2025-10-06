@@ -100,7 +100,7 @@ void SigInit::init21100() {
     ADD_SIG("SwingAngle", "F3 44 0F 59 15 ?? ?? ?? ?? 4C 8D 4C 24 30 48 8B D0");
     ADD_SIG("AppPlatform::readAssetFile", "48 89 5C 24 ? 48 89 7C 24 ? 55 48 8D 6C 24 ? 48 81 EC 60 01 00 00 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 ? 48 8B F9 48 89 4D");
 
-
+//
 
 }
 
