@@ -6,6 +6,7 @@
 #include "Events/Game/SwingDurationEvent.hpp"
 #include "../../../../Assets/Assets.hpp"
 #include "Modules/Doom/Doom.hpp"
+#include "../../../../Utils/VersionUtils.hpp"
 
 class SwingAnimations : public Module {
 
@@ -62,6 +63,13 @@ public:
 	void initializeSwingAngle()
 	{
 		if (swingAngleInitialized) return;
+
+		// Disable swingAngle for version 1.21.111 or above
+		if (VersionUtils::checkAboveOrEqual(21, 111)) {
+			Logger::info("SwingAngle disabled for version 1.21.111+");
+			swingAngleInitialized = true;
+			return;
+		}
 
 		auto addr = GET_SIG_ADDRESS("SwingAngle");
 		if (!addr) {

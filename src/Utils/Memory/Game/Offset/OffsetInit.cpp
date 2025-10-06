@@ -23,6 +23,7 @@ void OffsetInit::init21110() {
     ADD_OFFSET("ClientInstance::getFovY", 0xF9C);
     ADD_OFFSET("ClientInstance::viewMatrix", 0x348);
     ADD_OFFSET("MinecraftUIRenderContext::getTexture", 31);
+    ADD_OFFSET("SwingAngle", 4);
 
 //
 }
