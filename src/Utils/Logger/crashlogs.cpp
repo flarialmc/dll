@@ -17,12 +17,19 @@
 #include <filesystem>
 #include <fstream>
 #include <ctime>
+#include <iomanip>
+#include <sstream>
 
 //needed for being able to get into the crash handler on a crash
 #include <csignal>
 #include <exception>
 #include <cstdlib>
 #define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include <psapi.h>
+#include <dbghelp.h>
+
+#pragma comment(lib, "dbghelp.lib")
 
 //a decent amount of this was copied/modified from backward.cpp (https://github.com/bombela/backward-cpp)
 //mostly the stuff related to actually getting crash handlers on crashes
@@ -39,6 +46,9 @@ namespace glaiel::crashlogs {
     static std::filesystem::path output_folder;
     static std::string filename = "crash_{timestamp}.txt";
     static void (*on_output_crashlog)(std::string crashlog_filename) = NULL;
+
+    //exception information
+    static EXCEPTION_POINTERS* exception_pointers = nullptr;
 
     //thread stuff
     static std::mutex mut;
@@ -58,34 +68,77 @@ namespace glaiel::crashlogs {
         output_folder = folderpath;
     }
 
+    static std::string current_timestamp();
     static std::filesystem::path get_log_filepath();
     static const char* try_get_signal_name(int signal);
+    static std::string get_exception_name(DWORD code);
+    static std::string format_hex(DWORD64 value);
+    static std::string get_register_dump(CONTEXT* ctx);
+    static std::string get_loaded_modules();
+    static std::string get_memory_dump(void* address);
+    static std::string get_exception_info();
 
     //output the crashlog file after a crash has occured
     static void output_crash_log() {
         std::filesystem::path path = get_log_filepath();
         std::ofstream log(path);
 
+        // Basic information
+        log << "===============================================\n";
+        log << "           CRASH REPORT\n";
+        log << "===============================================\n\n";
         log << "COMMIT_HASH: " << COMMIT_HASH << std::endl;
+        log << "Timestamp: " << current_timestamp() << "\n";
+        log << "Process ID: " << GetCurrentProcessId() << "\n";
+        log << "Thread ID: " << GetCurrentThreadId() << "\n\n";
 
-        if(!header_message.empty()) log << header_message << std::endl;
-        if(crash_signal != 0) {
-            log << "Received signal " << crash_signal << " " << try_get_signal_name(crash_signal) << std::endl;
+        if(!header_message.empty()) {
+            log << header_message << std::endl << std::endl;
         }
-        log << trace << "\n\n";
-        log << "Enabled modules:" << "\n";
+
+        // Exception/Signal information
+        log << "===============================================\n";
+        log << "           EXCEPTION DETAILS\n";
+        log << "===============================================\n\n";
+
+        if(crash_signal != 0) {
+            log << "Signal: " << crash_signal << " (" << try_get_signal_name(crash_signal) << ")\n";
+        }
+
+        if(exception_pointers != nullptr) {
+            log << get_exception_info() << "\n";
+        }
+        log << "\n";
+
+        // Stack trace with enhanced formatting
+        log << "===============================================\n";
+        log << "           STACK TRACE\n";
+        log << "===============================================\n\n";
+
+        size_t frame_num = 0;
+        for (const auto& entry : trace) {
+            log << "#" << std::setw(2) << std::setfill('0') << frame_num++ << " ";
+            log << entry << "\n";
+        }
+        log << "\n";
+
+        // Enabled modules
+        log << "===============================================\n";
+        log << "           ENABLED FLARIAL MODULES\n";
+        log << "===============================================\n\n";
 
         for (const auto& pair : ModuleManager::moduleMap) {
             if(pair.second->isEnabled())
-                log << pair.second->name << "\n";
+                log << "  - " << pair.second->name << "\n";
         }
+        log << "\n";
 
         log.close();
 
         // Send crash telemetry
         try {
             std::string signalName = try_get_signal_name(crash_signal);
-            CrashTelemetry::sendCrashReport(trace, crash_signal, signalName);
+            CrashTelemetry::sendCrashReport(trace, crash_signal, signalName, exception_pointers);
 
 #if defined(__DEBUG__)
             // Also export user actions to file for manual review (debug only)
@@ -196,6 +249,183 @@ namespace glaiel::crashlogs {
         return "";
     }
 
+    //Get human-readable exception name
+    static std::string get_exception_name(DWORD code) {
+        switch (code) {
+            case EXCEPTION_ACCESS_VIOLATION: return "EXCEPTION_ACCESS_VIOLATION";
+            case EXCEPTION_ARRAY_BOUNDS_EXCEEDED: return "EXCEPTION_ARRAY_BOUNDS_EXCEEDED";
+            case EXCEPTION_BREAKPOINT: return "EXCEPTION_BREAKPOINT";
+            case EXCEPTION_DATATYPE_MISALIGNMENT: return "EXCEPTION_DATATYPE_MISALIGNMENT";
+            case EXCEPTION_FLT_DENORMAL_OPERAND: return "EXCEPTION_FLT_DENORMAL_OPERAND";
+            case EXCEPTION_FLT_DIVIDE_BY_ZERO: return "EXCEPTION_FLT_DIVIDE_BY_ZERO";
+            case EXCEPTION_FLT_INEXACT_RESULT: return "EXCEPTION_FLT_INEXACT_RESULT";
+            case EXCEPTION_FLT_INVALID_OPERATION: return "EXCEPTION_FLT_INVALID_OPERATION";
+            case EXCEPTION_FLT_OVERFLOW: return "EXCEPTION_FLT_OVERFLOW";
+            case EXCEPTION_FLT_STACK_CHECK: return "EXCEPTION_FLT_STACK_CHECK";
+            case EXCEPTION_FLT_UNDERFLOW: return "EXCEPTION_FLT_UNDERFLOW";
+            case EXCEPTION_ILLEGAL_INSTRUCTION: return "EXCEPTION_ILLEGAL_INSTRUCTION";
+            case EXCEPTION_IN_PAGE_ERROR: return "EXCEPTION_IN_PAGE_ERROR";
+            case EXCEPTION_INT_DIVIDE_BY_ZERO: return "EXCEPTION_INT_DIVIDE_BY_ZERO";
+            case EXCEPTION_INT_OVERFLOW: return "EXCEPTION_INT_OVERFLOW";
+            case EXCEPTION_INVALID_DISPOSITION: return "EXCEPTION_INVALID_DISPOSITION";
+            case EXCEPTION_NONCONTINUABLE_EXCEPTION: return "EXCEPTION_NONCONTINUABLE_EXCEPTION";
+            case EXCEPTION_PRIV_INSTRUCTION: return "EXCEPTION_PRIV_INSTRUCTION";
+            case EXCEPTION_SINGLE_STEP: return "EXCEPTION_SINGLE_STEP";
+            case EXCEPTION_STACK_OVERFLOW: return "EXCEPTION_STACK_OVERFLOW";
+            default: return "UNKNOWN_EXCEPTION";
+        }
+    }
+
+    //Format hex value
+    static std::string format_hex(DWORD64 value) {
+        std::stringstream ss;
+        ss << "0x" << std::hex << std::setw(16) << std::setfill('0') << value;
+        return ss.str();
+    }
+
+    //Get exception information
+    static std::string get_exception_info() {
+        if (!exception_pointers || !exception_pointers->ExceptionRecord) {
+            return "No exception record available";
+        }
+
+        std::stringstream ss;
+        auto* record = exception_pointers->ExceptionRecord;
+
+        ss << "Exception Code: " << format_hex(record->ExceptionCode)
+           << " (" << get_exception_name(record->ExceptionCode) << ")\n";
+        ss << "Exception Address: " << format_hex((DWORD64)record->ExceptionAddress) << "\n";
+        ss << "Exception Flags: " << format_hex(record->ExceptionFlags);
+
+        if (record->ExceptionFlags & EXCEPTION_NONCONTINUABLE) {
+            ss << " (NONCONTINUABLE)";
+        }
+        ss << "\n";
+
+        // Additional info for access violations
+        if (record->ExceptionCode == EXCEPTION_ACCESS_VIOLATION && record->NumberParameters >= 2) {
+            ss << "\nAccess Violation Details:\n";
+            ss << "  Type: " << (record->ExceptionInformation[0] == 0 ? "Read" :
+                                  record->ExceptionInformation[0] == 1 ? "Write" : "Execute") << "\n";
+            ss << "  Address: " << format_hex(record->ExceptionInformation[1]) << "\n";
+        }
+
+        return ss.str();
+    }
+
+    //Get register dump
+    static std::string get_register_dump(CONTEXT* ctx) {
+        if (!ctx) return "No context available";
+
+        std::stringstream ss;
+
+#ifdef _WIN64
+        ss << "RAX: " << format_hex(ctx->Rax) << "  RBX: " << format_hex(ctx->Rbx) << "\n";
+        ss << "RCX: " << format_hex(ctx->Rcx) << "  RDX: " << format_hex(ctx->Rdx) << "\n";
+        ss << "RSI: " << format_hex(ctx->Rsi) << "  RDI: " << format_hex(ctx->Rdi) << "\n";
+        ss << "RBP: " << format_hex(ctx->Rbp) << "  RSP: " << format_hex(ctx->Rsp) << "\n";
+        ss << "R8:  " << format_hex(ctx->R8)  << "  R9:  " << format_hex(ctx->R9) << "\n";
+        ss << "R10: " << format_hex(ctx->R10) << "  R11: " << format_hex(ctx->R11) << "\n";
+        ss << "R12: " << format_hex(ctx->R12) << "  R13: " << format_hex(ctx->R13) << "\n";
+        ss << "R14: " << format_hex(ctx->R14) << "  R15: " << format_hex(ctx->R15) << "\n";
+        ss << "RIP: " << format_hex(ctx->Rip) << "\n";
+        ss << "EFLAGS: " << format_hex(ctx->EFlags) << "\n";
+#else
+        ss << "EAX: " << format_hex(ctx->Eax) << "  EBX: " << format_hex(ctx->Ebx) << "\n";
+        ss << "ECX: " << format_hex(ctx->Ecx) << "  EDX: " << format_hex(ctx->Edx) << "\n";
+        ss << "ESI: " << format_hex(ctx->Esi) << "  EDI: " << format_hex(ctx->Edi) << "\n";
+        ss << "EBP: " << format_hex(ctx->Ebp) << "  ESP: " << format_hex(ctx->Esp) << "\n";
+        ss << "EIP: " << format_hex(ctx->Eip) << "\n";
+        ss << "EFLAGS: " << format_hex(ctx->EFlags) << "\n";
+#endif
+
+        return ss.str();
+    }
+
+    //Get loaded modules information
+    static std::string get_loaded_modules() {
+        std::stringstream ss;
+        HANDLE process = GetCurrentProcess();
+        HMODULE modules[1024];
+        DWORD needed;
+
+        if (EnumProcessModules(process, modules, sizeof(modules), &needed)) {
+            size_t module_count = needed / sizeof(HMODULE);
+
+            for (size_t i = 0; i < module_count; i++) {
+                char module_name[MAX_PATH];
+                MODULEINFO mod_info;
+
+                if (GetModuleFileNameExA(process, modules[i], module_name, sizeof(module_name))) {
+                    if (GetModuleInformation(process, modules[i], &mod_info, sizeof(mod_info))) {
+                        ss << format_hex((DWORD64)mod_info.lpBaseOfDll) << " - "
+                           << format_hex((DWORD64)mod_info.lpBaseOfDll + mod_info.SizeOfImage)
+                           << "  " << module_name << "\n";
+                    }
+                }
+            }
+        } else {
+            ss << "Failed to enumerate modules\n";
+        }
+
+        return ss.str();
+    }
+
+    //Get memory dump around crash address
+    static std::string get_memory_dump(void* address) {
+        std::stringstream ss;
+
+        if (!address) {
+            return "Invalid address (NULL)";
+        }
+
+        ss << "Memory dump at " << format_hex((DWORD64)address) << ":\n\n";
+
+        // Try to read 128 bytes before and after the crash address
+        const size_t dump_size = 128;
+        BYTE* base_addr = (BYTE*)address - dump_size;
+
+        for (int offset = -((int)dump_size); offset < (int)dump_size; offset += 16) {
+            BYTE* addr = (BYTE*)address + offset;
+            ss << format_hex((DWORD64)addr) << ": ";
+
+            // Try to read 16 bytes
+            BYTE buffer[16];
+            SIZE_T bytes_read = 0;
+            bool readable = ReadProcessMemory(GetCurrentProcess(), addr, buffer, 16, &bytes_read) != 0;
+
+            if (readable && bytes_read > 0) {
+                // Hex dump
+                for (size_t i = 0; i < 16; i++) {
+                    if (i < bytes_read) {
+                        ss << std::hex << std::setw(2) << std::setfill('0') << (int)buffer[i] << " ";
+                    } else {
+                        ss << "?? ";
+                    }
+                }
+
+                ss << " | ";
+
+                // ASCII representation
+                for (size_t i = 0; i < bytes_read; i++) {
+                    char c = buffer[i];
+                    ss << (isprint(c) ? c : '.');
+                }
+            } else {
+                ss << "?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? | ????????????????";
+            }
+
+            // Mark the crash address line
+            if (offset == 0) {
+                ss << "  <-- CRASH HERE";
+            }
+
+            ss << "\n";
+        }
+
+        return ss.str();
+    }
+
     //various callbacks needed to get into the crash handler during a crash (borrowed from backward.cpp)
     static inline void signal_handler(int signal) {
         crash_signal = signal;
@@ -206,7 +436,8 @@ namespace glaiel::crashlogs {
         crash_handler();
         std::quick_exit(1);
     }
-    __declspec(noinline) static LONG WINAPI exception_handler(EXCEPTION_POINTERS*) {
+    __declspec(noinline) static LONG WINAPI exception_handler(EXCEPTION_POINTERS* ex_ptrs) {
+        exception_pointers = ex_ptrs;
         crash_handler();
         return EXCEPTION_CONTINUE_SEARCH;
     }
