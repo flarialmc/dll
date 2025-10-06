@@ -133,7 +133,7 @@ void ItemPhysics::applyTransformation(glm::mat4x4& mat) {
 
     //auto* itemActor = static_cast<ItemActor*>(actor);
     // const bool isBlock = itemActor->getStack().block != nullptr; <-- not functional
-
+    //
     Vec3<float> renderRotation = rotation;
 
     if (!isOnGround) {
