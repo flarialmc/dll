@@ -131,20 +131,19 @@ void ItemPhysics::applyTransformation(glm::mat4x4& mat) {
     const bool smoothRotations = settings.getSettingByName<bool>("smoothrots")->value;
     const bool preserveRotations = settings.getSettingByName<bool>("preserverots")->value;
 
-    //auto* itemActor = static_cast<ItemActor*>(actor);
-    // const bool isBlock = itemActor->getStack().block != nullptr; <-- not functional
-    //
+    auto* itemActor = static_cast<ItemActor*>(actor);
+    const bool isBlock = itemActor->getStack().block != nullptr;
+
     Vec3<float> renderRotation = rotation;
 
     if (!isOnGround) {
         rotation.y += spinDirection.y * deltaTime * speed * yMul;
         rotation.y = fmodf(rotation.y + 360.f, 360.f);
         renderRotation = rotation;
-    }
-
-    else {
+    } else {
         if (!preserveRotations && !smoothRotations) {
             renderRotation = Vec3<float>(90.f, 0.f, 0.f);
+            if (isBlock) renderRotation.z = 174.f;
         }
         else if (smoothRotations && !preserveRotations) {
             auto shortestAngle = [](float current, float target) -> float {
@@ -152,11 +151,11 @@ void ItemPhysics::applyTransformation(glm::mat4x4& mat) {
                 return diff;
             };
 
-            float diff = shortestAngle(rotation.y, 180.f);
+            float diff = shortestAngle(rotation.y, isBlock ? 90.f : 180.f);
             if (fabsf(diff) > 0.5f) {
                 rotation.y += (diff > 0 ? 1.f : -1.f) * deltaTime * speed * 3.f * yMul;
             } else {
-                rotation.y = 180.f;
+                rotation.y = isBlock ? 90.f : 180.f;
                 spinDirection.y = 0;
             }
 
@@ -165,7 +164,8 @@ void ItemPhysics::applyTransformation(glm::mat4x4& mat) {
     }
 
 
-    mat = glm::translate(mat, glm::vec3(0.f, -1.55f, 0.f));
+    if (!isBlock) mat = glm::translate(mat, glm::vec3(0.f, -1.55f, 0.f));
+    else mat = glm::translate(mat, glm::vec3(0.f, -2.90f, 0.f));
 
 
     mat = rotate(mat, glm::radians(renderRotation.x), { 1.f, 0.f, 0.f });
