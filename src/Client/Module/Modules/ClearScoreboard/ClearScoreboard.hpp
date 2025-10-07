@@ -17,6 +17,8 @@ public:
 private:
     static inline std::string layerName = "sidebar";
     std::shared_ptr<UIControl> targetControl = nullptr;
+    Vec2<float> originalSize = Vec2{0.f, 0.f};
+    bool savedOriginalSize = false;
     void clearScoreboard();
     void restoreScoreboard();
 };

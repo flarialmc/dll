@@ -12,7 +12,11 @@ void OffsetInit::init21110() {
     ADD_OFFSET("ScreenContext::tessellator", 0xB8);
     ADD_OFFSET("LevelRender::getLevelRendererPlayer", 0x3E8);
     ADD_OFFSET("LevelRendererPlayer::cameraPos", 0x6A0);
+	
+    ADD_OFFSET("Attribute::Hunger", 1);
+    ADD_OFFSET("Attribute::Saturation", 2);
     ADD_OFFSET("Attribute::Health", 6);
+
     ADD_OFFSET("Actor::baseTickVft", 29);
     ADD_OFFSET("ContainerScreenController::_handlePlaceAll", 57);
     ADD_OFFSET("ClientInstance::camera", 0x288);
@@ -23,6 +27,7 @@ void OffsetInit::init21110() {
     ADD_OFFSET("ClientInstance::getFovY", 0xF9C);
     ADD_OFFSET("ClientInstance::viewMatrix", 0x348);
     ADD_OFFSET("MinecraftUIRenderContext::getTexture", 31);
+    ADD_OFFSET("SwingAngle", 4);
 
 //
 }

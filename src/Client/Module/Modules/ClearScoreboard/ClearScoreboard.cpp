@@ -2,6 +2,7 @@
 
 void ClearScoreboard::onEnable() {
     targetControl = nullptr;
+    savedOriginalSize = false;
     Listen(this, SetupAndRenderEvent, &ClearScoreboard::onSetupAndRender)
     Module::onEnable();
 }
@@ -43,8 +44,11 @@ void ClearScoreboard::clearScoreboard() {
         });
     }
 
-    // Clear the control if we have it
     if (targetControl) {
+        if (!savedOriginalSize) {
+            originalSize = targetControl->sizeConstrains;
+            savedOriginalSize = true;
+        }
         if (targetControl->sizeConstrains.x != 0.f || targetControl->sizeConstrains.y != 0.f) {
             targetControl->sizeConstrains = Vec2{0.f, 0.f};
         }
@@ -52,5 +56,9 @@ void ClearScoreboard::clearScoreboard() {
 }
 
 void ClearScoreboard::restoreScoreboard() {
+    if (targetControl && savedOriginalSize) {
+        targetControl->sizeConstrains = originalSize;
+    }
     targetControl = nullptr;
+    savedOriginalSize = false;
 }

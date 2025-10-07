@@ -1,5 +1,4 @@
 #include "Client.hpp"
-
 #include <lib/json/json.hpp>
 
 #include <filesystem>
