@@ -6,6 +6,7 @@
 
 void OffsetInit::init21110() {
     Logger::custom(fg(fmt::color::golden_rod), "Offsets", "Loading offsets for 1.21.11X");
+    ADD_OFFSET("ChatScreenController::refreshChatMessages", 0xC73);
     ADD_OFFSET("Player::playerName", 0xC18);
     ADD_OFFSET("MinecraftGame::textureGroup", 0x778);
     ADD_OFFSET("Player::playerInventory", 0x5B8);

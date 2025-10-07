@@ -24,6 +24,6 @@ public:
 
     void enableHook() override {
         auto addressTick = GET_SIG_ADDRESS("ChatScreenController::tick");
-        //this->manualHook((void *) addressTick, (void *) ChatScreenController__tick, (void **) &funcOriginalTick);
+        this->manualHook((void *) addressTick, (void *) ChatScreenController__tick, (void **) &funcOriginalTick);
     }
 };
