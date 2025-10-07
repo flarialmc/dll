@@ -11,7 +11,7 @@ private:
         auto event = nes::make_holder<ChatScreenControllerTickEvent>(_this);
         eventMgr.trigger(event);
 
-        return funcOriginalTick(_this);
+        return funcOriginalTick(_this); // <----- Crashes right here!!!
     }
 
 public:
@@ -24,6 +24,6 @@ public:
 
     void enableHook() override {
         auto addressTick = GET_SIG_ADDRESS("ChatScreenController::tick");
-        this->manualHook((void *) addressTick, (void *) ChatScreenController__tick, (void **) &funcOriginalTick);
+        //this->manualHook((void *) addressTick, (void *) ChatScreenController__tick, (void **) &funcOriginalTick);
     }
 };
