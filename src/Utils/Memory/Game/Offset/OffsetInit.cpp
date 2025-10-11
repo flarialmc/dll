@@ -30,6 +30,8 @@ void OffsetInit::init21110() {
     ADD_OFFSET("MinecraftUIRenderContext::getTexture", 31);
     ADD_OFFSET("SwingAngle", 4);
 
+    ADD_OFFSET("Player::gamemode", 0xA78);
+
 //
 }
 
