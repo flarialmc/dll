@@ -70,7 +70,8 @@ void SigInit::init21110()
     ADD_SIG("ContainerScreenController::_handleTakeAll", "E8 ? ? ? ? 48 8B 46 ? C6 80 ? ? ? ? ? 48 8B 7E");
 
     ADD_SIG("Json::Value::ToStyledString", "E8 ? ? ? ? 90 0F 57 C9 F3 0F 7F 4D ? 48 8B 47");
-    ADD_SIG("Json::Value::Value", "48 89 5C 24 ? 57 48 83 EC ? 48 8B D9 C6 41 ? ? B9 ? ? ? ? 48 8B FA E8 ? ? ? ? 48 89 44 24 ? 48 85 C0 74 ? 48 83 7F");
+    ADD_SIG("Json::Reader::Reader", "48 89 5C 24 ? 48 89 74 24 ? 48 89 4C 24 ? 57 48 83 EC ? 48 8B F9 33 F6 48 89 31 48 89 71 ? 48 89 71 ? 48 89 71 ? 48 89 71 ? B9");
+    ADD_SIG("Json::Reader::Parse", "48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 41 56 48 83 EC ? 48 83 7A ? ? 41 0F B6 F1");
 }
 void SigInit::init21100() {
     Logger::custom(fg(fmt::color::gold), "Signatures", "Loading sigs for 1.21.10X");

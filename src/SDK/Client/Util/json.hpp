@@ -154,8 +154,35 @@ namespace MinecraftJson
         {
 
         }
+        Value(std::string const& value) {
+            memset(this, 0, sizeof(*this));
+            static uintptr_t func = GET_SIG_ADDRESS("Json::Reader::Reader");
+            void* Reader = nullptr;
+            Memory::CallFunc<void, void*>((void*)func, Reader);
+
+            static uintptr_t func2 = GET_SIG_ADDRESS("Json::Reader::Parse");
+            Memory::CallFunc<void, void*, std::string, MinecraftJson::Value*, bool>((void*)func2, Reader, value, this, false);
+        }
+
         Value() {
             memset(this, 0, sizeof(*this));
+        }
+    };
+
+    class Reader
+    {
+    public:
+        Reader()
+        {
+            static uintptr_t func = GET_SIG_ADDRESS("Json::Reader::Reader");
+            Memory::CallFunc<void, void*>((void*)func, this);
+        }
+        Value Parse(std::string const& json)
+        {
+            static uintptr_t func2 = GET_SIG_ADDRESS("Json::Reader::Parse");
+            Value result;
+            Memory::CallFunc<void, void*, std::string, MinecraftJson::Value*, bool>((void*)func2, this, json, &result, false);
+            return result;
         }
     };
 
