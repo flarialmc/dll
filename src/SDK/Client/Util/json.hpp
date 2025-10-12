@@ -139,9 +139,9 @@ namespace MinecraftJson
         }
 
         std::string toStyledString(std::string* output) {
-            /*static uintptr_t func = SigManager::JSON_toStyledString;
-            MemUtils::callFastcall<void, void*, std::string*>(func, this, output);
-            return *output;*/
+            static uintptr_t func = Memory::offsetFromSig(GET_SIG_ADDRESS("Json::Value::ToStyledString"), 1);
+            Memory::CallFunc<void, MinecraftJson::Value*, std::string*>((void*)func, this, output);
+            return *output;
         }
 
         nlohmann::json toNlohmannJson() {
@@ -154,8 +154,35 @@ namespace MinecraftJson
         {
 
         }
+        Value(std::string const& value) {
+            memset(this, 0, sizeof(*this));
+            static uintptr_t func = GET_SIG_ADDRESS("Json::Reader::Reader");
+            void* Reader = nullptr;
+            Memory::CallFunc<void, void*>((void*)func, Reader);
+
+            static uintptr_t func2 = GET_SIG_ADDRESS("Json::Reader::Parse");
+            Memory::CallFunc<void, void*, std::string, MinecraftJson::Value*, bool>((void*)func2, Reader, value, this, false);
+        }
+
         Value() {
             memset(this, 0, sizeof(*this));
+        }
+    };
+
+    class Reader
+    {
+    public:
+        Reader()
+        {
+            static uintptr_t func = GET_SIG_ADDRESS("Json::Reader::Reader");
+            Memory::CallFunc<void, void*>((void*)func, this);
+        }
+        Value Parse(std::string const& json)
+        {
+            static uintptr_t func2 = GET_SIG_ADDRESS("Json::Reader::Parse");
+            Value result;
+            Memory::CallFunc<void, void*, std::string, MinecraftJson::Value*, bool>((void*)func2, this, json, &result, false);
+            return result;
         }
     };
 
