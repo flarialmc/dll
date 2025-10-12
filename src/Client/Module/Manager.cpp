@@ -132,6 +132,7 @@
 #include "Modules/Stopwatch/Stopwatch.hpp"
 #include "Modules/Misc/F1Listener/F1Listener.hpp"
 #include "Modules/TNTTimer/TNTTimer.hpp"
+#include "Modules/ItemCounter/ItemCounter.hpp"
 
 #ifdef COMPILE_DOOM
 	#include "Modules/Doom/Doom.hpp"
@@ -313,10 +314,10 @@ void ModuleManager::initialize() {
 
 	addModule<DepthOfField>();
 
-	// addModule<InventoryLock>();
-
 	addModule<TNTTimer>();
 	addModule<InventoryLock>();
+
+	addModule<ItemCounter>();
 
 #ifdef COMPILE_DOOM
 	addModule<DoomModule>();

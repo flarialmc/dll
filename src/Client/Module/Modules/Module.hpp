@@ -106,6 +106,7 @@ public:
 		std::function<void()> action);
 
 	void addConditionalTextBox(bool condition, const std::string& text, const std::string& subtext, std::string& value, int limit = 16);
+	void addConditionalTextBox(bool condition, const std::string& text, const std::string& subtext, int limit, const std::string& settingName);
 
 	void addConditionalColorPicker(bool condition, const std::string& text, const std::string& subtext, std::string& value, float& opacity, bool& rgb);
 	void addConditionalColorPicker(bool condition, const std::string& text, const std::string& subtext, const std::string& settingName);
