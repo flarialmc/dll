@@ -16,4 +16,12 @@ public:
     mce::MaterialPtr* getSelectionBoxMaterial() {
         return hat::member_at<mce::MaterialPtr*>(this, 0xF08);
     }
+
+    float getFovX() {
+        return hat::member_at<float>(this, GET_OFFSET("ClientInstance::getFovX"));
+    };
+
+    float getFovY() {
+        return hat::member_at<float>(this, GET_OFFSET("ClientInstance::getFovY"));
+    };
 };

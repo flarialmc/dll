@@ -23,14 +23,14 @@ enum ResourceFileSystem : int32_t {
 class ResourceLocation {
 public:
     ResourceFileSystem fileSystem;
-    std::string filePath;
+    Core::PathBuffer<std::string> filePath;
     uint64_t pathHash{};
     uint64_t fullHash{};
 
     ResourceLocation() = default;
 
     ResourceLocation(const std::string& filePath, bool external) {
-        this->filePath = filePath;
+        this->filePath = Core::PathBuffer<std::string>(filePath);
         if (external)
             this->fileSystem = ResourceFileSystem::Raw;
         else this->fileSystem = ResourceFileSystem::UserPackage;
@@ -40,11 +40,11 @@ public:
 
     bool operator==(const ResourceLocation& other) const {
         if(this->fileSystem != other.fileSystem || this->pathHash != other.pathHash) return false;
-        return this->filePath == other.filePath;
+        return this->filePath.getContainer() == other.filePath.getContainer();
     }
 
     bool operator<(const ResourceLocation& other) const {
-        return this->filePath < other.filePath;
+        return this->filePath.getContainer() < other.filePath.getContainer();
     }
 
     // Get the full path to a texture file within a resource pack
@@ -69,8 +69,8 @@ private:
         const uint64_t FNV_PRIME = 0x100000001B3u;
 
         uint64_t _pathHash = FNV_OFFSET_BASIS;
-        if (!this->filePath.empty()) {
-            for (char c : this->filePath) {
+        if (!this->filePath.getContainer().empty()) {
+            for (char c : this->filePath.getContainer()) {
                 _pathHash *= FNV_PRIME;
                 _pathHash ^= c;
             }

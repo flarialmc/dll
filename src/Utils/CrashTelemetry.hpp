@@ -3,6 +3,7 @@
 #include <string>
 #include <stacktrace>
 #include <json/json_fwd.hpp>
+#include <windows.h>
 
 class CrashTelemetry {
 public:
@@ -13,7 +14,8 @@ public:
     static void sendCrashReport(
         const std::stacktrace& trace,
         int signal = 0,
-        const std::string& signalName = ""
+        const std::string& signalName = "",
+        EXCEPTION_POINTERS* exceptionPointers = nullptr
     );
 
     // Generate system information
@@ -35,8 +37,12 @@ public:
     static nlohmann::json getCrashInfo(
         const std::stacktrace& trace,
         int signal,
-        const std::string& signalName
+        const std::string& signalName,
+        EXCEPTION_POINTERS* exceptionPointers = nullptr
     );
+
+    // Get exception details from EXCEPTION_POINTERS
+    static nlohmann::json getExceptionDetails(EXCEPTION_POINTERS* exceptionPointers);
 
     // Generate unique crash ID
     static std::string generateCrashId();
@@ -79,6 +85,9 @@ public:
 
     // Get latest log file content
     static std::string getLatestLogContent();
+
+    // Get enabled modules as text (like in crash log file)
+    static std::string getEnabledModulesText();
 
     // Session start time
     static std::chrono::steady_clock::time_point s_sessionStart;

@@ -51,7 +51,7 @@ public:
                 ispatched = true;
                 // Bypass VendorID check to support some Intel GPUs
                 // bgfx::d3d12::RendererContextD3D12::init
-                if (auto ptr = reinterpret_cast<uint8_t*>(Memory::findSig("81 BF ?? ?? 00 00 86 80 00 00")); ptr) {
+                if (auto ptr = reinterpret_cast<uint8_t*>(Memory::findSig("81 BF ?? ?? 00 00 86 80 00 00", "bgfx::d3d12::RendererContextD3D12::init VendorID check")); ptr) {
                     // 1.19.40
                     ScopedVP(ptr, 10, PAGE_READWRITE);
                     ptr[6] = 0;
@@ -63,7 +63,7 @@ public:
 
                 // Fix rendering issues on some NVIDIA GPUs
                 // dragon::bgfximpl::toSamplerFlags
-                if (auto ptr = reinterpret_cast<uint8_t*>(Memory::findSig("FF E1 80 7B ? ? B8 00 00 07 10")); ptr) {
+                if (auto ptr = reinterpret_cast<uint8_t*>(Memory::findSig("FF E1 80 7B ? ? B8 00 00 07 10", "dragon::bgfximpl::toSamplerFlags NVIDIA fix")); ptr) {
                     // 1.21.50
                     ScopedVP(ptr, 10, PAGE_READWRITE);
                     ptr[9] = 0;

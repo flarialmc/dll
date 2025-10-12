@@ -11,7 +11,7 @@ private:
         auto event = nes::make_holder<ChatScreenControllerTickEvent>(_this);
         eventMgr.trigger(event);
 
-        return funcOriginalTick(_this);
+        return funcOriginalTick(_this); // <----- Crashes right here!!!!
     }
 
 public:

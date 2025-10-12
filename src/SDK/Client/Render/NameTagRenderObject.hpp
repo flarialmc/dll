@@ -2,7 +2,12 @@
 
 #include <Utils/Memory/Memory.hpp>
 
-struct NameTagRenderObject {
-    BUILD_ACCESS(this, std::string, nameTag, GET_OFFSET("NameTagRenderObject::nameTag"));
-    BUILD_ACCESS(this, Vec3<float>, pos, GET_OFFSET("NameTagRenderObject::pos"));
+struct __declspec(align(8)) NameTagRenderObject {
+    std::string nameTag;
+    std::shared_ptr<uintptr_t> mesh;
+    void* tagMat;
+    void* mTextMatOverride;
+    MCCColor tagColor;
+    MCCColor textColor;
+    Vec3<float> pos;
 };

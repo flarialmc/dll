@@ -61,7 +61,7 @@ void BlockOutline::onOutlineSelection(RenderOutlineSelectionEvent &event) {
 
     mce::MaterialPtr *material = MaterialUtils::getNametag();
 
-    MCDrawUtil3D dc(SDK::clientInstance->getLevelRender(), event.getScreenContext(), material);
+    MCDrawUtil3D dc(SDK::clientInstance->getLevelRender(), SDK::scn, material);
 
     auto face = (int) SDK::clientInstance->getLocalPlayer()->getLevel()->getHitResult().facing;
 

@@ -2,6 +2,7 @@
 
 #include "../Module.hpp"
 #include "Events/Game/PerspectiveEvent.hpp"
+#include "Events/Render/DrawNameTagEvent.hpp"
 
 
 class ThirdPerson : public Module {
@@ -32,5 +33,9 @@ public:
 
     static void unpatch();
 
+    void settingsRender(float settingsOffset) override;
+
     void onGetViewPerspective(PerspectiveEvent& event);
+
+    void onDrawNameTag(DrawNameTagEvent& event);
 };

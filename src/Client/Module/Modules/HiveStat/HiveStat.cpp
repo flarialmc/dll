@@ -285,21 +285,22 @@ void HiveStat::onRender(RenderEvent &event) {
                             oss << std::fixed << std::setprecision(2) << fkdr;
 
                             if (fkdr >= getOps<float>("threshold-FKDR-1")) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 0, 170, 255)); // Dark blue
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("dark_blue"));
                             } else if (fkdr >= getOps<float>("threshold-FKDR-2")) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 85, 85, 255)); // Red
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("red"));
                             } else if (fkdr >= getOps<float>("threshold-FKDR-3")) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 255, 0, 255)); // Green
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("green"));
                             } else if (fkdr >= getOps<float>("threshold-FKDR-4")) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 215, 0, 255)); // Gold
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("gold"));
                             } else {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(128, 128, 128, 255)); // Gray
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("gray"));
                             }
 
                             ImGui::Text("%s", oss.str().c_str());
                             ImGui::PopStyleColor();
                             columnIndex++;
                         }
+
                         if (getOps<bool>("showKD") == true) {
 
                             ImGui::TableSetColumnIndex(columnIndex);
@@ -308,21 +309,22 @@ void HiveStat::onRender(RenderEvent &event) {
                             oss << std::fixed << std::setprecision(2) << kd;
 
                             if (kd >= getOps<float>("threshold-KD-1")) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 0, 170, 255)); // Dark blue
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("dark_blue"));
                             } else if (kd >= getOps<float>("threshold-KD-2")) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 85, 85, 255)); // Red
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("red"));
                             } else if (kd >= getOps<float>("threshold-KD-3")) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 255, 0, 255)); // Green
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("green"));
                             } else if (kd >= getOps<float>("threshold-KD-4")) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 215, 0, 255)); // Gold
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("gold"));
                             } else {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(128, 128, 128, 255)); // Gray
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("gray"));
                             }
 
                             ImGui::Text("%s", oss.str().c_str());
                             ImGui::PopStyleColor();
                             columnIndex++;
                         }
+
                         if (getOps<bool>("showWR") == true) {
 
                             ImGui::TableSetColumnIndex(columnIndex);
@@ -331,21 +333,22 @@ void HiveStat::onRender(RenderEvent &event) {
                             oss << std::fixed << std::setprecision(0) << winrate << "%";
 
                             if (winrate >= getOps<float>("threshold-WR-1")) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 0, 170, 255)); // Dark blue
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("dark_blue"));
                             } else if (winrate >= getOps<float>("threshold-WR-2")) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 85, 85, 255)); // Red
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("red"));
                             } else if (winrate >= getOps<float>("threshold-WR-3")) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 255, 0, 255)); // Green
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("green"));
                             } else if (winrate >= getOps<float>("threshold-WR-4")) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 215, 0, 255)); // Gold
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("gold"));
                             } else {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(128, 128, 128, 255)); // Gray
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("gray"));
                             }
 
                             ImGui::Text("%s", oss.str().c_str());
                             ImGui::PopStyleColor();
                             columnIndex++;
                         }
+
                         if (getOps<bool>("showLevel") == true) {
 
                             ImGui::TableSetColumnIndex(columnIndex);
@@ -354,27 +357,28 @@ void HiveStat::onRender(RenderEvent &event) {
                             oss << std::fixed << std::setprecision(0) << level;
 
                             if (level >= getOps<int>("threshold-Level-1")) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 0, 170, 255)); // Dark blue
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("dark_blue"));
                             } else if (level >= getOps<int>("threshold-Level-2")) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 85, 85, 255)); // Red
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("red"));
                             } else if (level >= getOps<int>("threshold-Level-3")) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 255, 0, 255)); // Green
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("green"));
                             } else if (level >= getOps<int>("threshold-Level-4")) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 255, 255)); // Magenta
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("magenta"));
                             } else if (level >= getOps<int>("threshold-Level-5")) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 255, 255, 255)); // Aqua
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("aqua"));
                             } else if (level >= getOps<int>("threshold-Level-6")) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 0, 255)); // Yellow
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("yellow"));
                             } else if (level >= getOps<int>("threshold-Level-7")) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 215, 0, 255)); // Gold
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("gold"));
                             } else {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(128, 128, 128, 255)); // Gray
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("gray"));
                             }
 
                             ImGui::Text("%s%s", it->second.getPrestige(), oss.str().c_str());
                             ImGui::PopStyleColor();
                             columnIndex++;
                         }
+
                         if (getOps<bool>("showWins") == true) {
 
                             ImGui::TableSetColumnIndex(columnIndex);
@@ -383,27 +387,28 @@ void HiveStat::onRender(RenderEvent &event) {
                             oss << std::fixed << std::setprecision(0) << victories;
 
                             if (victories >= 10000) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 0, 170, 255)); // Dark blue
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("dark_blue"));
                             } else if (victories >= 8000) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 85, 85, 255)); // Red
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("red"));
                             } else if (victories >= 5000) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 255, 0, 255)); // Green
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("green"));
                             } else if (victories >= 3000) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 255, 255)); // Magenta
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("magenta"));
                             } else if (victories >= 1000) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 255, 255, 255)); // Aqua
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("aqua"));
                             } else if (victories >= 500) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 0, 255)); // Yellow
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("yellow"));
                             } else if (victories >= 100) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 215, 0, 255)); // Gold
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("gold"));
                             } else {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(128, 128, 128, 255)); // Gray
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("gray"));
                             }
 
                             ImGui::Text("%s", oss.str().c_str());
                             ImGui::PopStyleColor();
                             columnIndex++;
                         }
+
                         if (getOps<bool>("showLosses") == true) {
 
                             ImGui::TableSetColumnIndex(columnIndex);
@@ -412,27 +417,28 @@ void HiveStat::onRender(RenderEvent &event) {
                             oss << std::fixed << std::setprecision(0) << losses;
 
                             if (losses >= 10000) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(170, 0, 0, 255)); // Dark red
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("dark_red"));
                             } else if (losses >= 8000) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 85, 85, 255)); // Red
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("red"));
                             } else if (losses >= 5000) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 170, 0, 255)); // Gold
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("orange"));
                             } else if (losses >= 3000) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 85, 255)); // Yellow
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("olive"));
                             } else if (losses >= 1000) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 255, 0, 255)); // Green
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("green"));
                             } else if (losses >= 500) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(85, 255, 255, 255)); // Aqua
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("dark_aqua"));
                             } else if (losses >= 100) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(192, 192, 192, 255)); // Light Gray
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("light_gray"));
                             } else {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(128, 128, 128, 255)); // Gray
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("gray"));
                             }
 
                             ImGui::Text("%s", oss.str().c_str());
                             ImGui::PopStyleColor();
                             columnIndex++;
                         }
+
                         if (getOps<bool>("showKills") == true) {
 
                             ImGui::TableSetColumnIndex(columnIndex);
@@ -441,27 +447,28 @@ void HiveStat::onRender(RenderEvent &event) {
                             oss << std::fixed << std::setprecision(0) << kills;
 
                             if (kills >= 10000) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 0, 170, 255)); // Dark blue
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("dark_blue"));
                             } else if (kills >= 8000) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 85, 85, 255)); // Red
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("red"));
                             } else if (kills >= 5000) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 255, 0, 255)); // Green
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("green"));
                             } else if (kills >= 3000) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 255, 255)); // Magenta
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("magenta"));
                             } else if (kills >= 1000) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 255, 255, 255)); // Aqua
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("aqua"));
                             } else if (kills >= 500) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 0, 255)); // Yellow
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("yellow"));
                             } else if (kills >= 100) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 215, 0, 255)); // Gold
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("gold"));
                             } else {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(128, 128, 128, 255)); // Gray
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("gray"));
                             }
 
                             ImGui::Text("%s", oss.str().c_str());
                             ImGui::PopStyleColor();
                             columnIndex++;
                         }
+
                         if (getOps<bool>("showDeaths") == true) {
 
                             ImGui::TableSetColumnIndex(columnIndex);
@@ -470,23 +477,23 @@ void HiveStat::onRender(RenderEvent &event) {
                             oss << std::fixed << std::setprecision(0) << deaths;
 
                             if (deaths >= 20000) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 0, 170, 255)); // Dark blue
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("dark_blue"));
                             } else if (deaths >= 10000) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(170, 0, 0, 255)); // Dark red
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("dark_red"));
                             } else if (deaths >= 8000) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 85, 85, 255)); // Red
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("red"));
                             } else if (deaths >= 5000) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 170, 0, 255)); // Gold
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("orange"));
                             } else if (deaths >= 3000) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 85, 255)); // Yellow
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("olive"));
                             } else if (deaths >= 1000) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 255, 0, 255)); // Green
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("green"));
                             } else if (deaths >= 500) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(85, 255, 255, 255)); // Aqua
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("dark_aqua"));
                             } else if (deaths >= 100) {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(192, 192, 192, 255)); // Light Gray
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("light_gray"));
                             } else {
-                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(128, 128, 128, 255)); // Gray
+                                ImGui::PushStyleColor(ImGuiCol_Text, colorMap.at("gray"));
                             }
 
                             ImGui::Text("%s", oss.str().c_str());

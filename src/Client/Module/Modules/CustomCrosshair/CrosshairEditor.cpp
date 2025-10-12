@@ -69,29 +69,19 @@ const unsigned char* CrosshairImage::getImageData()
 
 void CrosshairImage::SaveImage(std::string name)
 {
-    if (!valid || PixelData.empty() || Size <= 0) {
-        return;
-    }
-
-    // Ensure directory exists
-    std::string crosshairDir = Utils::getClientPath() + "\\Crosshairs";
-    if (!std::filesystem::exists(crosshairDir)) {
-        std::filesystem::create_directories(crosshairDir);
-    }
-
     // Get the image data
     const unsigned char* data = getImageData();
 
-    if (data != nullptr) {
-        // Use stb_image_write to save the PNG
-        int result = stbi_write_png((Utils::getClientPath() + "\\Crosshairs\\" + name + ".png").c_str(), Size, Size, 4, data, Size * 4);
+    // Use stb_image_write to save the PNG
+    int result = stbi_write_png((Utils::getClientPath() + "//Crosshairs//" + name + ".png").c_str(), Size, Size, 4, data, Size * 4);
 
-        // Clean up the allocated memory
-        delete[] data;
+    // Clean up the allocated memory
+    delete[] data;
 
-        if (!result) {
-            valid = false;
-        }
+    // Optional: Log error if save fails
+    if (!result) {
+        // Add error handling (e.g., log to console or UI)
+        // std::cerr << "Failed to save crosshair: " << name << std::endl;
     }
 }
 
@@ -243,8 +233,6 @@ void CustomCrosshair::CrosshairEditorWindow()
             for (auto& ch : crosshairs) {
                 if (ch.second != nullptr && !ch.first.empty()) {
                     ch.second->SaveImage(ch.first);
-
-                    invalidateCrosshairTexture(ch.first);
                 }
             }
 
@@ -260,9 +248,6 @@ void CustomCrosshair::CrosshairEditorWindow()
                 crosshair->SaveImage(settings.getSettingByName<std::string>("CurrentCrosshair")->value);
             }
             CrosshairReloaded = true;
-
-            invalidateCrosshairTexture(CurrentSelectedCrosshair);
-
             FlarialGUI::Notify("Loaded the crosshair: " + CurrentSelectedCrosshair);
         }
 
@@ -320,31 +305,17 @@ void CustomCrosshair::CrosshairEditorWindow()
         if (FlarialGUI::RoundedButton(8, ButtonPosX, ButtonPosY,
             anotherColor, textCol, L"", CrosshairRectHeight, CrosshairRectHeight, round.x / 2, round.x / 2))
         {
-            // Check if there's only one crosshair left
-            int validCrosshairCount = 0;
-            for (const auto& ch : crosshairs) {
-                if (ch.second != nullptr && !ch.first.empty()) {
-                    validCrosshairCount++;
-                }
+            auto it = crosshairs.find(CurrentSelectedCrosshair);
+
+            if (it != crosshairs.end()) {
+                delete it->second;
+                crosshairs.erase(it);
             }
 
-            if (validCrosshairCount <= 1) {
-                // Show warning if trying to delete the last crosshair
-                FlarialGUI::Notify("Cannot delete the last remaining crosshair!");
-            } else {
-                // Proceed with deletion if there are multiple crosshairs
-                auto it = crosshairs.find(CurrentSelectedCrosshair);
-
-                if (it != crosshairs.end()) {
-                    delete it->second;
-                    crosshairs.erase(it);
-                }
-
-                if (settings.getSettingByName<std::string>("CurrentCrosshair")->value == CurrentSelectedCrosshair)
-                {
-                    settings.getSettingByName<std::string>("CurrentCrosshair")->value = "";
-                    CrosshairReloaded = true;
-                }
+            if (settings.getSettingByName<std::string>("CurrentCrosshair")->value == CurrentSelectedCrosshair)
+            {
+                settings.getSettingByName<std::string>("CurrentCrosshair")->value = "";
+                CrosshairReloaded = true;
             }
         }
 

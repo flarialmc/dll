@@ -16,5 +16,9 @@ public:
 
 private:
     static inline std::string layerName = "chat_panel";
+    std::shared_ptr<UIControl> targetControl = nullptr;
+    Vec2<float> originalSize = Vec2{0.f, 0.f};
+    bool savedOriginalSize = false;
     void clearChat();
+    void restoreChat();
 };

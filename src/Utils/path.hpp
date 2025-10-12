@@ -141,3 +141,14 @@ inline Core::PathPart::PathPart(const Core::PathBuffer<Container>& pathBuffer) :
 
 template <typename Container>
 inline Core::PathBuffer<Container>::PathBuffer(const Core::Path& s) : mContainer(s.getUtf8StdString()) {}
+
+template <typename Container>
+inline Core::PathBuffer<Container>& Core::PathBuffer<Container>::operator=(Core::PathBuffer<Container>&& rhs) {
+    mContainer = std::move(rhs.mContainer);
+    return *this;
+}
+
+template <typename Container>
+inline bool Core::PathBuffer<Container>::operator==(const Core::Path& s) const {
+    return mContainer == s.getUtf8StdString();
+}

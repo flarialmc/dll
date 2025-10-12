@@ -4,6 +4,37 @@
 #include <Utils/Logger/Logger.hpp>
 #include <Utils/Memory/Game/SignatureAndOffsetManager.hpp>
 
+void OffsetInit::init21110() {
+    Logger::custom(fg(fmt::color::golden_rod), "Offsets", "Loading offsets for 1.21.11X");
+    ADD_OFFSET("ChatScreenController::refreshChatMessages", 0xC73);
+    ADD_OFFSET("Player::playerName", 0xC18);
+    ADD_OFFSET("MinecraftGame::textureGroup", 0x778);
+    ADD_OFFSET("Player::playerInventory", 0x5B8);
+    ADD_OFFSET("ScreenContext::tessellator", 0xB8);
+    ADD_OFFSET("LevelRender::getLevelRendererPlayer", 0x3E8);
+    ADD_OFFSET("LevelRendererPlayer::cameraPos", 0x6A0);
+	
+    ADD_OFFSET("Attribute::Hunger", 1);
+    ADD_OFFSET("Attribute::Saturation", 2);
+    ADD_OFFSET("Attribute::Health", 6);
+
+    ADD_OFFSET("Actor::baseTickVft", 29);
+    ADD_OFFSET("ContainerScreenController::_handlePlaceAll", 57);
+    ADD_OFFSET("ClientInstance::camera", 0x288);
+    ADD_OFFSET("ClientInstance::guiData", 0x578);
+
+    ADD_OFFSET("ItemActor::stack", 0x3B0);
+    ADD_OFFSET("ClientInstance::getFovX", 0xF88);
+    ADD_OFFSET("ClientInstance::getFovY", 0xF9C);
+    ADD_OFFSET("ClientInstance::viewMatrix", 0x348);
+    ADD_OFFSET("MinecraftUIRenderContext::getTexture", 31);
+    ADD_OFFSET("SwingAngle", 4);
+
+    ADD_OFFSET("Player::gamemode", 0xA78);
+
+//
+}
+
 void OffsetInit::init21100() {
     Logger::custom(fg(fmt::color::golden_rod), "Offsets", "Loading offsets for 1.21.10X");
 
@@ -84,7 +115,7 @@ void OffsetInit::init2170() {
     ADD_OFFSET("ClientInstance::guiData", 0x5B0);
     ADD_OFFSET("ClientInstance::getFovX", 0x748);
     ADD_OFFSET("ClientInstance::getFovY", 0x75C);
-
+//
     ADD_OFFSET("mce::Camera::worldMatrixStack", 0x40);
 
     ADD_OFFSET("MinecraftGame::textureGroup", 0x6C0);
@@ -174,6 +205,8 @@ void OffsetInit::init2150() {
     ADD_OFFSET("Weather::lightningLevel", 0x40);
 
     ADD_OFFSET("Level::getRuntimeEntity", 57);
+    ADD_OFFSET("MinecraftUIRenderContext::getTexture", 29);
+
 }
 
 void OffsetInit::init2140() {

@@ -7,6 +7,7 @@
 
 ClientInstance *SDK::clientInstance = nullptr;
 ScreenView *SDK::screenView = nullptr;
+ScreenContext* SDK::scn = nullptr;
 std::vector<DrawTextQueueEntry> SDK::drawTextQueue;
 std::vector<DrawTextQueueEntry> SDK::drawTextQueue2;
 std::string SDK::currentScreen;

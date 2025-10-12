@@ -57,6 +57,7 @@ void MCDrawUtil3D::drawLineList(Vec3<float> const& p1, Vec3<float> const& p2, D2
 void MCDrawUtil3D::drawQuad(Vec3<float> a, Vec3<float> b, Vec3<float> c, Vec3<float> d, D2D_COLOR_F const& color) {
 	auto scn = screenContext;
 	auto tess = scn->getTessellator();
+	if (!tess) return;
 	*scn->getColorHolder() = { 1.f, 1.f, 1.f, 1.f };
 	tess->begin(mce::PrimitiveMode::LineStrip, 1); // linestrip
 	tess->color(color.r, color.g, color.b, color.a);
@@ -90,6 +91,8 @@ void MCDrawUtil3D::fillQuad(Vec3<float> p1, Vec3<float> p2, Vec3<float> p3, Vec3
 	auto scn = screenContext;
 	
 	auto tess = scn->getTessellator();
+
+	if (!tess) return;
 	*scn->getColorHolder() = { 1.f, 1.f, 1.f, 1.f };
 	tess->begin(mce::PrimitiveMode::QuadList, 4); // linestrip
 	tess->color(color.r, color.g, color.b, color.a);

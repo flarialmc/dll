@@ -13,7 +13,7 @@
 #define ADD_SIG(name, sig) \
     []{ \
         constexpr unsigned int hash_val = Utils::hash(name); \
-        Mgr.addSignature(hash_val, sig); \
+        Mgr.addSignature(hash_val, sig, name); \
     }()
 
 #define GET_SIG(name) \
@@ -45,9 +45,10 @@
 
 class SignatureAndOffsetManager {
 public:
-    void addSignature(unsigned int hash, const char* sig);
+    void addSignature(unsigned int hash, const char* sig, const char* name);
     void removeSignature(unsigned int hash);
     [[nodiscard]] const char* getSig(unsigned int hash) const;
+    [[nodiscard]] const char* getSigName(unsigned int hash) const;
     [[nodiscard]] uintptr_t getSigAddress(unsigned int hash) const;
 
     void addOffset(unsigned int hash, int offset);
@@ -58,7 +59,12 @@ public:
     void clear();
 
 private:
-    std::unordered_map<unsigned int, std::pair<std::string, uintptr_t>> sigs{};
+    struct SignatureData {
+        std::string signature;
+        std::string name;
+        uintptr_t address;
+    };
+    std::unordered_map<unsigned int, SignatureData> sigs{};
     std::unordered_map<unsigned int, int> offsets{};
 };
 

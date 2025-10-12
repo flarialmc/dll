@@ -8,15 +8,11 @@
 
 class ItemRendererEvent : public Event, public Cancellable {
 private:
-    ItemRenderer* itemRenderer;
-    BaseActorRenderContext* renderContext;
     ActorRenderData* renderData;
 
 public:
-    ItemRendererEvent(ItemRenderer* renderer, BaseActorRenderContext* ctx, ActorRenderData* data)
-        : itemRenderer(renderer), renderContext(ctx), renderData(data) {}
+    ItemRendererEvent(ActorRenderData* data)
+        : renderData(data) {}
 
-    ItemRenderer* getItemRenderer() const { return itemRenderer; }
-    BaseActorRenderContext* getRenderContext() const { return renderContext; }
     ActorRenderData* getRenderData() const { return renderData; }
 };

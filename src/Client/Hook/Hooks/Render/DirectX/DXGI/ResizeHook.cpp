@@ -168,16 +168,6 @@ void ResizeHook::cleanShit(bool fullReset) {
     // Reinitialize async loading after cleanup so player heads continue to load
     TabList::ReinitializeAfterResize();
 
-    auto customCrosshairModule = ModuleManager::getModule("Custom Crosshair");
-    if (customCrosshairModule) {
-        auto customCrosshair = std::dynamic_pointer_cast<CustomCrosshair>(customCrosshairModule);
-        if (customCrosshair) {
-            customCrosshair->cleanupTextures();
-            customCrosshair->cleanupTexturesDX12();
-            customCrosshair->reinitializeAfterResize();
-        }
-    }
-
     if (fullReset) {
         FlarialGUI::hasLoadedAll = false;
         for (auto& [id, texture] : ImagesClass::ImguiDX12Textures) {

@@ -13,6 +13,6 @@ public:
     TexturePtr() = default;
 
     [[nodiscard]] std::string GetFilePath() const {
-        return resourceLocation->filePath;
+        return resourceLocation->filePath.getContainer();
     }
 };

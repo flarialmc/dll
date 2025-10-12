@@ -66,7 +66,7 @@ int FlarialGUI::SliderInt(int index, float x, float y, int& startingPoint, const
 
 	RoundedRect(x, y, TextBoxes[30 + index].curBgCol, percWidth, percHeight, round.x, round.x);
 
-	int limit = 3;//std::to_string(maxValue).length() + (minValue < 0 ? 1 : 0);
+	int limit = 3;
 
 	startingPoint = std::clamp(startingPoint, minValue, maxValue);
 	if (SliderIntRects[index].validInt == -1) SliderIntRects[index].validInt = std::clamp(startingPoint, minValue, maxValue);

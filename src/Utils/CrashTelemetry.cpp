@@ -37,7 +37,8 @@ void CrashTelemetry::initialize() {
 void CrashTelemetry::sendCrashReport(
     const std::stacktrace& trace,
     int signal,
-    const std::string& signalName
+    const std::string& signalName,
+    EXCEPTION_POINTERS* exceptionPointers
 ) {
     try {
         if (!s_initialized) {
@@ -59,15 +60,17 @@ void CrashTelemetry::sendCrashReport(
             {"crashId", crashId},
             {"timestamp", timestamp},
             {"clientInfo", getClientInfo()},
-            {"crashInfo", getCrashInfo(trace, signal, signalName)},
+            {"crashInfo", getCrashInfo(trace, signal, signalName, exceptionPointers)},
             {"systemInfo", getSystemInfo()},
             {"hardwareInfo", getHardwareInfo()},
             {"sessionInfo", getSessionInfo()},
             {"additionalData", {
                 {"logFiles", nlohmann::json::array()}, // Could be populated later
                 {"moduleStates", getModuleStates()},
-                {"userActions", UserActionLogger::getRecentActions(20)},
-                {"logs", getLatestLogContent()}
+                {"userActions", UserActionLogger::getRecentActions(100)}, // Match exportToFile behavior
+                {"logs", getLatestLogContent()},
+                {"commitHash", COMMIT_HASH}, // Add commit hash like in crash log file
+                {"enabledModulesText", getEnabledModulesText()} // Add enabled modules list like in crash log file
             }}
         };
 
@@ -113,11 +116,67 @@ nlohmann::json CrashTelemetry::getClientInfo() {
 nlohmann::json CrashTelemetry::getCrashInfo(
     const std::stacktrace& trace,
     int signal,
-    const std::string& signalName
+    const std::string& signalName,
+    EXCEPTION_POINTERS* exceptionPointers
 ) {
+    std::string message = signalName.empty() ? "Unknown crash" : signalName;
+
+    // Add exception details to the message string
+    if (exceptionPointers && exceptionPointers->ExceptionRecord) {
+        auto* record = exceptionPointers->ExceptionRecord;
+
+        std::stringstream ss;
+        ss << message << "\n";
+
+        // Get exception name
+        std::string exceptionName;
+        switch (record->ExceptionCode) {
+            case EXCEPTION_ACCESS_VIOLATION: exceptionName = "EXCEPTION_ACCESS_VIOLATION"; break;
+            case EXCEPTION_ARRAY_BOUNDS_EXCEEDED: exceptionName = "EXCEPTION_ARRAY_BOUNDS_EXCEEDED"; break;
+            case EXCEPTION_BREAKPOINT: exceptionName = "EXCEPTION_BREAKPOINT"; break;
+            case EXCEPTION_DATATYPE_MISALIGNMENT: exceptionName = "EXCEPTION_DATATYPE_MISALIGNMENT"; break;
+            case EXCEPTION_FLT_DENORMAL_OPERAND: exceptionName = "EXCEPTION_FLT_DENORMAL_OPERAND"; break;
+            case EXCEPTION_FLT_DIVIDE_BY_ZERO: exceptionName = "EXCEPTION_FLT_DIVIDE_BY_ZERO"; break;
+            case EXCEPTION_FLT_INEXACT_RESULT: exceptionName = "EXCEPTION_FLT_INEXACT_RESULT"; break;
+            case EXCEPTION_FLT_INVALID_OPERATION: exceptionName = "EXCEPTION_FLT_INVALID_OPERATION"; break;
+            case EXCEPTION_FLT_OVERFLOW: exceptionName = "EXCEPTION_FLT_OVERFLOW"; break;
+            case EXCEPTION_FLT_STACK_CHECK: exceptionName = "EXCEPTION_FLT_STACK_CHECK"; break;
+            case EXCEPTION_FLT_UNDERFLOW: exceptionName = "EXCEPTION_FLT_UNDERFLOW"; break;
+            case EXCEPTION_ILLEGAL_INSTRUCTION: exceptionName = "EXCEPTION_ILLEGAL_INSTRUCTION"; break;
+            case EXCEPTION_IN_PAGE_ERROR: exceptionName = "EXCEPTION_IN_PAGE_ERROR"; break;
+            case EXCEPTION_INT_DIVIDE_BY_ZERO: exceptionName = "EXCEPTION_INT_DIVIDE_BY_ZERO"; break;
+            case EXCEPTION_INT_OVERFLOW: exceptionName = "EXCEPTION_INT_OVERFLOW"; break;
+            case EXCEPTION_INVALID_DISPOSITION: exceptionName = "EXCEPTION_INVALID_DISPOSITION"; break;
+            case EXCEPTION_NONCONTINUABLE_EXCEPTION: exceptionName = "EXCEPTION_NONCONTINUABLE_EXCEPTION"; break;
+            case EXCEPTION_PRIV_INSTRUCTION: exceptionName = "EXCEPTION_PRIV_INSTRUCTION"; break;
+            case EXCEPTION_SINGLE_STEP: exceptionName = "EXCEPTION_SINGLE_STEP"; break;
+            case EXCEPTION_STACK_OVERFLOW: exceptionName = "EXCEPTION_STACK_OVERFLOW"; break;
+            default: exceptionName = "UNKNOWN_EXCEPTION"; break;
+        }
+
+        ss << "Exception Code: 0x" << std::hex << std::setw(16) << std::setfill('0') << record->ExceptionCode
+           << " (" << exceptionName << ")\n";
+        ss << "Exception Address: 0x" << std::hex << std::setw(16) << std::setfill('0') << (uint64_t)record->ExceptionAddress << "\n";
+        ss << "Exception Flags: 0x" << std::hex << std::setw(16) << std::setfill('0') << record->ExceptionFlags;
+
+        // Additional info for access violations
+        if (record->ExceptionCode == EXCEPTION_ACCESS_VIOLATION && record->NumberParameters >= 2) {
+            std::string accessType;
+            if (record->ExceptionInformation[0] == 0) accessType = "Read";
+            else if (record->ExceptionInformation[0] == 1) accessType = "Write";
+            else accessType = "Execute";
+
+            ss << "\n\nAccess Violation Details:\n";
+            ss << "  Type: " << accessType << "\n";
+            ss << "  Address: 0x" << std::hex << std::setw(16) << std::setfill('0') << record->ExceptionInformation[1];
+        }
+
+        message = ss.str();
+    }
+
     nlohmann::json crashInfo = {
         {"type", getCrashType(signal)},
-        {"message", signalName.empty() ? "Unknown crash" : signalName},
+        {"message", message},
         {"stackTrace", formatStackTrace(trace)}
     };
 
@@ -127,6 +186,62 @@ nlohmann::json CrashTelemetry::getCrashInfo(
     }
 
     return crashInfo;
+}
+
+nlohmann::json CrashTelemetry::getExceptionDetails(EXCEPTION_POINTERS* exceptionPointers) {
+    if (!exceptionPointers || !exceptionPointers->ExceptionRecord) {
+        return nullptr;
+    }
+
+    auto* record = exceptionPointers->ExceptionRecord;
+
+    nlohmann::json details = {
+        {"code", record->ExceptionCode},
+        {"address", (uint64_t)record->ExceptionAddress},
+        {"flags", record->ExceptionFlags}
+    };
+
+    // Get exception name
+    std::string exceptionName;
+    switch (record->ExceptionCode) {
+        case EXCEPTION_ACCESS_VIOLATION: exceptionName = "EXCEPTION_ACCESS_VIOLATION"; break;
+        case EXCEPTION_ARRAY_BOUNDS_EXCEEDED: exceptionName = "EXCEPTION_ARRAY_BOUNDS_EXCEEDED"; break;
+        case EXCEPTION_BREAKPOINT: exceptionName = "EXCEPTION_BREAKPOINT"; break;
+        case EXCEPTION_DATATYPE_MISALIGNMENT: exceptionName = "EXCEPTION_DATATYPE_MISALIGNMENT"; break;
+        case EXCEPTION_FLT_DENORMAL_OPERAND: exceptionName = "EXCEPTION_FLT_DENORMAL_OPERAND"; break;
+        case EXCEPTION_FLT_DIVIDE_BY_ZERO: exceptionName = "EXCEPTION_FLT_DIVIDE_BY_ZERO"; break;
+        case EXCEPTION_FLT_INEXACT_RESULT: exceptionName = "EXCEPTION_FLT_INEXACT_RESULT"; break;
+        case EXCEPTION_FLT_INVALID_OPERATION: exceptionName = "EXCEPTION_FLT_INVALID_OPERATION"; break;
+        case EXCEPTION_FLT_OVERFLOW: exceptionName = "EXCEPTION_FLT_OVERFLOW"; break;
+        case EXCEPTION_FLT_STACK_CHECK: exceptionName = "EXCEPTION_FLT_STACK_CHECK"; break;
+        case EXCEPTION_FLT_UNDERFLOW: exceptionName = "EXCEPTION_FLT_UNDERFLOW"; break;
+        case EXCEPTION_ILLEGAL_INSTRUCTION: exceptionName = "EXCEPTION_ILLEGAL_INSTRUCTION"; break;
+        case EXCEPTION_IN_PAGE_ERROR: exceptionName = "EXCEPTION_IN_PAGE_ERROR"; break;
+        case EXCEPTION_INT_DIVIDE_BY_ZERO: exceptionName = "EXCEPTION_INT_DIVIDE_BY_ZERO"; break;
+        case EXCEPTION_INT_OVERFLOW: exceptionName = "EXCEPTION_INT_OVERFLOW"; break;
+        case EXCEPTION_INVALID_DISPOSITION: exceptionName = "EXCEPTION_INVALID_DISPOSITION"; break;
+        case EXCEPTION_NONCONTINUABLE_EXCEPTION: exceptionName = "EXCEPTION_NONCONTINUABLE_EXCEPTION"; break;
+        case EXCEPTION_PRIV_INSTRUCTION: exceptionName = "EXCEPTION_PRIV_INSTRUCTION"; break;
+        case EXCEPTION_SINGLE_STEP: exceptionName = "EXCEPTION_SINGLE_STEP"; break;
+        case EXCEPTION_STACK_OVERFLOW: exceptionName = "EXCEPTION_STACK_OVERFLOW"; break;
+        default: exceptionName = "UNKNOWN_EXCEPTION"; break;
+    }
+    details["name"] = exceptionName;
+
+    // Additional info for access violations
+    if (record->ExceptionCode == EXCEPTION_ACCESS_VIOLATION && record->NumberParameters >= 2) {
+        std::string accessType;
+        if (record->ExceptionInformation[0] == 0) accessType = "Read";
+        else if (record->ExceptionInformation[0] == 1) accessType = "Write";
+        else accessType = "Execute";
+
+        details["accessViolation"] = {
+            {"type", accessType},
+            {"address", (uint64_t)record->ExceptionInformation[1]}
+        };
+    }
+
+    return details;
 }
 
 nlohmann::json CrashTelemetry::getSystemInfo() {
@@ -372,6 +487,20 @@ std::string CrashTelemetry::getLatestLogContent() {
         return content;
     } catch (const std::exception& e) {
         return "Error reading latest.log: " + std::string(e.what());
+    }
+}
+
+std::string CrashTelemetry::getEnabledModulesText() {
+    try {
+        std::stringstream ss;
+        for (const auto& pair : ModuleManager::moduleMap) {
+            if (pair.second && pair.second->isEnabled()) {
+                ss << pair.second->name << "\n";
+            }
+        }
+        return ss.str();
+    } catch (const std::exception& e) {
+        return "Error getting enabled modules: " + std::string(e.what());
     }
 }
 

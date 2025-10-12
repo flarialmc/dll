@@ -140,10 +140,13 @@ DWORD WINAPI init() {
 
         if (onlineAnnouncementElapsed >= std::chrono::minutes(10) && ModuleManager::initialized &&
             Client::settings.getSettingByName<bool>("promotions")->value) {
-            SDK::clientInstance->getGuiData()->displayClientMessage(
-                "§khiii §r §n§l§4FLARIAL §r§khiii \n§r§cDonate to Flarial! §ehttps://flarial.xyz/donate\n§9Join our discord! §ehttps://flarial.xyz/discord"
-            ); 
-            lastAnnouncementTime = now;
+            if (SDK::clientInstance and SDK::clientInstance->getGuiData())
+            {
+                SDK::clientInstance->getGuiData()->displayClientMessage(
+                    "§khiii §r §n§l§4FLARIAL §r§khiii \n§r§cDonate to Flarial! §ehttps://flarial.xyz/donate\n§9Join our discord! §ehttps://flarial.xyz/discord"
+                );
+                lastAnnouncementTime = now;
+            }
         }
 
         std::this_thread::sleep_for(std::chrono::milliseconds(60));

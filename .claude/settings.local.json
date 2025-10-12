@@ -21,7 +21,8 @@
       "WebSearch",
       "WebFetch(domain:www.gamedev.net)",
       "Bash(timeout:*)",
-      "Bash(.build.bat)"
+      "Bash(.build.bat)",
+      "Bash(findstr:*)"
     ],
     "deny": []
   }
