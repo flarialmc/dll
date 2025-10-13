@@ -7,6 +7,7 @@
 #include "../../../Client/GUI/Engine/Engine.hpp"
 #include "Components/OnGroundFlagComponent.hpp"
 #include "EntityContext.hpp"
+#include "Components/ActorTypeComponent.hpp"
 
 template<typename Component>
 Component *Actor::tryGet(uintptr_t addr) {
@@ -460,4 +461,17 @@ float Actor::getHunger() {
 
 float Actor::getSaturation() {
     return getAttributesComponent()->baseAttributes.getInstance(Attribute(GET_OFFSET("Attribute::Saturation"), "minecraft:saturation").mIDValue)->GetValue();
+}
+
+ActorTypeComponent* Actor::getActorTypeComponent()
+{
+    static uintptr_t sig;
+
+    if (!VersionUtils::checkAboveOrEqual(21, 00)) {
+        if (sig == NULL) {
+            sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getActorTypeComponent"), "Actor::getActorTypeComponent");
+        }
+    }
+
+    return tryGet<ActorTypeComponent>(sig);
 }

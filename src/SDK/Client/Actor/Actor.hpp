@@ -17,6 +17,7 @@
 #include "Components/AABBShapeComponent.hpp"
 #include "Components/RuntimeIDComponent.hpp"
 #include "Components/ActorDataFlagComponent.hpp"
+#include "Components/ActorTypeComponent.hpp"
 #include "Components/MobEffectsComponent.hpp"
 #include "Components/AttributesComponent.hpp"
 #include "Components/SynchedActorDataComponent.hpp"
@@ -259,6 +260,7 @@ public:
     float getHunger();
 
     float getSaturation();
+    ActorTypeComponent* getActorTypeComponent();
 
     //class SerializedSkin* getSkin();
 };

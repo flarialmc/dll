@@ -1,5 +1,6 @@
 #include "CustomCrosshair.hpp"
 #include "Client.hpp"
+#include "SDK/Client/Actor/Components/ActorTypeComponent.hpp"
 
 #include "Utils/Render/PositionUtils.hpp"
 
@@ -44,11 +45,15 @@ void CustomCrosshair::defaultConfig() {
     Module::defaultConfig("core");
     setDef("CustomCrosshair", false);
     setDef("highlightOnEntity", false);
+    setDef("highlightOnPlayer", false);
+    setDef("highlightOnBlock", false);
     setDef("solidColorWhenHighlighted", true);
     setDef("solidColor", false);
     setDef("renderInThirdPerson", false);
     setDef("default", (std::string) "fafafa", 0.55f, false);
     setDef("enemy", (std::string) "FF0000", 1.f, false);
+    setDef("block", (std::string) "00FF00", 1.f, false);
+    setDef("player", (std::string) "0000FF", 1.f, false);
     setDef("CurrentSelectedColor", (std::string)"FFFFFF", 1.f, false);
     setDef("CurrentCrosshair", (std::string)"Crosshair1");
     setDef("ShowGridLines", true);
@@ -86,7 +91,9 @@ void CustomCrosshair::settingsRender(float settingsOffset) {
     addToggle("Use Custom Crosshair", "Uses a custom crosshair.","CustomCrosshair");
     addToggle("Solid Color", "Make crosshair a solid color / more visible", "solidColor");
     addToggle("Render in Third Person", "Weather or not to render in third person", "renderInThirdPerson");
-    addToggle("Highlight on Entity", "Highlight when enemy in reach", "highlightOnEntity");
+    addToggle("Highlight on Entity", "Highlight when enemy (other than player) in reach", "highlightOnEntity");
+    addToggle("Highlight on Player", "Highlight when player in reach", "highlightOnPlayer");
+    addToggle("Highlight on Block", "Highlight when block in reach", "highlightOnBlock");
     addConditionalToggle(getOps<bool>("highlightOnEntity"), "Solid Color When Highlighted", "Use solid color when highlighted", "solidColorWhenHighlighted");
 
     extraPadding();
@@ -99,6 +106,8 @@ void CustomCrosshair::settingsRender(float settingsOffset) {
     addHeader("Colors");
     addColorPicker("Default Color", "When the enemy is not in view.", "default");
     addConditionalColorPicker(getOps<bool>("highlightOnEntity"), "Enemy Color", "When the enemy is in view.", "enemy");
+    addConditionalColorPicker(getOps<bool>("highlightOnPlayer"), "Player Color", "When the player is in view.", "player");
+    addConditionalColorPicker(getOps<bool>("highlightOnBlock"), "Block Color", "When a block is in view.", "block");
 
 
     FlarialGUI::UnsetScrollView();
@@ -123,6 +132,9 @@ void CustomCrosshair::onHudCursorRendererRender(HudCursorRendererRenderEvent &ev
     auto renderInThirdPerson = settings.getSettingByName<bool>("renderInThirdPerson")->value;
     if (!renderInThirdPerson && currentPerspective != Perspective::FirstPerson) return;
     bool isHoveringEnemy = (player->getLevel()->getHitResult().type == HitResultType::Entity);
+    bool isHoveringPlayer = false;
+    if (isHoveringEnemy) isHoveringPlayer = (player->getLevel()->getHitResult().getEntity()->getActorTypeComponent()->mType == ActorType::Player);
+    bool isHoveringBlock = (player->getLevel()->getHitResult().type == HitResultType::Tile);
 
     bool isDefault = !settings.getSettingByName<bool>("CustomCrosshair")->value;
 
@@ -164,7 +176,13 @@ void CustomCrosshair::onHudCursorRendererRender(HudCursorRendererRenderEvent &ev
 
     tess->begin(mce::PrimitiveMode::QuadList, 4);
 
-    D2D1_COLOR_F color = isHoveringEnemy && getOps<bool>("highlightOnEntity") ? getColor("enemy") : getColor("default");
+    // fire modulo
+    D2D1_COLOR_F color = getColor(
+        isHoveringPlayer && getOps<bool>("highlightOnEntity") ? "player" :
+        isHoveringEnemy  && getOps<bool>("highlightOnEntity") ? "enemy"  :
+        isHoveringBlock  && getOps<bool>("highlightOnBlock")  ? "block"  :
+        "default"
+    );
 
     tess->color(color.r, color.g, color.b, color.a);
 
