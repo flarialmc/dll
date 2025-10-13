@@ -33,7 +33,7 @@ If you encounter issues, check out our [FAQ](https://discord.gg/flarial-communit
 
 2. **Git**: Install Git if you haven't already. You can download Git from [git-scm.com](https://git-scm.com/downloads) and follow the installation instructions.
 
-3. **MSVC**: Ensure the MSVC compiler is installed on your system (**Clang would not work). You can download it from [the Visual Studio downloads page](https://visualstudio.microsoft.com/downloads).
+3. **MSVC**: Ensure the MSVC compiler is installed on your system (**Clang would not work**). You can download it from [the Visual Studio downloads page](https://visualstudio.microsoft.com/downloads), then select Desktop Development with C++ in the Visual Studio installer.
 
 ### Steps to Clone and Build the Project:
 
