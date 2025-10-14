@@ -132,6 +132,7 @@
 #include "Modules/Stopwatch/Stopwatch.hpp"
 #include "Modules/Misc/F1Listener/F1Listener.hpp"
 #include "Modules/TNTTimer/TNTTimer.hpp"
+#include "Modules/Spotify/Spotify.hpp"
 
 #ifdef COMPILE_DOOM
 	#include "Modules/Doom/Doom.hpp"
@@ -317,6 +318,7 @@ void ModuleManager::initialize() {
 
 	addModule<TNTTimer>();
 	addModule<InventoryLock>();
+	addModule<Spotify>();
 
 #ifdef COMPILE_DOOM
 	addModule<DoomModule>();
