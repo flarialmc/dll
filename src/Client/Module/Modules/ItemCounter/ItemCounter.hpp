@@ -14,7 +14,7 @@ private:
 public:
 
 	ItemCounter() : Module("Item Counter", "Item Counter",
-		IDR_SKULL_PNG, "") {
+		IDR_MULTIPLIER_PNG, "") {
 
 	};
 
