@@ -253,8 +253,11 @@ void ItemCounter::settingsRender(float settingsOffset) {
         extraPadding();
     }
 
-    addToggle("Show Settings", "", "showSettings");
-    if (items > 0 && getOps<bool>("showSettings")) defaultAddSettings("all");
+    if (items > 0) {
+        addToggle("Show Settings", "", "showSettings");
+        if (getOps<bool>("showSettings")) defaultAddSettings("all");
+    }
+
 
     FlarialGUI::UnsetScrollView();
     resetPadding();
