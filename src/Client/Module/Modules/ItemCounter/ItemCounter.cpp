@@ -47,7 +47,7 @@ void ItemCounter::multiDefaultConfig(int subIndexInt) {
     const std::string subIndex = std::format("-{}", subIndexInt);
 
     setDef("itemName" + subIndex, std::string("item name here"));
-    setDef("useCustomSettings" + subIndex, true);
+    setDef("useCustomSettings" + subIndex, false);
     setDef("showCustomSettings" + subIndex, false);
 
     setDef("percentageX" + subIndex, 0.0f);
@@ -64,7 +64,7 @@ void ItemCounter::multiDefaultConfig(int subIndexInt) {
     setDef("glow" + subIndex, false);
     setDef("glowAmount" + subIndex, 30.0f);
 
-    setDef("text" + subIndex, (std::string) std::format("Item {}: {{value}}", subIndex));
+    setDef("text" + subIndex, (std::string) std::string("{name}: {value}"));
     setDef("textscale" + subIndex, 1.0f);
     setDef("textalignment" + subIndex, (std::string) "Center");
     setDef("textShadow" + subIndex, false);
@@ -143,44 +143,74 @@ void ItemCounter::multiSettingsRender(int subIndexInt) {
     bool c = getOps<bool>("useCustomSettings" + subIndex) && getOps<bool>("showCustomSettings" + subIndex);
 
     if (c) addHeader(std::format("Main {}", subIndexInt));
-    addConditionalSlider(c, "UI Scale", "", "uiscale" + subIndex, 2.0f);
-    addConditionalToggle(c, "Translucency", "A blur effect, MAY BE PERFORMANCE HEAVY!", "BlurEffect" + subIndex);
-    addConditionalSlider(c, "Rounding", "Rounding of the rectangle", "rounding" + subIndex);
-    addConditionalToggle(c, "Background", "", "showBg" + subIndex);
-    addConditionalToggle(c && getOps<bool>("showBg" + subIndex), "Background Shadow", "Displays a shadow under the background", "rectShadow" + subIndex);
-    addConditionalSlider(c && getOps<bool>("showBg" + subIndex) && getOps<bool>("rectShadow"), "Shadow Offset", "How far the shadow will be.", "rectShadowOffset" + subIndex, 0.02f, 0.001f);
-    addConditionalToggle(c, "Border", "", "border" + subIndex);
-    addConditionalSlider(c && getOps<bool>("border" + subIndex), "Border Thickness", "", "borderWidth" + subIndex, 4.f);
-    addConditionalToggle(c, "Glow", "", "glow" + subIndex);
-    addConditionalSlider(c && getOps<bool>("glow" + subIndex), "Glow Amount", "", "glowAmount" + subIndex, 100.f);
+    addConditionalSlider(c, "UI Scale", "", settings.getSettingByName<float>("uiscale" + subIndex)->value, 2.0f);
+    addConditionalToggle(c, "Translucency", "A blur effect, MAY BE PERFORMANCE HEAVY!", settings.getSettingByName<bool>("BlurEffect" + subIndex)->value);
+    addConditionalSlider(c, "Rounding", "Rounding of the rectangle", settings.getSettingByName<float>("rounding" + subIndex)->value);
+    addConditionalToggle(c, "Background", "", settings.getSettingByName<bool>("showBg" + subIndex)->value);
+    addConditionalToggle(c && getOps<bool>("showBg" + subIndex), "Background Shadow", "Displays a shadow under the background", settings.getSettingByName<bool>("rectShadow" + subIndex)->value);
+    addConditionalSlider(c && getOps<bool>("showBg" + subIndex) && getOps<bool>("rectShadow" + subIndex), "Shadow Offset", "How far the shadow will be.", settings.getSettingByName<float>("rectShadowOffset" + subIndex)->value, 0.02f, 0.001f);
+    addConditionalToggle(c, "Border", "", settings.getSettingByName<bool>("border" + subIndex)->value);
+    addConditionalSlider(c && getOps<bool>("border" + subIndex), "Border Thickness", "", settings.getSettingByName<float>("borderWidth" + subIndex)->value, 4.f);
+    addConditionalToggle(c, "Glow", "", settings.getSettingByName<bool>("glow" + subIndex)->value);
+    addConditionalSlider(c && getOps<bool>("glow" + subIndex), "Glow Amount", "", settings.getSettingByName<float>("glowAmount" + subIndex)->value, 100.f);
     if (c) extraPadding();
 
     if (c) addHeader(std::format("Text {}", subIndexInt));
-    addConditionalTextBox(c, "Format", "Use {value} for the value.", 50, "text" + subIndex);
-    addConditionalSlider(c, "Text Scale", "", "textscale" + subIndex, 2.0f);
-    addConditionalDropdown(c, "Text Alignment", "", std::vector<std::string>{"Left", "Center", "Right"}, "textalignment" + subIndex, true);
-    addConditionalToggle(c, "Text Shadow", "Displays a shadow under the text", "textShadow" + subIndex);
-    addConditionalSlider(getOps<bool>("textShadow"), "Shadow Offset", "How far the shadow will be.", "textShadowOffset" + subIndex, 0.02f, 0.001f);
+    addConditionalTextBox(c, "Format", "Use {value} for the value and {name} for the name.", 50, "text" + subIndex);
+    addConditionalSlider(c, "Text Scale", "", settings.getSettingByName<float>("textscale" + subIndex)->value, 2.0f);
+    addConditionalDropdown(c, "Text Alignment", "", std::vector<std::string>{"Left", "Center", "Right"}, settings.getSettingByName<std::string>("textalignment" + subIndex)->value, true);
+    addConditionalToggle(c, "Text Shadow", "Displays a shadow under the text", settings.getSettingByName<bool>("textShadow" + subIndex)->value);
+    addConditionalSlider(getOps<bool>("textShadow" + subIndex), "Shadow Offset", "How far the shadow will be.", settings.getSettingByName<float>("textShadowOffset" + subIndex)->value, 0.02f, 0.001f);
     if (c) extraPadding();
 
     if (c) addHeader(std::format("Colors {}", subIndexInt));
-    addConditionalColorPicker(c, "Text Color", "", "text" + subIndex);
-    addConditionalColorPicker(c && getOps<bool>("showBg" + subIndex), "Background Color", "", "bg" + subIndex);
-    addConditionalColorPicker(c && getOps<bool>("rectShadow" + subIndex), "Background Shadow Color", "", "rectShadow" + subIndex);
-    addConditionalColorPicker(c && getOps<bool>("textShadow" + subIndex), "Text Shadow Color", "", "textShadow" + subIndex);
-    addConditionalColorPicker(c && getOps<bool>("border" + subIndex), "Border Color", "", "border" + subIndex);
-    addConditionalColorPicker(c && getOps<bool>("glow" + subIndex), "Glow Color", "", "glow" + subIndex);
+    addConditionalColorPicker(
+        c, "Text Color", "",
+        settings.getSettingByName<std::string>("text" + subIndex + "Col")->value,
+        settings.getSettingByName<float>("text" + subIndex + "Opacity")->value,
+        settings.getSettingByName<bool>("text" + subIndex + "RGB")->value
+    );
+    addConditionalColorPicker(
+        c && getOps<bool>("showBg" + subIndex), "Background Color", "",
+        settings.getSettingByName<std::string>("bg" + subIndex + "Col")->value,
+        settings.getSettingByName<float>("bg" + subIndex + "Opacity")->value,
+        settings.getSettingByName<bool>("bg" + subIndex + "RGB")->value
+    );
+    addConditionalColorPicker(
+        c && getOps<bool>("rectShadow" + subIndex), "Background Shadow Color", "",
+        settings.getSettingByName<std::string>("rectShadow" + subIndex + "Col")->value,
+        settings.getSettingByName<float>("rectShadow" + subIndex + "Opacity")->value,
+        settings.getSettingByName<bool>("rectShadow" + subIndex + "RGB")->value
+    );
+    addConditionalColorPicker(
+        c && getOps<bool>("textShadow" + subIndex), "Text Shadow Color", "",
+        settings.getSettingByName<std::string>("textShadow" + subIndex + "Col")->value,
+        settings.getSettingByName<float>("textShadow" + subIndex + "Opacity")->value,
+        settings.getSettingByName<bool>("textShadow" + subIndex + "RGB")->value
+    );
+    addConditionalColorPicker(
+        c && getOps<bool>("border" + subIndex), "Border Color", "",
+        settings.getSettingByName<std::string>("border" + subIndex + "Col")->value,
+        settings.getSettingByName<float>("border" + subIndex + "Opacity")->value,
+        settings.getSettingByName<bool>("border" + subIndex + "RGB")->value
+    );
+    addConditionalColorPicker(
+        c && getOps<bool>("glow" + subIndex), "Glow Color", "",
+        settings.getSettingByName<std::string>("glow" + subIndex + "Col")->value,
+        settings.getSettingByName<float>("glow" + subIndex + "Opacity")->value,
+        settings.getSettingByName<bool>("glow" + subIndex + "RGB")->value
+    );
     if (c) extraPadding();
 
     if (c) addHeader(std::format("Misc {}", subIndexInt));
-    addConditionalToggle(c, "Responsive Rectangle", "Rectangle resizes with text", "responsivewidth" + subIndex);
-    addConditionalToggle(c, "Reverse Padding X", "For Text Position", "reversepaddingx" + subIndex);
-    addConditionalToggle(c, "Reverse Padding Y", "For Text Position", "reversepaddingy" + subIndex);
-    addConditionalSlider(c, "Padding X", "For Text Position", "padx" + subIndex, 1.f);
-    addConditionalSlider(c, "Padding Y", "For Text Position", "pady" + subIndex, 1.f);
-    addConditionalSlider(c, "Rectangle Width", "", "rectwidth" + subIndex, 2.f, 0.001f);
-    addConditionalSlider(c, "Rectangle Height", "", "rectheight" + subIndex, 2.f, 0.001f);
-    addConditionalSlider(c, "Rotation", "", "rotation" + subIndex, 360.f, 0, false);
+    addConditionalToggle(c, "Responsive Rectangle", "Rectangle resizes with text", settings.getSettingByName<bool>("responsivewidth" + subIndex)->value);
+    addConditionalToggle(c, "Reverse Padding X", "For Text Position", settings.getSettingByName<bool>("reversepaddingx" + subIndex)->value);
+    addConditionalToggle(c, "Reverse Padding Y", "For Text Position", settings.getSettingByName<bool>("reversepaddingy" + subIndex)->value);
+    addConditionalSlider(c, "Padding X", "For Text Position", settings.getSettingByName<float>("padx" + subIndex)->value, 1.f);
+    addConditionalSlider(c, "Padding Y", "For Text Position", settings.getSettingByName<float>("pady" + subIndex)->value, 1.f);
+    addConditionalSlider(c, "Rectangle Width", "", settings.getSettingByName<float>("rectwidth" + subIndex)->value, 2.f, 0.001f);
+    addConditionalSlider(c, "Rectangle Height", "", settings.getSettingByName<float>("rectheight" + subIndex)->value, 2.f, 0.001f);
+    addConditionalSlider(c, "Rotation", "", settings.getSettingByName<float>("rotation" + subIndex)->value, 360.f, 0, false);
 
 }
 
@@ -204,10 +234,7 @@ void ItemCounter::settingsRender(float settingsOffset) {
 
         addHeader(std::format("Item - {}", i));
 
-        // addTextBox("Item Name", "item name", 50, "itemName" + subIndex);
         addTextBox("Item Name", "item name", settings.getSettingByName<std::string>("itemName" + subIndex)->value, 50);
-        // addToggle("Use Custom Settings", "allows you to change render settings specifically for this item", "useCustomSettings" + subIndex);
-        // addConditionalToggle(getOps<bool>("useCustomSettings" + subIndex), "Show Custom Settings", "", "showCustomSettings" + subIndex);
         addToggle("Use Custom Settings", "allows you to change render settings specifically for this item", settings.getSettingByName<bool>("useCustomSettings" + subIndex)->value);
         addConditionalToggle(getOps<bool>("useCustomSettings" + subIndex), "Show Custom Settings", "", settings.getSettingByName<bool>("showCustomSettings" + subIndex)->value);
 
@@ -436,6 +463,8 @@ void ItemCounter::onTick(TickEvent& event) {
     if (!this->isEnabled()) return;
     if (!SDK::hasInstanced || SDK::clientInstance == nullptr) return;
 
+    if (SDK::getCurrentScreen() != "hud_screen") return;
+
     auto player = SDK::clientInstance->getLocalPlayer();
     if (!player || !player->getSupplies()) return;
 
@@ -443,7 +472,6 @@ void ItemCounter::onTick(TickEvent& event) {
     auto inventory = supplies->getInventory();
     if (!inventory) return;
 
-    if (SDK::getCurrentScreen() != "hud_screen") return;
 
     for (int i: subIndexesToRender) {
         int itemCount = 0;
@@ -452,7 +480,13 @@ void ItemCounter::onTick(TickEvent& event) {
         SettingType<std::string>* s = settings.getSettingByName<std::string>(std::format("itemName-{}", i));
         if (s == nullptr) continue;
 
-        if (offhandItem && offhandItem->getItem() && offhandItem->getItem()->name == s->value) {
+        std::string itemName = String::toLower(s->value);
+
+        if (itemName.empty() || itemName == "item name here") continue;
+
+        std::ranges::replace(itemName, ' ', '_');
+
+        if (offhandItem && offhandItem->getItem() && String::toLower(offhandItem->getItem()->name) == itemName) {
             itemCount = offhandItem->count;
         }
 
@@ -460,7 +494,7 @@ void ItemCounter::onTick(TickEvent& event) {
             auto item = inventory->getItem(i);
 
             if (item->getItem() != nullptr) {
-                if (item->getItem()->name == s->value) {
+                if (String::toLower(item->getItem()->name) == itemName) {
                     itemCount += item->count;
                 }
 
@@ -484,15 +518,26 @@ void ItemCounter::onRender(RenderEvent& event) {
         if (this->settings.getSettingByName<std::string>(std::format("text-{}", i)) != nullptr) text = getOps<std::string>(std::format("text-{}", i));
 
         std::string uppercaseSentence;
-        std::string search = "{VALUE}";
+        for (char c: text) {
+            uppercaseSentence += (char) std::toupper(c);
+        }
+
+        std::string searchValue = "{VALUE}";
+
+        size_t posValue = uppercaseSentence.find(searchValue);
+        if (posValue != std::string::npos) {
+            text.replace(posValue, searchValue.length(), std::to_string(itemCountMap[getOps<std::string>(std::format("itemName-{}", i))]));
+        }
 
         for (char c: text) {
             uppercaseSentence += (char) std::toupper(c);
         }
 
-        size_t pos = uppercaseSentence.find(search);
-        if (pos != std::string::npos) {
-            text.replace(pos, search.length(), std::to_string(itemCountMap[getOps<std::string>(std::format("itemName-{}", i))]));
+        std::string searchName = "{NAME}";
+
+        size_t posName = uppercaseSentence.find(searchName);
+        if (posName != std::string::npos) {
+            text.replace(posName, searchName.length(), text);
         }
 
         multiNormalRenderCore(_temp, text, i, getOps<bool>(std::format("useCustomSettings-{}", i)));

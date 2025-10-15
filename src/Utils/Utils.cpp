@@ -615,3 +615,19 @@ std::string String::toUpper(std::string input) {
     std::ranges::transform(input, input.begin(), ::toupper);
     return input;
 }
+
+std::string String::toTitle(std::string input) {
+    std::string res = input;
+    bool newWord = true;
+    for (char& ch : res) {
+        if (std::isspace(static_cast<unsigned char>(ch))) {
+            newWord = true;
+        } else if (newWord) {
+            ch = std::toupper(static_cast<unsigned char>(ch));
+            newWord = false;
+        } else {
+            ch = std::tolower(static_cast<unsigned char>(ch));
+        }
+    }
+    return res;
+}
