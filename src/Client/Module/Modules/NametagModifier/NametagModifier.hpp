@@ -17,7 +17,7 @@ public:
 
     NametagModifier(): Module("Nametag", "Shows your nametag for you while\nin 3rd person mode.",
                 IDR_NAMETAG_PNG, "", false, {"third person nametag", "3rd person nametag"}) {
-        address = GET_SIG_ADDRESS("NametagModifierNametag");
+        address = GET_SIG_ADDRESS("ThirdPersonNametag");
 
         original.resize(6);
         Memory::copyBytes((LPVOID) address, original.data(), 6);
