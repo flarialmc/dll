@@ -384,6 +384,8 @@ public:
     static std::string toLower(std::string input);
 
     static std::string toUpper(std::string input);
+
+    static std::string toTitle(std::string input);
 };
 
 struct CaretMeasureData {

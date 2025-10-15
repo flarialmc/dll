@@ -5,7 +5,7 @@
 #include "Events/Render/DrawNameTagEvent.hpp"
 
 
-class ThirdPerson : public Module {
+class NametagModifier : public Module {
 
 private:
 
@@ -15,7 +15,7 @@ private:
 
 public:
 
-    ThirdPerson(): Module("Nametag", "Shows your nametag for you while\nin 3rd person mode.",
+    NametagModifier(): Module("Nametag", "Shows your nametag for you while\nin 3rd person mode.",
                 IDR_NAMETAG_PNG, "", false, {"third person nametag", "3rd person nametag"}) {
         address = GET_SIG_ADDRESS("ThirdPersonNametag");
 
