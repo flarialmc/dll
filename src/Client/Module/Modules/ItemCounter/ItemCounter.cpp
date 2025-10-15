@@ -134,6 +134,7 @@ void ItemCounter::multiClearConfig(int subIndexInt) {
 
 void ItemCounter::defaultConfig() {
     Module::defaultConfig("all");
+    setDef("showSettings", false);
 }
 
 void ItemCounter::multiSettingsRender(int subIndexInt) {
@@ -158,7 +159,7 @@ void ItemCounter::multiSettingsRender(int subIndexInt) {
     if (c) addHeader(std::format("Text {}", subIndexInt));
     addConditionalTextBox(c, "Format", "Use {value} for the value and {name} for the name.", 50, "text" + subIndex);
     addConditionalSlider(c, "Text Scale", "", settings.getSettingByName<float>("textscale" + subIndex)->value, 2.0f);
-    addConditionalDropdown(c, "Text Alignment", "", std::vector<std::string>{"Left", "Center", "Right"}, settings.getSettingByName<std::string>("textalignment" + subIndex)->value, true);
+    addConditionalDropdown(c, "Text Alignment", "", std::vector<std::string>{"Left", "Center", "Right"}, "textalignment" + subIndex, false);
     addConditionalToggle(c, "Text Shadow", "Displays a shadow under the text", settings.getSettingByName<bool>("textShadow" + subIndex)->value);
     addConditionalSlider(getOps<bool>("textShadow" + subIndex), "Shadow Offset", "How far the shadow will be.", settings.getSettingByName<float>("textShadowOffset" + subIndex)->value, 0.02f, 0.001f);
     if (c) extraPadding();
@@ -251,6 +252,9 @@ void ItemCounter::settingsRender(float settingsOffset) {
 
         extraPadding();
     }
+
+    addToggle("Show Settings", "", "showSettings");
+    if (items > 0 && getOps<bool>("showSettings")) defaultAddSettings("all");
 
     FlarialGUI::UnsetScrollView();
     resetPadding();
@@ -515,29 +519,25 @@ void ItemCounter::onRender(RenderEvent& event) {
     for (int i: subIndexesToRender) {
 
         std::string text{};
+        std::string itemName{};
         if (this->settings.getSettingByName<std::string>(std::format("text-{}", i)) != nullptr) text = getOps<std::string>(std::format("text-{}", i));
+        else continue;
+        if (this->settings.getSettingByName<std::string>(std::format("text-{}", i)) != nullptr) itemName = getOps<std::string>(std::format("itemName-{}", i));
+        else continue;
 
         std::string uppercaseSentence;
         for (char c: text) {
             uppercaseSentence += (char) std::toupper(c);
         }
 
-        std::string searchValue = "{VALUE}";
-
-        size_t posValue = uppercaseSentence.find(searchValue);
-        if (posValue != std::string::npos) {
-            text.replace(posValue, searchValue.length(), std::to_string(itemCountMap[getOps<std::string>(std::format("itemName-{}", i))]));
-        }
-
-        for (char c: text) {
-            uppercaseSentence += (char) std::toupper(c);
-        }
-
-        std::string searchName = "{NAME}";
-
-        size_t posName = uppercaseSentence.find(searchName);
-        if (posName != std::string::npos) {
-            text.replace(posName, searchName.length(), text);
+        for (auto pair: std::vector<std::pair<std::string, std::string>>{
+            {"{VALUE}", std::to_string(itemCountMap[itemName])},
+            {"{NAME}", itemName}
+        }) {
+            size_t pos = uppercaseSentence.find(pair.first);
+            if (pos != std::string::npos) {
+                text.replace(pos, pair.first.length(), pair.second);
+            }
         }
 
         multiNormalRenderCore(_temp, text, i, getOps<bool>(std::format("useCustomSettings-{}", i)));
