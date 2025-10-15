@@ -26,7 +26,7 @@
 #include "Modules/EntityCounter/EntityCounter.hpp"
 #include "Modules/SnapLook/SnapLook.hpp"
 #include "Modules/Freelook/Freelook.hpp"
-#include "Modules/ThirdPersonNametag/ThirdPerson.hpp"
+#include "Modules/NametagModifier/NametagModifier.hpp"
 #include "Modules/MotionBlur/MotionBlur.hpp"
 #include "Modules/ArmorHUD/ArmorHUD.hpp"
 #include "Modules/PaperDoll/PaperDoll.hpp"
@@ -204,7 +204,7 @@ void ModuleManager::initialize() {
 	addModule<Hitbox>();
 	if (VersionUtils::checkAboveOrEqual(21, 80)) addModule<GlintColor>();
 	addModule<HurtColor>();
-	addModule<ThirdPerson>();
+	addModule<NametagModifier>();
 	addModule<JavaDynamicFOV>();
 
 	addModule<SnapLook>();
