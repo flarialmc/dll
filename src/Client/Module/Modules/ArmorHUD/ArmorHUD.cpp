@@ -44,7 +44,8 @@ void ArmorHUD::defaultConfig() {
 	setDef("durBarOffsetX", 1.92f);
 	setDef("durBarOffsetY", 12.45f);
 	setDef("durBarOpacity", 1.f);
-	setDef("spacing", 1.f);
+	setDef("spacing", 1.25f);
+	setDef("handArmorSpacing", 0.f);
 	setDef("hideMaxDurText", false);
 	setDef("showSpecialMaxDurBarCol", false);
 	setDef("showStaticDurBarCol", false);
@@ -52,7 +53,9 @@ void ArmorHUD::defaultConfig() {
 	setDef("showDurBarMax", false);
 	setDef("100color", 120.f);
 	setDef("0color", 0.f);
-	
+	setDef("slotBackground", true);
+	setDef("alwaysShowSlot", false);
+
 }
 
 void ArmorHUD::settingsRender(float settingsOffset) {
@@ -60,6 +63,7 @@ void ArmorHUD::settingsRender(float settingsOffset) {
 
 	addSlider("Size", "", "uiscale", 5.f, 0.f, true);
 	addSlider("Spacing", "", "spacing", 10.f, 0.f, true);
+	addSlider("Hand Spacing", "Extra distance between hand items and armor items", "handArmorSpacing", 10.f, 0.0f, true);
 	addToggle("Vertical ArmorHUD", "To switch between a vertical or horizontal layout", "vertical");
 	addConditionalToggle(getOps<bool>("vertical"), "Durability to the left", "", "durability_left");
 	addToggle("Show offhand item", "", "show_offhand");
@@ -68,7 +72,11 @@ void ArmorHUD::settingsRender(float settingsOffset) {
 	addToggle("Change Color", "", "color");
 
 	extraPadding();
+	addHeader("Slot Background");
+	addToggle("Slot Background", "", "slotBackground");
+	addConditionalToggle(getOps<bool>("slotBackground") && !getOps<bool>("fillGaps"), "Always Show Slot", "Fill gaps with slot background", "alwaysShowSlot");
 
+	extraPadding();
 	addHeader("Durability");
 	addToggle("Durability Text", "", "showdurability");
 	addConditionalSlider(getOps<bool>("showdurability") && getOps<bool>("vertical"), "Text Offset X", "", "textOffsetX", 50.f, 0.0f, false);
@@ -137,6 +145,7 @@ void ArmorHUD::renderDurability() {
 				if (getOps<bool>("showdurability") || getOps<bool>("showDurBar")) {
 					auto scaledPos = PositionUtils::getCustomScreenScaledPos(Vec2<float>{16, 16}, uiscale);
 					float spacing = (vertical ? scaledPos.y : scaledPos.x) * ospacing;
+					float extraSpacing = (vertical ? scaledPos.y : scaledPos.x) * getOps<float>("handArmorSpacing");
 
 					float xmodifier = 0.0f;
 					float ymodifier = 0.0f;
@@ -223,6 +232,11 @@ void ArmorHUD::renderDurability() {
 							if (vertical) ymodifier += spacing;
 							else xmodifier += spacing;
 						}
+					}
+
+					if (extraSpacing) {
+						if (vertical) ymodifier += extraSpacing;
+						else xmodifier += extraSpacing;
 					}
 
 					if (getOps<bool>("show_mainhand") && SDK::clientInstance->getLocalPlayer()->getSupplies()->getInventory()->getItem(
@@ -471,11 +485,35 @@ void ArmorHUD::onSetupAndRender(SetupAndRenderEvent& event) {
 			float xmodifier = 0.0f;
 			float ymodifier = 0.0f;
 
+			auto guiLocation = ResourceLocation("textures/gui/gui", false);
+			auto guiTexture = muirc->createTexture(guiLocation, false);
+
+			bool showSlotBg = getOps<bool>("slotBackground");
+			bool alwaysShowSlot = getOps<bool>("alwaysShowSlot");
+
+			float extraSpacing = 16 * uiscale * getOps<float>("handArmorSpacing");
+
+			Vec2<float> uvSize = Vec2<float>((20.f / 256.f), (20.f / 256.f));
+
+			mce::Color defaultColor;
+			static auto flushLayer = HashedString("ui_flush");
+
 			if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
 				if (SDK::clientInstance->getLocalPlayer() != nullptr)
 					if (SDK::clientInstance->getLocalPlayer()->getSupplies() != nullptr) {
 						for (int i = 2; i < 6; i++) {
 							auto armorSlot = SDK::clientInstance->getLocalPlayer()->getArmor(i - 2);
+							auto scaleValue = settings.getSettingByName<float>("uiscale")->value;
+
+							if (showSlotBg && (armorSlot->getItem() != nullptr || (!fillGaps && alwaysShowSlot))) {
+								Vec2<float> uvPos = Vec2<float>((((i - 2) * 20.0f) / 256.f), 0.f);
+
+								Vec2<float> slotSize = Vec2<float>(20.0f * scaleValue, 20.0f * scaleValue);
+								Vec2<float> slotPos = Vec2<float>(scaledPos.x + xmodifier - ((slotSize.x - scaleValue * 16.0f) / 2), scaledPos.y + ymodifier - ((slotSize.y - scaleValue * 16.0f) / 2));
+
+								muirc->drawImage(guiTexture, slotPos, slotSize, uvPos, uvSize);
+								muirc->flushImages(defaultColor, 1.0f, flushLayer);
+							}
 
 							if (armorSlot->getItem() != nullptr) {
 
@@ -489,16 +527,15 @@ void ArmorHUD::onSetupAndRender(SetupAndRenderEvent& event) {
 									armorSlot,
 									0,
 									scaledPos.x + xmodifier, scaledPos.y + ymodifier, 1.0f,
-									settings.getSettingByName<float>(
-										"uiscale")->value, false);
+									scaleValue,
+									false);
 
 								if (armorSlot->isEnchanted()) {
 									barc.itemRenderer->renderGuiItemNew(&barc,
 										armorSlot,
 										0,
 										scaledPos.x + xmodifier, scaledPos.y + ymodifier, 1.0f,
-										settings.getSettingByName<float>(
-											"uiscale")->value,
+										scaleValue,
 										true);
 								}
 
@@ -513,7 +550,13 @@ void ArmorHUD::onSetupAndRender(SetupAndRenderEvent& event) {
 							}
 						}
 
-						if (getOps<bool>("show_mainhand") && SDK::clientInstance->getLocalPlayer()->getSupplies()->getInventory()->getItem(
+						if (extraSpacing) {
+							if (vertical) ymodifier += extraSpacing;
+							else xmodifier += extraSpacing;
+						}
+
+						bool showMainhand = getOps<bool>("show_mainhand");
+						if (showMainhand && SDK::clientInstance->getLocalPlayer()->getSupplies()->getInventory()->getItem(
 							SDK::clientInstance->getLocalPlayer()->getSupplies()->getSelectedSlot())->getItem() !=
 							nullptr) {
 							auto item = SDK::clientInstance->getLocalPlayer()->getSupplies()->getInventory()->getItem(
@@ -525,25 +568,44 @@ void ArmorHUD::onSetupAndRender(SetupAndRenderEvent& event) {
 							durabilities[0][1] = maxDamage;
 							durabilities[0][0] = durabilityLeft;
 
+							auto scaleValue = settings.getSettingByName<float>("uiscale")->value;
+
+							Vec2<float> uvPos = Vec2<float>(0.f, 0.f);
+
+							Vec2<float> slotSize = Vec2<float>(20.0f * scaleValue, 20.0f * scaleValue);
+							Vec2<float> slotPos = Vec2<float>(scaledPos.x + xmodifier - ((slotSize.x - scaleValue * 16.0f) / 2), scaledPos.y + ymodifier - ((slotSize.y - scaleValue * 16.0f) / 2));
+
+							muirc->drawImage(guiTexture, slotPos, slotSize, uvPos, uvSize);
+							muirc->flushImages(defaultColor, 1.0f, flushLayer);
+
 							barc.itemRenderer->renderGuiItemNew(&barc,
 								item,
 								0, scaledPos.x + xmodifier, scaledPos.y + ymodifier, 1.0f,
-								settings.getSettingByName<float>(
-									"uiscale")->value,
+								scaleValue,
 								false);
 
 							if (item->isEnchanted()) {
 								barc.itemRenderer->renderGuiItemNew(&barc,
 									item,
 									0, scaledPos.x + xmodifier, scaledPos.y + ymodifier, 1.0f,
-									settings.getSettingByName<float>(
-										"uiscale")->value,
+									scaleValue,
 									true);
 							}
 							if (fillGaps) {
 								if (vertical) ymodifier += spacing;
 								else xmodifier += spacing;
 							}
+						}
+						else if (showMainhand && !fillGaps && alwaysShowSlot) {
+							auto scaleValue = settings.getSettingByName<float>("uiscale")->value;
+
+							Vec2<float> uvPos = Vec2<float>(0.f, 0.f);
+
+							Vec2<float> slotSize = Vec2<float>(20.0f * scaleValue, 20.0f * scaleValue);
+							Vec2<float> slotPos = Vec2<float>(scaledPos.x + xmodifier - ((slotSize.x - scaleValue * 16.0f) / 2), scaledPos.y + ymodifier - ((slotSize.y - scaleValue * 16.0f) / 2));
+
+							muirc->drawImage(guiTexture, slotPos, slotSize, uvPos, uvSize);
+							muirc->flushImages(defaultColor, 1.0f, flushLayer);
 						}
 
 						if (!fillGaps) {
@@ -563,21 +625,40 @@ void ArmorHUD::onSetupAndRender(SetupAndRenderEvent& event) {
 								durabilities[1][1] = maxDamage;
 								durabilities[1][0] = durabilityLeft;
 
+								auto scaleValue = settings.getSettingByName<float>("uiscale")->value;
+
+								Vec2<float> uvPos = Vec2<float>(showMainhand == true ? (20.0f / 256.0f) : 0.f, 0.f);
+
+								Vec2<float> slotSize = Vec2<float>(20.0f * scaleValue, 20.0f * scaleValue);
+								Vec2<float> slotPos = Vec2<float>(scaledPos.x + xmodifier - ((slotSize.x - scaleValue * 16.0f) / 2), scaledPos.y + ymodifier - ((slotSize.y - scaleValue * 16.0f) / 2));
+
+								muirc->drawImage(guiTexture, slotPos, slotSize, uvPos, uvSize);
+								muirc->flushImages(defaultColor, 1.0f, flushLayer);
+
 								barc.itemRenderer->renderGuiItemNew(&barc,
 									item,
 									0, scaledPos.x + xmodifier, scaledPos.y + ymodifier, 1.0f,
-									settings.getSettingByName<float>(
-										"uiscale")->value,
+									scaleValue,
 									false);
 
 								if (item->isEnchanted()) {
 									barc.itemRenderer->renderGuiItemNew(&barc,
 										item,
 										0, scaledPos.x + xmodifier, scaledPos.y + ymodifier, 1.0f,
-										settings.getSettingByName<float>(
-											"uiscale")->value,
+										scaleValue,
 										true);
 								}
+							}
+							else if (showOffhand && !fillGaps && alwaysShowSlot) {
+								auto scaleValue = settings.getSettingByName<float>("uiscale")->value;
+
+								Vec2<float> uvPos = Vec2<float>(showMainhand == true ? (20.0f / 256.0f) : 0.f, 0.f);
+
+								Vec2<float> slotSize = Vec2<float>(20.0f * scaleValue, 20.0f * scaleValue);
+								Vec2<float> slotPos = Vec2<float>(scaledPos.x + xmodifier - ((slotSize.x - scaleValue * 16.0f) / 2), scaledPos.y + ymodifier - ((slotSize.y - scaleValue * 16.0f) / 2));
+
+								muirc->drawImage(guiTexture, slotPos, slotSize, uvPos, uvSize);
+								muirc->flushImages(defaultColor, 1.0f, flushLayer);
 							}
 						}
 					}
