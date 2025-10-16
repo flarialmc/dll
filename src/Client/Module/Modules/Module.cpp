@@ -617,6 +617,24 @@ void Module::addConditionalTextBox(bool condition, const std::string& text, cons
     FlarialGUI::ResetOverrideAlphaValues();
 }
 
+void Module::addConditionalTextBox(bool condition, const std::string& text, const std::string& subtext, int limit, const std::string& settingName) {
+    FlarialGUI::OverrideAlphaValues((Constraints::RelativeConstraint(0.05f, "height", true) - conditionalTextBoxAnims[textboxIndex]) / Constraints::RelativeConstraint(0.05f, "height", true));
+
+    if (condition) {
+        padding -= conditionalTextBoxAnims[textboxIndex];
+        FlarialGUI::lerp(conditionalTextBoxAnims[textboxIndex], 0.0f, 0.25f * FlarialGUI::frameFactor);
+        addTextBox(text, subtext, limit, settingName);
+    } else {
+        FlarialGUI::lerp(conditionalTextBoxAnims[textboxIndex], Constraints::RelativeConstraint(0.05f, "height", true), 0.25f * FlarialGUI::frameFactor);
+        if (conditionalTextBoxAnims[textboxIndex] < Constraints::RelativeConstraint(0.0499f, "height", true)) {
+            padding -= conditionalTextBoxAnims[textboxIndex];
+            addTextBox(text, subtext, limit, settingName);
+        } else textboxIndex++;
+    }
+
+    FlarialGUI::ResetOverrideAlphaValues();
+}
+
 void Module::addConditionalColorPicker(bool condition, const std::string& text, const std::string& subtext, const std::string& settingName) {
     FlarialGUI::OverrideAlphaValues((Constraints::RelativeConstraint(0.05f, "height", true) - conditionalColorPickerAnims[colorPickerIndex]) / Constraints::RelativeConstraint(0.05f, "height", true));
 

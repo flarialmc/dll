@@ -1,46 +1,46 @@
-#include "ThirdPerson.hpp"
+#include "NametagModifier.hpp"
 
 #include "Client.hpp"
 
 
-void ThirdPerson::defaultConfig() {
+void NametagModifier::defaultConfig() {
     Module::defaultConfig("core");
     setDef("nameTagText", (std::string)"ffffff", 1.f, false);
     setDef("nameTagBg", (std::string)"000000", 0.25f, false);
 }
 
-void ThirdPerson::onEnable() {
+void NametagModifier::onEnable() {
     patch();
-    Listen(this, PerspectiveEvent, &ThirdPerson::onGetViewPerspective)
-    Listen(this, DrawNameTagEvent, &ThirdPerson::onDrawNameTag)
+    Listen(this, PerspectiveEvent, &NametagModifier::onGetViewPerspective)
+    Listen(this, DrawNameTagEvent, &NametagModifier::onDrawNameTag)
     Module::onEnable();
 }
 
-void ThirdPerson::onDisable() {
-    Deafen(this, PerspectiveEvent, &ThirdPerson::onGetViewPerspective)
-    Deafen(this, DrawNameTagEvent, &ThirdPerson::onDrawNameTag)
+void NametagModifier::onDisable() {
+    Deafen(this, PerspectiveEvent, &NametagModifier::onGetViewPerspective)
+    Deafen(this, DrawNameTagEvent, &NametagModifier::onDrawNameTag)
     unpatch();
     Module::onDisable();
 }
 
-void ThirdPerson::patch() {
+void NametagModifier::patch() {
     Memory::nopBytes((void *) address, 6);
     patched = true;
 }
 
-void ThirdPerson::unpatch() {
+void NametagModifier::unpatch() {
     Memory::patchBytes((void *) address, original.data(), original.size());
     patched = false;
 }
 
-void ThirdPerson::onGetViewPerspective(PerspectiveEvent &event) {
+void NametagModifier::onGetViewPerspective(PerspectiveEvent &event) {
     if (auto sl = ModuleManager::getModule("SnapLook"); sl && sl->active) {
         if (!patched) patch();
     } else if (event.getPerspective() == Perspective::FirstPerson && patched) unpatch();
     else if (event.getPerspective() != Perspective::FirstPerson && !patched) patch();
 }
 
-void ThirdPerson::onDrawNameTag(DrawNameTagEvent &event) {
+void NametagModifier::onDrawNameTag(DrawNameTagEvent &event) {
     D2D_COLOR_F textCol = getColor("nameTagText");
     D2D_COLOR_F bgCol = getColor("nameTagBg");
 
@@ -49,7 +49,7 @@ void ThirdPerson::onDrawNameTag(DrawNameTagEvent &event) {
 }
 
 
-void ThirdPerson::settingsRender(float settingsOffset) {
+void NametagModifier::settingsRender(float settingsOffset) {
 	initSettingsPage();
 
 	addHeader("Nametag");
