@@ -584,6 +584,7 @@ void SigInit::init2030() {
     ADD_SIG("Actor::getMobEffectsComponent", "DA BA 2F B4 D6 F7");
     ADD_SIG("Actor::getActorRotationComponent", "DA BA CE 21 1E DC");
 	ADD_SIG("Actor::getSynchedActorDataComponent", "DA BA DC 1A 96 D4");
+	ADD_SIG("Actor::getActorTypeComponent", "C8 25 14 AD F3 51");
 
     ADD_SIG("ActorCollision::isOnGround", "40 53 48 83 EC ? 48 8B D9 BA E1 2D 1F 21"); // TODO: wrong
 
