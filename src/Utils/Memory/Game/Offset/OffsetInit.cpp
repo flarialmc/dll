@@ -18,7 +18,7 @@ void OffsetInit::init21110() {
     ADD_OFFSET("Attribute::Saturation", 2);
     ADD_OFFSET("Attribute::Health", 6);
 
-    ADD_OFFSET("Actor::baseTickVft", 29);
+    ADD_OFFSET("Actor::baseTickVft", 24);
     ADD_OFFSET("ContainerScreenController::_handlePlaceAll", 57);
     ADD_OFFSET("ClientInstance::camera", 0x288);
     ADD_OFFSET("ClientInstance::guiData", 0x578);
