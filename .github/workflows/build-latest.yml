@@ -250,13 +250,6 @@ jobs:
           name: Flarial_DLL
           path: ./artifacts
 
-      - name: Setup AWS CLI for R2
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-
       - name: Determine file path for upload
         id: filepath
         run: |
@@ -270,6 +263,10 @@ jobs:
           fi
 
       - name: Upload DLL to R2
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_REGION: us-east-1
         run: |
           aws s3 cp ./artifacts/Flarial.dll \
             s3://${{ secrets.R2_BUCKET_NAME }}/${{ steps.filepath.outputs.path }} \
