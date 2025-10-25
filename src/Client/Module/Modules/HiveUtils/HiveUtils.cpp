@@ -56,7 +56,7 @@ void HiveUtils::settingsRender(float settingsOffset) {
     addHeader("Auto Re Q");
     addToggle("Auto re-queue ", "Find a new game when the current game is over", "ReQ");
     addToggle("Solo mode ", "Re-Q when you finish a game or die and can't respawn.\nNot recomended while in a party.", "solo");
-    addToggle("Team Elimination", "Re-Q when the team your on is fully ELIMINATED.", "eliminated");
+    addToggle("Team Elimination", "Re-Q when the team you\'re on is fully ELIMINATED.", "eliminated");
     addKeybind("Requeue Keybind", "When setting, hold the new bind for 2 seconds.", "keybind", true);
 
     addHeader("Map avoider");
