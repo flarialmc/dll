@@ -238,37 +238,3 @@ jobs:
         env:
           OUTPUT1: ${{ needs.windows-build.outputs.type}}
           TAG_NAME: ${{ steps.tag.outputs.TAG_NAME }}
-
-  upload-to-r2:
-    runs-on: ubuntu-latest
-    needs: [check-commit, windows-build]
-    if: needs.check-commit.outputs.should_build == 'true'
-    steps:
-      - name: Download dll artifact
-        uses: actions/download-artifact@v4.1.9
-        with:
-          name: Flarial_DLL
-          path: ./artifacts
-
-      - name: Determine file path for upload
-        id: filepath
-        run: |
-          TYPE="${{ needs.windows-build.outputs.type }}"
-          if [[ "$TYPE" == "0" ]]; then
-            echo "path=nightly.dll" >> "$GITHUB_OUTPUT"
-          elif [[ "$TYPE" == "1" ]]; then
-            echo "path=latest.dll" >> "$GITHUB_OUTPUT"
-          elif [[ "$TYPE" == "2" ]]; then
-            echo "path=beta.dll" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Upload DLL to R2
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-          AWS_REGION: us-east-1
-        run: |
-          aws s3 cp ./artifacts/Flarial.dll \
-            s3://${{ secrets.R2_BUCKET_NAME }}/${{ steps.filepath.outputs.path }} \
-            --endpoint-url ${{ secrets.R2_ENDPOINT_URL }} \
-            --content-type "application/octet-stream"
