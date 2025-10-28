@@ -1,77 +1,66 @@
 #pragma once
 
 #include <format>
-#include <windows.h>
-#include <unknwn.h>
-#include "../../../../Client.hpp"
 #include "../../../Manager.hpp"
 #include "Utils/Utils.hpp"
+#include <vector>
+#include <algorithm>
+#include <chrono>
+#include <cmath>
+#include <deque>
 
 class ClickData {
 public:
-    double timestamp;  // Milliseconds since some reference point
-    // ... other click data members ...
+    double timestamp;
 };
-    
+
 class RateLimiter {
 public:
-    RateLimiter(float cps) : rate(cps), tokens(cps), lastRefill(std::chrono::steady_clock::now()) {
+    using Clock = std::chrono::high_resolution_clock;
+
+    RateLimiter() : cpsLimit(0) {}
+
+    void setRate(int cps) {
+        cpsLimit = cps;
     }
 
     bool allow() {
-        if (rate <= 0.0f) return true;
-
-        using Clock = std::chrono::steady_clock;
         auto now = Clock::now();
-        
-        // Calculate time elapsed since last refill
-        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastRefill).count();
-        
-        // Refill tokens based on elapsed time, but limit refill to prevent bursts
-        if (elapsed > 0) {
-            // Limit the elapsed time to prevent large token refills after inactivity
-            double cappedElapsed = std::min(static_cast<double>(elapsed), 1000.0 / rate); // Max 1 second worth of tokens
-            double tokensToAdd = (static_cast<double>(rate) * cappedElapsed) / 1000.0;
-            tokens = std::min(static_cast<double>(rate), tokens + tokensToAdd);
-            lastRefill = now;
-        }
+        auto oneSecAgo = now - std::chrono::seconds(1);
 
-        // Check if we have enough tokens
-        if (tokens >= 1.0) {
-            tokens -= 1.0;
-            return true;
-        }
-        
-        return false;
-    }
+        while (!q.empty() && q.front() < oneSecAgo) q.pop_front();
 
-    void setRate(float cps) {
-        rate = cps;
-        // Don't reset tokens to avoid sudden bursts when rate changes
-        if (tokens > static_cast<double>(rate)) {
-            tokens = static_cast<double>(rate); // Cap tokens to new rate
-        }
+        if (static_cast<int>(q.size()) >= cpsLimit) return false;
+
+        q.push_back(now);
+        return true;
     }
 
 private:
-    float rate;
-    double tokens;
-    std::chrono::steady_clock::time_point lastRefill;
+    int cpsLimit;
+    std::deque<std::chrono::time_point<Clock>> q;
 };
 
-class GUIMouseListener : public Listener {
+class GUIMouseListener {
 public:
-    static inline RateLimiter leftLimiter = { 0.0f };
-    static inline RateLimiter rightLimiter = { 0.0f };
+    GUIMouseListener() {
+        Listen(this, MouseEvent, &GUIMouseListener::onMouse);
+
+        leftLimiter.setRate(10);
+        rightLimiter.setRate(10);
+    }
+
     static inline std::vector<ClickData> leftClickList;
     static inline std::vector<ClickData> rightClickList;
-    static inline std::deque<std::chrono::steady_clock::time_point> leftClicks;
-    static inline std::deque<std::chrono::steady_clock::time_point> rightClicks;
-    static inline std::chrono::time_point<std::chrono::high_resolution_clock> lastRightClick;
-    static inline std::chrono::time_point<std::chrono::high_resolution_clock> lastLeftClick;
+
+    static inline double lastLeftClickTime = 0.0;
+    static inline double lastRightClickTime = 0.0;
+
+    static inline RateLimiter leftLimiter;
+    static inline RateLimiter rightLimiter;
 
     void onMouse(MouseEvent &event) {
-        GUIMouseListener::handleMouse(event);
+        handleMouse(event);
     };
 
     static void handleMouse(MouseEvent& event) {
@@ -79,118 +68,125 @@ public:
         if (event.getMouseY() != 0) MC::mousePos.y = event.getMouseY();
         MC::mouseButton = event.getButton();
         MC::mouseAction = event.getAction();
-        if (event.getButton() != MouseButton::None) MC::lastMouseButton = event.getButton();
+        if (event.getButton() != None) MC::lastMouseButton = event.getButton();
 
-        if (event.getButton() != MouseButton::None && event.getAction() == MouseAction::Press) {
+        if (event.getButton() != None && event.getAction() == Press) {
             MC::held = true;
-            if (event.getButton() == MouseButton::Left) MC::heldLeft = true;
-            if (event.getButton() == MouseButton::Right) MC::heldRight = true;
+            if (event.getButton() == Left) MC::heldLeft = true;
+            if (event.getButton() == Right) MC::heldRight = true;
         }
-        if (event.getButton() != MouseButton::None && event.getAction() == MouseAction::Release) {
+        if (event.getButton() != None && event.getAction() == Release) {
             MC::held = false;
-            if (event.getButton() == MouseButton::Left) MC::heldLeft = false;
-            if (event.getButton() == MouseButton::Right) MC::heldRight = false;
+            if (event.getButton() == Left) MC::heldLeft = false;
+            if (event.getButton() == Right) MC::heldRight = false;
         }
 
-        auto limiterMod = ModuleManager::getModule("CPS Limiter");
-        //if (!limiterMod) return;
+        bool limiterEnabled = false;
+        int leftRate = 10;
+        int rightRate = 10;
+        if (auto limiterMod = ModuleManager::getModule("CPS Limiter")) {
+            limiterEnabled = limiterMod->getOps<bool>("enabled");
+            leftRate = limiterMod->getOps<int>("Left");
+            rightRate = limiterMod->getOps<int>("Right");
+        }
 
-        GUIMouseListener::leftLimiter.setRate(limiterMod->getOps<int>("Left"));
-        GUIMouseListener::rightLimiter.setRate(limiterMod->getOps<int>("Right"));
+        if (limiterEnabled) {
+            leftLimiter.setRate(leftRate);
+            rightLimiter.setRate(rightRate);
+        }
 
         using MB = MouseButton;
 
-        if (event.getButton() == MB::Left && MC::held) {
-            if (!GUIMouseListener::leftLimiter.allow() && limiterMod->getOps<bool>("enabled")) {
-                event.cancel();
-                return;
+        if (event.getButton() == Left && MC::held) {
+            if (limiterEnabled) {
+                if (!leftLimiter.allow()) {
+                    event.cancel();
+                    return;
+                }
             }
-            GUIMouseListener::AddLeftClick();
+            AddLeftClick();
         }
-        else if (event.getButton() == MB::Right && MC::held) {
-            if (!GUIMouseListener::rightLimiter.allow() && limiterMod->getOps<bool>("enabled")) {
-                event.cancel();
-                return;
+        else if (event.getButton() == Right && MC::held) {
+            if (limiterEnabled) {
+                if (!rightLimiter.allow()) {
+                    event.cancel();
+                    return;
+                }
             }
-            GUIMouseListener::AddRightClick();
+            AddRightClick();
         }
-    }
-
-    GUIMouseListener() {
-        Listen(this, MouseEvent, &GUIMouseListener::onMouse);
-    }
-
-    ~GUIMouseListener() {
-        Deafen(this, MouseEvent, &GUIMouseListener::onMouse);
     }
 
     static void AddLeftClick() {
-        ClickData click{};
-        click.timestamp = Utils::Microtime();
-        GUIMouseListener::leftClickList.insert(GUIMouseListener::leftClickList.begin(), click);
+        double now = Utils::Microtime();
 
-        if (GUIMouseListener::leftClickList.size() >= 100) {
-            GUIMouseListener::leftClickList.pop_back();
+        auto limiterMod = ModuleManager::getModule("CPS Limiter");
+        int debounceMs = limiterMod->getOps<int>("debounce");
+        double debounceSec = static_cast<double>(debounceMs) / 1000.0;
+
+        if (lastLeftClickTime > 0.0 && (now - lastLeftClickTime) < debounceSec && limiterMod->getOps<bool>("enabled")) return;
+        lastLeftClickTime = now;
+
+        ClickData click{};
+        click.timestamp = now;
+        leftClickList.insert(leftClickList.begin(), click);
+
+        if (leftClickList.size() >= 100) {
+            leftClickList.pop_back();
         }
     }
 
     static void AddRightClick() {
-        ClickData click{};
-        click.timestamp = Utils::Microtime();
-        GUIMouseListener::rightClickList.insert(GUIMouseListener::rightClickList.begin(), click);
+        double now = Utils::Microtime();
 
-        if (GUIMouseListener::rightClickList.size() >= 100) {
-            GUIMouseListener::rightClickList.pop_back();
+        auto limiterMod = ModuleManager::getModule("CPS Limiter");
+        int debounceMs = limiterMod->getOps<int>("debounce");
+        double debounceSec = static_cast<double>(debounceMs) / 1000.0;
+
+        if (lastLeftClickTime > 0.0 && (now - lastLeftClickTime) < debounceSec && limiterMod->getOps<bool>("enabled")) return;
+        lastRightClickTime = now;
+
+        ClickData click{};
+        click.timestamp = now;
+        rightClickList.insert(rightClickList.begin(), click);
+
+        if (rightClickList.size() >= 100) {
+            rightClickList.pop_back();
         }
     }
 
     static int GetLeftCPS() {
-        if (GUIMouseListener::leftClickList.empty()) {
+        if (leftClickList.empty()) {
             return 0;
         }
 
         double currentMicros = Utils::Microtime();
-        auto count = std::count_if(GUIMouseListener::leftClickList.begin(), GUIMouseListener::leftClickList.end(), [currentMicros](const ClickData& click) {
+        auto count = std::count_if(leftClickList.begin(), leftClickList.end(), [currentMicros](const ClickData& click) {
             return (currentMicros - click.timestamp <= 1.0);
-            });
+        });
 
         return (int)std::round(count);
     }
 
     static int GetRightCPS() {
-        if (GUIMouseListener::rightClickList.empty()) {
+        if (rightClickList.empty()) {
             return 0;
         }
 
         double currentMicros = Utils::Microtime();
-        auto count = std::count_if(GUIMouseListener::rightClickList.begin(), GUIMouseListener::rightClickList.end(),
-            [currentMicros](const ClickData& click) {
-                return (currentMicros - click.timestamp <= 1.0);
-            });
+        auto count = std::ranges::count_if(rightClickList,
+                                           [currentMicros](const ClickData& click) {
+                                               return (currentMicros - click.timestamp <= 1.0);
+                                           });
 
         return (int)std::round(count);
     }
 
     static double getCurrentTime() {
         using namespace std::chrono;
-        return duration<double>(high_resolution_clock::now().time_since_epoch()).count();
-    }
-
-    // Helper to try a click against a given deque + limit.
-    static bool tryLimit(std::deque<std::chrono::steady_clock::time_point>& q, float cpsLimit) {
-        using Clock = std::chrono::steady_clock;
+        using Clock = high_resolution_clock;
         auto now = Clock::now();
-        auto oneSecAgo = now - std::chrono::seconds(1);
-
-        while (!q.empty() && q.front() < oneSecAgo) {
-            q.pop_front();
-        }
-
-        if (static_cast<int>(q.size()) >= static_cast<int>(cpsLimit)) {
-            return false;
-        }
-
-        q.push_back(now);
-        return true;
+        auto us = duration_cast<microseconds>(now.time_since_epoch()).count();
+        return static_cast<double>(us) / 1000000.0;
     }
 };
