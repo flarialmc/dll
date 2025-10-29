@@ -143,7 +143,7 @@ public:
         int debounceMs = limiterMod->getOps<int>("debounce");
         double debounceSec = static_cast<double>(debounceMs) / 1000.0;
 
-        if (lastLeftClickTime > 0.0 && (now - lastLeftClickTime) < debounceSec && limiterMod->getOps<bool>("enabled")) return;
+        if (lastRightClickTime > 0.0 && (now - lastRightClickTime) < debounceSec && limiterMod->getOps<bool>("enabled")) return;
         lastRightClickTime = now;
 
         ClickData click{};
