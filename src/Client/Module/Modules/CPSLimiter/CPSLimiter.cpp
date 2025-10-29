@@ -19,7 +19,7 @@ void CPSLimiter::settingsRender(float settingsOffset) {
     addSliderInt("Left Click", "Limit for your LMB.", "Left");
     addSliderInt("Right Click", "Right for your RMB.", "Right");
 
-    addSliderInt("Debounce Delay (ms)", "Minimum delay between clicks, in milliseconds.", "debounce", 200, 1);
+    addSliderInt("Debounce Delay (ms)", "Minimum delay between clicks, in milliseconds.\nExtra clicks will be cancelled.", "debounce", 200, 1);
 
     FlarialGUI::UnsetScrollView();
 
