@@ -12,10 +12,6 @@ Flarial Client is available in 2 forms:
 - Includes Discord integration for community and support.
 - Offers additional Minecraft management features.
 
-### Standalone DLL
-- A minimal, lightweight version for advanced users.
-- Requires an external injector to set up and run.
-
 ## Supported Platforms
 
 - **Operating System:** Windows 10/11 (64-bit processors only)
@@ -37,38 +33,8 @@ If you encounter issues, check out our [FAQ](https://discord.gg/flarial-communit
 
 ### Steps to Clone and Build the Project:
 
-1. **Clone the Repository**:
-   Open a terminal or command prompt and clone the repository using Git:
-   ```bash
-   git clone https://github.com/flarialmc/dll.git
-   ```
-
-2. **Navigate to the Project Directory**:
-   Change into the directory of the cloned repository:
-   ```bash
-   cd dll
-   ```
-
-3. **Create a Build Directory**:
-   It's a good practice to create a separate directory for out-of-source builds. This keeps your source directory clean and allows for easier management of builds:
-   ```bash
-   mkdir build
-   cd build
-   ```
-
-4. **Configure with CMake**:
-   Run CMake to configure the build environment. Specify the path to the CMakeLists.txt file in the root of the cloned repository:
-   ```bash
-   cmake ..
-   ```
-   This command generates the necessary build files based on the CMake configuration.
-
-5. **Build the Project**:
-   Once CMake has configured the build files successfully, you can build the project using a suitable build tool (like `make` on Unix-like systems or Visual Studio on Windows):
-   ```bash
-   cmake --build .
-   ```
-   This command compiles the project according to the generated build files.
+Method 1 - You can open this project in CLion or Visual Studio, and make sure to use the MSVC toolchain, preferably combined with Ninja. If you don't know what any of this means, please do some research on this matter.
+Method 2 - **You can use build.bat** file as well.
 
 By following these steps, you should be able to clone and build the project using CMake successfully.
 
