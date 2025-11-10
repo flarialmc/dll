@@ -7,6 +7,8 @@ Our current open-source model works as follows. Key portions of Flarial that we 
 Alongside this, the current model contains delayed releases for version updates. For instance, if the current Minecraft version is 1.21.200, Flarial's signatures and offsets on this repository will stay on the previous version of Minecraft. 
 
 Furthermore, as an open-source contributor, you can make pull requests to Flarial with your feature of choice.
+Two official developers will review your pull request and merge as seen fit. Don't worry, your features will be accepted into the closed source repository and hence the official distribution channels as seen fit.
+
 **However**, it is highly encouraged to **apply** to be part of the development team, for the moment, open a ticket in our discord. We cannot guarantee you an official position at the moment, as obviously, we are in the process of many changes.
 Everything mentioned here can and will change in the future.
 
