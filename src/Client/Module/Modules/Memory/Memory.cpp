@@ -16,6 +16,7 @@ void MEM::onDisable()
 void MEM::defaultConfig()
 {
     setDef("textscale", 0.8f);
+    setDef("showMegabytes", false);
     Module::defaultConfig("all");
     
 }
@@ -29,6 +30,10 @@ void MEM::settingsRender(float settingsOffset)
 
     addHeader("Text");
     defaultAddSettings("text");
+    extraPadding();
+
+    addHeader("Module Settings");
+    addToggle("Show Megabytes", "Display memory usage in MB instead of percentage", "showMegabytes");
     extraPadding();
 
     addHeader("Colors");
@@ -45,7 +50,6 @@ void MEM::settingsRender(float settingsOffset)
 void MEM::onRender(RenderEvent& event)
 {
     if (isEnabled()) {
-        //TODO: (Memory module) Do megabytes mode
         MEMORYSTATUSEX memory_status;
         memory_status.dwLength = sizeof(memory_status);
         GlobalMemoryStatusEx(&memory_status);
@@ -53,9 +57,19 @@ void MEM::onRender(RenderEvent& event)
         DWORDLONG free_memory = memory_status.ullAvailPhys;
         DWORDLONG used_memory = total_memory - free_memory;
 
-        int sussymem = static_cast<int>((used_memory * 100) / total_memory);
+        std::string text;
 
-        std::string text = FlarialGUI::cached_to_string(sussymem) + "%";
+        if (getOps<bool>("showMegabytes")) {
+            // Convert bytes to megabytes
+            DWORDLONG used_mb = used_memory / (1024 * 1024);
+            DWORDLONG total_mb = total_memory / (1024 * 1024);
+            text = FlarialGUI::cached_to_string(static_cast<int>(used_mb)) + " / " + 
+                   FlarialGUI::cached_to_string(static_cast<int>(total_mb)) + " MB";
+        } else {
+            // Show percentage
+            int sussymem = static_cast<int>((used_memory * 100) / total_memory);
+            text = FlarialGUI::cached_to_string(sussymem) + "%";
+        }
 
         this->normalRender(4, text);
     }
