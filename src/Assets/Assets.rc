@@ -203,3 +203,5 @@ IDR_ANDROID_LOGO_PNG          PNG "Data\\android.png"
 IDR_WIN10_LOGO_PNG            PNG "Data\\win10.png"
 IDR_CHROMEOS_LOGO_PNG         PNG "Data\\chromeos.png"
 IDR_INVENTORYLOCK_PNG         PNG "Data\\InventoryLock.png"
+
+IDR_ESCWHENDMG_PNG            PNG "Data\\EscWhenDmg.png"
