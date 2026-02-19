@@ -133,6 +133,7 @@
 #include "Modules/Misc/F1Listener/F1Listener.hpp"
 #include "Modules/TNTTimer/TNTTimer.hpp"
 #include "Modules/ItemCounter/ItemCounter.hpp"
+#include "Modules/EscWhenDmg/EscWhenDmg.hpp"
 
 #ifdef COMPILE_DOOM
 	#include "Modules/Doom/Doom.hpp"
@@ -318,6 +319,8 @@ void ModuleManager::initialize() {
 	addModule<InventoryLock>();
 
 	addModule<ItemCounter>();
+
+	addModule<EscWhenDmg>();
 
 #ifdef COMPILE_DOOM
 	addModule<DoomModule>();
