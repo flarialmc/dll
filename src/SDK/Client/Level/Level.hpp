@@ -144,4 +144,10 @@ public:
     std::string getWorldFolderName() { return hat::member_at<std::string>(this, GET_OFFSET("Level::worldFolderName")); }
 
     std::vector<Actor *> getRuntimeActorList();
+
+    Actor* getRuntimeEntity(uint64_t actorId, bool getRemoved)
+    {
+        static auto off = GET_OFFSET("Level::getRuntimeEntity");
+        return Memory::CallVFuncI<Actor*>(off, this, actorId, getRemoved);
+    }
 };
