@@ -1,53 +1,24 @@
 #include "PotCounter.hpp"
 
-
-
-
-void PotCounter::onEnable()
+void PotCounter::customInit()
 {
     Listen(this, TickEvent, &PotCounter::onTick)
-    Listen(this, RenderEvent, &PotCounter::onRender)
-    Module::onEnable();
 }
 
-void PotCounter::onDisable()
+void PotCounter::customCleanup()
 {
     Deafen(this, TickEvent, &PotCounter::onTick)
-    Deafen(this, RenderEvent, &PotCounter::onRender)
-    Module::onDisable();
 }
 
-void PotCounter::defaultConfig()
+void PotCounter::customConfig()
 {
     setDef("text", (std::string)"{value} Pots");
     setDef("textscale", 0.70f);
-    Module::defaultConfig("all");
-    
 }
 
-void PotCounter::settingsRender(float settingsOffset)
+std::string PotCounter::getDisplayValue()
 {
-
-    initSettingsPage();
-
-
-    addHeader("Main");
-    defaultAddSettings("main");
-    extraPadding();
-
-    addHeader("Text");
-    defaultAddSettings("text");
-    extraPadding();
-
-    addHeader("Colors");
-    defaultAddSettings("colors");
-    extraPadding();
-
-    addHeader("Misc");
-    defaultAddSettings("misc");
-
-    FlarialGUI::UnsetScrollView();
-    resetPadding();
+    return FlarialGUI::cached_to_string(pots);
 }
 
 void PotCounter::onTick(TickEvent& event)
@@ -75,11 +46,4 @@ void PotCounter::onTick(TickEvent& event)
             }
         }
     }
-}
-
-void PotCounter::onRender(RenderEvent& event)
-{
-    if (!this->isEnabled()) return;
-    auto potsStr = FlarialGUI::cached_to_string(pots);
-    this->normalRender(14, potsStr);
 }

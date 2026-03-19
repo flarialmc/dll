@@ -6,6 +6,7 @@
 
 class Player : public Actor {
 public:
+    BUILD_ACCESS(this, uintptr_t**, vtable, 0x0);
     PlayerInventory* getSupplies() {
         return hat::member_at<PlayerInventory*>(this, GET_OFFSET("Player::playerInventory"));
     }

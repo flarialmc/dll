@@ -1,25 +1,12 @@
 #pragma once
 
-#include "../Module.hpp"
+#include "../HUDModule.hpp"
 
-
-
-class MEM : public Module {
-
+class MEM : public HUDModule {
 public:
+    MEM() : HUDModule(4, "Memory", "Shows your current system RAM usage.",
+        IDR_MEMORY_PNG, "", {"stats"}) {}
 
-	MEM(): Module("Memory", "Shows your current system RAM usage.",
-		IDR_MEMORY_PNG, "", false, {"stats"}) {
-
-	}
-
-	void onEnable() override;
-
-	void onDisable() override;
-
-	void defaultConfig() override;
-
-	void settingsRender(float settingsOffset) override;
-
-	void onRender(RenderEvent& event);
+protected:
+    std::string getDisplayValue() override;
 };

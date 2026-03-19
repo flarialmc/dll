@@ -9,10 +9,11 @@
 class ItemRendererEvent : public Event, public Cancellable {
 private:
     ActorRenderData* renderData;
-
+    bool isGroup;
 public:
-    ItemRendererEvent(ActorRenderData* data)
-        : renderData(data) {}
+    ItemRendererEvent(ActorRenderData* data, bool _isGroup = false)
+        : renderData(data), isGroup(_isGroup) {}
 
     ActorRenderData* getRenderData() const { return renderData; }
+    bool isItemGroup() { return isGroup; }
 };

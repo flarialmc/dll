@@ -4,12 +4,32 @@
 void FlarialGUI::ScrollBar(float x, float y, float width, float height, float radius) {
     float whiteY;
 
-//    if (y - ClickGUI::accumilatedPos > y + height) {
-//        ClickGUI::accumilatedPos += scrollposmodifier;
-//    }
-
-    if (y + ClickGUI::accumilatedPos > y) {
+    // Clamp scroll to prevent scrolling above the top of content
+    if (ClickGUI::accumilatedPos > 0) {
         ClickGUI::accumilatedPos = 0;
+    }
+
+    // Clamp scroll to prevent scrolling too far past the bottom of content
+    // Calculate the viewport height from ScrollViewRect if available
+    float viewportHeight = ScrollViewRect.bottom - ScrollViewRect.top;
+    if (viewportHeight <= 0) {
+        // Fallback if ScrollViewRect isn't set yet - use a reasonable default
+        viewportHeight = height * 0.5f;
+    }
+
+    // Calculate minimum scroll position (how far we can scroll down)
+    // If content is smaller than viewport, no scrolling is needed
+    float minScroll = 0.0f;
+    if (height > viewportHeight) {
+        // Content is taller than viewport, allow scrolling
+        // minScroll is negative because scrolling down = negative offset
+        // Add extra padding (half viewport height) to allow scrolling last items fully into view
+        float extraPadding = viewportHeight * 0.5f;
+        minScroll = -(height - viewportHeight + extraPadding);
+    }
+
+    if (ClickGUI::accumilatedPos < minScroll) {
+        ClickGUI::accumilatedPos = minScroll;
     }
 
     FlarialGUI::lerp(FlarialGUI::scrollpos, ClickGUI::accumilatedPos, 0.30f * FlarialGUI::frameFactor);

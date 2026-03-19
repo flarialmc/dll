@@ -16,7 +16,7 @@ Actor *HitResult::getEntity() {
         if (!registryRef) return nullptr;
         auto& ownedRegistry = registryRef->registry.ownedRegistry;
         auto* component = ownedRegistry.try_get<ActorOwnerComponent>(this->entity.id);
-        return component ? component->actor : nullptr;
+        return component ? component->actor.get() : nullptr;
     } else {
         if (sig == NULL) {
             if(VersionUtils::checkAboveOrEqual(20, 50)) {

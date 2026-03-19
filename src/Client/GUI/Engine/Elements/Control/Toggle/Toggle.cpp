@@ -12,6 +12,14 @@ void FlarialGUI::Toggle(int index, float x, float y, bool isEnabled) {
 void FlarialGUI::Toggle(int index, float x, float y, bool isEnabled, bool rgb, std::string moduleName, std::string settingName) {
 	auto mod = ModuleManager::getModule(moduleName);
 
+	// Ensure vectors are large enough for this index
+	if (index >= static_cast<int>(toggleColors.size())) {
+		toggleColors.resize(index + 1, D2D1::ColorF(D2D1::ColorF::White));
+	}
+	if (index >= static_cast<int>(toggleSpacings.size())) {
+		toggleSpacings.resize(index + 1, 0.0f);
+	}
+
 	D2D1_COLOR_F disabledColor = ClickGUI::getColor("primary3");
 	D2D1_COLOR_F enabledColor = ClickGUI::getColor("primary1");
 	D2D1_COLOR_F circleColor = ClickGUI::getColor("primary2");
@@ -113,6 +121,14 @@ void FlarialGUI::Toggle(int index, float x, float y, bool isEnabled, bool rgb, s
 
 
 bool FlarialGUI::Toggle(int index, float x, float y, bool isEnabled, bool rgb) {
+	// Ensure vectors are large enough for this index
+	if (index >= static_cast<int>(toggleColors.size())) {
+		toggleColors.resize(index + 1, D2D1::ColorF(D2D1::ColorF::White));
+	}
+	if (index >= static_cast<int>(toggleSpacings.size())) {
+		toggleSpacings.resize(index + 1, 0.0f);
+	}
+
 	D2D1_COLOR_F disabledColor = ClickGUI::getColor("primary3");
 	D2D1_COLOR_F enabledColor = ClickGUI::getColor("primary1");
 	D2D1_COLOR_F circleColor = ClickGUI::getColor("primary2");

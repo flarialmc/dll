@@ -5,89 +5,122 @@
 #include <SDK/Client/Network/Packet/TextPacket.hpp>
 #include <SDK/Client/Network/Packet/SetTitlePacket.hpp>
 
-void ModuleScript::onEnable() {
-    if (const auto& script = linkedScript.lock()) {
-        if (script->getState()) {
+void ModuleScript::onEnable()
+{
+    if (const auto& script = linkedScript.lock())
+    {
+        if (script->getState())
+        {
             ScriptManager::executeFunction(script->getState(), "onEnable");
             Module::onEnable();
         }
     }
 }
 
-void ModuleScript::onDisable() {
-    if (const auto& script = linkedScript.lock()) {
-        if (script->getState()) {
+void ModuleScript::onDisable()
+{
+    if (const auto& script = linkedScript.lock())
+    {
+        if (script->getState())
+        {
             ScriptManager::executeFunction(script->getState(), "onDisable");
             Module::onDisable();
         }
     }
 }
 
-void ModuleScript::onKey(KeyEvent& event) {
+void ModuleScript::onKey(KeyEvent& event)
+{
     if (!isEnabled() || !ScriptManager::initialized) return;
 
-    if (static_cast<int>(event.getAction()) == 1) {
+    if (static_cast<int>(event.getAction()) == 1)
+    {
         ScriptUtils::onKeyPressed(event.getKey());
-    } else if (static_cast<int>(event.getAction()) == 0) {
+    }
+    else if (static_cast<int>(event.getAction()) == 0)
+    {
         ScriptUtils::onKeyReleased(event.getKey());
     }
 
-    if (const auto& script = linkedScript.lock()) {
-        bool cancelled = script->registerCancellableEvent("KeyEvent", event.getKey(), static_cast<int>(event.getAction()));
+    if (const auto& script = linkedScript.lock())
+    {
+        bool cancelled = script->registerCancellableEvent("KeyEvent", event.getKey(),
+                                                          static_cast<int>(event.getAction()));
         if (cancelled) event.cancel();
     }
 }
 
-void ModuleScript::onMouse(MouseEvent& event) {
-    if (!isEnabled() || !ScriptManager::initialized || event.getButton() == 0 || event.getAction() == 0) return;
+void ModuleScript::onMouse(MouseEvent& event)
+{
+    if (!isEnabled() || !ScriptManager::initialized || event.getButton() == 0 || event.getAction()
+        == 0) return;
 
-    if (const auto& script = linkedScript.lock()) {
-        bool cancelled = script->registerCancellableEvent("MouseEvent", static_cast<int>(event.getButton()), static_cast<int>(event.getAction()));
+    if (const auto& script = linkedScript.lock())
+    {
+        bool cancelled = script->registerCancellableEvent("MouseEvent",
+                                                          static_cast<int>(event.getButton()),
+                                                          static_cast<int>(event.getAction()));
         if (cancelled) event.cancel();
     }
 }
 
-void ModuleScript::onPacketReceive(PacketEvent &event) {
+void ModuleScript::onPacketReceive(PacketEvent& event)
+{
     if (!isEnabled() || !ScriptManager::initialized) return;
 
-    if (const auto& script = linkedScript.lock()) {
+    if (const auto& script = linkedScript.lock())
+    {
         bool cancel = false;
         auto id = event.getPacket()->getId();
 
-        if (id == MinecraftPacketIds::Text) {
-            const auto* tp = reinterpret_cast<TextPacket*>(event.getPacket());
-            if (tp) {
-                std::string msg = tp->message;
-                std::string name = tp->name;
-                int type = static_cast<int>(tp->type);
+        if (id == MinecraftPacketIds::Text)
+        {
+            auto tpOpt = getTextPacket(event.getPacket());
+            if (!tpOpt) return;
+            const auto& tp = *tpOpt;
+            if (!tp.message.empty() and
+            !tp.name.empty()
+            )
+            {
+                std::string msg{tp.message};
+                std::string name{tp.name};
+                int type = static_cast<int>(0);
 
-                bool ChatReceiveEvent = script->registerCancellableEvent("ChatReceiveEvent", msg, name, type);
+                bool ChatReceiveEvent = script->registerCancellableEvent(
+                    "ChatReceiveEvent", msg, name, type);
                 if (ChatReceiveEvent) cancel = true;
             }
         }
-        if (id == MinecraftPacketIds::ChangeDimension) {
+        if (id == MinecraftPacketIds::ChangeDimension)
+        {
             bool ChangeDimensionEvent = script->registerCancellableEvent("ChangeDimensionEvent");
             if (ChangeDimensionEvent) cancel = true;
         }
-        if (id == MinecraftPacketIds::Login) {
+        if (id == MinecraftPacketIds::Login)
+        {
             bool LoginEvent = script->registerCancellableEvent("LoginEvent");
             if (LoginEvent) cancel = true;
         }
-        if (id == MinecraftPacketIds::Disconnect) {
+        if (id == MinecraftPacketIds::Disconnect)
+        {
             bool DisconnectEvent = script->registerCancellableEvent("DisconnectEvent");
             if (DisconnectEvent) cancel = true;
         }
-        if (id == MinecraftPacketIds::ContainerOpen) {
+        if (id == MinecraftPacketIds::ContainerOpen)
+        {
             bool ContainerOpenEvent = script->registerCancellableEvent("ContainerOpenEvent");
             if (ContainerOpenEvent) cancel = true;
         }
-        if (id == MinecraftPacketIds::ContainerClose) {
+        if (id == MinecraftPacketIds::ContainerClose)
+        {
             bool ContainerCloseEvent = script->registerCancellableEvent("ContainerCloseEvent");
             if (ContainerCloseEvent) cancel = true;
         }
-        if (id == MinecraftPacketIds::SetTitle) {
+        if (id == MinecraftPacketIds::SetTitle)
+        {
             const auto* stp = reinterpret_cast<SetTitlePacket*>(event.getPacket());
-            if (stp) {
+            if (stp)
+            {
                 std::string text = stp->text;
                 int type = stp->type;
 
@@ -95,7 +128,8 @@ void ModuleScript::onPacketReceive(PacketEvent &event) {
                 if (SetTitleEvent) cancel = true;
             }
         }
-        if (id == MinecraftPacketIds::Respawn) {
+        if (id == MinecraftPacketIds::Respawn)
+        {
             bool RespawnEvent = script->registerCancellableEvent("RespawnEvent");
             if (RespawnEvent) cancel = true;
         }
@@ -103,20 +137,28 @@ void ModuleScript::onPacketReceive(PacketEvent &event) {
     }
 }
 
-void ModuleScript::onPacketSend(PacketSendEvent& event) {
+void ModuleScript::onPacketSend(PacketSendEvent& event)
+{
     if (!isEnabled() || !ScriptManager::initialized) return;
 
-    if (const auto& script = linkedScript.lock()) {
+    if (const auto& script = linkedScript.lock())
+    {
         bool cancel = false;
 
-        if (event.getPacket()->getId() == MinecraftPacketIds::Text) {
-            const auto *pkt = reinterpret_cast<TextPacket*>(event.getPacket());
-            if (pkt) {
-                std::string msg = pkt->message;
-                std::string name = pkt->name;
-                auto type = pkt->type;
+        if (event.getPacket()->getId() == MinecraftPacketIds::Text)
+        {
+            auto pktOpt = getTextPacket(event.getPacket());
+            if (!pktOpt) return;
+            const auto& pkt = *pktOpt;
+            if (pkt.message.empty() || pkt.name.empty())
+            {
+                std::string msg{pkt.message};
+                std::string name{pkt.name};
+                // auto type = pkt.type();
+                auto type = 0;
 
-                bool ChatSendEvent = script->registerCancellableEvent("ChatSendEvent", msg, name, static_cast<int>(type));
+                bool ChatSendEvent = script->registerCancellableEvent(
+                    "ChatSendEvent", msg, name, static_cast<int>(type));
                 if (ChatSendEvent) cancel = true;
             }
         }
@@ -124,52 +166,64 @@ void ModuleScript::onPacketSend(PacketSendEvent& event) {
     }
 }
 
-void ModuleScript::onTick(TickEvent& event) {
+void ModuleScript::onTick(TickEvent& event)
+{
     if (!isEnabled() || !ScriptManager::initialized) return;
 
-    if (const auto& script = linkedScript.lock()) {
+    if (const auto& script = linkedScript.lock())
+    {
         script->registerEvent("TickEvent");
     }
 }
 
-void ModuleScript::onRender(RenderEvent& event) {
+void ModuleScript::onRender(RenderEvent& event)
+{
     if (!isEnabled() || !ScriptManager::initialized) return;
 
-    if (const auto& script = linkedScript.lock()) {
+    if (const auto& script = linkedScript.lock())
+    {
         script->registerEvent("RenderEvent");
     }
 }
 
-void ModuleScript::onSetupAndRender(SetupAndRenderEvent& event) {
+void ModuleScript::onSetupAndRender(SetupAndRenderEvent& event)
+{
     if (!isEnabled() || !ScriptManager::initialized) return;
 
-    if (const auto& script = linkedScript.lock()) {
+    if (const auto& script = linkedScript.lock())
+    {
         script->registerEvent("SetupAndRenderEvent");
     }
 }
 
-void ModuleScript::onAttack(AttackEvent& event) {
+void ModuleScript::onAttack(AttackEvent& event)
+{
     if (!isEnabled() || !ScriptManager::initialized) return;
 
-    if (const auto& script = linkedScript.lock()) {
+    if (const auto& script = linkedScript.lock())
+    {
         script->registerEvent("AttackEvent");
     }
 }
 
-void ModuleScript::onFOV(FOVEvent& event) {
+void ModuleScript::onFOV(FOVEvent& event)
+{
     if (!isEnabled() || !ScriptManager::initialized) return;
 
-    if (const auto& script = linkedScript.lock()) {
+    if (const auto& script = linkedScript.lock())
+    {
         if (event.getFOV() == 70) return;
 
         script->registerEvent("FOVEvent", event.getFOV());
     }
 }
 
-void ModuleScript::onPerspective(PerspectiveEvent& event) {
+void ModuleScript::onPerspective(PerspectiveEvent& event)
+{
     if (!isEnabled() || !ScriptManager::initialized) return;
 
-    if (const auto& script = linkedScript.lock()) {
+    if (const auto& script = linkedScript.lock())
+    {
         script->registerEvent("PerspectiveEvent", static_cast<int>(event.getPerspective()));
     }
 }

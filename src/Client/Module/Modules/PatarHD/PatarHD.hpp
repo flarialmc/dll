@@ -8,8 +8,8 @@ class PatarHD : public Module {
 private:
 	float x = 0;
 	float y = 0;
-	float xv = 1;
-	float yv = 1;
+	float xDirection = 1;
+	float yDirection = 1;
 	int pic = 0;
 	int lastTime = 0;
 	std::chrono::steady_clock::time_point time;

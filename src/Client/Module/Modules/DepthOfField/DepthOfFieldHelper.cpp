@@ -353,10 +353,11 @@ void DepthOfFieldHelper::Cleanup()
 
 void DepthOfFieldHelper::RenderDepthOfField(ID3D11RenderTargetView* pDstRenderTargetView, float intensity, float focusRange, float focusDistance, bool autoFocus)
 {
-    if (intensity <= 0 || !SwapchainHook::GetBackbuffer() || !pDepthMapSRV) return;
+    auto backbuffer = SwapchainHook::GetBackbuffer();
+    if (intensity <= 0 || !backbuffer || !pDepthMapSRV) return;
 
     winrt::com_ptr<ID3D11ShaderResourceView> pOrigShaderResourceView = MotionBlur::BackbufferToSRVExtraMode();
-    if (!SwapchainHook::ExtraSavedD3D11BackBuffer) return;
+    if (!pOrigShaderResourceView) return;
 
     winrt::com_ptr<ID3D11DeviceContext> pContext = SwapchainHook::context;
     if (!pContext) return;
@@ -371,7 +372,7 @@ void DepthOfFieldHelper::RenderDepthOfField(ID3D11RenderTargetView* pDstRenderTa
 
     // Ensure intermediate textures exist
     D3D11_TEXTURE2D_DESC desc;
-    SwapchainHook::GetBackbuffer()->GetDesc(&desc);
+    backbuffer->GetDesc(&desc);
 
     if (currentTextureWidth != desc.Width || currentTextureHeight != desc.Height ||
         !pIntermediateTexture1 || !pIntermediateRTV1 || !pIntermediateSRV1) {

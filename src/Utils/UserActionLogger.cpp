@@ -11,11 +11,45 @@
 #include <filesystem>
 #include "SDK/SDK.hpp"
 #include "Client/Module/Manager.hpp"
+#include "Client/Module/Modules/ClickGUI/ClickGUI.hpp"
+#include "Client/GUI/Engine/EngineCore.hpp"
 
 std::vector<UserAction> UserActionLogger::s_actions;
 std::mutex UserActionLogger::s_mutex;
 bool UserActionLogger::s_initialized = false;
 std::string UserActionLogger::s_logDirectory = "";
+
+namespace {
+struct ClickGuiContext {
+    bool active = false;
+    bool inMenu = false;
+    bool editMode = false;
+    std::string currentTab = "unknown";
+    std::string pageType = "unknown";
+    std::string settingsModule;
+};
+
+ClickGuiContext captureClickGuiContext() {
+    ClickGuiContext context;
+
+    try {
+        auto clickGuiModule = ModuleManager::getModule("ClickGUI");
+        context.active = clickGuiModule && clickGuiModule->active;
+        context.inMenu = FlarialGUI::inMenu;
+        context.editMode = ClickGUI::editmenu;
+
+        if (context.active || context.inMenu || context.editMode) {
+            context.currentTab = ClickGUI::curr;
+            context.pageType = ClickGUI::page.type;
+            context.settingsModule = ClickGUI::page.module;
+        }
+    } catch (...) {
+        // Keep defaults if context access fails.
+    }
+
+    return context;
+}
+} // namespace
 
 void UserActionLogger::initialize() {
     if (s_initialized) return;
@@ -43,7 +77,15 @@ void UserActionLogger::logButtonClick(const std::string& buttonId, const std::st
 
 void UserActionLogger::logModuleToggle(const std::string& moduleName, bool enabled, const std::string& trigger) {
     std::string details = "enabled: " + std::string(enabled ? "true" : "false") + ", trigger: " + trigger;
-    logAction("module_toggle", moduleName, details, trigger, true);
+
+    // Map trigger to valid inputMethod (API only accepts: mouse, keyboard, system, unknown)
+    std::string inputMethod = "unknown";
+    if (trigger == "keybind") inputMethod = "keyboard";
+    else if (trigger == "gui" || trigger == "click") inputMethod = "mouse";
+    else if (trigger == "command") inputMethod = "keyboard";
+    else if (trigger == "system") inputMethod = "system";
+
+    logAction("module_toggle", moduleName, details, inputMethod, true);
 }
 
 void UserActionLogger::logKeyPress(int keyCode, bool pressed, const std::string& context) {
@@ -105,9 +147,11 @@ void UserActionLogger::logAction(const std::string& type, const std::string& tar
 }
 
 nlohmann::json UserActionLogger::getRecentActions(int maxActions) {
-    std::lock_guard<std::mutex> lock(s_mutex);
-
     nlohmann::json actions = nlohmann::json::array();
+    std::unique_lock<std::mutex> lock(s_mutex, std::try_to_lock);
+    if (!lock.owns_lock()) {
+        return actions;
+    }
 
     int startIndex = std::max(0, static_cast<int>(s_actions.size()) - maxActions);
 
@@ -136,14 +180,77 @@ nlohmann::json UserActionLogger::getRecentActions(int maxActions) {
 }
 
 nlohmann::json UserActionLogger::getCurrentState() {
+    const auto clickGuiContext = captureClickGuiContext();
+    size_t actionCount = 0;
+    bool actionLoggerBusy = false;
+    {
+        std::unique_lock<std::mutex> lock(s_mutex, std::try_to_lock);
+        if (lock.owns_lock()) {
+            actionCount = s_actions.size();
+        } else {
+            actionLoggerBusy = true;
+        }
+    }
+
     return {
         {"currentScreen", getCurrentScreen()},
         {"activeModules", getActiveModules()},
-        {"totalActionsLogged", s_actions.size()},
+        {"totalActionsLogged", actionCount},
+        {"actionLoggerBusy", actionLoggerBusy},
+        {"clickGui", {
+            {"active", clickGuiContext.active},
+            {"inMenu", clickGuiContext.inMenu},
+            {"editMode", clickGuiContext.editMode},
+            {"currentTab", clickGuiContext.currentTab},
+            {"pageType", clickGuiContext.pageType},
+            {"settingsModule", clickGuiContext.settingsModule}
+        }},
         {"timestamp", std::chrono::duration_cast<std::chrono::seconds>(
             std::chrono::system_clock::now().time_since_epoch()
         ).count()}
     };
+}
+
+std::string UserActionLogger::getCrashContextText() {
+    std::stringstream ss;
+    const auto clickGuiContext = captureClickGuiContext();
+
+    ss << "Current Screen: " << getCurrentScreen() << "\n";
+    ss << "ClickGUI Active: " << (clickGuiContext.active ? "true" : "false") << "\n";
+    ss << "ClickGUI In Menu: " << (clickGuiContext.inMenu ? "true" : "false") << "\n";
+    ss << "Edit Mode: " << (clickGuiContext.editMode ? "true" : "false") << "\n";
+
+    if (clickGuiContext.active || clickGuiContext.inMenu || clickGuiContext.editMode) {
+        ss << "ClickGUI Tab: " << clickGuiContext.currentTab << "\n";
+        ss << "ClickGUI Page: " << clickGuiContext.pageType << "\n";
+        ss << "ClickGUI Module: " << (clickGuiContext.settingsModule.empty() ? "none" : clickGuiContext.settingsModule) << "\n";
+    }
+
+    std::unique_lock<std::mutex> lock(s_mutex, std::try_to_lock);
+    if (!lock.owns_lock()) {
+        ss << "Last Action: unavailable (action logger busy)\n";
+        return ss.str();
+    }
+
+    if (s_actions.empty()) {
+        ss << "Last Action: none logged\n";
+        return ss.str();
+    }
+
+    const UserAction& action = s_actions.back();
+    auto actionTimestamp = std::chrono::duration_cast<std::chrono::seconds>(
+        action.timestamp.time_since_epoch()
+    ).count();
+
+    ss << "Last Action Type: " << action.type << "\n";
+    ss << "Last Action Target: " << action.target << "\n";
+    ss << "Last Action Details: " << action.details << "\n";
+    ss << "Last Action Screen: " << action.screen << "\n";
+    ss << "Last Action Input: " << action.inputMethod << "\n";
+    ss << "Last Action Success: " << (action.success ? "true" : "false") << "\n";
+    ss << "Last Action Timestamp: " << actionTimestamp << "\n";
+
+    return ss.str();
 }
 
 void UserActionLogger::cleanup() {

@@ -2,7 +2,6 @@
 #include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 void UpdatePlayerHook::callback(void* a1, void* a2, void* a3) {
-    //  Combo counter and reach counter logic will be done here in the next commit.
     auto event = nes::make_holder<UpdatePlayerEvent>();
 
     if (SDK::clientInstance && SDK::clientInstance->getLocalPlayer() != nullptr) {

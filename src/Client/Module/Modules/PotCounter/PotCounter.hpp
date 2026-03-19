@@ -1,31 +1,27 @@
 #pragma once
 
-#include "../Module.hpp"
+#include "../HUDModule.hpp"
 #include "Events/Game/TickEvent.hpp"
-#include "Events/Render/RenderEvent.hpp"
 
-class PotCounter : public Module {
+class PotCounter : public HUDModule {
 
 private:
-
 	int pots = 0;
 
 public:
-
-	PotCounter(): Module("Pot Counter", "Counts how much potions are\nin your inventory.",
-		IDR_POTION_PNG, "", false, {"potion counter"}) {
+	PotCounter(): HUDModule(14, "Pot Counter", "Counts how much potions are\nin your inventory.",
+		IDR_POTION_PNG, "", {"potion counter"}) {
 
 	}
 
-	void onEnable() override;
-
-	void onDisable() override;
-
-	void defaultConfig() override;
-
-	void settingsRender(float settingsOffset) override;
-
 	void onTick(TickEvent& event);
 
-	void onRender(RenderEvent& event);
+protected:
+	std::string getDisplayValue() override;
+
+	void customConfig() override;
+
+	void customInit() override;
+
+	void customCleanup() override;
 };

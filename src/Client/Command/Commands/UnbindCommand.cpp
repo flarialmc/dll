@@ -22,6 +22,9 @@ void UnbindCommand::execute(const std::vector<std::string> &args) {
             "SnapLook",
             "Skin_Stealer",
             "Tab_List",
+            "Chunk_Border",
+            "Hitbox",
+            "Cinematic_Camera",
             "Eject"
         };
         std::string modListText = "Keybindable Module List: (put _ in place of spaces)";

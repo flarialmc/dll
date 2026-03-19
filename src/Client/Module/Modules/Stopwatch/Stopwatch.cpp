@@ -306,7 +306,7 @@ std::string Stopwatch::getFormattedTime(double seconds) {
 }
 
 void Stopwatch::onKey(KeyEvent& event) {
-	if (!SDK::clientInstance->getLocalPlayer()) return;
+	if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer()) return;
 	if (this->isEnabled() && SDK::getCurrentScreen() == "hud_screen") {
 		this->keybindActions[0]({ std::any(event) });
 	}

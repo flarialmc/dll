@@ -1,60 +1,26 @@
 #include "OpponentReach.hpp"
 
-
-
-
-void OpponentReach::onEnable()
+void OpponentReach::customInit()
 {
-    Listen(this, RenderEvent, &OpponentReach::onRender)
     Listen(this, PacketEvent, &OpponentReach::onPacketReceive)
     Listen(this, TickEvent, &OpponentReach::onTick)
-    Module::onEnable();
 }
 
-void OpponentReach::onDisable()
+void OpponentReach::customCleanup()
 {
-    Deafen(this, RenderEvent, &OpponentReach::onRender)
     Deafen(this, PacketEvent, &OpponentReach::onPacketReceive)
     Deafen(this, TickEvent, &OpponentReach::onTick)
-    Module::onDisable();
 }
 
-void OpponentReach::defaultConfig()
+void OpponentReach::customConfig()
 {
     setDef("textscale", 0.8f);
-    Module::defaultConfig("all");
     setDef("tryToExcludeTeam", true);
-    
 }
 
-void OpponentReach::settingsRender(float settingsOffset)
+std::string OpponentReach::getDisplayValue()
 {
-    initSettingsPage();
-
-    defaultAddSettings("main");
-    extraPadding();
-
-    addHeader("Text");
-    defaultAddSettings("text");
-    extraPadding();
-
-    addHeader("Colors");
-    defaultAddSettings("colors");
-    extraPadding();
-
-    addHeader("Misc");
-    defaultAddSettings("misc");
-
-    FlarialGUI::UnsetScrollView();
-    resetPadding();
-}
-
-void OpponentReach::onRender(RenderEvent& event)
-{
-    if (this->isEnabled()) {
-        auto delayStr = std::format("{:.2f}", opponentReach);
-        this->normalRender(22, delayStr);
-    }
+    return std::format("{:.2f}", opponentReach);
 }
 
 void OpponentReach::onPacketReceive(PacketEvent& event)

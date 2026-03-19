@@ -386,6 +386,50 @@ public:
     static std::string toUpper(std::string input);
 
     static std::string toTitle(std::string input);
+
+    static std::wstring utf8_to_utf16(const std::string& s)
+    {
+        if (s.empty()) return {};
+
+        int len = MultiByteToWideChar(
+            CP_UTF8, 0,
+            s.c_str(), -1,
+            nullptr, 0
+        );
+
+        std::wstring out(len - 1, L'\0');
+
+        MultiByteToWideChar(
+            CP_UTF8, 0,
+            s.c_str(), -1,
+            out.data(), len
+        );
+
+        return out;
+    }
+
+    static std::string utf16_to_utf8(const std::wstring& ws)
+    {
+        if (ws.empty()) return {};
+
+        int len = WideCharToMultiByte(
+            CP_UTF8, 0,
+            ws.c_str(), -1,
+            nullptr, 0,
+            nullptr, nullptr
+        );
+
+        std::string out(len - 1, '\0');
+
+        WideCharToMultiByte(
+            CP_UTF8, 0,
+            ws.c_str(), -1,
+            out.data(), len,
+            nullptr, nullptr
+        );
+
+        return out;
+    }
 };
 
 struct CaretMeasureData {

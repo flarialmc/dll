@@ -13,9 +13,6 @@
 #include <minhook/MinHook.h>
 #include <libhat/Scanner.hpp>
 
-#define in_range(x, a, b) (x >= a && x <= b)
-#define get_bits(x) (in_range((x & (~0x20)), 'A', 'F') ? ((x & (~0x20)) - 'A' + 0xa) : (in_range(x, '0', '9') ? x - '0' : 0))
-#define get_byte(x) (get_bits(x[0]) << 4 | get_bits(x[1]))
 
 template<typename Ret, typename Type>
 Ret &direct_access(Type *type, size_t offset) {
@@ -53,18 +50,21 @@ void set##name(const type& v) { direct_access<type>(ptr, offset) = v; }
 
 class Memory {
 public:
+    /// Calls a virtual function at a compile-time vtable index on the given object.
     template<unsigned int IIdx, typename TRet, typename... TArgs>
     static auto CallVFunc(void *thisptr, TArgs... argList) -> TRet {
         using Fn = TRet(__thiscall *)(void *, decltype(argList)...);
         return (*static_cast<Fn **>(thisptr))[IIdx](thisptr, std::forward<TArgs>(argList)...);
     }
 
+    /// Calls a virtual function at a runtime-determined vtable index on the given object.
     template<typename TRet, typename... TArgs>
     static auto CallVFuncI(uint32_t index, void *thisptr, TArgs... argList) -> TRet {
         using Fn = TRet(__thiscall*)(void *, TArgs...);
         return (*static_cast<Fn **>(thisptr))[index](thisptr, std::forward<TArgs>(argList)...);
     }
 
+    /// Creates and immediately enables a MinHook detour, logging success/failure.
     static void hookFunc(void *pTarget, void *pDetour, void **ppOriginal, std::string name) {
         if (pTarget == nullptr) {
             Logger::custom(fg(fmt::color::crimson), "vFunc Hook", "{} has invalid address", name);
@@ -81,9 +81,35 @@ public:
         Logger::custom(fg(fmt::color::dodger_blue), "vFunc Hook", "Hooked {} at {}", name, pTarget);
     }
 
+    // Queued version - creates hook and queues for batch enabling
+    // Call applyQueuedHooks() after creating all hooks to enable them in one thread suspend
+    static void hookFuncQueued(void *pTarget, void *pDetour, void **ppOriginal, std::string name) {
+        if (pTarget == nullptr) {
+            Logger::custom(fg(fmt::color::crimson), "vFunc Hook", "{} has invalid address", name);
+            return;
+        }
+
+        if (MH_CreateHook(pTarget, pDetour, ppOriginal) != MH_OK) {
+            Logger::custom(fg(fmt::color::crimson), "vFunc Hook", "Failed to hook {}", name);
+            return;
+        }
+
+        if (MH_QueueEnableHook(pTarget) != MH_OK) {
+            Logger::custom(fg(fmt::color::crimson), "vFunc Hook", "Failed to queue {}", name);
+            return;
+        }
+
+        Logger::custom(fg(fmt::color::dodger_blue), "vFunc Hook", "Queued {} at {}", name, pTarget);
+    }
+
+    // Apply all queued hooks in one batch (single thread suspend/resume)
+    static void applyQueuedHooks() {
+        MH_ApplyQueued();
+    }
+
     template<typename R, typename... Args>
     static R CallFunc(void *func, Args... args) {
-        return ((R(*)(Args...)) func)(args...);
+        return static_cast<R(*)(Args...)>(func)(args...);
     }
 
     template<unsigned int index>
@@ -93,6 +119,7 @@ public:
         hookFunc(vTable[index], pDetour, ppOriginal, std::move(name));
     }
 
+    /// Scans the .text section for a byte pattern and returns its absolute address, or 0 if not found.
     static uintptr_t findSig(std::string_view signature) {
         auto parsed = hat::parse_signature(signature);
         if (!parsed.has_value()) {
@@ -100,7 +127,7 @@ public:
             return 0u;
         }
 
-        auto result = hat::find_pattern(parsed.value(), ".text");
+        const auto result = hat::find_pattern(parsed.value(), ".text");
 
         if (!result.has_result()) {
             Logger::custom(fg(fmt::color::crimson), "Signatures", "Failed to find signature: {} ", signature);
@@ -128,6 +155,7 @@ public:
     }
 
 
+    /// Safely releases a COM object pointer and nullifies it; no-ops if already null.
     template<typename T>
     static void SafeRelease(T *&pPtr) {
         if (pPtr != nullptr) {
@@ -143,17 +171,19 @@ public:
         pPtr = nullptr;  // Smart pointer automatically calls Release()
     }
 
+    /// Follows a multi-level pointer chain, dereferencing and adding each offset in sequence.
     static uintptr_t findDMAAddy(uintptr_t ptr, const std::vector<unsigned int>& offsets) {
 
         uintptr_t addr = ptr;
 
         for (unsigned int offset: offsets) {
-            addr = *(uintptr_t *) addr;
+            addr = *reinterpret_cast<uintptr_t*>(addr);
             addr += offset;
         }
         return addr;
     }
 
+    /// Overwrites a memory region with NOP (0x90) instructions, temporarily elevating page protection.
     static void nopBytes(void *dst, const unsigned int size) {
         if (dst == nullptr) return;
 
@@ -163,6 +193,7 @@ public:
         VirtualProtect(dst, size, oldprotect, &oldprotect);
     }
 
+    /// Copies bytes from src to dst with temporary write-protection elevation.
     static void copyBytes(void *src, void *dst, const unsigned int size) {
         if (src == nullptr || dst == nullptr) return;
 
@@ -172,6 +203,7 @@ public:
         VirtualProtect(src, size, oldprotect, &oldprotect);
     }
 
+    /// Patches memory at dst with bytes from src, temporarily elevating page protection.
     static void patchBytes(void *dst, const void *src, const unsigned int size) {
         if (src == nullptr || dst == nullptr) return;
 
@@ -197,6 +229,7 @@ public:
         return reinterpret_cast<Ret>(offsetFromSig(sig, offset));
     }
 
+    /// Calculates the 4-byte RIP-relative offset from instructionAddress to targetAddress.
     static std::array<std::byte, 4> getRipRel(uintptr_t instructionAddress, uintptr_t targetAddress) {
         uintptr_t relAddress = targetAddress - (instructionAddress + 4); // 4 bytes for RIP-relative addressing
         std::array<std::byte, 4> relRipBytes{};
@@ -208,6 +241,7 @@ public:
         return relRipBytes;
     }
 
+    /// Reads a function pointer from a vtable at the given index (assumes 8-byte x64 pointers).
     static uintptr_t GetAddressByIndex(uintptr_t vtable, int index) {
         return *reinterpret_cast<uintptr_t *>(vtable + 8 * index);
     }
@@ -234,6 +268,7 @@ public:
     }
 };
 
+/// RAII guard that changes memory protection on construction and restores it on destruction.
 class ScopedVirtualProtect {
 public:
     ScopedVirtualProtect(void *addr, size_t size, DWORD newProtect,

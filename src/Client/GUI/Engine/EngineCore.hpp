@@ -84,6 +84,7 @@ namespace FlarialGUI {
 	extern bool DoLoadFontLater;
 	extern bool HasAFontLoaded;
 	extern std::vector<std::pair<std::vector<std::byte>, FontKey>> FontMemoryToLoad;
+	extern std::mutex FontMemoryToLoadMutex;  // Protects FontMemoryToLoad from concurrent access
 
 	extern std::string currentKeybind;
 

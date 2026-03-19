@@ -1,58 +1,26 @@
 #include "HitPing.hpp"
 
-
 #include "SDK/Client/Network/Packet/EntityEventPacket.hpp"
 
-void HitPing::onEnable() {
-    Listen(this, RenderEvent, &HitPing::onRender)
+void HitPing::customInit() {
     Listen(this, AttackEvent, &HitPing::onAttack)
     Listen(this, PacketEvent, &HitPing::onPacketReceive)
     Listen(this, TickEvent, &HitPing::onTick)
-    Module::onEnable();
 }
 
-void HitPing::onDisable() {
-    Deafen(this, RenderEvent, &HitPing::onRender)
+void HitPing::customCleanup() {
     Deafen(this, AttackEvent, &HitPing::onAttack)
     Deafen(this, PacketEvent, &HitPing::onPacketReceive)
     Deafen(this, TickEvent, &HitPing::onTick)
-    Module::onDisable();
 }
 
-void HitPing::defaultConfig() {
+void HitPing::customConfig() {
     setDef("text", (std::string)"{value} ms");
     setDef("textscale", 0.80f);
-    Module::defaultConfig("all");
-    
 }
 
-void HitPing::settingsRender(float settingsOffset) {
-    initSettingsPage();
-
-    defaultAddSettings("main");
-    extraPadding();
-
-    addHeader("Text");
-    defaultAddSettings("text");
-    extraPadding();
-
-    addHeader("Colors");
-    defaultAddSettings("colors");
-    extraPadding();
-
-    addHeader("Misc");
-    defaultAddSettings("misc");
-
-    FlarialGUI::UnsetScrollView();
-    resetPadding();
-}
-
-void HitPing::onRender(RenderEvent &event) {
-    if (this->isEnabled()) {
-        auto delayStr = FlarialGUI::cached_to_string(pingReach) + "\n" + FlarialGUI::cached_to_string((int)round(hitDelay.count() * 1000));
-
-        this->normalRender(21, delayStr);
-    }
+std::string HitPing::getDisplayValue() {
+    return FlarialGUI::cached_to_string(pingReach) + "\n" + FlarialGUI::cached_to_string((int)round(hitDelay.count() * 1000));
 }
 
 void HitPing::onAttack(AttackEvent &event) { // only calculate ping on first hit
@@ -111,8 +79,12 @@ void HitPing::onPacketReceive(PacketEvent &event) {
 
                     if (time.count() >= 0.0001) {
                         hitDelay = time;
-                        auto actors = SDK::clientInstance->getLocalPlayer()->getLevel()->getRuntimeActorList();
-                        auto actor = std::find_if(actors.begin(), actors.end(), [&](auto& a) {
+                        auto playerLocal = SDK::clientInstance->getLocalPlayer();
+                        if (!playerLocal) return;
+                        auto levelLocal = playerLocal->getLevel();
+                        if (!levelLocal) return;
+                        auto actors = levelLocal->getRuntimeActorList();
+                        const auto actor = std::ranges::find_if(actors, [&](auto& a) {
                             return a->getRuntimeIDComponent()->runtimeID == id;
                         });
                         if (actor != actors.end()) {
@@ -125,7 +97,7 @@ void HitPing::onPacketReceive(PacketEvent &event) {
 
                             auto posAtTimeOfHit = actorHitInfo->second.second.lastActorTouchPos;
 
-                            auto closestPoint = Vec3<float>{ std::clamp(posAtTimeOfHit.x, lower.x, upper.x),
+                            const auto closestPoint = Vec3<float>{ std::clamp(posAtTimeOfHit.x, lower.x, upper.x),
                                 std::clamp(posAtTimeOfHit.y, lower.y, upper.y),
                                 std::clamp(posAtTimeOfHit.z, lower.z, upper.z) };
 

@@ -1,4 +1,4 @@
-﻿#include "Manager.hpp"
+#include "Manager.hpp"
 
 #include "Modules/Misc/Input/GUIKeyListener.hpp"
 #include "Modules/Misc/SaveConfig/SaveConfigListener.hpp"
@@ -28,7 +28,6 @@
 #include "Modules/Freelook/Freelook.hpp"
 #include "Modules/NametagModifier/NametagModifier.hpp"
 #include "Modules/MotionBlur/MotionBlur.hpp"
-#include "Modules/ArmorHUD/ArmorHUD.hpp"
 #include "Modules/PaperDoll/PaperDoll.hpp"
 #include "Modules/PatarHD/PatarHD.hpp"
 #include "Modules/FogColor/FogColor.hpp"
@@ -47,14 +46,12 @@
 #include "Modules/Misc/Uninject/UninjectListener.hpp"
 #include "Modules/CPSLimiter/CPSLimiter.hpp"
 #include "Modules/BlockBreakIndicator/BlockBreakIndicator.hpp"
-//#include "Modules/CompactChat/CompactChat.hpp"
 #include "Modules/FOVChanger/FOVChanger.hpp"
 #include "Modules/UpsideDown/UpsideDown.hpp"
 #include "Modules/Animations/Animations.hpp"
 #include "Modules/DVD Screen/dvd.hpp"
 #include "Modules/BlockOutline/BlockOutline.hpp"
 #include "Modules/Hitbox/Hitbox.hpp"
-#include "Modules/InventoryHUD//InventoryHUD.hpp"
 #include "Modules/NoHurtCam/NoHurtCam.hpp"
 #include "Modules/CommandHotkey/CommandHotkey.hpp"
 #include "Modules/Misc/DiscordRPC/DiscordRPCListener.hpp"
@@ -133,6 +130,10 @@
 #include "Modules/Misc/F1Listener/F1Listener.hpp"
 #include "Modules/TNTTimer/TNTTimer.hpp"
 #include "Modules/ItemCounter/ItemCounter.hpp"
+#include "Modules/PitchDisplay/PitchDisplay.hpp"
+#include "Modules/ExperienceInfo/ExperienceInfo.hpp"
+#include "Modules/DurabilityWarning/DurabilityWarning.hpp"
+// #include "Modules/PanoramaShader/PanoramaShader.hpp"  // Uses CubemapBackgroundScreenRenderHook (render thread safe)
 
 #ifdef COMPILE_DOOM
 	#include "Modules/Doom/Doom.hpp"
@@ -202,18 +203,30 @@ void ModuleManager::initialize() {
 	addModule<Sneak>();
 	addModule<Sprint>();
 	addModule<Hitbox>();
-	if (VersionUtils::checkAboveOrEqual(21, 80)) addModule<GlintColor>();
 	addModule<HurtColor>();
+	addModule<BlockHit>();
+
+	if (VersionUtils::checkAboveOrEqual(21, 130) && !VersionUtils::checkAboveOrEqual(26, 0)) {
+	}
+
 	addModule<NametagModifier>();
 	addModule<JavaDynamicFOV>();
 
 	addModule<SnapLook>();
 	addModule<FogColor>();
-	addModule<ArmorHUD>();
 	addModule<TimeChanger>();
-	addModule<RenderOptions>();
 	addModule<PaperDoll>();
 	addModule<GuiScale>();
+
+	addModule<RenderOptions>();
+	if (!VersionUtils::checkAboveOrEqual(26, 0)) {
+		
+		addModule<GlintColor>();
+
+	}
+
+	addModule<ItemPhysics>();
+
 	addModule<TabList>();
 	addModule<WeatherChanger>();
 	addModule<NickModule>();
@@ -231,8 +244,9 @@ void ModuleManager::initialize() {
 
 	addModule<BlockOutline>();
 	addModule<CommandHotkey>();
-	addModule<NoHurtCam>();
-	addModule<InventoryHUD>();
+
+	if (VersionUtils::checkBelow(21, 130)) addModule<NoHurtCam>();
+
 	addModule<HiveUtils>();
 	addModule<HitPing>();
 	addModule<InstantHurtAnimation>();
@@ -252,16 +266,14 @@ void ModuleManager::initialize() {
 	addModule<MovableDayCounter>();
 	// addModule<CompactChat>();
 
-	addModule<ItemPhysics>();
 
 	addModule<Mousestrokes>();
 
 	if (VersionUtils::checkAboveOrEqual(21, 40)) {
-		addModule<JavaInventoryHotkeys>();
-		addModule<BlockHit>();
 		addModule<SwingAnimations>();
 	}
 
+	if (VersionUtils::checkBelow(21, 120)) addModule<JavaInventoryHotkeys>();
 
 	addModule<HiveStat>();
 	addModule<Waypoints>();
@@ -280,19 +292,21 @@ void ModuleManager::initialize() {
 	//addModule<ItemUseDelayFix>();
 	addModule<ZeqaUtils>();
 	addModule<MumbleLink>();
-	addModule<MaterialBinLoader>();
+	if (VersionUtils::checkBelow(21, 130)) addModule<MaterialBinLoader>();
 
 	addModule<MinimalViewBobbing>();
 
 	addModule<Lewis>();
 	addModule<Coordinates>();
+	addModule<ExperienceInfo>();
 	addModule<DisableMouseWheel>();
 	addModule<JavaDebugMenu>();
 	addModule<DirectionHUD>();
 
 	addModule<JavaViewBobbing>();
 
-	addModule<DeathLogger>();
+	if (VersionUtils::checkBelow(26, 0)) addModule<DeathLogger>();
+
 	addModule<Twerk>();
 	addModule<CinematicCamera>();
 	addModule<ChunkBorder>();
@@ -302,6 +316,7 @@ void ModuleManager::initialize() {
 	addModule<MessageLogger>();
 	}
 	addModule<TotemCounter>();
+	addModule<ItemCounter>();
 	addModule<BetterHungerBar>();
 	addModule<ParticleMultiplier>();
 	addModule<BowSensitivity>();
@@ -317,7 +332,13 @@ void ModuleManager::initialize() {
 	addModule<TNTTimer>();
 	addModule<InventoryLock>();
 
-	addModule<ItemCounter>();
+
+	addModule<PitchDisplay>();
+	addModule<DurabilityWarning>();
+
+#ifdef __DEBUG__
+	// addModule<FemaleGenderMod>();
+#endif
 
 #ifdef COMPILE_DOOM
 	addModule<DoomModule>();
@@ -336,17 +357,14 @@ void ModuleManager::initialize() {
 	addService<ImGUIMouseListener>();
 	addService<ImGUIKeyListener>();
 	addService<ScriptMarketplace>();
-	// addService<F1Listener>();
+	addService<F1Listener>();
 
 	initialized = true;
 }
 
 void ModuleManager::terminate() {
 	initialized = false;
-	for (const auto& pair : moduleMap) {
-		if (pair.second != nullptr)
-			pair.second->terminate();
-	}
+	for (const auto& val : moduleMap | std::views::values) if (val != nullptr) val->terminate();
 	moduleMap.clear();
 	services.clear();
 }
@@ -354,9 +372,9 @@ void ModuleManager::terminate() {
 void ModuleManager::restart() {
 	initialized = false;
 	Client::LoadSettings();
-	for (const auto& pair : moduleMap) {
-		if (pair.second) {
-			std::shared_ptr mod = getModule(pair.second->name);
+	for (const auto& val : moduleMap | std::views::values) {
+		if (val) {
+			std::shared_ptr mod = getModule(val->name);
 			if (mod != nullptr) {
 				bool old = mod->enabledState;
 				if (mod->isEnabled()) mod->onDisable();
@@ -384,7 +402,7 @@ void ModuleManager::syncState() {
 		restart();
 		return;
 	}
-	for (const auto& [key, module] : moduleMap) {
+	for (const auto& module : moduleMap | std::views::values) {
 		if (!module || module->enabledState == module->isEnabled() || module->delayDisable) continue;
 
 		if (module->enabledState) module->onEnable();

@@ -149,7 +149,8 @@ float DirectionHUD::getRelativeYaw(float playerX, float playerZ, float pointX, f
 }
 
 void DirectionHUD::onRender(RenderEvent &event) {
-    if (!this->isEnabled()) return;
+    if (!this->isEnabled() || ClickGUI::blurActive) return;
+    ClickGUI::HudFadeGuard fadeGuard;
     if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer()) return;
     if (SDK::getCurrentScreen() != "hud_screen") return;
     if (getOps<bool>("hideWhenTabList") && ModuleManager::getModule("Tab List") != nullptr && ModuleManager::getModule("Tab List")->active) return;
@@ -334,11 +335,18 @@ void DirectionHUD::onRender(RenderEvent &event) {
         if (waypoints) {
             for (const auto& [name, wp] : waypoints->WaypointList) {
                 if (!waypoints->settings.getSettingByName<bool>("state-" + FlarialGUI::cached_to_string(wp.index))) continue;
-                if (waypoints->settings.getSettingByName<std::string>("world-" + FlarialGUI::cached_to_string(wp.index))->value != SDK::clientInstance->getLocalPlayer()->getLevel()->getWorldFolderName()) continue;
-                if (waypoints->settings.getSettingByName<std::string>("dimension-" + FlarialGUI::cached_to_string(wp.index))->value != SDK::clientInstance->getBlockSource()->getDimension()->getName()) continue;
+                auto level = SDK::clientInstance->getLocalPlayer()->getLevel();
+                if (!level) continue;
+                if (waypoints->settings.getSettingByName<std::string>("world-" + FlarialGUI::cached_to_string(wp.index))->value != level->getWorldFolderName()) continue;
+                auto blockSource = SDK::clientInstance->getBlockSource();
+                if (!blockSource) continue;
+                auto dimension = blockSource->getDimension();
+                if (!dimension) continue;
+                if (waypoints->settings.getSettingByName<std::string>("dimension-" + FlarialGUI::cached_to_string(wp.index))->value != dimension->getName()) continue;
 
                 Vec3<float> waypointPos = waypoints->getPos(wp.index);
                 Vec3<float> *playerPos = SDK::clientInstance->getLocalPlayer()->getPosition();
+                if (!playerPos) continue;
 
                 float relativeYaw = getRelativeYaw(playerPos->x, playerPos->z, waypointPos.x, waypointPos.z, lerpYaw);
 

@@ -2,15 +2,21 @@
 
 #include <cstdint>
 #include <string>
+#include <functional>
 
 class HashedString {
 public:
     uint64_t hash{};
     std::string text;
-    const HashedString *lastMatch{};
+    mutable const HashedString *lastMatch{};
 
-    explicit HashedString(const std::string &text) {
-        this->text = text;
+    HashedString() = default;
+
+    explicit HashedString(const std::string &text) : text(text) {
+        this->computeHash();
+    }
+
+    explicit HashedString(const char* text) : text(text) {
         this->computeHash();
     }
 
@@ -31,24 +37,37 @@ public:
         this->hash = _hash;
     }
 
-    bool operator==(HashedString &other) {
-        if (this->text == other.text) {
-            return ((this->lastMatch == &other) && (other.lastMatch == this));
+    [[nodiscard]] uint64_t getHash() const { return hash; }
+    [[nodiscard]] const std::string& getString() const { return text; }
+    [[nodiscard]] bool empty() const { return text.empty(); }
+
+    bool operator==(const HashedString &other) const {
+        if (this == &other || lastMatch == &other) return true;
+        if (hash != other.hash) return false;
+        if (text == other.text) {
+            lastMatch = &other;
+            other.lastMatch = this;
+            return true;
         }
         return false;
     }
 
-    bool operator!=(HashedString &other) {
+    bool operator!=(const HashedString &other) const {
         return !(*this == other);
     }
 
-    bool operator<(HashedString &other) const {
-        if (this->hash < other.hash) {
-            return true;
-        }
-        if (this->hash <= other.hash) {
-            return (strcmp(this->text.c_str(), other.text.c_str()) < 0);
-        }
-        return false;
+    bool operator<(const HashedString &other) const {
+        if (hash < other.hash) return true;
+        if (hash > other.hash) return false;
+        return text < other.text;
     }
 };
+
+namespace std {
+    template<>
+    struct hash<HashedString> {
+        size_t operator()(const HashedString &hs) const noexcept {
+            return static_cast<size_t>(hs.getHash());
+        }
+    };
+}

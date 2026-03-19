@@ -32,10 +32,12 @@ private:
 
             static auto itemPhysics = ModuleManager::getModule("Item Physics");
 
-            ActorRenderData data;
+            ActorRenderData data{};
             data.actor = entity;
-            data.rotation = entity->getActorRotationComponent()->rot;
-            data.position = *entity->getPosition();
+            auto* rotComp = entity->getActorRotationComponent();
+            if (rotComp) data.rotation = rotComp->rot;
+            auto* pos = entity->getPosition();
+            if (pos) data.position = *pos;
 
             auto& stack = SDK::clientInstance->getCamera().getWorldMatrixStack();
             stack.push();

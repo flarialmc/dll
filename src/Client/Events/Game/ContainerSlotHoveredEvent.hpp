@@ -3,10 +3,13 @@
 #include <cstdint>
 #include "../Event.hpp"
 
+class ContainerScreenController;
+
 class ContainerSlotHoveredEvent : public Event {
 private:
     int64_t hoveredSlot;
     std::string collectionName;
+    ContainerScreenController* controller;
 public:
     [[nodiscard]] int64_t getHoveredSlot() {
         return this->hoveredSlot;
@@ -16,5 +19,10 @@ public:
         return this->collectionName;
     }
 
-    explicit ContainerSlotHoveredEvent(std::string collectionName, int64_t hoveredSlot) : collectionName(collectionName), hoveredSlot(hoveredSlot) {}
+    [[nodiscard]] ContainerScreenController* getController() {
+        return this->controller;
+    }
+
+    explicit ContainerSlotHoveredEvent(std::string collectionName, int64_t hoveredSlot, ContainerScreenController* controller = nullptr)
+        : collectionName(collectionName), hoveredSlot(hoveredSlot), controller(controller) {}
 };

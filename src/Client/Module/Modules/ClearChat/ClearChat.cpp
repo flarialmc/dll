@@ -28,6 +28,7 @@ void ClearChat::onSetupAndRender(SetupAndRenderEvent& event) {
 void ClearChat::clearChat() {
     if (!(SDK::clientInstance && SDK::clientInstance->getLocalPlayer())) return;
     if (SDK::getCurrentScreen() != "hud_screen") return;
+    if (!SDK::screenView || !SDK::screenView->VisualTree || !SDK::screenView->VisualTree->root) return;
 
     // If we don't have the control yet, find it
     if (!targetControl) {

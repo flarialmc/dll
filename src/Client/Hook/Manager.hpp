@@ -3,11 +3,11 @@
 #include <vector>
 
 #include "Hooks/Hook.hpp"
-#include "Hooks/Input/KeyHook.hpp"
 #include "Hooks/Input/MouseHook.hpp"
 #include "Hooks/Render/DirectX/DXGI/SwapchainHook.hpp"
 #include "Hooks/Visual/getFovHook.hpp"
 #include "Hooks/Game/OnSuspend.hpp"
+#include "Hooks/Game/OnDeviceLost.hpp"
 
 class HookManager {
 public:

@@ -8,7 +8,7 @@ struct ToolTipStruct {
     float opac = 0.0f;
     float hoverX{};
     float hoverY{};
-    bool in = false;
+    bool isHovered = false;
     std::string textName;
     std::chrono::milliseconds duration;
 };

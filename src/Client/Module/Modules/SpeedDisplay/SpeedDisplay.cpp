@@ -1,59 +1,26 @@
 #include "SpeedDisplay.hpp"
 
-
 void SpeedDisplay::onEnable()
 {
-    Listen(this, RenderEvent, &SpeedDisplay::onRender)
+    HUDModule::onEnable();
     Listen(this, TickEvent, &SpeedDisplay::onTick)
-    Module::onEnable();
 }
 
 void SpeedDisplay::onDisable()
 {
-    Deafen(this, RenderEvent, &SpeedDisplay::onRender)
     Deafen(this, TickEvent, &SpeedDisplay::onTick)
-    Module::onDisable();
+    HUDModule::onDisable();
 }
 
-void SpeedDisplay::defaultConfig()
+std::string SpeedDisplay::getDisplayValue()
 {
-    setDef("text", (std::string)"{value} m/s");
-    Module::defaultConfig("all");
-    
-}
-
-void SpeedDisplay::settingsRender(float settingsOffset)
-{
-    initSettingsPage();
-
-    defaultAddSettings("main");
-    extraPadding();
-
-    addHeader("Text");
-    defaultAddSettings("text");
-    extraPadding();
-
-    addHeader("Colors");
-    defaultAddSettings("colors");
-    extraPadding();
-
-    addHeader("Misc");
-    defaultAddSettings("misc");
-
-    FlarialGUI::UnsetScrollView();
-    resetPadding();
-}
-
-void SpeedDisplay::onRender(RenderEvent& event)
-{
-    if (!this->isEnabled()) return;
-    this->normalRender(15, speed);
+    return speed;
 }
 
 void SpeedDisplay::onTick(TickEvent& event)
 {
     if (!this->isEnabled()) return;
-    if (!SDK::clientInstance->getLocalPlayer())
+    if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer())
         return;
     auto stateVectorComponent = SDK::clientInstance->getLocalPlayer()->getStateVectorComponent();
     if (stateVectorComponent != nullptr) {

@@ -13,7 +13,8 @@ bool WaypointCommand::checkValid(const std::string& s) {
             if (decimal) return false;
             decimal = true;
         }
-        else if (!std::isdigit(i)) return false;
+        else if (!std::isdigit(i) && !(i == s.front() && i == '-'))
+            return false;
     }
     return true;
 }

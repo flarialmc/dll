@@ -12,8 +12,12 @@ class VersionUtils {
     static void addData();
 
     static bool checkAboveOrEqual(int m, int b);
+    static bool checkAbove(int m, int b);
     static bool checkBelowOrEqual(int m, int b);
+    static bool checkBelow(int m, int b);
+    static bool checkBetweenOrEqual(int m1, int b1, int m2, int b2);
     static bool checkBetween(int m1, int b1, int m2, int b2);
+    static bool checkEqual(int m, int b);
 
     static std::vector<std::pair<std::string, std::pair<std::function<void()>, std::function<void()>>>> versions;
 };

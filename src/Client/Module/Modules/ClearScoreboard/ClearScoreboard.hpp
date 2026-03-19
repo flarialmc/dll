@@ -21,4 +21,6 @@ private:
     bool savedOriginalSize = false;
     void clearScoreboard();
     void restoreScoreboard();
+
+    std::string lastServer = "";
 };

@@ -1,4 +1,6 @@
 ﻿#include "Utils.hpp"
+#include "PlatformUtils.hpp"
+#include "ShellMessageUtil.hpp"
 
 #include <Client/GUI/Engine/Engine.hpp>
 #include <Utils/WinrtUtils.hpp>
@@ -15,16 +17,15 @@
 #include <winrt/Windows.ApplicationModel.Core.h>
 #include <winrt/Windows.UI.Core.h>
 
+
 std::string Utils::getRoamingPath() {
-    using namespace winrt::Windows::Storage;
-
-    std::filesystem::path path(ApplicationData::Current().RoamingFolder().Path().c_str());
-
-    return path.string();
+    return PlatformUtils::getRoamingPath();
 }
 
 std::string Utils::getClientPath() {
-    std::filesystem::path path(Utils::getRoamingPath() + "\\Flarial");
+    std::string ClientDir = "\\Flarial";
+    if (PlatformUtils::isGDK()) ClientDir += "\\Client";
+    std::filesystem::path path(Utils::getRoamingPath() + ClientDir);
     return path.string();
 }
 
@@ -34,15 +35,25 @@ std::string Utils::getConfigsPath() {
 }
 
 void Utils::MessageDialogW(PCWSTR pText, PCWSTR pTitle) {
-    auto dispatcher = winrt::Windows::ApplicationModel::Core::CoreApplication::MainView()
-            .CoreWindow()
-            .Dispatcher();
+    if (PlatformUtils::isUWP()) {
+        try {
+            auto dispatcher = winrt::Windows::ApplicationModel::Core::CoreApplication::MainView()
+                    .CoreWindow()
+                    .Dispatcher();
 
-    dispatcher.TryRunAsync(winrt::Windows::UI::Core::CoreDispatcherPriority::High,
-                           [pText, pTitle]() {
-                               winrt::Windows::UI::Popups::MessageDialog dialog(pText, pTitle ? pTitle : L"");
-                               dialog.ShowAsync();
-                           });
+            dispatcher.TryRunAsync(winrt::Windows::UI::Core::CoreDispatcherPriority::High,
+                                   [pText, pTitle]() {
+                                       winrt::Windows::UI::Popups::MessageDialog dialog(pText, pTitle ? pTitle : L"");
+                                       dialog.ShowAsync();
+                                   });
+        } catch (const std::exception& e) {
+            LOG_ERROR("Failed to show UWP dialog: {}", e.what());
+            ShellMessageUtil::showW(nullptr, pText, pTitle ? pTitle : L"", MB_OK);
+        }
+    } else {
+        // GDK/Win32: Use themed shell message box
+        ShellMessageUtil::showW(nullptr, pText, pTitle ? pTitle : L"", MB_OK);
+    }
 }
 
 std::string Utils::getAssetsPath() {

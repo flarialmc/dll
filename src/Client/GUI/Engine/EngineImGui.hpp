@@ -8,6 +8,7 @@
 #include "Elements/Control/TextBox/TextBoxStruct.hpp"
 #include "Elements/Control/Slider/SliderRect.hpp"
 #include "Elements/Control/SliderInt/SliderIntRect.hpp"
+#include "Elements/Control/RangeSlider/RangeSliderRect.hpp"
 #include "Elements/Windows/WindowRect.hpp"
 #include "Elements/Control/Tooltip/ToolTipStruct.hpp"
 #include "Elements/Structs/HSV.hpp"
@@ -19,6 +20,7 @@ namespace FlarialGUI {
 	extern std::unordered_map<int, WindowRect> WindowRects;
 	extern std::unordered_map<int, SliderRect> SliderRects;
 	extern std::unordered_map<int, SliderIntRect> SliderIntRects;
+	extern std::unordered_map<int, RangeSliderRect> RangeSliderRects;
 	extern std::unordered_map<int, TextBoxStruct> TextBoxes;
 	extern std::unordered_map<int, ColorPicker> ColorPickers;
 	extern std::unordered_map<int, DropdownStruct> DropDownMenus;
@@ -46,7 +48,7 @@ namespace FlarialGUI {
 	// ImGui text utilities
 	ImVec2 getFlarialTextSize(const wchar_t* text, const float width, const float height,
 		const DWRITE_TEXT_ALIGNMENT alignment, const float fontSize,
-		const DWRITE_FONT_WEIGHT weight, bool moduleFont = false, bool troll = false);
+		const DWRITE_FONT_WEIGHT weight, bool moduleFont = false, bool skipOpacityOverride = false);
 
 	// ImGui conversion utilities
 	ImColor D2DColorToImColor(D2D1_COLOR_F color);
@@ -74,11 +76,16 @@ namespace FlarialGUI {
 
 	void FlarialText(float x, float y, const wchar_t* text, float width, float height, DWRITE_TEXT_ALIGNMENT alignment);
 
+	/// Creates a clipped scrollable region; pair with UnsetScrollView() to end.
 	void SetScrollView(float x, float y, float width, float height);
+	/// Ends the current scrollable region started by SetScrollView().
 	void UnsetScrollView();
+	/// Renders a scroll indicator bar within the scrollable region.
 	void ScrollBar(float x, float y, float width, float height, float radius);
+	/// Registers a draggable/resizable window region for HUD module positioning.
 	void SetWindowRect(float x, float y, float width, float height, int currentNum, std::string modname);
 	void UnsetWindowRect();
+	/// Returns the adjusted position of a window after user dragging, accounting for bounds.
 	Vec2<float> CalculateMovedXY(float x, float y, int num, float rectWidth = 0.0f, float rectHeight = 0.0f);
 	Vec2<float> CalculateResizedXY(float x, float y, float width, float height);
 	void UpdateWindowRects();
@@ -98,11 +105,17 @@ namespace FlarialGUI {
 	void Toggle(int index, float x, float y, bool isEnabled, bool rgb, std::string moduleName, std::string settingName);
 	bool Toggle(int index, float x, float y, bool isEnabled, bool rgb);
 
+	/// Interactive float slider control; auto-saves to module setting if moduleName/settingName provided.
 	float Slider(int index, float x, float y, float& value, float maxValue = 100.0f, float minValue = 0.0f, bool zerosafe = true, std::string moduleName = "", std::string settingName = "");
+	/// Interactive integer slider control; auto-saves to module setting if moduleName/settingName provided.
 	int SliderInt(int index, float x, float y, int& value, int maxValue = 100, int minValue = 0, std::string moduleName = "", std::string settingName = "");
+	/// Dual-handle range slider for selecting a min/max value pair.
+	void RangeSlider(int index, float x, float y, float& minValue, float& maxValue, float rangeMin, float rangeMax, std::string moduleName = "", std::string minSettingName = "", std::string maxSettingName = "");
 
 	inline int TextCursorPosition = 0; //Cursor position from right
+	/// Raw text input field with character limit; returns current text value.
 	std::string TextBox(int index, std::string& text, int limit, float x, float y, float width, float height, int special = 0, std::string moduleName = "", std::string settingName = "");
+	/// Visual text input that displays 'real' string (e.g. masked characters) instead of actual value.
 	std::string TextBoxVisual(int index, std::string& text, int limit, float x, float y, const std::string& real = "", std::string moduleName = "", std::string settingName = "");
 
 	// Color picker
@@ -127,10 +140,14 @@ namespace FlarialGUI {
 	void KeybindSelector(int index, float x, float y, std::string& keybind, std::string moduleName = "", std::string settingName = "");
 
 	// Notifications and tooltips
+	/// Displays a transient notification message that auto-expires after a duration.
 	void Notify(const std::string& text);
+	/// Renders and updates all active notifications each frame (call once per frame).
 	void NotifyHeartbeat();
+	/// Shows a tooltip at the given position; relative=true positions relative to cursor.
 	void Tooltip(const std::string& id, float x, float y, const std::string& text, float width, float height, bool push = true, bool relative = false,
 		std::chrono::milliseconds duration = std::chrono::milliseconds(1000));
+	/// Renders all active tooltips and removes expired ones each frame.
 	void displayToolTips();
 
 	// Image and rendering utilities
@@ -144,9 +161,12 @@ namespace FlarialGUI {
 		const float imageHeight);
 
 	// Image loading and caching
+	/// Synchronously loads all images from resources into cache.
 	void LoadAllImages();
+	/// Asynchronously loads images from resources; returns a future for completion tracking.
 	std::future<void> LoadImagesAsync();
 	void CleanupImageResources();
+	/// Preloads all common UI image assets into cache for faster rendering.
 	void LoadAllImageToCache();
 	void ExtractImageResource(int resourceId, std::string fileName, LPCTSTR type);
 	void LoadFont(int resourceId);
@@ -160,12 +180,25 @@ namespace FlarialGUI {
 	std::string
 		FlarialTextWithFont(float x, float y, const wchar_t* text, float width, float height,
 			DWRITE_TEXT_ALIGNMENT alignment, float fontSize,
-			DWRITE_FONT_WEIGHT weight, bool moduleFont = false, bool troll = false);
+			DWRITE_FONT_WEIGHT weight, bool moduleFont = false, bool skipOpacityOverride = false);
 
 	std::string
 		FlarialTextWithFont(float x, float y, const wchar_t* text, float width, float height,
 			DWRITE_TEXT_ALIGNMENT alignment, float fontSize,
 			DWRITE_FONT_WEIGHT weight, D2D1_COLOR_F color, bool moduleFont = false);
 
-	void ResetShit();
+	// Formatted text with color tags support
+	// Renders text with embedded color tags like {red}, {green}, {#ff00ff}, {reset}
+	// defaultColor is used for {reset} and as the initial color
+	void FlarialTextWithFontFormatted(float x, float y, const std::string& text, float width, float height,
+		DWRITE_TEXT_ALIGNMENT alignment, float fontSize,
+		DWRITE_FONT_WEIGHT weight, D2D1_COLOR_F defaultColor, bool moduleFont = false);
+
+	// Get the total width of formatted text (with color tags stripped)
+	ImVec2 getFlarialTextSizeFormatted(const std::string& text, float width, float height,
+		DWRITE_TEXT_ALIGNMENT alignment, float fontSize,
+		DWRITE_FONT_WEIGHT weight, bool moduleFont = false);
+
+	/// Resets all GUI element states (windows, sliders, text boxes, color pickers, dropdowns)
+	void ResetUIState();
 }

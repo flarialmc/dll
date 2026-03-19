@@ -32,8 +32,8 @@ inline void saveMp3File(const unsigned char* byteArray, size_t size, const std::
 class Lewis : public Module {
 	float x = 0;
 	float y = 0;
-	float xv = 1;
-	float yv = 1;
+	float xDirection = 1;
+	float yDirection = 1;
 
 	std::chrono::time_point<std::chrono::system_clock> NextLewisScream = std::chrono::system_clock::now();
 

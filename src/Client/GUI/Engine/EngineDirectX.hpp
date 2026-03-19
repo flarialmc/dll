@@ -111,8 +111,8 @@ namespace FlarialGUI {
 	void ApplyCombinedDeepFry();
 	void CopyBitmap(ID2D1Bitmap1* from, ID2D1Bitmap** to);
 	void ApplyGaussianBlurToTarget(ID2D1BitmapRenderTarget* target, float blurIntensity);
-	void ApplySusGaussianBlur(float blurIntensity);
-	void AllahBlur(float intensity);
+	void ApplyGaussianBlur(float blurIntensity);
+	void ApplyBlur(float intensity);
 	void BlurRect(D2D1_ROUNDED_RECT rect);
 	void PrepareBlur(float intensity);
 

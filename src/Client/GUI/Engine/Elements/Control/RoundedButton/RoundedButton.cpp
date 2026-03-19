@@ -55,6 +55,14 @@ bool FlarialGUI::RoundedButton(const int index, float x, float y, const D2D_COLO
 
     if (isAdditionalY) UnSetIsInAdditionalYMode();
 
+    // Ensure vectors are large enough for this index
+    if (index >= static_cast<int>(darkenAmounts.size())) {
+        darkenAmounts.resize(index + 1, 0.0f);
+    }
+    if (index >= static_cast<int>(glowAlphas.size())) {
+        glowAlphas.resize(index + 1, 0.0f);
+    }
+
     D2D1_COLOR_F buttonColor;
 
     if (CursorInRect(x, y, width, height)) {

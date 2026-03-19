@@ -29,7 +29,6 @@ void ZeqaUtils::defaultConfig()
     setDef("killstreak", false);
     setDef("friendaccept", false);
     setDef("duelaccept", false);
-    
 }
 
 void ZeqaUtils::settingsRender(float settingsOffset)
@@ -38,7 +37,8 @@ void ZeqaUtils::settingsRender(float settingsOffset)
 
 
     addHeader("Auto re queue");
-    addToggle("Auto re queue", "Requeue the same ranked/unranked duel after  the current one is over.", "req");
+    addToggle("Auto re queue",
+              "Requeue the same ranked/unranked duel after  the current one is over.", "req");
 
 
     addHeader("Auto accept");
@@ -49,7 +49,8 @@ void ZeqaUtils::settingsRender(float settingsOffset)
     addToggle("Promo message", "Removes all promo/info messages", "promomessage");
     addToggle("player join", "Removes player join message", "join");
     addToggle("player leave", "Removes player leave message", "leave");
-    addToggle("Kill streak", "Removes Message indicating a player has gotten a kill streak", "killstreak");
+    addToggle("Kill streak", "Removes Message indicating a player has gotten a kill streak",
+              "killstreak");
 
     FlarialGUI::UnsetScrollView();
     resetPadding();
@@ -67,77 +68,122 @@ void ZeqaUtils::onPacketReceive(PacketEvent& event)
         ip == "203.28.238.35" || // au
         ip == "38.54.63.126" || // za
         ip.find("zeqa") != std::string::npos
-    ) {
-        if (id == MinecraftPacketIds::Text) {
-            auto* pkt = reinterpret_cast<TextPacket*>(event.getPacket());
+    )
+    {
+        if (id == MinecraftPacketIds::Text)
+        {
+            auto pktOpt = getTextPacket(event.getPacket());
+            if (!pktOpt) return;
+            auto& pkt = *pktOpt;
 
-            if (getOps<bool>("promomessage")) {
-                if (pkt->message == " " ||
-                    pkt->message == " " ||
-                    pkt->message == " " || //onix promotion
-                    pkt->message == " " ||
-                    pkt->message == " ") {
+            if (getOps<bool>("promomessage"))
+            {
+                if (pkt.message == " " ||
+                    pkt.message == " " ||
+                    pkt.message == " " || //onix promotion
+                    pkt.message == " " ||
+                    pkt.message == " ")
+                {
                     event.cancel();
                 }
             }
-            if (getOps<bool>("join")) {
-
-                if (pkt->message.substr(0, 15) == "§8[§a+§8]§a") {
+            if (getOps<bool>("join"))
+            {
+                if (pkt.message.substr(0, 15) == "§8[§a+§8]§a")
+                {
                     event.cancel();
                 }
             }
-            if (getOps<bool>("leave")) {
-
-                if (pkt->message.substr(0, 15) == "§8[§c-§8]§c") {
+            if (getOps<bool>("leave"))
+            {
+                if (pkt.message.substr(0, 15) == "§8[§c-§8]§c")
+                {
                     event.cancel();
                 }
             }
-            if (getOps<bool>("killstreak")) {
-                if (pkt->message.contains("§g has gotten a ") && pkt->message.contains("§g killstreak")) {
+            if (getOps<bool>("killstreak"))
+            {
+                if (pkt.message.contains("§g has gotten a ") && pkt.message.contains(
+                    "§g killstreak"))
+                {
                     event.cancel();
                 }
             }
-            if (getOps<bool>("friendaccept")) {
-                if (pkt->message.find("§l§q» §r§aYou have received a friend request from ") != std::string::npos) {
-
+            if (getOps<bool>("friendaccept"))
+            {
+                if (pkt.message.find("§l§q» §r§aYou have received a friend request from ") !=
+                    std::string::npos)
+                {
                     std::shared_ptr<Packet> packet = SDK::createPacket(77);
                     auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
-                    command_packet->command = "/f accept " + pkt->message.substr(61, pkt->message.length() - 68);
+                    // command_packet->command = "/f accept " + pkt.message.substr(61, pkt.message.length() - 68);
+                    std::string command;
+                    command.reserve(64);
+                    command.append("/f accept \"");
+                    command.append(pkt.message.substr(61, pkt.message.length() - 68));
+                    command.append("\"");
+                    command_packet->command = std::move(command);
 
                     command_packet->origin.type = CommandOriginType::Player;
 
                     command_packet->InternalSource = true;
                     SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
 
-                    FlarialGUI::Notify("Accepted friend invite from: " + pkt->message.substr(61, pkt->message.length() - 68));
+                    // FlarialGUI::Notify("Accepted friend invite from: " + pkt.message.substr(61, pkt.message.length() - 68));
+                    std::string notification;
+                    notification.reserve(64);
+                    notification.append("Accepted friend invite from ");
+                    notification.append(pkt.message.substr(61, pkt.message.length() - 68));
+                    notification.append(".");
+                    FlarialGUI::Notify(std::move(notification));
                 }
             }
-            if (getOps<bool>("duelaccept")) {
-                if (pkt->message.find(/*"to accept the invite!" &&*/ " §7Type §g/accept") != std::string::npos) {
-
+            if (getOps<bool>("duelaccept"))
+            {
+                if (pkt.message.find(/*"to accept the invite!" &&*/ " §7Type §g/accept") !=
+                    std::string::npos)
+                {
                     std::shared_ptr<Packet> packet = SDK::createPacket(77);
                     auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
-                    command_packet->command = "/accept " + pkt->message.substr(23, pkt->message.length() - 48);
+                    // command_packet->command = "/accept " + pkt.message.substr(23, pkt.message.length() - 48);
+                    std::string command;
+                    command.reserve(64);
+                    command.append("/accept \"");
+                    command.append(pkt.message.substr(23, pkt.message.length() - 48));
+                    command.append("\"");
+                    command_packet->command = std::move(command);
 
                     command_packet->origin.type = CommandOriginType::Player;
 
                     command_packet->InternalSource = true;
                     SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
 
-                    FlarialGUI::Notify("Accepted duel invite from: " + pkt->message.substr(23, pkt->message.length() - 48));
+                    // FlarialGUI::Notify("Accepted duel invite from: " + pkt.message.substr(23, pkt.message.length() - 48));
+                    std::string notification;
+                    notification.reserve(64);
+                    notification.append("Accepted duel invite from ");
+                    notification.append(pkt.message.substr(23, pkt.message.length() - 48));
+                    notification.append(".");
+                    FlarialGUI::Notify(std::move(notification));
                 }
             }
         }
-        if (id == MinecraftPacketIds::ShowModalForm) {
-            if (getOps<bool>("req")) { //I know someone is going to copy paste this please leave some credit this took a lot of time
+        if (id == MinecraftPacketIds::ShowModalForm)
+        {
+            if (getOps<bool>("req"))
+            {
+                //I know someone is going to copy paste this please leave some credit this took a lot of time
                 auto* pkt = reinterpret_cast<ModalFormRequestPacket*>(event.getPacket());
                 // ImGui::SetClipboardText(pkt->mFormJSON.c_str());
 
                 nlohmann::json jsonData = nlohmann::json::parse(pkt->mFormJSON);
 
-                if (jsonData.contains("buttons") && jsonData["buttons"].is_array()) {
-                    for (const auto& button : jsonData["buttons"]) {
-                        if (button.contains("text") && button["text"] == "\u00a7gPlay \u00a7fAgain") {
+                if (jsonData.contains("buttons") && jsonData["buttons"].is_array())
+                {
+                    for (const auto& button : jsonData["buttons"])
+                    {
+                        if (button.contains("text") && button["text"] == "\u00a7gPlay \u00a7fAgain")
+                        {
                             // Cancel ui from showing
                             event.cancel();
 
@@ -148,24 +194,31 @@ void ZeqaUtils::onPacketReceive(PacketEvent& event)
 
                             std::string gamemode = "";
 
-                            if (cleanContent.find("Unranked") != std::string::npos) {
+                            if (cleanContent.find("Unranked") != std::string::npos)
+                            {
                                 cleanContent = cleanContent.substr(15); // Remove "Unranked"
-                                gamemode = cleanContent + " Unranked"; //add Unranked back but at the end this time
+                                gamemode = cleanContent + " Unranked";
+                                //add Unranked back but at the end this time
                             }
-                            else if (cleanContent.find("Ranked") != std::string::npos) {
+                            else if (cleanContent.find("Ranked") != std::string::npos)
+                            {
                                 cleanContent = cleanContent.substr(13); // Remove "Ranked"
-                                gamemode = cleanContent + " Ranked"; //add Ranked back but at the end this time
+                                gamemode = cleanContent + " Ranked";
+                                //add Ranked back but at the end this time
                             }
 
-                            if (!gamemode.empty()) {
+                            if (!gamemode.empty())
+                            {
                                 std::shared_ptr<Packet> packet = SDK::createPacket(77);
-                                auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
+                                auto* command_packet = reinterpret_cast<CommandRequestPacket*>(
+                                    packet.get());
                                 command_packet->command = "/q " + gamemode;
 
                                 command_packet->origin.type = CommandOriginType::Player;
 
                                 command_packet->InternalSource = true;
-                                SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
+                                SDK::clientInstance->getPacketSender()->
+                                                     sendToServer(command_packet);
 
                                 FlarialGUI::Notify("Joined the queue for " + gamemode);
                             }

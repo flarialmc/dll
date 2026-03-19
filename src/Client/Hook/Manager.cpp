@@ -16,10 +16,11 @@
 #include "Hooks/Game/getViewPerspective.hpp"
 #include "Hooks/Visual/FontDrawTransformedHook.hpp"
 #include "Hooks/Visual/HurtColorHook.hpp"
+#include "Hooks/Visual/ColorFormatHook.hpp"
 #include "Hooks/Visual/DimensionFogColorHook.hpp"
 #include "Hooks/Visual/OverworldFogColorHook.hpp"
 #include "Hooks/Visual/TimeChangerHook.hpp"
-#include "Hooks/Render/ItemRendererHook.hpp"
+#include "Hooks/Render/ItemRendererRenderGroupHook.hpp"
 #include "Hooks/Game/getSensHook.hpp"
 #include "Hooks/Game/ContainerScreenControllerHook.hpp"
 #include "Hooks/Render/TextureGroup_getTextureHook.hpp"
@@ -46,6 +47,7 @@
 #include "Hooks/Game/ChatScreenControllerHook.hpp"
 #include "Hooks/Game/HudScreenControllerHook.hpp"
 #include "Hooks/Game/SoundEnginePlayHook.hpp"
+#include "Hooks/Game/BedrockLogHook.hpp"
 #include "Hooks/Game/getCurrentSwingDurationHook.hpp"
 
 #include "Hooks/Render/BobHurt.hpp"
@@ -55,12 +57,26 @@
 #include "Hooks/Visual/Level_addParticleEffect.hpp"
 #include "Hooks/Visual/Level_sendServerLegacyParticle.hpp"
 #include "Hooks/Game/ActorDropItem.hpp"
+#include "Hooks/Game/InventoryAddItem.hpp"
+#include "Hooks/Game/AnimationComponent_playAnimation.hpp"
+#include "Hooks/Game/SplashTextHook.hpp"
+#include "Hooks/Game/UnicodeWndProcHack.hpp"
+#include "Hooks/Input/ClipCursorHook.hpp"
+#include "Hooks/Input/CursorHandler.hpp"
+#include "Hooks/Input/TabOutFix.hpp"
+#include "Hooks/Render/UpdateCameraHook.hpp"
+#include "Utils/WinrtUtils.hpp"
+#include "Hooks/Render/BgfxFrameExtractorInsertHook.hpp"
+#include "Hooks/Game/ClientInstanceUpdate.hpp"
+#include "Hooks/Game/ParseThirdPartyServersHook.hpp"
+#include "Hooks/Render/BoneTransformHook.hpp"
 
 std::vector<std::shared_ptr<Hook>> HookManager::hooks;
 
 std::string dxVersion[5] = {"Couldn't initialize", "DX9", "DX10", "DX11", "DX12"};
 
-void HookManager::initialize() {
+void HookManager::initialize()
+{
     uint64_t start = Utils::getCurrentMs();
     MH_Initialize();
 
@@ -68,21 +84,42 @@ void HookManager::initialize() {
 
     if (kiero::getRenderType() == 0) kiero::init(kiero::RenderType::D3D11);
 
-    if (kiero::getRenderType() == 0) {
+    if (kiero::getRenderType() == 0)
+    {
         kiero::init(kiero::RenderType::D3D10);
         Logger::debug("[Kiero] Trying d3d10");
     }
 
+    if (VersionUtils::checkAboveOrEqual(21, 120))
+    {
+        addHook<CursorHandler>();
+        addHook<UnicodeWndProcHack>();
+    }
+
+    if (VersionUtils::checkEqual(21, 121))
+        addHook<TabOutFixHook>();
+    if (VersionUtils::checkAboveOrEqual(21, 130))
+    {
+        addHook<UpdateCameraHook>();
+    }
+
+  //  addHook<ParseThirdPartyServersHook>();
     addHook<KeyHook>();
     addHook<MouseHook>();
 
-    if (!Client::settings.getSettingByName<bool>("killdx")->value)
-        addHook<CommandListHook>();
+    if(VersionUtils::checkAboveOrEqual(21, 130)) {
+        addHook<ClientInstanceUpdateHook>();
+    }
+
+    // Always add CommandListHook - we need it to capture the DX12 command queue
+    // even when killdx is enabled, because the DX11 fallback might not work on GDK
+    addHook<CommandListHook>();
 
     addHook<SwapchainHook>();
     addHook<ResizeHook>();
 
-    if(VersionUtils::checkAboveOrEqual(21, 40)) {
+    if (VersionUtils::checkAboveOrEqual(21, 40))
+    {
         addHook<TextureGroup_getTextureHook>();
     }
     addHook<getViewPerspectiveHook>();
@@ -94,18 +131,25 @@ void HookManager::initialize() {
     addHook<displayClientMessageHook>();
     addHook<ActorBaseTick>();
     addHook<OnSuspendHook>();
+    addHook<OnDeviceLostHook>();
     addHook<getGammaHook>();
-    addHook<FontDrawTransformedHook>();
-    addHook<HurtColorHook>();
+    if (!VersionUtils::checkAboveOrEqual(21, 120)) addHook<FontDrawTransformedHook>();
+    if (VersionUtils::checkAboveOrEqual(21, 130)) addHook<HurtColorHook>();
+    addHook<ColorFormatHook>();
     addHook<DimensionFogColorHook>();
     addHook<OverworldFogColorHook>();
     addHook<TimeChangerHook>();
-    addHook<ItemRendererHook>();
+    addHook<ItemRendererRenderGroupHook>();
     addHook<SendPacketHook>();
     addHook<ApplyTurnDeltaHook>();
-    //addHook<getSensHook>();
+    //addHook<AnimationComponent_playAnimation>();
+    if (VersionUtils::checkBelow(21, 80)) {
+        addHook<getSensHook>(); // Sensitivity is now handled in ApplyTurnDeltaHook (for .80+)
+    }
     addHook<HudMobEffectsRendererHook>();
-    if(VersionUtils::checkAboveOrEqual(20, 60)) { // due to texture group offset
+    if (VersionUtils::checkAboveOrEqual(20, 60))
+    {
+        // due to texture group offset
         addHook<HudCursorRendererHook>();
         addHook<BaseActorRendererRenderTextHook>();
 
@@ -113,14 +157,15 @@ void HookManager::initialize() {
     }
     addHook<UIControl_updateCachedPositionHook>();
 
-    if (VersionUtils::checkAboveOrEqual(21, 40)) {
+    if (VersionUtils::checkAboveOrEqual(21, 40))
+    {
         addHook<ContainerScreenControllerHook>();
     }
 
     addHook<_composeFullStackHook>();
 
-    // likely packchanger hooks, im not sure!
-    if(!VersionUtils::checkAboveOrEqual(21, 60))
+    // packchanger hooks
+    if (!VersionUtils::checkAboveOrEqual(21, 60))
     {
         addHook<isPreGameHook>();
 
@@ -130,7 +175,7 @@ void HookManager::initialize() {
         addHook<GeneralSettingsScreenControllerCtorHook>();
     }
 
-    addHook<ItemInHandRendererRenderItem>();
+        addHook<ItemInHandRendererRenderItem>();
 
     addHook<RenderOutlineSelectionHook>();
     addHook<getTimeOfDayHook>();
@@ -146,22 +191,46 @@ void HookManager::initialize() {
     addHook<SoundEnginePlayHook>();
     addHook<getCurrentSwingDurationHook>();
     addHook<ActorDropItem>();
-    if(VersionUtils::checkAboveOrEqual(21, 40)) {
+    addHook<InventoryAddItem>();
+    if (VersionUtils::checkAboveOrEqual(21, 40))
+    {
         addHook<UpdatePlayerHook>();
     }
 
-    if(VersionUtils::checkAboveOrEqual(21, 50)) {
+    if (VersionUtils::checkAboveOrEqual(21, 50))
+    {
         addHook<ReadFileHook>();
     }
-    for (const auto& hook: hooks) {
+
+    // Better Inventory hooks (1.21.130+)
+    if (VersionUtils::checkAboveOrEqual(21, 130))
+    {
+        // TODO: Re-enable when hook classes are restored in BetterInventory port refactor.
+        // addHook<FlyingItemRendererHook>();
+        // addHook<IconBlitMultiColorHook>();
+    }
+
+    if (VersionUtils::checkAboveOrEqual(21, 130)) {
+        addHook<BgfxFrameExtractorInsertHook>();
+        addHook<BoneTransformHook>();
+    }
+
+#ifdef __DEBUG__
+    if (VersionUtils::checkAboveOrEqual(21, 130)) addHook<BedrockLogHook>();
+#endif
+
+    // if (VersionUtils::checkEqual(21, 130)) addHook<SplashTextHook>();
+    for (const auto& hook : hooks)
+    {
         hook->enableHook();
     }
 
     float elapsed = (Utils::getCurrentMs() - start) / 1000.0;
-    Logger::custom(fg(fmt::color::deep_sky_blue), "Hook", "Initialized {} hooks in {:.2f}s", hooks.size(), elapsed);
+    Logger::custom(fg(fmt::color::deep_sky_blue), "Hook", "Initialized {} hooks in {:.2f}s",
+                   hooks.size(), elapsed);
 }
 
-void HookManager::terminate() {
+void HookManager::terminate()
+{
     hooks.clear();
 }
-

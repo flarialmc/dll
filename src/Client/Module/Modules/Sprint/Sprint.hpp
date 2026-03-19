@@ -1,34 +1,32 @@
 #pragma once
 
-#include "../Module.hpp"
+#include "../HUDModule.hpp"
 #include "Events/Game/TickEvent.hpp"
-#include "Events/Render/RenderEvent.hpp"
+#include "Events/Input/KeyEvent.hpp"
+#include "Events/Input/MouseEvent.hpp"
 
-
-class Sprint : public Module {
+class Sprint : public HUDModule {
 public:
-	Sprint(): Module("Toggle Sprint", "Automatically sprints for you!!!",
-		IDR_AUTO_SPRINT_PNG, "CTRL", false, {"auto sprint", "autosprint"}) {
-	}
+    Sprint() : HUDModule(5, "Toggle Sprint", "Automatically sprints for you!!!",
+        IDR_AUTO_SPRINT_PNG, "CTRL", {"auto sprint", "autosprint"}) {}
 
-	void onEnable() override;
+    void onSetup() override;
 
-	void onDisable() override;
+    bool toggleSprinting = false;
 
-	void defaultConfig() override;
+protected:
+    std::string getDisplayValue() override;
 
-	void settingsRender(float settingsOffset) override;
+    void customConfig() override;
 
-	bool toggleSprinting = false;
+    void customSettings() override;
 
-	void onSetup() override;
+    void customInit() override;
 
-	void onKey(KeyEvent& event);
+    void customCleanup() override;
 
-	void onMouse(MouseEvent& event);
-
-	void onRender(RenderEvent& event);
-
-	void onTick(TickEvent& event);
+private:
+    void onKey(KeyEvent& event);
+    void onMouse(MouseEvent& event);
+    void onTick(TickEvent& event);
 };
-

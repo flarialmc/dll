@@ -16,16 +16,15 @@ std::string ClickGUIElements::SearchBar(int index, std::string& text, int limit,
 
 		Vec2<float> round = Constraints::RoundingConstraint(19, 19);
 
-		if (index > searchBarSizes.size() - 1 || index == 0) {
-			float nigga = Constraints::RelativeConstraint(0.42, "height");
-
-			searchBarSizes.emplace_back(nigga);
+		// Ensure vectors are large enough for this index
+		if (index >= static_cast<int>(searchBarSizes.size())) {
+			float defaultSize = Constraints::RelativeConstraint(0.42, "height");
+			searchBarSizes.resize(index + 1, defaultSize);
 		}
 
-		if (index > searchCutOutHeights.size() - 1 || index == 0) {
-			float nigga = Constraints::RelativeConstraint(0.38, "height");
-
-			searchCutOutHeights.emplace_back(nigga);
+		if (index >= static_cast<int>(searchCutOutHeights.size())) {
+			float defaultHeight = Constraints::RelativeConstraint(0.38, "height");
+			searchCutOutHeights.resize(index + 1, defaultHeight);
 		}
 
 		if (FlarialGUI::TextBoxes[index].isActive) {
@@ -38,7 +37,7 @@ std::string ClickGUIElements::SearchBar(int index, std::string& text, int limit,
 		if (FlarialGUI::TextBoxes[index].cursorOpac > 1) FlarialGUI::TextBoxes[index].isAt1 = true;
 		if (FlarialGUI::TextBoxes[index].cursorOpac < 0) FlarialGUI::TextBoxes[index].isAt1 = false;
 
-		if (index <= searchBarSizes.size()) {
+		if (index < static_cast<int>(searchBarSizes.size())) {
 
 			const float textWidth = searchBarSizes[index];
 			const float percHeight = Constraints::RelativeConstraint(0.42, "height");
@@ -94,10 +93,17 @@ std::string ClickGUIElements::SearchBar(int index, std::string& text, int limit,
 
 			cursorCol.a = FlarialGUI::TextBoxes[index].cursorOpac;
 
+			// Calculate cursor position accounting for TextCursorPosition (offset from end of text)
+			std::string tempText = text;
+			int cursorPos = std::clamp(FlarialGUI::TextCursorPosition, 0, static_cast<int>(tempText.length()));
+			if (cursorPos > 0 && cursorPos <= static_cast<int>(tempText.length())) {
+				tempText.erase(tempText.length() - cursorPos);
+			}
+
 			FlarialGUI::lerp(
 				FlarialGUI::TextBoxes[index].cursorX,
-				(x - textWidth) + Constraints::RelativeConstraint(0.38, "height") + 
-				FlarialGUI::getFlarialTextSize(FlarialGUI::to_wide(text).c_str(),
+				(x - textWidth) + Constraints::RelativeConstraint(0.38, "height") +
+				FlarialGUI::getFlarialTextSize(FlarialGUI::to_wide(tempText).c_str(),
 					textWidth, percHeight,
 					DWRITE_TEXT_ALIGNMENT_LEADING,
 					Constraints::SpacingConstraint(0.60f, textWidth),

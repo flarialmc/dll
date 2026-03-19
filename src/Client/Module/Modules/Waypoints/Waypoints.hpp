@@ -13,6 +13,7 @@ struct Waypoint {
 	float opacity;
 	int index;
 	bool state;
+	bool isDeathWp = false;
 };
 
 class Waypoints : public Module {
@@ -36,7 +37,7 @@ public:
 
 	static float random();
 
-	void addWaypoint(int index, std::string name, std::string color, Vec3<float> position, bool state, bool config, bool rgb, float opacity);
+	void addWaypoint(int index, std::string name, std::string color, Vec3<float> position, bool state, bool config, bool rgb, float opacity, bool deathWp = false);
 
 	int getNextAvailableIndex();
 

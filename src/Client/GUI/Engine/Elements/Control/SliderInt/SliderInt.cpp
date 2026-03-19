@@ -78,7 +78,7 @@ int FlarialGUI::SliderInt(int index, float x, float y, int& startingPoint, const
 	text = TextBox(30 + index, text, limit, x, y, percWidth, percHeight, 4, moduleName, settingName);
 	text = String::removeNonNumeric(text, true);
 
-	if (text.empty()) SliderIntRects[index].isValid = false;
+	if (text.empty() || text == "-") SliderIntRects[index].isValid = false;
 	else {
 		SliderIntRects[index].isValid = true;
 		SliderIntRects[index].validInt = std::clamp(std::stoi(text), minValue, maxValue);

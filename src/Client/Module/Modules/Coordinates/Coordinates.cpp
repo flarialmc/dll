@@ -1,20 +1,24 @@
 #include "Coordinates.hpp"
 #include <cmath>
-
+#include <Utils/PlatformUtils.hpp>
 
 
 void Coordinates::onEnable() {
     Listen(this, RenderEvent, &Coordinates::onRender)
+    Listen(this, KeyEvent, &Coordinates::onKey)
     Module::onEnable();
 }
 
 void Coordinates::onDisable() {
     Deafen(this, RenderEvent, &Coordinates::onRender)
+    Deafen(this, KeyEvent, &Coordinates::onKey)
     Module::onDisable();
 }
 
 void Coordinates::defaultConfig() {
     settings.changeType<float, int>("decimalCount");
+    getKeybind(1);
+
     setDef("responsivewidth", true);
     setDef("text", (std::string) "{D} X: {X} Y: {Y} Z: {Z}");
     setDef("textscale", 0.80f);
@@ -31,6 +35,7 @@ void Coordinates::defaultConfig() {
     setDef("NetherFormat", (std::string) "{dim}");
     setDef("TheEndFormat", (std::string) "{dim}");
     setDef("showOtherDimCoords", false);
+    setDef("keybind-1", std::string("")); // Copy-to-clipboard
     
 }
 
@@ -70,6 +75,9 @@ void Coordinates::settingsRender(float settingsOffset) {
 
     addHeader("Misc");
     defaultAddSettings("misc");
+
+    addKeybind("Copy to cliboard", "Lets you copy your coordinates to your clipboard with a key", "keybind-1", true);
+
 
     FlarialGUI::UnsetScrollView();
     resetPadding();
@@ -199,6 +207,21 @@ void Coordinates::onRender(RenderEvent &event) {
             }
 
             this->normalRenderCore(33, text);
+        }
+    }
+}
+
+void Coordinates::onKey(KeyEvent& event) {
+    if (ClientInstance::getTopScreenName() == "hud_screen") {
+        if (event.getKeyAsString(true) == this->getKeybind(1)) {
+
+            Vec3<float> Pos = SDK::clientInstance->getLocalPlayer()->getAABBShapeComponent()->aabb.lower;
+
+            std::string cords = FlarialGUI::cached_to_string(static_cast<int>(Pos.x)) + ", " +
+                                FlarialGUI::cached_to_string(static_cast<int>(Pos.y)) + ", " +
+                                FlarialGUI::cached_to_string(static_cast<int>(Pos.z));
+
+            PlatformUtils::setClipboard(cords);
         }
     }
 }

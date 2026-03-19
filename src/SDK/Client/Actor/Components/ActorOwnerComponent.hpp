@@ -4,6 +4,6 @@
 
 class ActorOwnerComponent : public IEntityComponent {
 public:
-    class Actor* actor;
+    std::unique_ptr<class Actor> actor;
 };
 static_assert(sizeof(ActorOwnerComponent) == 0x8);

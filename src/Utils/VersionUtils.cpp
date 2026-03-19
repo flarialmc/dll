@@ -11,6 +11,16 @@ std::string VersionUtils::getFormattedVersion() {
     Version currentVersion = WinrtUtils::impl::getGameVersion();
     std::string version = WinrtUtils::impl::toRawString(currentVersion);
 
+    Logger::debug(version);
+
+    if (version == "1.21.131") { // some sigs changed
+        return "1.21.131";
+    }
+
+    if (currentVersion.build == 130) { // dude
+        return "1.21.13";
+    }
+
     if (version == "1.21.202") { // i cba for now
         // 1.21.202.0 - 1.21.2
         // 1.21.2003.0 - 1.21.20
@@ -40,7 +50,7 @@ std::string VersionUtils::getFormattedVersion() {
     // Construct formatted version string
     std::string formattedVersion = parts[0] + "." + parts[1];
     if (parts.size() > 2) {
-        formattedVersion += "." + parts[2].substr(0, parts[2].size() - 3); // Take only the first character of the patch version
+        formattedVersion += "." + parts[2].substr(0, parts[2].size() - 1); // Take only the first character of the patch version
     }
 
     return formattedVersion;
@@ -48,6 +58,16 @@ std::string VersionUtils::getFormattedVersion() {
 
 void VersionUtils::initialize() {
     versions = {
+         {"1.26.3", {SigInit::init260, OffsetInit::init260}},
+        {"1.26.2", {SigInit::init260, OffsetInit::init260}},
+        {"1.26.1", {SigInit::init260, OffsetInit::init260}},
+        {"1.26.0", {SigInit::init260, OffsetInit::init260}},
+        {"1.21.132", {SigInit::init21131, OffsetInit::init21130}},
+        {"1.21.131", {SigInit::init21131, OffsetInit::init21130}},
+        // all it took?
+        {"1.21.130", {SigInit::init21130, OffsetInit::init21130}},
+        {"1.21.13", {SigInit::init21130, OffsetInit::init21130}},
+        {"1.21.12", {SigInit::init21120, OffsetInit::init21120}},
         {"1.21.11", {SigInit::init21110, OffsetInit::init21110}},
         {"1.21.10", {SigInit::init21100, OffsetInit::init21100}},
         {"1.21.9", {SigInit::init2190, OffsetInit::init2190}},
@@ -122,7 +142,16 @@ bool VersionUtils::checkAboveOrEqual(const int m, const int b) {
     if (minor > m)
         return true;
     if (minor == m)
-        return (build / 100) >= b;
+        return build >= b;
+    return false;
+}
+
+bool VersionUtils::checkAbove(const int m, const int b) {
+    static auto [major, minor, build, error] = WinrtUtils::impl::getGameVersion();
+    if (minor > m)
+        return true;
+    if (minor == m)
+        return build > b;
     return false;
 }
 
@@ -131,10 +160,28 @@ bool VersionUtils::checkBelowOrEqual(const int m, const int b) {
     if (minor < m)
         return true;
     if (minor == m)
-        return (build / 100) <= b;
+        return build <= b;
     return false;
 }
 
-bool VersionUtils::checkBetween(const int m1, const int b1, const int m2, const int b2) {
+bool VersionUtils::checkBelow(const int m, const int b) {
+    static auto [major, minor, build, error] = WinrtUtils::impl::getGameVersion();
+    if (minor < m)
+        return true;
+    if (minor == m)
+        return build < b;
+    return false;
+}
+
+bool VersionUtils::checkBetweenOrEqual(const int m1, const int b1, const int m2, const int b2) {
     return checkAboveOrEqual(m1, b1) && checkBelowOrEqual(m2, b2);
+}
+
+bool VersionUtils::checkBetween(const int m1, const int b1, const int m2, const int b2) {
+    return checkAbove(m1, b1) && checkBelow(m2, b2);
+}
+
+bool VersionUtils::checkEqual(const int m, const int b) {
+    static auto [major, minor, build, error] = WinrtUtils::impl::getGameVersion();
+    return minor == m && build == b;
 }

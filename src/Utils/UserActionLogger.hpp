@@ -34,6 +34,9 @@ public:
     // Get recent actions for crash telemetry
     static nlohmann::json getRecentActions(int maxActions = 20);
 
+    // Get human-readable context for crash logs
+    static std::string getCrashContextText();
+
     // Get current system state
     static nlohmann::json getCurrentState();
 

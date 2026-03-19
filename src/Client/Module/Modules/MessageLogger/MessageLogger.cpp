@@ -39,8 +39,17 @@ void MessageLogger::onPacket(PacketEvent &event) {
 void MessageLogger::onTick(TickEvent &event) {
     if (!this->isEnabled() || !update) return;
     update = false;
-    if (prevMsgVecSize == SDK::clientInstance->getGuiData()->getGuiMessages().size()) return;
-    prevMsgVecSize = SDK::clientInstance->getGuiData()->getGuiMessages().size();
+
+    auto& messages = SDK::clientInstance->getGuiData()->getGuiMessages();
+    size_t currentSize = messages.size();
+
+    if (currentSize == prevMsgVecSize || currentSize == 0) return;
+    prevMsgVecSize = currentSize;
+
+    // Get the message BEFORE any file operations to avoid race conditions
+    std::string fullMsg = messages.back().fullMsg;
+    if (fullMsg.empty()) return;
+
     std::string path = Utils::getClientPath() + "\\MessageLogger";
 
     auto now = std::chrono::system_clock::now();
@@ -61,9 +70,9 @@ void MessageLogger::onTick(TickEvent &event) {
             ss.str("");
             ss.clear();
             ss << std::put_time(local_tm, "%H:%M:%S"); // e.g., "10:23:13"
-            logFile << "[" << ss.str() << "] " << SDK::clientInstance->getGuiData()->getGuiMessages().back().fullMsg << std::endl;
+            logFile << "[" << ss.str() << "] " << fullMsg << std::endl;
         }
-        else logFile << SDK::clientInstance->getGuiData()->getGuiMessages().back().fullMsg << std::endl;
+        else logFile << fullMsg << std::endl;
 
         logFile.close();
     } else Logger::error("Error opening message logger file {}", curTxtFile);
@@ -76,9 +85,9 @@ void MessageLogger::onTick(TickEvent &event) {
                 ss.str("");
                 ss.clear();
                 ss << std::put_time(local_tm, "%H:%M:%S"); // e.g., "10:23:13"
-                logFile_clean << "[" << ss.str() << "] " << String::removeColorCodes(SDK::clientInstance->getGuiData()->getGuiMessages().back().fullMsg) << std::endl;
+                logFile_clean << "[" << ss.str() << "] " << String::removeColorCodes(fullMsg) << std::endl;
             }
-            else logFile_clean << String::removeColorCodes(SDK::clientInstance->getGuiData()->getGuiMessages().back().fullMsg) << std::endl;
+            else logFile_clean << String::removeColorCodes(fullMsg) << std::endl;
 
             logFile_clean.close();
         } else Logger::error("Error opening message logger file_clean {}", curTxtFile_clean);

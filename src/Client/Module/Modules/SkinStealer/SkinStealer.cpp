@@ -32,7 +32,7 @@ void SkinStealer::settingsRender(float settingsOffset) {
     initSettingsPage();
 
     addHeader("Clone");
-    addKeybind("Keybind", "Hold for 2 seconds!", "keybind", true);
+    addKeybind("Keybind", "", "keybind", true);
     addToggle("Save Skin Locally", "", "saveSkin");
 
     FlarialGUI::UnsetScrollView();
@@ -92,7 +92,7 @@ void SkinStealer::cloneSkin(std::string targetName) {
             if (std::shared_ptr<SkinStealer> ssmod = std::dynamic_pointer_cast<SkinStealer>(mod)) {
                 if (ssmod->clone) {
                     SkinStealCommand::SaveSkin(val.name, val.playerSkin.mSkinImage, val.playerSkin.mCapeImage);
-                    SDK::clientInstance->getGuiData()->displayClientMessage("§aSaved skin and cape locally: Use <.path skin> to open the folder.");
+                    SDK::clientInstance->getGuiData()->displayClientMessage("§aSaved skin and cape locally: Type <.path skin> in chat to open the folder.");
                 }
             }
         }
@@ -161,7 +161,7 @@ void SkinStealer::onTick(TickEvent &event) {
 }
 
 void SkinStealer::onKey(KeyEvent &event) {
-    if (!SDK::clientInstance->getLocalPlayer()) return;
+    if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer()) return;
     if (this->isEnabled() && this->isKeyPartOfKeybind(event.key) && this->isKeybind(event.keys) && (
             SDK::getCurrentScreen() == "hud_screen" ||
             SDK::getCurrentScreen() == "zoom_screen" ||
@@ -172,7 +172,7 @@ void SkinStealer::onKey(KeyEvent &event) {
 }
 
 void SkinStealer::onMouse(MouseEvent &event) {
-    if (!SDK::clientInstance->getLocalPlayer()) return;
+    if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer()) return;
     if (Utils::getMouseAsString(event.getButton()) == getOps<std::string>("keybind") && event.getAction() == MouseAction::Press && this->isEnabled() && (
             SDK::getCurrentScreen() == "hud_screen" ||
             SDK::getCurrentScreen() == "zoom_screen" ||

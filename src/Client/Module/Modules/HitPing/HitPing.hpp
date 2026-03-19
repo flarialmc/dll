@@ -1,11 +1,10 @@
 #pragma once
 
-#include "../Module.hpp"
+#include "../HUDModule.hpp"
 
 #include "Events/Game/AttackEvent.hpp"
 #include "Events/Game/TickEvent.hpp"
 #include "Events/Network/PacketEvent.hpp"
-#include "Events/Render/RenderEvent.hpp"
 
 using Duration = std::chrono::duration<double>;
 
@@ -17,28 +16,19 @@ struct HitInfo {
 	Duration lastActorHitDelay{};
 };
 
-class HitPing : public Module {
+class HitPing : public HUDModule {
 private:
 	std::chrono::time_point<std::chrono::high_resolution_clock> last_hit;
 	Duration hitDelay = std::chrono::milliseconds(0);
 	float pingReach{};
 
 	std::map<uint64_t, std::pair<bool, HitInfo>> actorsHit;
+
 public:
-	HitPing() : Module("Hit Ping", "Measures your hit delay!",
+	HitPing() : HUDModule(21, "Hit Ping", "Measures your hit delay!",
 		IDR_PING_PNG, "") {
-		
+
 	};
-
-	void onEnable() override;
-
-	void onDisable() override;
-
-	void defaultConfig() override;
-
-	void settingsRender(float settingsOffset) override;
-
-	void onRender(RenderEvent& event);
 
 	void onAttack(AttackEvent& event);
 
@@ -47,5 +37,13 @@ public:
 	void onTick(TickEvent& event);
 
 	void ClearOldHits();
-};
 
+protected:
+	std::string getDisplayValue() override;
+
+	void customConfig() override;
+
+	void customInit() override;
+
+	void customCleanup() override;
+};

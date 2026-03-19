@@ -59,11 +59,16 @@ void BlockOutline::onOutlineSelection(RenderOutlineSelectionEvent &event) {
     D2D1_COLOR_F outlineCol = getColor("outline");
     D2D1_COLOR_F overlayCol = getColor("overlay");
 
+    auto player = SDK::clientInstance->getLocalPlayer();
+    if (!player) return;
+    auto level = player->getLevel();
+    if (!level) return;
+
     mce::MaterialPtr *material = MaterialUtils::getNametag();
 
     MCDrawUtil3D dc(SDK::clientInstance->getLevelRender(), SDK::scn, material);
 
-    auto face = (int) SDK::clientInstance->getLocalPlayer()->getLevel()->getHitResult().facing;
+    auto face = (int) level->getHitResult().facing;
 
     auto bp = event.getPos();
 

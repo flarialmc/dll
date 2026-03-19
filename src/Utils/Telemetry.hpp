@@ -7,13 +7,14 @@
 class Telemetry {
 public:
     static void sendModuleEvent(const std::string& moduleName, const std::string& action);
+    static void sendStartupVersionPing(const std::string& version);
     static std::string generateUserHash();
     static std::string getClientVersion();
 
 private:
     static std::string getSystemIdentifier();
     static std::string sha256(const std::string& input);
-    static void sendTelemetryAsync(const nlohmann::json& payload);
+    static void sendTelemetryAsync(const std::string& endpoint, const nlohmann::json& payload);
     static std::string s_userHash;
     static std::once_flag s_initFlag;
 };

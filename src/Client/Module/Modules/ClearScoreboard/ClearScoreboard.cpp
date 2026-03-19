@@ -3,6 +3,7 @@
 void ClearScoreboard::onEnable() {
     targetControl = nullptr;
     savedOriginalSize = false;
+    lastServer = "";
     Listen(this, SetupAndRenderEvent, &ClearScoreboard::onSetupAndRender)
     Module::onEnable();
 }
@@ -22,12 +23,23 @@ void ClearScoreboard::settingsRender(float settingsOffset) {
 
 void ClearScoreboard::onSetupAndRender(SetupAndRenderEvent& event) {
     if (!this->isEnabled()) return;
+    if (!(SDK::getCurrentScreen() == "hud_screen" || SDK::getCurrentScreen() == "zoom_screen" || SDK::getCurrentScreen() == "f3_screen")) return;
+
+    // Re-resolve the control on server change since the UI tree gets rebuilt
+    if (lastServer.empty() || lastServer != SDK::getServerIP()) {
+        targetControl = nullptr;
+        savedOriginalSize = false;
+        lastServer = SDK::getServerIP();
+    }
+
+    // Clear every frame — scoreboard updates reset sizeConstrains
     clearScoreboard();
 }
 
 void ClearScoreboard::clearScoreboard() {
     if (!(SDK::clientInstance && SDK::clientInstance->getLocalPlayer())) return;
     if (SDK::getCurrentScreen() != "hud_screen") return;
+    if (!SDK::screenView || !SDK::screenView->VisualTree || !SDK::screenView->VisualTree->root) return;
 
     // If we don't have the control yet, find it
     if (!targetControl) {

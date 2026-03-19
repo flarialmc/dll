@@ -2,17 +2,19 @@
 #include "../Hook.hpp"
 #include "../../../../SDK/Client/Actor/Actor.hpp"
 
+// why do we use this?
+
 class ActorBaseTick : public Hook {
 
 private:
-    static void callback(Actor *actor);
+    static __int64 callback(Actor *actor);
 
 public:
-    typedef void(__thiscall *original)(Actor *actor);
+    typedef __int64(__thiscall *original)(Actor *actor);
 
     static inline original funcOriginal = nullptr;
 
-    ActorBaseTick();
+     ActorBaseTick();
 
     void enableHook() override;
 

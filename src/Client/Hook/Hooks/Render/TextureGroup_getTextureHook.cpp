@@ -13,7 +13,15 @@ TexturePtr* TextureGroup_getTextureHook::TextureGroup_getTextureCallback(Texture
                                                                   void *a5, int a6, void *a7) {
     if(result == nullptr) return nullptr;
 
+    // Prevent recursive event triggering - getTexture can call itself
+    static thread_local bool inCallback = false;
+    if (inCallback) {
+        return funcOriginal(_this, result, location, forceReload, a5, a6, a7);
+    }
+
+    inCallback = true;
     auto retTexture = funcOriginal(_this, result, location, forceReload, a5, a6, a7);
+    inCallback = false;
 
     BedrockTextureData* bypassRefIncrement = *(BedrockTextureData**)&retTexture->clientTexture;
 

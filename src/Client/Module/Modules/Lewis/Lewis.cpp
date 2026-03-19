@@ -52,13 +52,13 @@ void Lewis::onRender(RenderEvent& event)
             float s = Constraints::RelativeConstraint(0.35, "height", true) * this->settings.getSettingByName<float>("lewisbouncesize")->value;
             FlarialGUI::image(IDR_LEWIS_PNG, D2D1::RectF(x, y, x + s, y + s), mode);
 
-            x += this->settings.getSettingByName<float>("lewisbouncespeed")->value * xv;
-            y += this->settings.getSettingByName<float>("lewisbouncespeed")->value * yv;
+            x += this->settings.getSettingByName<float>("lewisbouncespeed")->value * xDirection;
+            y += this->settings.getSettingByName<float>("lewisbouncespeed")->value * yDirection;
 
-            if (x >= MC::windowSize.x - s) xv = -1;
-            if (x < 0) xv = 1;
-            if (y >= MC::windowSize.y - s) yv = -1;
-            if (y < 0) yv = 1;
+            if (x >= MC::windowSize.x - s) xDirection = -1;
+            if (x < 0) xDirection = 1;
+            if (y >= MC::windowSize.y - s) yDirection = -1;
+            if (y < 0) yDirection = 1;
         }
 
         if (this->settings.getSettingByName<bool>("lewiscrosshair")->value)

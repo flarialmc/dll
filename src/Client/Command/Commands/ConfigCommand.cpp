@@ -1,28 +1,32 @@
 #include "ConfigCommand.hpp"
 
+#include <Utils/WinrtUtils.hpp>
+#include <Utils/PlatformUtils.hpp>
+#include <Scripting/ScriptManager.hpp>
+
 #include <winrt/base.h>
 #include <winrt/Windows.Storage.Pickers.h>
 #include <winrt/Windows.Foundation.h>
 #include <winrt/Windows.Foundation.Collections.h>
 #include <winrt/Windows.Storage.h>
+#include <winrt/Windows.Storage.Streams.h>
 
-#include <Utils/WinrtUtils.hpp>
-#include <Scripting/ScriptManager.hpp>
+namespace winrt
+{
+    using namespace Windows::Storage;
+}
 
 #include <shlobj.h>
 #include <string>
-#include <winrt/Windows.Storage.Streams.h>
 #include <miniz/miniz.h>
 #include <Manager.hpp>
 #include <random>
 #include <filesystem>
 #include <fstream>
+#include <commdlg.h>
 
 #include "Modules/Misc/ScriptMarketplace/ScriptMarketplace.hpp"
-namespace winrt
-{
-    using namespace Windows::Storage;
-}
+
 winrt::Windows::Foundation::IAsyncAction importZip() {
     const auto selectedFiles = co_await WinrtUtils::pickFiles(L".zip");
     if (selectedFiles.Size() == 0) co_return;

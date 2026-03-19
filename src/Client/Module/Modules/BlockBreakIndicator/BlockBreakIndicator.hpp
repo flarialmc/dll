@@ -1,31 +1,25 @@
 #pragma once
 
-#include "../Module.hpp"
+#include "../HUDModule.hpp"
 
-#include "../../../../Assets/Assets.hpp"
-
-class BlockBreakIndicator : public Module {
+class BlockBreakIndicator : public HUDModule {
 private:
     float lastProgress = 0.0f;
     float currentProgress = 0.0f;
+    float currentHeight = 0.0f;
 
 public:
-    BlockBreakIndicator() : Module("Break Progress", "Visual indicator to show the progress\nof breaking a block.",
-                                   IDR_BLOCK_BREAK_INDICATOR_PNG, "", false, {"mining", "mine"}) {
-        
+    BlockBreakIndicator() : HUDModule(16, "Break Progress", "Visual indicator to show the progress\nof breaking a block.",
+                                      IDR_BLOCK_BREAK_INDICATOR_PNG, "", {"mining", "mine"}) {
+
     };
-
-    void onEnable() override;
-
-    void onDisable() override;
-
-    void defaultConfig() override;
-
-    void settingsRender(float settingsOffset) override;
-
-    float currentHeight = 0.0f;
 
     void normalRender(int index, std::string &value) override;
 
-    void onRender(RenderEvent &event);
+    void settingsRender(float settingsOffset) override;
+
+protected:
+    std::string getDisplayValue() override;
+
+    void customConfig() override;
 };

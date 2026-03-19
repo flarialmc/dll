@@ -1,9 +1,6 @@
 #include "ModernKeybindHandling.hpp"
 
 
-#include "Hook/Hooks/Input/KeyHook.hpp"
-
-
 void ModernKeybindHandling::onEnable()
 {
     parser.parseOptionsFile();
@@ -134,61 +131,57 @@ void ModernKeybindHandling::onSetTopScreenName(SetTopScreenNameEvent& event)
 void ModernKeybindHandling::restoreMovementInput()
 {
     updateMovementKeys();
-    
+
     if (SDK::clientInstance != nullptr && SDK::clientInstance->getLocalPlayer() != nullptr) {
-        auto* handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
-        if (handler != nullptr) {
-            updateMovementInputHandler();
-        }
+        updateMovementInputHandler();
     }
 }
 
 void ModernKeybindHandling::updateMovementInputHandler()
 {
     if (SDK::clientInstance == nullptr || SDK::clientInstance->getLocalPlayer() == nullptr) return;
-    
-    auto* handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
-    if (handler == nullptr) return;
 
     auto module = ModuleManager::getModule("Toggle Sprint");
     if (module == nullptr) return;
-    
+
     updateMovementKeys();
-    
+
+    auto handler = SDK::clientInstance->getLocalPlayer()->getHandler();
+
     for (int i = 0; i < movementKeys.size(); i++) {
         int key = movementKeys[i];
         bool isKeyHeld = heldKeys[key];
-        
+
         if (i == 0) {
-            handler->mInputState.forward = isKeyHeld;
-            handler->mRawInputState.forward = isKeyHeld;
+            handler.setForward(isKeyHeld);
+            handler.setRawForward(isKeyHeld);
         }
         else if (i == 1) {
-            handler->mInputState.backward = isKeyHeld;
-            handler->mRawInputState.backward = isKeyHeld;
+            handler.setBackward(isKeyHeld);
+            handler.setRawBackward(isKeyHeld);
         }
         else if (i == 2) {
-            handler->mInputState.left = isKeyHeld;
-            handler->mRawInputState.left = isKeyHeld;
+            handler.setLeft(isKeyHeld);
+            handler.setRawLeft(isKeyHeld);
         }
         else if (i == 3) {
-            handler->mInputState.right = isKeyHeld;
-            handler->mRawInputState.right = isKeyHeld;
+            handler.setRight(isKeyHeld);
+            handler.setRawRight(isKeyHeld);
         }
         else if (i == 4) {
-            handler->jumping = isKeyHeld;
-            handler->mInputState.mJumpDown = isKeyHeld;
-            handler->mRawInputState.mJumpDown = isKeyHeld;
+            handler.setJumping(isKeyHeld);
+            handler.setMJumpDown(isKeyHeld);
+            handler.setRawMJumpDown(isKeyHeld);
         }
         else if (i == 5) {
-            handler->sneaking = isKeyHeld;
-            handler->mInputState.mSneakDown = isKeyHeld;
-            handler->mRawInputState.mSneakDown = isKeyHeld;
+            handler.setSneaking(isKeyHeld);
+            handler.setMSneakDown(isKeyHeld);
+            handler.setRawMSneakDown(isKeyHeld);
         }
         else if (i == 6 && !module->isEnabled()) {
-            handler->sprinting = isKeyHeld;
-            handler->mInputState.mSprintDown = isKeyHeld;
-            handler->mRawInputState.mSprintDown = isKeyHeld;
+            handler.setSprinting(isKeyHeld);
+            handler.setMSprintDown(isKeyHeld);
+            handler.setRawMSprintDown(isKeyHeld);
         }
     }
 }

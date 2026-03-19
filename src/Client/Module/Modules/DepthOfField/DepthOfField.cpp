@@ -15,10 +15,9 @@ void DepthOfField::onEnable() {
 void DepthOfField::onDisable() {
     Deafen(this, RenderUnderUIEvent, &DepthOfField::onRender)
 
-    if (DepthOfFieldHelper::pDepthMapSRV) {
-        DepthOfFieldHelper::pDepthMapSRV->Release();
-        DepthOfFieldHelper::pDepthMapSRV = nullptr;
-    }
+    // Release D3D resources safely - use Cleanup() which handles all resources properly
+    // Don't release pDepthMapSRV here as it may have been invalidated by device reset
+    // The helper's Cleanup() will handle it when appropriate
 
     Module::onDisable();
 }

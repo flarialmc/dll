@@ -36,5 +36,9 @@ Level_sendServerLegacyParticle::Level_sendServerLegacyParticle(): Hook("Send Ser
 
 void Level_sendServerLegacyParticle::enableHookk()
 {
-    Memory::hookFunc(SDK::clientInstance->getLocalPlayer()->getLevel()->vtable[175], (void*)&Level_sendServerLegacyParticle::Level_sendServerLegacyParticleDetour, (void**)&funcOriginal, "Send Server Legacy Particle Hook");
+    auto player = SDK::clientInstance->getLocalPlayer();
+    if (!player) return;
+    auto level = player->getLevel();
+    if (!level) return;
+    Memory::hookFunc(level->vtable[175], (void*)&Level_sendServerLegacyParticle::Level_sendServerLegacyParticleDetour, (void**)&funcOriginal, "Send Server Legacy Particle Hook");
 }

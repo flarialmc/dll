@@ -29,11 +29,11 @@ class APIUtils {
 
   static std::string VectorToList(const std::vector<std::string> &vec);
 
-  static std::vector<std::string> UpdateVector(const std::vector<std::string> &currentVec,
-                                               const std::vector<std::string> &commands);
+  static std::vector<std::string> UpdateVector(const std::vector<std::string>& currentVec,
+                                                const std::vector<std::string>& commands, std::string localPlayerName);
 
   static std::vector<std::string> UpdateVector(const std::vector<std::string> &currentVec,
-                                               const std::string &commandListStr);
+                                               const std::string &commandListStr, std::string localPlayerName);
 
   static std::vector<std::string> UpdateVectorFast(const std::vector<std::string> &currentVec,
                                                    const std::vector<std::string> &commands);

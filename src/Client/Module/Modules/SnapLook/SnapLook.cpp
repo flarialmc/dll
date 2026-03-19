@@ -32,7 +32,7 @@ void SnapLook::settingsRender(float settingsOffset)
     initSettingsPage();
 
     addToggle("Togglable", "", "togglable");
-    addKeybind("Keybind", "Hold for 2 seconds!", "keybind", true);
+    addKeybind("Keybind", "", "keybind", true);
     addDropdown("Mode", "", std::vector<std::string>{
         "Third Person Front",
         "Third Person Back",

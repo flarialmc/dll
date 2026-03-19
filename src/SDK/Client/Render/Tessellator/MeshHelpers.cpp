@@ -4,9 +4,10 @@
 #include <Utils/Memory/Memory.hpp>
 
 void MeshHelpers::renderMeshImmediately(ScreenContext* screenContext, Tessellator* tessellator, mce::MaterialPtr* material) {
+    static bool ver121120 = VersionUtils::checkAboveOrEqual(21, 120);
     if (VersionUtils::checkAboveOrEqual(21, 20)) {
         char pad[0x58]{};
-        static auto sig = Memory::offsetFromSig(GET_SIG_ADDRESS("MeshHelpers::renderMeshImmediately"), 1);
+        static auto sig = ver121120 ? GET_SIG_ADDRESS("MeshHelpers::renderMeshImmediately") : Memory::offsetFromSig(GET_SIG_ADDRESS("MeshHelpers::renderMeshImmediately"), 1);
         using func_t = void(*)(ScreenContext*, Tessellator*, mce::MaterialPtr*, char*);
         static auto func = reinterpret_cast<func_t>(sig);
         if (!material) {
@@ -32,6 +33,7 @@ void MeshHelpers::renderMeshImmediately(ScreenContext* screenContext, Tessellato
 }
 
 void MeshHelpers::renderMeshImmediately2(ScreenContext* screenContext, Tessellator* tessellator, mce::MaterialPtr* material, BedrockTextureData& texture) {
+    if (!screenContext || !tessellator || !material) return;
     if (VersionUtils::checkAboveOrEqual(21, 20)) {
         char pad[0x58]{};
         static auto sig = GET_SIG_ADDRESS("MeshHelpers::renderMeshImmediately2");

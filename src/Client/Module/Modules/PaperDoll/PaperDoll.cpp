@@ -39,7 +39,8 @@ void PaperDoll::settingsRender(float settingsOffset) {
 }
 
 void PaperDoll::onRender(RenderEvent &event) {
-    if (!this->isEnabled()) return;
+    if (!this->isEnabled() || ClickGUI::blurActive) return;
+    ClickGUI::HudFadeGuard fadeGuard;
     if (ClientInstance::getTopScreenName() == "hud_screen" &&
         this->isEnabled() ||
         ClientInstance::getTopScreenName() == "pause_screen" &&
@@ -101,8 +102,11 @@ void PaperDoll::onSetupAndRender(SetupAndRenderEvent &event) {
                     control->sizeConstrains = Vec2<float>{scale, scale};
 
                     if (getOps<bool>("alwaysshow") || ClickGUI::editmenu) {
-                        auto component = reinterpret_cast<CustomRenderComponent *>(control->getComponents()[4].get());
-                        component->renderer->state = 1.0f;
+                        auto& components = control->getComponents();
+                        if (components.size() > 4 && components[4]) {
+                            auto component = reinterpret_cast<CustomRenderComponent *>(components[4].get());
+                            component->renderer->state = 1.0f;
+                        }
                     }
 
                     if (delayDisable) {

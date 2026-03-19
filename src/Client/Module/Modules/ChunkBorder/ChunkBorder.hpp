@@ -13,7 +13,7 @@ class ChunkBorder : public Module {
 private:
     float bottom = -64.0f;
     float top = 320.0f;
-    int chunkSize = 16.0f;
+    int chunkSize = 16;
 
 public:
     ChunkBorder() : Module("Chunk Border", "Chunk Border",
@@ -28,6 +28,8 @@ public:
     void defaultConfig() override;
 
     void settingsRender(float settingsOffset) override;
+
+    void onKey(KeyEvent& event);
 
     void onRender3D(Render3DEvent& event);
 

@@ -1,5 +1,64 @@
 #pragma once
 
+/**
+ * @file PlayerLib.hpp
+ * @brief Lua bindings for local player information and actions
+ *
+ * Provides scripts with access to local player state. Most functions are
+ * read-only for information display. Action functions (say, executeCommand)
+ * allow interaction but cannot manipulate player movement or aim.
+ *
+ * ## Available Functions
+ *
+ * ### Identity & Position
+ * - `player.name()` - Get player's display name
+ * - `player.position()` - Get x, y, z coordinates (returns 3 values)
+ * - `player.rotation()` - Get pitch/yaw as table {x, y}
+ * - `player.dimension()` - Get current dimension name
+ * - `player.velocity()` - Get velocity x, y, z (returns 3 values)
+ * - `player.speed()` - Get horizontal movement speed
+ *
+ * ### Status
+ * - `player.health()` - Get current health (-1 if unavailable)
+ * - `player.hunger()` - Get hunger level (-1 if unavailable)
+ * - `player.saturation()` - Get saturation level
+ * - `player.hurtTime()` - Ticks since last damage
+ * - `player.grounded()` - Is player on solid ground
+ * - `player.gamemode()` - Get gamemode (0=survival, 1=creative, 2=adventure, 3=spectator)
+ *
+ * ### Inventory (read-only)
+ * - `player.armor()` - Get armor table {helmet, chestplate, leggings, boots}
+ * - `player.mainhand()` - Get mainhand item info
+ * - `player.offhand()` - Get offhand item info
+ * - `player.selectedSlot()` - Get selected hotbar slot (0-8)
+ *
+ * ### Effects
+ * - `player.effects()` - Get table of active potion effects
+ *
+ * ### Actions
+ * - `player.say(message)` - Send chat message
+ * - `player.executeCommand(command)` - Execute a command
+ *
+ * @example
+ * ```lua
+ * -- Display player status
+ * function onTick()
+ *     local hp = player.health()
+ *     local x, y, z = player.position()
+ *
+ *     if hp < 5 then
+ *         client.notify("Low health warning!")
+ *     end
+ * end
+ *
+ * -- Display speed
+ * function onRender()
+ *     local spd = player.speed()
+ *     gui.text({x=10, y=10}, "Speed: " .. string.format("%.2f", spd), 100, 20, 1.0)
+ * end
+ * ```
+ */
+
 #include "ScriptLib.hpp"
 
 #include <Utils/Utils.hpp>
@@ -43,11 +102,11 @@ private:
         lua_settable(L, -3);
 
         lua_pushstring(L, "maxDurability");
-        lua_pushnumber(L, static_cast<int>(item->getMaxDamage()));
+        lua_pushnumber(L, item->getMaxDamage());
         lua_settable(L, -3);
 
         lua_pushstring(L, "damage");
-        lua_pushnumber(L, static_cast<int>(item->getDamageValue()));
+        lua_pushnumber(L, item->getDamageValue());
         lua_settable(L, -3);
 
         lua_pushstring(L, "isEnchanted");
@@ -74,9 +133,9 @@ public:
         }
 
         Vec3<float> pos = *player->getPosition();
-        lua_pushnumber(L, static_cast<double>(pos.x));
-        lua_pushnumber(L, static_cast<double>(pos.y));
-        lua_pushnumber(L, static_cast<double>(pos.z));
+        lua_pushnumber(L, std::round(pos.x * 1000.0f) / 1000.0f);
+        lua_pushnumber(L, std::round((pos.y - 1.62f) * 1000.0f) / 1000.0f); // Offset is present to make sure position returned is at the player's legs
+        lua_pushnumber(L, std::round(pos.z * 1000.0f) / 1000.0f);
         return 3;
     }
 
@@ -205,16 +264,18 @@ public:
         std::string msg = lua_tostring(L, 1);
 
         std::shared_ptr<Packet> packet = SDK::createPacket(9);
-        auto* pkt = reinterpret_cast<TextPacket*>(packet.get());
+        // auto* pkt = reinterpret_cast<TextPacket*>(packet.get());
+        //
+        // pkt->type = TextPacketType::CHAT;
+        // pkt->message = msg;
+        // pkt->platformId = "";
+        // pkt->translationNeeded = false;
+        // pkt->xuid = "";
+        // pkt->name = player->getPlayerName();
 
-        pkt->type = TextPacketType::CHAT;
-        pkt->message = msg;
-        pkt->platformId = "";
-        pkt->translationNeeded = false;
-        pkt->xuid = "";
-        pkt->name = player->getPlayerName();
+        craftChatPacket(packet.get(), player->getPlayerName(), msg);
 
-        SDK::clientInstance->getPacketSender()->sendToServer(pkt);
+        SDK::clientInstance->getPacketSender()->sendToServer(packet.get());
 
         return 0;
     }
@@ -234,9 +295,9 @@ public:
         Vec2<float> rot = player->getActorRotationComponent()->rot;
 
         lua_newtable(L);
-        lua_pushnumber(L, static_cast<double>(rot.x));
+        lua_pushnumber(L, rot.x);
         lua_setfield(L, -2, "x");
-        lua_pushnumber(L, static_cast<double>(rot.y));
+        lua_pushnumber(L, rot.y);
         lua_setfield(L, -2, "y");
 
         return 1;
@@ -260,6 +321,100 @@ public:
 
         return 0;
     }
+
+    // === New read-only state functions ===
+
+    static int gamemode() {
+        auto player = SDK::clientInstance->getLocalPlayer();
+        if (!player) return 0;
+        auto* gamemodeComp = player->getGameModeType();
+        if (!gamemodeComp) return 0;
+        return static_cast<int>(gamemodeComp->gameType);
+    }
+
+    static int selectedSlot() {
+        auto player = SDK::clientInstance->getLocalPlayer();
+        if (!player) return 0;
+        auto* supplies = player->getSupplies();
+        if (!supplies) return 0;
+        return supplies->getSelectedSlot();
+    }
+
+    static int effects(lua_State* L) {
+        auto player = SDK::clientInstance->getLocalPlayer();
+        lua_newtable(L);
+
+        if (!player) return 1;
+
+        // Get active effects using the getMobEffects method
+        auto effects = player->getMobEffects();
+
+        int index = 1;
+        for (const auto& effect : effects) {
+            if (effect.duration <= 0) continue;
+
+            lua_newtable(L);
+
+            lua_pushstring(L, "id");
+            lua_pushinteger(L, static_cast<lua_Integer>(effect.id));
+            lua_settable(L, -3);
+
+            lua_pushstring(L, "amplifier");
+            lua_pushinteger(L, effect.amplifier);
+            lua_settable(L, -3);
+
+            lua_pushstring(L, "duration");
+            lua_pushinteger(L, effect.duration);
+            lua_settable(L, -3);
+
+            lua_rawseti(L, -2, index++);
+        }
+
+        return 1;
+    }
+
+    static int velocity(lua_State* L) {
+        auto player = SDK::clientInstance->getLocalPlayer();
+
+        if (!player) {
+            lua_pushnumber(L, 0.0f);
+            lua_pushnumber(L, 0.0f);
+            lua_pushnumber(L, 0.0f);
+            return 3;
+        }
+
+        auto* motion = player->getStateVectorComponent();
+        if (!motion) {
+            lua_pushnumber(L, 0.0f);
+            lua_pushnumber(L, 0.0f);
+            lua_pushnumber(L, 0.0f);
+            return 3;
+        }
+
+        lua_pushnumber(L, motion->velocity.x);
+        lua_pushnumber(L, motion->velocity.y);
+        lua_pushnumber(L, motion->velocity.z);
+        return 3;
+    }
+
+    static float speed() {
+        auto player = SDK::clientInstance->getLocalPlayer();
+        if (!player) return 0.0f;
+
+        auto* motion = player->getStateVectorComponent();
+        if (!motion) return 0.0f;
+
+        // Calculate horizontal speed (ignoring Y component)
+        float xVel = motion->velocity.x;
+        float zVel = motion->velocity.z;
+        return std::sqrt(xVel * xVel + zVel * zVel);
+    }
+
+    static float saturation() {
+        auto player = SDK::clientInstance->getLocalPlayer();
+        if (!player) return 0.0f;
+        return player->getSaturation();
+    }
 };
 
 class PlayerLib : public ScriptLib {
@@ -269,18 +424,33 @@ public:
 
         getGlobalNamespace(state)
             .beginClass<sLocalPlayer>("player")
+                // Identity & Position
                 .addStaticFunction("name", &sLocalPlayer::name)
-                .addStaticFunction("hurtTime", &sLocalPlayer::hurtTime)
                 .addStaticFunction("position", &sLocalPlayer::position)
+                .addStaticFunction("rotation", &sLocalPlayer::rotation)
+                .addStaticFunction("dimension", &sLocalPlayer::dimension)
+                .addStaticFunction("velocity", &sLocalPlayer::velocity)
+                .addStaticFunction("speed", &sLocalPlayer::speed)
+
+                // Status
                 .addStaticFunction("health", &sLocalPlayer::health)
                 .addStaticFunction("hunger", &sLocalPlayer::hunger)
+                .addStaticFunction("saturation", &sLocalPlayer::saturation)
+                .addStaticFunction("hurtTime", &sLocalPlayer::hurtTime)
+                .addStaticFunction("grounded", &sLocalPlayer::grounded)
+                .addStaticFunction("gamemode", &sLocalPlayer::gamemode)
+
+                // Inventory (read-only)
                 .addStaticFunction("armor", &sLocalPlayer::armor)
                 .addStaticFunction("offhand", &sLocalPlayer::offhand)
                 .addStaticFunction("mainhand", &sLocalPlayer::mainhand)
-                .addStaticFunction("dimension", &sLocalPlayer::dimension)
-                .addStaticFunction("grounded", &sLocalPlayer::grounded)
+                .addStaticFunction("selectedSlot", &sLocalPlayer::selectedSlot)
+
+                // Effects
+                .addStaticFunction("effects", &sLocalPlayer::effects)
+
+                // Actions
                 .addStaticFunction("say", &sLocalPlayer::say)
-                .addStaticFunction("rotation", &sLocalPlayer::rotation)
                 .addStaticFunction("executeCommand", &sLocalPlayer::executeCommand)
             .endClass();
     }

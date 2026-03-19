@@ -32,4 +32,5 @@ public:
 
 	void onRender(RenderEvent& event);
 
+    void onKey(KeyEvent& event);
 };

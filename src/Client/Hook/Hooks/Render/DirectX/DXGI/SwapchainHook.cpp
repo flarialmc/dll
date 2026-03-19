@@ -10,9 +10,11 @@
 #include <imgui/imgui_impl_dx12.h>
 #include "unknwnbase.h"
 #include "UnderUIHooks.hpp"
+#include "CreateSwapChainForHwndHook.hpp"
 #include "CreateSwapchainForCoreWindowHook.hpp"
 #include "ResizeHook.hpp"
 #include "../../../../../Module/Modules/DepthOfField/DepthOfFieldHelper.hpp"
+#include "../../../../../Module/Manager.hpp"
 using ::IUnknown;
 
 SwapchainHook::SwapchainHook() : Hook("swapchain_hook", 0) {}
@@ -20,7 +22,7 @@ SwapchainHook::SwapchainHook() : Hook("swapchain_hook", 0) {}
 winrt::com_ptr<ID3D12CommandQueue> SwapchainHook::queue = nullptr;
 HANDLE SwapchainHook::fenceEvent = nullptr;
 
-bool SwapchainHook::initImgui = false;
+std::atomic<bool> SwapchainHook::initImgui{false};
 bool allfontloaded = false;
 bool first = false;
 bool imguiWindowInit = false;
@@ -96,10 +98,19 @@ void SwapchainHook::enableHook() {
         window2 = FindWindowByTitle("Flarial");
     }
 
+    // Phase 1: Hook Present using kiero's vtable guess.
+    // This works on most systems because DXGI's Present function is shared between DX11/DX12.
+    // Phase 2 (in create-swapchain hooks) will re-hook from the live swapchain's vtable
+    // to handle systems where kiero's guess differs from the actual game API.
     if (kiero::getRenderType() == kiero::RenderType::D3D12) {
+        Logger::debug("[Swapchain] Phase 1: kiero detected DX12, hooking Present at kiero index 140");
         kiero::bind(140, (void **) &funcOriginal, (void *) swapchainCallback);
     } else if (kiero::getRenderType() == kiero::RenderType::D3D11) {
+        Logger::debug("[Swapchain] Phase 1: kiero detected DX11, hooking Present at kiero index 8");
         kiero::bind(8, (void **) &funcOriginal, (void *) swapchainCallback);
+    } else {
+        Logger::warn("[Swapchain] Phase 1: kiero render type is {} — Present hook may not work until Phase 2",
+                     static_cast<int>(kiero::getRenderType()));
     }
 
     winrt::com_ptr<IDXGIFactory2> pFactory;
@@ -107,6 +118,7 @@ void SwapchainHook::enableHook() {
     if (!pFactory) LOG_ERROR("Factory not created");
 
     CreateSwapchainForCoreWindowHook::hook(pFactory.get());
+    CreateSwapChainForHwndHook::Hook(pFactory.get());
 
     winrt::com_ptr<IDXGIAdapter> adapter;
     pFactory->EnumAdapters(0, adapter.put());
@@ -138,24 +150,115 @@ isMedal = false;
 
 }
 
-bool SwapchainHook::init = false;
+std::atomic<bool> SwapchainHook::init{false};
 bool SwapchainHook::currentVsyncState;
 
+
+// Extern declaration for dx12DeviceRemoved flag from SwapchainHook_DX12.cpp (Better Frames)
+extern bool dx12DeviceRemoved;
+bool dx11FallbackComplete = false; // Track if we've successfully switched to DX11 (non-static for extern access)
+
+bool SwapchainHook::canForceDX11Fallback() {
+    // Can force fallback if: we're on DX12, haven't already triggered RemoveDevice, and haven't completed fallback
+    // Use d3d12Device5.get() for explicit null check - winrt::com_ptr comparison can be finicky
+    return isDX12 && !dx12DeviceRemoved && !dx11FallbackComplete && d3d12Device5.get() != nullptr;
+}
+
+void SwapchainHook::forceDX11Fallback() {
+    if (!canForceDX11Fallback()) {
+        Logger::warn("[Swapchain] Cannot force DX11 fallback - conditions not met");
+        return;
+    }
+
+    Logger::success("[Swapchain] Force DX11 Fallback: Calling RemoveDevice()");
+    d3d12Device5->RemoveDevice();
+    dx12DeviceRemoved = true;
+    // The swapchainCallback will handle the rest - detecting DX11 and reinitializing
+}
+
+void SwapchainHook::rehookPresentFromSwapchain(IDXGISwapChain* pSwapChain) {
+    if (!pSwapChain) return;
+
+    // IDXGISwapChain::Present is always at vtable index 8, regardless of DX11/DX12
+    void** vtable = *reinterpret_cast<void***>(pSwapChain);
+    constexpr int PRESENT_VTABLE_INDEX = 8;
+    void* livePresentAddr = vtable[PRESENT_VTABLE_INDEX];
+
+    // Try to create a hook at the live swapchain's Present address.
+    // If kiero already hooked this exact address, MH_CreateHook returns MH_ERROR_ALREADY_CREATED — no mismatch.
+    // If the address differs (kiero's dummy vtable vs game's real vtable), a new hook is created.
+    MH_STATUS status = MH_CreateHook(livePresentAddr, reinterpret_cast<void*>(swapchainCallback),
+                                      reinterpret_cast<void**>(&funcOriginal));
+    if (status == MH_OK) {
+        MH_EnableHook(livePresentAddr);
+        Logger::success("[Swapchain] Phase 2: Re-hooked Present from live swapchain vtable "
+                        "(kiero had a different address — this fixes the mismatch)");
+    } else if (status == MH_ERROR_ALREADY_CREATED) {
+        Logger::debug("[Swapchain] Phase 2: Present already hooked at live swapchain address (no mismatch)");
+    } else {
+        Logger::error("[Swapchain] Phase 2: Failed to re-hook Present, MH_STATUS={}", static_cast<int>(status));
+    }
+}
 
 HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags) {
     if (Client::disable || !Client::init) return funcOriginal(pSwapChain, syncInterval, flags);
 
-    isDX12 = GraphicsAPI::D3D12 == DetectSwapchainAPI(pSwapChain);
 
-    if (currentVsyncState != Client::settings.getSettingByName<bool>("vsync")->value) {
-        recreate = true;
+    Logger::debug("{}", (void*)SDK::getBgfxContext()->getRendererContext());
+    // Detect the actual API from the swapchain
+    GraphicsAPI detectedAPI = DetectSwapchainAPI(pSwapChain);
+
+    // One-time log: report whether runtime detection matches kiero's initial guess
+    static bool apiMismatchLogged = false;
+    if (!apiMismatchLogged) {
+        apiMismatchLogged = true;
+        bool kieroSaidDX12 = kiero::getRenderType() == kiero::RenderType::D3D12;
+        bool runtimeIsDX12 = detectedAPI == GraphicsAPI::D3D12;
+        if (kieroSaidDX12 != runtimeIsDX12) {
+            Logger::warn("[Swapchain] API MISMATCH: kiero detected {} but runtime swapchain is {} "
+                         "(Phase 2 rehook should have corrected this)",
+                         kieroSaidDX12 ? "DX12" : "DX11",
+                         runtimeIsDX12 ? "DX12" : "DX11");
+        } else {
+            Logger::debug("[Swapchain] API match confirmed: kiero and runtime both agree on {}",
+                          runtimeIsDX12 ? "DX12" : "DX11");
+        }
     }
+
+    // If RemoveDevice() was called (Better Frames), check if game has recreated with DX11
+    if (dx12DeviceRemoved && !dx11FallbackComplete)
+    {
+        if (detectedAPI == GraphicsAPI::D3D12)
+        {
+            // Swapchain is still DX12, waiting for game to recreate with DX11
+            // Return error to trigger game's device lost handling
+            return DXGI_ERROR_DEVICE_REMOVED;
+        }
+        // Game has recreated swapchain with DX11!
+        isDX12 = false;
+        init = false; // Need to reinitialize with the new DX11 swapchain
+        swapchain = pSwapChain; // Update to new swapchain
+        dx11FallbackComplete = true;
+        Logger::success("[Swapchain] Better Frames: Game recreated swapchain with DX11!");
+
+        // Re-hook ResizeBuffers for DX11 - the initial hook used DX12 indices from kiero
+        ResizeHook::rehookForDX11(pSwapChain);
+    }
+    else if (!dx11FallbackComplete)
+    {
+        isDX12 = detectedAPI == GraphicsAPI::D3D12;
+    }
+    // else: dx11FallbackComplete is true, isDX12 stays false
+
+    // Note: VSync changes require restart - the tearing flag must be set during swapchain creation
+    // Don't trigger recreation here as it won't help and causes issues
     //if (containsModule(L"medal-hook64.dll")) recreate = false;
 
     if (recreate) {
         init = false;
         initImgui = false;
-        Logger::debug("[DEBUG] Recreating Swapchain");
+        recreate = false; // Reset flag BEFORE triggering recreation to prevent infinite loop
+        Logger::debug("[Swapchain] Triggering swapchain recreation via ResizeBuffers");
         pSwapChain->ResizeBuffers(0, MC::windowSize.x, MC::windowSize.y, DXGI_FORMAT_UNKNOWN, DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING);
 
         return DXGI_ERROR_DEVICE_RESET;
@@ -174,6 +277,9 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
     }
 
     FPSMeasure();
+
+    UnderUIHooks::resetPanoramaFrameFlag();
+
 
     if (!init) {
 
@@ -201,6 +307,10 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
             } else {
 
+                // Note: Panorama shader now renders directly in PreSetupAndRenderEvent,
+                // BEFORE the game's UI renders. We no longer need to fire RenderUnderUIEvent
+                // here since that would be at Present time (after UI has already rendered).
+
                 DX11Render();
 
             }
@@ -210,7 +320,6 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
     try {
         if (init && initImgui && !FlarialGUI::hasLoadedAll) { FlarialGUI::LoadAllImages(); FlarialGUI::hasLoadedAll = true; }
     } catch (const std::exception &ex) { LOG_ERROR("Fail at loading all images: ", ex.what()); }
-
 
     if (currentVsyncState) {
         return funcOriginal(pSwapChain, 0, DXGI_PRESENT_ALLOW_TEARING);
@@ -331,6 +440,7 @@ void SwapchainHook::FPSMeasure() {
 
 
 winrt::com_ptr<ID3D11Texture2D> SwapchainHook::GetBackbuffer() {
+    std::lock_guard<std::mutex> lock(backbufferMutex);
     return SavedD3D11BackBuffer;
 }
 
@@ -390,18 +500,23 @@ void SwapchainHook::CleanupBackbufferStorage() {
     maxBackbufferFrames = 0;
     currentBackbufferIndex = 0;
     currentBackbufferIndexUnderUI = 0;
+    validBackbufferFrames = 0;
+    validBackbufferFramesUnderUI = 0;
 }
 
 winrt::com_ptr<ID3D11ShaderResourceView> SwapchainHook::GetCurrentBackbufferSRV(bool underUI) {
+    static int logCounter = 0;
 
     if (underUI) {
-        if (backbufferStorageUnderUI.empty()) {
+        if (backbufferStorageUnderUI.empty() || validBackbufferFramesUnderUI == 0) {
+            if (++logCounter % 300 == 1) Logger::debug("[MotionBlur] GetCurrentBackbufferSRV(underUI): empty={}, valid={}", backbufferStorageUnderUI.empty(), validBackbufferFramesUnderUI);
             return nullptr;
         }
         int prevIndex = (currentBackbufferIndexUnderUI - 1 + backbufferStorageUnderUI.size()) % backbufferStorageUnderUI.size();
         return backbufferStorageUnderUI[prevIndex].srv;
     } else {
-        if (backbufferStorage.empty()) {
+        if (backbufferStorage.empty() || validBackbufferFrames == 0) {
+            if (++logCounter % 300 == 1) Logger::debug("[MotionBlur] GetCurrentBackbufferSRV: empty={}, valid={}", backbufferStorage.empty(), validBackbufferFrames);
             return nullptr;
         }
         int prevIndex = (currentBackbufferIndex - 1 + backbufferStorage.size()) % backbufferStorage.size();
@@ -420,42 +535,73 @@ void SwapchainHook::SaveBackbuffer(bool underui) {
                 // Use underUI storage for frames without UI
                 auto& currentStorage = backbufferStorageUnderUI[currentBackbufferIndexUnderUI];
 
-                if (UnderUIHooks::bgfxCtx->m_msaart) {
+                if (UnderUIHooks::bgfxCtx && UnderUIHooks::bgfxCtx->m_msaart) {
                     context->ResolveSubresource(currentStorage.texture.get(), 0, UnderUIHooks::bgfxCtx->m_msaart, 0, DXGI_FORMAT_R8G8B8A8_UNORM);
                 } else {
                     context->CopyResource(currentStorage.texture.get(), SavedD3D11BackBuffer.get());
                 }
 
                 currentBackbufferIndexUnderUI = (currentBackbufferIndexUnderUI + 1) % backbufferStorageUnderUI.size();
+                // Track that we have valid frame data in this storage
+                if (validBackbufferFramesUnderUI < static_cast<int>(backbufferStorageUnderUI.size())) {
+                    validBackbufferFramesUnderUI++;
+                }
             } else {
 
                 auto& currentStorage = backbufferStorage[currentBackbufferIndex];
                 context->CopyResource(currentStorage.texture.get(), SavedD3D11BackBuffer.get());
                 currentBackbufferIndex = (currentBackbufferIndex + 1) % backbufferStorage.size();
+                // Track that we have valid frame data in this storage
+                if (validBackbufferFrames < static_cast<int>(backbufferStorage.size())) {
+                    validBackbufferFrames++;
+                }
             }
 
         } else if (FlarialGUI::needsBackBuffer)
         {
             // Fallback to old behavior if storage not initialized
-            ExtraSavedD3D11BackBuffer = nullptr;
-            if (!ExtraSavedD3D11BackBuffer) {
-                D3D11_TEXTURE2D_DESC textureDesc = {};
-                SavedD3D11BackBuffer->GetDesc(&textureDesc);
-                textureDesc.Usage = D3D11_USAGE_DEFAULT;
-                textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-                textureDesc.CPUAccessFlags = 0;
+            // Use mutex to protect ExtraSavedD3D11BackBuffer access (prevents race with MotionBlur)
+            winrt::com_ptr<ID3D11Texture2D> localExtraBuffer;
+            {
+                std::lock_guard<std::mutex> lock(backbufferMutex);
 
-                SwapchainHook::d3d11Device->CreateTexture2D(&textureDesc, nullptr, ExtraSavedD3D11BackBuffer.put());
+                // Check if we need to recreate the texture (first time or size changed)
+                bool needsRecreate = !ExtraSavedD3D11BackBuffer;
+                if (ExtraSavedD3D11BackBuffer) {
+                    D3D11_TEXTURE2D_DESC existingDesc = {};
+                    ExtraSavedD3D11BackBuffer->GetDesc(&existingDesc);
+                    D3D11_TEXTURE2D_DESC currentDesc = {};
+                    SavedD3D11BackBuffer->GetDesc(&currentDesc);
+                    if (existingDesc.Width != currentDesc.Width || existingDesc.Height != currentDesc.Height) {
+                        needsRecreate = true;
+                    }
+                }
+                if (needsRecreate) {
+                    ExtraSavedD3D11BackBuffer = nullptr;
+                    D3D11_TEXTURE2D_DESC textureDesc = {};
+                    SavedD3D11BackBuffer->GetDesc(&textureDesc);
+                    textureDesc.Usage = D3D11_USAGE_DEFAULT;
+                    textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+                    textureDesc.CPUAccessFlags = 0;
+
+                    SwapchainHook::d3d11Device->CreateTexture2D(&textureDesc, nullptr, ExtraSavedD3D11BackBuffer.put());
+                }
+
+                // Take local copy for GPU operations outside the lock
+                localExtraBuffer = ExtraSavedD3D11BackBuffer;
             }
 
-            if (underui) {
-                if (UnderUIHooks::bgfxCtx->m_msaart) {
-                    context->ResolveSubresource(ExtraSavedD3D11BackBuffer.get(), 0, UnderUIHooks::bgfxCtx->m_msaart, 0, DXGI_FORMAT_R8G8B8A8_UNORM);
+            // Perform GPU operations with local copy (outside mutex to avoid blocking)
+            if (localExtraBuffer) {
+                if (underui) {
+                    if (UnderUIHooks::bgfxCtx && UnderUIHooks::bgfxCtx->m_msaart) {
+                        context->ResolveSubresource(localExtraBuffer.get(), 0, UnderUIHooks::bgfxCtx->m_msaart, 0, DXGI_FORMAT_R8G8B8A8_UNORM);
+                    } else {
+                        context->CopyResource(localExtraBuffer.get(), SavedD3D11BackBuffer.get());
+                    }
                 } else {
-                    context->CopyResource(ExtraSavedD3D11BackBuffer.get(), SavedD3D11BackBuffer.get());
+                    context->CopyResource(localExtraBuffer.get(), SavedD3D11BackBuffer.get());
                 }
-            } else {
-                context->CopyResource(ExtraSavedD3D11BackBuffer.get(), SavedD3D11BackBuffer.get());
             }
         }
     } else {
@@ -467,11 +613,34 @@ void SwapchainHook::SaveBackbuffer(bool underui) {
 }
 
 void SwapchainHook::SaveDepthmap(ID3D11DeviceContext* pContext, ID3D11DepthStencilView* pDepthStencilView) {
-    if (!pDepthStencilView || isDX12) return;
+    static int callCounter = 0;
 
-    auto depthOfFieldModule = ModuleManager::getModule("Depth Of Field");
-    if (!depthOfFieldModule || !depthOfFieldModule->isEnabled()) {
+    if (!pDepthStencilView || isDX12) {
+        if (++callCounter % 600 == 1) {
+            Logger::debug("[SaveDepthmap] Early return - pDepthStencilView={}, isDX12={}",
+                pDepthStencilView != nullptr, isDX12);
+        }
         return;
+    }
+
+    // Check if either Depth of Field OR Real Motion Blur needs the depth buffer
+    auto depthOfFieldModule = ModuleManager::getModule("Depth Of Field");
+    auto motionBlurModule = ModuleManager::getModule("Motion Blur");
+
+    bool dofNeedsDepth = depthOfFieldModule && depthOfFieldModule->isEnabled();
+    bool motionBlurNeedsDepth = motionBlurModule && motionBlurModule->isEnabled()
+                                && motionBlurModule->getOps<std::string>("blurType") == "Real Motion Blur";
+
+    if (!dofNeedsDepth && !motionBlurNeedsDepth) {
+        if (++callCounter % 600 == 1 && motionBlurModule && motionBlurModule->isEnabled()) {
+            Logger::debug("[SaveDepthmap] No depth needed - blurType={}",
+                motionBlurModule->getOps<std::string>("blurType"));
+        }
+        return;
+    }
+
+    if (++callCounter % 300 == 1) {
+        Logger::debug("[SaveDepthmap] Capturing depth buffer - dof={}, motionBlur={}", dofNeedsDepth, motionBlurNeedsDepth);
     }
 
     ID3D11Resource* pResource = nullptr;
@@ -561,7 +730,11 @@ std::vector<SwapchainHook::BackbufferStorage> SwapchainHook::backbufferStorageUn
 int SwapchainHook::currentBackbufferIndex = 0;
 int SwapchainHook::currentBackbufferIndexUnderUI = 0;
 int SwapchainHook::maxBackbufferFrames = 0;
+int SwapchainHook::validBackbufferFrames = 0;
+int SwapchainHook::validBackbufferFramesUnderUI = 0;
 winrt::com_ptr<ID3D11Texture2D> SwapchainHook::ExtraSavedD3D11BackBuffer;
+std::mutex SwapchainHook::imguiInputMutex;
+std::mutex SwapchainHook::backbufferMutex;
 UINT SwapchainHook::lastBackbufferWidth = 0;
 UINT SwapchainHook::lastBackbufferHeight = 0;
 

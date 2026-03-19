@@ -1,60 +1,42 @@
 #include "Waila.hpp"
 #include "Client.hpp"
 
-
 void Waila::onEnable()
 {
+    HUDModule::onEnable();
     Listen(this, SetupAndRenderEvent, &Waila::onSetupAndRender)
-    Listen(this, RenderEvent, &Waila::onRender)
-    Module::onEnable();
 }
 
 void Waila::onDisable()
 {
     Deafen(this, SetupAndRenderEvent, &Waila::onSetupAndRender)
-    Deafen(this, RenderEvent, &Waila::onRender)
-    Module::onDisable();
+    HUDModule::onDisable();
 }
 
-void Waila::defaultConfig()
+void Waila::customConfig()
 {
     setDef("responsivewidth", true);
     setDef("textscale", 0.80f);
-    Module::defaultConfig("all");
     setDef("advanced", false);
     setDef("showAir", false);
-    
 }
 
-void Waila::settingsRender(float settingsOffset)
+void Waila::customSettings()
 {
-    initSettingsPage();
-
-    addHeader("Main");
-    defaultAddSettings("main");
     addToggle("Advanced Mode", "", "advanced");
     addToggle("Show Air", "", "showAir");
-    extraPadding();
+}
 
-    addHeader("Text");
-    defaultAddSettings("text");
-    extraPadding();
-
-    addHeader("Colors");
-    defaultAddSettings("colors");
-    extraPadding();
-
-    addHeader("Misc Customizations");
-    defaultAddSettings("misc");
-
-    FlarialGUI::UnsetScrollView();
-    resetPadding();
+std::string Waila::getDisplayValue()
+{
+    if ((lookingAt == "air" || lookingAt == "minecraft:air") && !getOps<bool>("showAir")) return "";
+    return lookingAt;
 }
 
 void Waila::onSetupAndRender(SetupAndRenderEvent& event)
 {
     if (!this->isEnabled()) return;
-    if (!SDK::clientInstance->getLocalPlayer()) return;
+    if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer()) return;
     if (!SDK::clientInstance->getLocalPlayer()->getLevel()) return;
     if (!SDK::clientInstance->getBlockSource()) return;
     HitResult result = SDK::clientInstance->getLocalPlayer()->getLevel()->getHitResult();
@@ -64,7 +46,8 @@ void Waila::onSetupAndRender(SetupAndRenderEvent& event)
         result.blockPos.z };
     BlockSource* blockSource = SDK::clientInstance->getBlockSource();
     try {
-        BlockLegacy* block = blockSource->getBlock(pos)->getBlockLegacy();
+        Block* oBlock = blockSource->getBlock(pos);
+        BlockLegacy* block = oBlock->getBlockLegacy();
         if (!block) return;
         try {
 
@@ -75,13 +58,5 @@ void Waila::onSetupAndRender(SetupAndRenderEvent& event)
     }
     catch (const std::exception& e) {
         LOG_ERROR("Failed to get block: {}", e.what());
-    }
-}
-
-void Waila::onRender(RenderEvent& event)
-{
-    if (this->isEnabled()) {
-        if ((lookingAt == "air" || lookingAt == "minecraft:air") && !getOps<bool>("showAir")) return;
-        this->normalRender(32, lookingAt);
     }
 }

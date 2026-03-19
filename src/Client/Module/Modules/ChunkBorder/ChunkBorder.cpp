@@ -7,26 +7,36 @@
 #include <cmath>
 
 void ChunkBorder::onEnable() {
+    Listen(this, KeyEvent, &ChunkBorder::onKey)
     Listen(this, Render3DEvent, &ChunkBorder::onRender3D)
     Module::onEnable();
 }
 
 void ChunkBorder::onDisable() {
+    Deafen(this, KeyEvent, &ChunkBorder::onKey)
     Deafen(this, Render3DEvent, &ChunkBorder::onRender3D)
     Module::onDisable();
 }
 
 void ChunkBorder::defaultConfig() {
+    getKeybind();
+
     Module::defaultConfig("core");
     setDef("corner", (std::string) "0000ff", 1.f, false);
     setDef("mid", (std::string) "ffff00", 1.f, false);
     setDef("adj", (std::string) "ff0000", 1.f, false);
     setDef("horizLineSpacing", 2);
     setDef("vertLineSpacing", 2.f);
+
+    setDef("toggle", false);
 }
 
 void ChunkBorder::settingsRender(float settingsOffset) {
     initSettingsPage();
+
+    addToggle("Toggle (Java-like behaviour)", "", "toggle");
+    addKeybind("Keybind", "", "keybind", true);
+    extraPadding();
 
     addHeader("Chunk Border");
     addSliderInt("Horizontal Line Spacing", "", "horizLineSpacing", chunkSize, 1);
@@ -42,8 +52,18 @@ void ChunkBorder::settingsRender(float settingsOffset) {
     resetPadding();
 }
 
+void ChunkBorder::onKey(KeyEvent &event) {
+    if (!this->isEnabled()) return;
+    if (this->isKeyPartOfKeybind(event.key)) {
+        if (this->isKeybind(event.keys)) {
+            keybindActions[0]({});
+        }
+    }
+}
+
 void ChunkBorder::onRender3D(Render3DEvent &event) {
     if (!this->isEnabled()) return;
+    if (getOps<bool>("toggle") && !this->active) return;
 
     const auto player = SDK::clientInstance->getLocalPlayer();
     if (!player) return;
@@ -69,24 +89,24 @@ void ChunkBorder::onRender3D(Render3DEvent &event) {
 
     // vertical lines
     for (int i = 0; i <= chunkSize / hls; ++i) {
-        const float offset = i * hls;
+        const float offset = static_cast<float>(i * hls);
         D2D1_COLOR_F col = (i % (chunkSize / hls) == 0) ? cornerCol : midCol;
 
         // z axis lines
-        dc.drawLineList(Vec3{anchor.x + offset, bottom, anchor.z}, Vec3{anchor.x + offset, top, anchor.z}, col);
-        dc.drawLineList(Vec3{anchor.x + offset, bottom, anchor.z + chunkSize}, Vec3{anchor.x + offset, top, anchor.z + chunkSize}, col);
+        dc.drawLineList(Vec3{anchor.x + offset, bottom, anchor.z}, Vec3{anchor.x + offset, top, anchor.z}, col, true);
+        dc.drawLineList(Vec3{anchor.x + offset, bottom, anchor.z + chunkSize}, Vec3{anchor.x + offset, top, anchor.z + chunkSize}, col, true);
 
         // x axis lines
-        dc.drawLineList(Vec3{anchor.x, bottom, anchor.z + offset}, Vec3{anchor.x, top, anchor.z + offset}, col);
-        dc.drawLineList(Vec3{anchor.x + chunkSize, bottom, anchor.z + offset}, Vec3{anchor.x + chunkSize, top, anchor.z + offset}, col);
+        dc.drawLineList(Vec3{anchor.x, bottom, anchor.z + offset}, Vec3{anchor.x, top, anchor.z + offset}, col, true);
+        dc.drawLineList(Vec3{anchor.x + static_cast<float>(chunkSize), bottom, anchor.z + offset}, Vec3{anchor.x + static_cast<float>(chunkSize), top, anchor.z + offset}, col, true);
     }
 
     // horizontal lines
     for (float y = bottom; y <= top; y += vls) {
-        dc.drawLineList(Vec3{anchor.x, y, anchor.z}, Vec3{anchor.x + chunkSize, y, anchor.z}, midCol);
-        dc.drawLineList(Vec3{anchor.x, y, anchor.z}, Vec3{anchor.x, y, anchor.z + chunkSize}, midCol);
-        dc.drawLineList(Vec3{anchor.x + chunkSize, y, anchor.z}, Vec3{anchor.x + chunkSize, y, anchor.z + chunkSize}, midCol);
-        dc.drawLineList(Vec3{anchor.x, y, anchor.z + chunkSize}, Vec3{anchor.x + chunkSize, y, anchor.z + chunkSize}, midCol);
+        dc.drawLineList(Vec3{anchor.x, y, anchor.z}, Vec3{anchor.x + chunkSize, y, anchor.z}, midCol, true);
+        dc.drawLineList(Vec3{anchor.x, y, anchor.z}, Vec3{anchor.x, y, anchor.z + chunkSize}, midCol, true);
+        dc.drawLineList(Vec3{anchor.x + chunkSize, y, anchor.z}, Vec3{anchor.x + chunkSize, y, anchor.z + chunkSize}, midCol, true);
+        dc.drawLineList(Vec3{anchor.x, y, anchor.z + chunkSize}, Vec3{anchor.x + chunkSize, y, anchor.z + chunkSize}, midCol, true);
     }
 
     // CURRENT CHUNK END
@@ -99,10 +119,9 @@ void ChunkBorder::onRender3D(Render3DEvent &event) {
             dc.drawLineList(
                 Vec3{anchor.x + x * chunkSize, bottom, anchor.z + z * chunkSize},
                 Vec3{anchor.x + x * chunkSize, top, anchor.z + z * chunkSize},
-                adjCol
+                adjCol,
+                true
             );
         }
     }
-
-    dc.flush();
 }

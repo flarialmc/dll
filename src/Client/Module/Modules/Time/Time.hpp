@@ -1,7 +1,6 @@
 #pragma once
 
-#include "../Module.hpp"
-#include "Events/Render/RenderEvent.hpp"
+#include "../HUDModule.hpp"
 #include <Events/Game/TimeEvent.hpp>
 
 inline std::tm localtime_xp(std::time_t timer) {
@@ -18,29 +17,26 @@ inline std::tm localtime_xp(std::time_t timer) {
 	return bt;
 }
 
-class Time : public Module {
+class Time : public HUDModule {
 
 public:
 
-	Time(): Module("Clock", "Displays your current local or ingame time.",
-		IDR_TIME_PNG, "", false, {"time"}) {
+	Time(): HUDModule(3, "Clock", "Displays your current local or ingame time.",
+		IDR_TIME_PNG, "", {"time"}) {
 	}
 
 	static inline float curTime;
 
-	void onEnable() override;
-
 	void onSetup() override;
-
-	void onDisable() override;
-
-	void onRender(RenderEvent& event);
-
-	void defaultConfig() override;
-
-	void settingsRender(float settingsOffset) override;
 
 	void onTimeEvent(TimeEvent& event);
 
 	[[nodiscard]] static std::string formatMCTime(float time, bool military);
+
+protected:
+	std::string getDisplayValue() override;
+
+	void customConfig() override;
+
+	void customSettings() override;
 };

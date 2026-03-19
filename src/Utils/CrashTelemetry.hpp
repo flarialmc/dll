@@ -15,7 +15,10 @@ public:
         const std::stacktrace& trace,
         int signal = 0,
         const std::string& signalName = "",
-        EXCEPTION_POINTERS* exceptionPointers = nullptr
+        EXCEPTION_POINTERS* exceptionPointers = nullptr,
+        const std::string& crashDump = "",
+        const std::string& crashId = "",
+        const std::string& reportId = ""
     );
 
     // Generate system information

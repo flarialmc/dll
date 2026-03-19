@@ -5,6 +5,12 @@
 #include "Client/Render/ScreenView/ScreenView.hpp"
 #include "Client/Network/Packet/Packet.hpp"
 #include "Client/Render/ScreenContext.hpp"
+#include "Client/Render/bgfx/Context.hpp"
+
+// New code should use these context classes directly:
+//   GameContext::instance()
+//   RenderContext::instance()
+// The SDK namespace below is maintained for backward compatibility.
 
 namespace ui {
     enum class TextAlignment {
@@ -57,32 +63,33 @@ struct DrawTextQueueEntry {
     }
 };
 
+// Legacy SDK namespace - maintained for backward compatibility
+// New code should use GameContext and RenderContext instead
 namespace SDK {
+    // Draw text queues
     extern std::vector<DrawTextQueueEntry> drawTextQueue;
     extern std::vector<DrawTextQueueEntry> drawTextQueue2;
-
     extern void pushDrawTextQueueEntry(DrawTextQueueEntry entry);
 
+    // Game state
     extern ClientInstance *clientInstance;
     extern ScreenView *screenView;
     extern ScreenContext* scn;
     extern bool hasInstanced;
     extern std::string currentScreen;
     extern uint64_t serverPing;
+    extern uint64_t lastPing;
 
+    // Utility functions
     bool containsIgnoreCase(const std::string &mainString, const std::string &searchString);
 
+    extern bgfx::Context* getBgfxContext();
     extern int getServerPing();
-
+    extern int getLastPing();
     extern void setCurrentScreen(const std::string &layer);
-
     extern std::string getCurrentScreen();
-
     extern std::string getServerIP();
-
     extern std::string getServerPort();
-
     extern std::shared_ptr<Packet> createPacket(int id);
-
     extern bool isHovered(Vec4<float> box, Vec2<float> mouse);
 }

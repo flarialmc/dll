@@ -33,7 +33,6 @@ void Twerk::onTick(TickEvent& event) {
     if (SDK::clientInstance != nullptr) {
         if (SDK::clientInstance->getLocalPlayer() != nullptr) {
 
-            auto* handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
             auto now = std::chrono::steady_clock::now();
 
             if (!ini) {
@@ -48,9 +47,10 @@ void Twerk::onTick(TickEvent& event) {
                 (shiftCount % 2 == 0 && elapsedTime > getOps<float>("shiftInterval")) ||
                 (shiftCount % 2 != 0 && elapsedTime > getOps<float>("shiftSpeed"))
             ) {
-                handler->sneaking = !handler->sneaking;
-                handler->mInputState.mSneakDown = !handler->mInputState.mSneakDown;
-                handler->mRawInputState.mSneakDown = !handler->mRawInputState.mSneakDown;
+                auto handler = SDK::clientInstance->getLocalPlayer()->getHandler();
+                handler.setSneaking(!handler.getSneaking());
+                handler.setMSneakDown(!handler.mSneakDown());
+                handler.setRawMSneakDown(!handler.mSneakDown());
                 lastShift = now;
                 shiftCount++;
             }

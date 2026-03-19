@@ -3,6 +3,8 @@
 
 #include <Utils/WinrtUtils.hpp>
 
+#include "Utils/PlatformUtils.hpp"
+
 
 void WikiCommand::execute(const std::vector<std::string> &args) {
 
@@ -29,12 +31,14 @@ void WikiCommand::execute(const std::vector<std::string> &args) {
     std::string link = std::format("https://minecraft.wiki/w/{}", item->getname());
 
     if (args[0] == "open") {
-        WinrtUtils::launchURI(link);
+        PlatformUtils::launchURI(link);
+
         addCommandMessage(std::format("Launched the wiki page for <{}>!", item->name));
         return;
     }
     else if (args[0] == "copy") {
-        WinrtUtils::setClipboard(link);
+        PlatformUtils::setClipboard(link);
+
         addCommandMessage(std::format("Copied the wiki link for <{}>!", item->name));
         return;
     }

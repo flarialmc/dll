@@ -4,6 +4,105 @@
 #include <Utils/Logger/Logger.hpp>
 #include <Utils/Memory/Game/SignatureAndOffsetManager.hpp>
 
+void OffsetInit::init260() {
+    Logger::custom(fg(fmt::color::golden_rod), "Offsets", "Loading offsets for 1.26.X");
+
+    ADD_OFFSET("MinecraftGame::gameRenderer", 0xD70);
+    ADD_OFFSET("MinecraftGame::textureGroup", 0x7A8);
+    ADD_OFFSET("ClientInstance::getLevelRenderer", 187);
+    ADD_OFFSET("LevelRender::getLevelRendererPlayer", 0x430);
+    ADD_OFFSET("LevelRendererPlayer::cameraPos", 0x704);
+    ADD_OFFSET("LevelData::worldName", 0x2A8);
+    ADD_OFFSET("CustomRenderComponent::renderer", 0x20);
+    ADD_OFFSET("Block::blockLegacy", 0x60);
+    ADD_OFFSET("BlockLegacy::name", 0xA8);
+    ADD_OFFSET("BlockLegacy::namespace", 0xD0);
+    ADD_OFFSET("BlockLegacy::mMapColor", 0x1B8);
+    ADD_OFFSET("UIControl::children", 0x98);
+    ADD_OFFSET("UIControl::components", 0xB8);
+}
+
+void OffsetInit::init21130() {
+    Logger::custom(fg(fmt::color::golden_rod), "Offsets", "Loading offsets for 1.21.13X");
+    ADD_OFFSET("ClientInstance::guiData", 0x648);
+    ADD_OFFSET("Level::getPlayerMap",  0x4E0);
+    ADD_OFFSET("ClientInstance::getPacketSender", 0x1C8);
+    ADD_OFFSET("ClientInstance::minecraftGame", 0x1A0);
+    ADD_OFFSET("ClientInstance::levelRenderer", 0x1B8);
+    ADD_OFFSET("Dimension::weather", 0x1C0);
+    ADD_OFFSET("ClientInstance::camera", 0x358);
+    ADD_OFFSET("Actor::mAlias", 0x1E8);
+    ADD_OFFSET("MinecraftGame::textureGroup", 0x780);
+    ADD_OFFSET("MinecraftGame::gameRenderer", 0xD30);
+    ADD_OFFSET("MinecraftGame::gameRendererW2S", 0xD38);
+    // Block / item structure offsets — confirmed via IDA RE of international 1.21.13x binary
+    // NOTE: In 1.21.13x "BlockLegacy" is actually BlockType (renamed). Block+0x78 = BlockType* (mBlockType).
+    ADD_OFFSET("Block::blockLegacy", 0x78);              // Block::mBlockType (BlockType*, same object as old BlockLegacy)
+    // BlockType::mDefaultState confirmed at 0x2E0:
+    //   Layout: vtable(8) + mDescriptionId(32) + mComponents(104) + mNameInfo(176) + ... + mBlockPermutations(24@0x2C8) + mDefaultState(8@0x2E0)
+    //   0x2C0 is mCreativeEnumState (uint64) — reading it returns 0xFFFFFFFF for fence gates, NOT a Block*.
+    //   Verified via ItemStack_getLinkedBlockPtr (0x14525BF30): reads *(_QWORD*)(*blockType + 736) where 736 == 0x2E0.
+    ADD_OFFSET("BlockLegacy::mDefaultState", 0x2E0);    // BlockType::mDefaultState -> Block const* (default permutation)
+    ADD_OFFSET("Item::mBlockType", 0x178);              // WeakPtr<BlockType const> — per LeviLamina Item.h layout (0x1D8 was mCameraComponentLegacy)
+
+    // Better Inventory leather armor preview helpers.
+    ADD_OFFSET("ItemRenderer::armorRenderInfo", 0x230);
+    ADD_OFFSET("ArmorRenderInfo::typeIndex", 0x34);
+
+    ADD_OFFSET("MinecraftUIRenderContext::textures", 0x58);
+
+    // ItemRegistry access — direct member offset within Level.
+    // ItemRegistryRef is 16 bytes (std::weak_ptr<ItemRegistry>).
+    // Confirmed offsets: mActorInfoRegistry=0x50, mTrimPatternRegistry=0x110,
+    // mTrimMaterialRegistry=0x120, mItemRegistry=0x198, mBlockTypeRegistry=0x1A8.
+    ADD_OFFSET("Level::mItemRegistry", 0x198);
+    // Offset of mNameToItemMap (unordered_map<HashedString, WeakPtr<Item>>) within ItemRegistry.
+    ADD_OFFSET("ItemRegistry::mNameToItemMap", 0x88);
+    // Offset of mTileItemNameToItemMap within ItemRegistry — maps tile short-names to items.
+    ADD_OFFSET("ItemRegistry::mTileItemNameToItemMap", 0x108);
+
+    // TextureGroup layout changed in 1.21.13x — AsyncCachedTextureLoader grew by 24 bytes,
+    // pushing mLoadedTextures from TextureGroupBase*+0x178 to TextureGroupBase*+0x190.
+    // Binary-confirmed via IDA: getTexture does `add rcx, 0x190` where rcx=TextureGroupBase*.
+    ADD_OFFSET("TextureGroup::loadedTextures", 0x190);
+
+    // AnimationComponent reload mechanism — used by FemaleGenderMod to force
+    // the main player model to pick up modified geometry from skin packets.
+    // Actor::getAnimationComponent() is virtual at vindex 109.
+    // It checks AnimationComponent+0x368 against global mReloadTimeStampClient.
+    ADD_OFFSET("Actor::getAnimationComponent", 109);
+    ADD_OFFSET("AnimationComponent::mLastReloadInitTimeStampClient", 0x368);
+
+    // ContainerScreenController vtable shifted by -2 in 1.21.130
+    ADD_OFFSET("ContainerScreenController::_handlePlaceAll", 54);
+    ADD_OFFSET("ContainerScreenController::_handlePlaceOne", 55);
+
+    // HashedString mActorRendererId — used by the renderer to key into the model cache.
+    // Hash (uint64_t) at +0x1E0, std::string at +0x1E8.
+    ADD_OFFSET("Actor::mActorRendererIdHash", 0x1E0);
+    ADD_OFFSET("Actor::mActorRendererIdStr", 0x1E8);
+
+    // LevelData::mMultiplayerGame — bool field offset within LevelData.
+    // Read by Level::isMultiplayerGame (vtable index 139). True for any server/Realm/LAN,
+    // false for singleplayer. Confirmed via IDA: UI getter reads LevelData+0x47B.
+    ADD_OFFSET("LevelData::isMultiplayerGame", 0x47B);
+}
+
+void OffsetInit::init21120()
+{
+    Logger::custom(fg(fmt::color::golden_rod), "Offsets", "Loading offsets for 1.21.12X");
+    ADD_OFFSET("RaknetConnector::JoinedIp", 0x3F0);
+    ADD_OFFSET("RaknetConnector::RawIp", 0x3D0);
+    ADD_OFFSET("RaknetConnector::port", 0x434);
+    ADD_OFFSET("LevelRender::getLevelRendererPlayer",  0x3F0);
+    ADD_OFFSET("Level::getPlayerMap", 0x4F8);
+    ADD_OFFSET("ClientInstance::getFovX", 0xF80);
+    ADD_OFFSET("ClientInstance::getFovY", 0xF94);
+    ADD_OFFSET("Level::getRuntimeActorList", 315);
+    ADD_OFFSET("ClientInstance::getLevelRenderer", 188);
+    ADD_OFFSET("ClientInstance::levelRenderer", 0x1B8);
+}
+
 void OffsetInit::init21110() {
     Logger::custom(fg(fmt::color::golden_rod), "Offsets", "Loading offsets for 1.21.11X");
     ADD_OFFSET("ChatScreenController::refreshChatMessages", 0xC73);
@@ -16,10 +115,13 @@ void OffsetInit::init21110() {
 	
     ADD_OFFSET("Attribute::Hunger", 1);
     ADD_OFFSET("Attribute::Saturation", 2);
+    ADD_OFFSET("Attribute::PlayerLevel", 4);
+    ADD_OFFSET("Attribute::PlayerExperience", 5);
     ADD_OFFSET("Attribute::Health", 6);
 
-    ADD_OFFSET("Actor::baseTickVft", 29);
+    ADD_OFFSET("Actor::baseTickVft", 25);
     ADD_OFFSET("ContainerScreenController::_handlePlaceAll", 57);
+    ADD_OFFSET("ContainerScreenController::_handlePlaceOne", 58);
     ADD_OFFSET("ClientInstance::camera", 0x288);
     ADD_OFFSET("ClientInstance::guiData", 0x578);
 
@@ -65,6 +167,8 @@ void OffsetInit::init2190() {
     ADD_OFFSET("RaknetConnector::RawIp", 0x3C0);
     ADD_OFFSET("RaknetConnector::port", 0x424);
 
+    ADD_OFFSET("Attribute::PlayerLevel", 5);
+    ADD_OFFSET("Attribute::PlayerExperience", 6);
     ADD_OFFSET("Attribute::Health", 7);
     ADD_OFFSET("ClientInstance::getBlockSource", 30);
     ADD_OFFSET("Level::worldFolderName", 0x250);
@@ -97,6 +201,8 @@ void OffsetInit::init2180() {
     ADD_OFFSET("Player::playerName", 0xC08);
     ADD_OFFSET("Player::playerInventory", 0x5C8);
 
+    ADD_OFFSET("Attribute::PlayerLevel", 4);
+    ADD_OFFSET("Attribute::PlayerExperience", 5);
     ADD_OFFSET("Attribute::Health", 6);
 
     ADD_OFFSET("Level::hitResult", 0x250);
@@ -181,6 +287,7 @@ void OffsetInit::init2150() {
 
     ADD_OFFSET("BlockLegacy::name", 0x98);
     ADD_OFFSET("BlockLegacy::namespace", 0xC0);
+    ADD_OFFSET("BlockLegacy::mMapColor", 0x1A8);
 
     ADD_OFFSET("Player::playerInventory", 0x5D0);
 
@@ -236,7 +343,19 @@ void OffsetInit::init2140() {
 
     ADD_OFFSET("ClientInstance::getPacketSender", 0xF8);
     ADD_OFFSET("NetworkSystem::remoteConnectorComposite", 0x90);
+    // RemoteConnectorComposite layout (computed from LeviLamina headers):
+    //   RemoteConnector base = 0x50 (Connector vtbl+mCallbacks + NEDL vtbl+members + ENORefs vtbl+mControlBlock)
+    //   mUnkc0ba51 = NonOwnerPointer<AppPlatform> (24 bytes) at +0x50
+    //   mUnk48bddd = NetherNetConnector*           (8 bytes)  at +0x68
+    //   mUnk39d08b = RakNetConnector*              (8 bytes)  at +0x70
+    ADD_OFFSET("RemoteConnectorComposite::netherNetConnector", 0x68);
     ADD_OFFSET("RemoteConnectorComposite::rakNetConnector", 0x70);
+    // NetherNetConnector::mPeers layout (computed from LeviLamina headers):
+    //   RemoteConnector base (0x50) + INetherNetTransportInterfaceCallbacks vtbl (0x08)
+    //   + mHttpLibrary(16) + mNetworkID(24) + mTransport(72) + mBroadcastCallbackMutex(80)
+    //   + mBroadcastRequestCallback(64) + mBroadcastResponseCallback(64) + mEventsMutex(80)
+    //   + mEvents(8) = 0x1F0
+    ADD_OFFSET("NetherNetConnector::mPeers", 0x1F0);
 
     ADD_OFFSET("ScreenContext::tessellator", 0xC8);
 
@@ -277,6 +396,10 @@ void OffsetInit::init2130() {
 
     // 48 8B ? ? ? ? ? EB ? 48 8B ? ? ? ? ? FF 15 ? ? ? ? 44 8B ? ? 48 8B
     ADD_OFFSET("ContainerScreenController::_handlePlaceAll", 56);
+    ADD_OFFSET("ContainerScreenController::_handlePlaceOne", 57);
+
+    ADD_OFFSET("Actor::AABBShapeComponent", 0x220);
+    ADD_OFFSET("Actor::StateVectorComponent", 0x350);
 }
 
 void OffsetInit::init2120() {
@@ -314,6 +437,7 @@ void OffsetInit::init2120() {
 
     ADD_OFFSET("BlockLegacy::name", 0x50);
     ADD_OFFSET("BlockLegacy::namespace", 0x78);
+    // TODO: BlockLegacy::mMapColor offset needs verification for 1.21.2X
 }
 
 void OffsetInit::init2100() {
@@ -475,6 +599,8 @@ void OffsetInit::init2040() {
     ADD_OFFSET("AttributeInstance::Value", 0x88);
     ADD_OFFSET("Attribute::Hunger", 2);
     ADD_OFFSET("Attribute::Saturation", 3);
+    ADD_OFFSET("Attribute::PlayerLevel", 5);
+    ADD_OFFSET("Attribute::PlayerExperience", 6);
     ADD_OFFSET("Attribute::Health", 7);
     ADD_OFFSET("RaknetConnector::port", 0x478);
 }
@@ -534,8 +660,9 @@ void OffsetInit::init2030() {
     ADD_OFFSET("MinecraftGame::textureGroup", 0x810);
 
     ADD_OFFSET("Option::optionInformation", 0x8);
-    ADD_OFFSET("Option::value", 0x10);
+    ADD_OFFSET("Option::value", 0x10);  // Dev options (88 bytes) store value at 0x10
     ADD_OFFSET("Option::value1", 0x70);
+    // Note: Full BoolOption (136 bytes) stores value at 0x1E8, but dev options use 0x10
     ADD_OFFSET("OptionInfo::TranslateName", 0x158);
 
     ADD_OFFSET("Item::AtlasTextureFile", 0x8);
@@ -544,6 +671,12 @@ void OffsetInit::init2030() {
 
     ADD_OFFSET("ItemStack::tag", 0x10);
     ADD_OFFSET("ItemStack::count", 0x20);
+
+    // ItemStackBase layout (stable from 1.20.5X+, matching LeviLamina headers)
+    ADD_OFFSET("ItemStack::auxValue", 0x20);
+    ADD_OFFSET("ItemStack::valid", 0x23);    // mValid_DeprecatedSeeComment
+    ADD_OFFSET("ItemStack::showPickUp", 0x24);
+    ADD_OFFSET("ItemStack::pickupTime", 0x28);
 
     ADD_OFFSET("Biome::temperature", 0x40);
 
@@ -624,9 +757,12 @@ void OffsetInit::init2030() {
     ADD_OFFSET("AttributeInstance::Value", 0x84);
     ADD_OFFSET("Attribute::Hunger", 1);
     ADD_OFFSET("Attribute::Saturation", 2);
+    ADD_OFFSET("Attribute::PlayerLevel", 4);
+    ADD_OFFSET("Attribute::PlayerExperience", 5);
     ADD_OFFSET("Attribute::Health", 6);
 
     ADD_OFFSET("BlockSource::getBlock", 2); // might be incorrect, bounds of versions unknown
+    ADD_OFFSET("BlockSource::getChunk", 41); // getChunk(int x, int z) — returns LevelChunk* (null if not loaded)
 
     //ADD_OFFSET("ContainerScreenController::_handlePlaceAll", X);
 

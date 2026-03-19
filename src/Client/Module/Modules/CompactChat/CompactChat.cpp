@@ -4,19 +4,22 @@
 #include "SDK/Client/Render/GuiMessage.hpp"
 #include "Modules/Nick/NickModule.hpp"
 
-void CompactChat::onEnable() {
+void CompactChat::onEnable()
+{
     Listen(this, PacketEvent, &CompactChat::onPacketReceive)
     Listen(this, ChatScreenControllerTickEvent, &CompactChat::onChatScreenControllerTickEvent)
     Module::onEnable();
 }
 
-void CompactChat::onDisable() {
+void CompactChat::onDisable()
+{
     Deafen(this, PacketEvent, &CompactChat::onPacketReceive)
     Deafen(this, ChatScreenControllerTickEvent, &CompactChat::onChatScreenControllerTickEvent)
     Module::onDisable();
 }
 
-void CompactChat::defaultConfig() {
+void CompactChat::defaultConfig()
+{
     Module::defaultConfig("core");
     setDef("format", (std::string)"{msg} {count}");
     setDef("countTextColor", (std::string)"Dark Purple");
@@ -25,25 +28,25 @@ void CompactChat::defaultConfig() {
     setDef("bracketColor", (std::string)"White");
 }
 
-void CompactChat::settingsRender(float settingsOffset) {
-
-
+void CompactChat::settingsRender(float settingsOffset)
+{
     initSettingsPage();
 
     addTextBox("Format", "{msg} for message, {count} for count.", 0, "format");
     addToggle("Show Brackets", "", "showBrackets");
-    addConditionalDropdown(getOps<bool>("showBrackets"), "Bracket Style", "", std::vector<std::string>{
-                    "( )",
-                    "{ }",
-                    "[ ]",
-                    "< >",
-                }, "bracketStyle", true);
+    addConditionalDropdown(getOps<bool>("showBrackets"), "Bracket Style", "",
+                           std::vector<std::string>{
+                               "( )",
+                               "{ }",
+                               "[ ]",
+                               "< >",
+                           }, "bracketStyle", true);
 
     extraPadding();
 
     addHeader("Colors");
 
-    std::vector<std::string> colors = {
+    const std::vector<std::string> colors = {
         "White",
         "Black",
         "Netherite",
@@ -72,61 +75,75 @@ void CompactChat::settingsRender(float settingsOffset) {
     };
 
     addDropdown("Count Text Color", "", colors, "countTextColor", true);
-    addConditionalDropdown(getOps<bool>("showBrackets"), "Bracket Color", "", colors, "bracketColor", true);
+    addConditionalDropdown(getOps<bool>("showBrackets"), "Bracket Color", "", colors,
+                           "bracketColor", true);
 
     FlarialGUI::UnsetScrollView();
 
     resetPadding();
 }
 
-std::string CompactChat::getCountText(int count) {
-
+std::string CompactChat::getCountText(int count)
+{
     auto countCol = NickModule::textColors.find(getOps<std::string>("countTextColor"));
 
-    if (countCol == NickModule::textColors.end()) {
+    if (countCol == NickModule::textColors.end())
+    {
         settings.setValue<std::string>("countTextColor", "Dark Purple");
         countCol = NickModule::textColors.find(getOps<std::string>("countTextColor"));
     }
 
     auto bracketCol = NickModule::textColors.find(getOps<std::string>("bracketColor"));
 
-    if (bracketCol == NickModule::textColors.end()) {
+    if (bracketCol == NickModule::textColors.end())
+    {
         settings.setValue<std::string>("bracketColor", "White");
         bracketCol = NickModule::textColors.find(getOps<std::string>("bracketColor"));
     }
 
-    if (getOps<bool>("showBrackets")) {
-        if (getOps<std::string>("bracketStyle").empty()) settings.setValue<std::string>("bracketStyle", "( )");
-        std::string bracket = getOps<std::string>("bracketStyle");
-        return std::format("§r{}{}§r{}x{}§r{}{}§r", bracketCol->second, bracket[0], countCol->second, count, bracketCol->second, bracket[2]);
+    if (getOps<bool>("showBrackets"))
+    {
+        if (getOps<std::string>("bracketStyle").empty()) settings.setValue<std::string>(
+            "bracketStyle", "( )");
+        auto bracket = getOps<std::string>("bracketStyle");
+        return std::format("§r{}{}§r{}x{}§r{}{}§r", bracketCol->second, bracket[0],
+                           countCol->second, count, bracketCol->second, bracket[2]);
     }
     return std::format("§r{}x{}§r", countCol->second, count);
 }
 
-void CompactChat::replace(std::string& str, std::string from, std::string to) {
-    size_t pos = str.find(from);
-    if (pos != std::string::npos) {
+void CompactChat::replace(std::string& str, std::string from, std::string to)
+{
+    const size_t pos = str.find(from);
+    if (pos != std::string::npos)
+    {
         str.erase(pos, from.length());
         str.insert(pos, to);
     }
 }
 
-void CompactChat::onPacketReceive(PacketEvent& event) {
+void CompactChat::onPacketReceive(PacketEvent& event)
+{
     if (!this->isEnabled()) return;
-    MinecraftPacketIds id = event.getPacket()->getId();
 
-    if (id == MinecraftPacketIds::Text) {
-        auto* pkt = reinterpret_cast<TextPacket*>(event.getPacket());
-        std::vector<GuiMessage>& mesgVec = SDK::clientInstance->getGuiData()->getGuiMessages();
+    if (event.getPacket()->getId() == MinecraftPacketIds::Text)
+    {
+        auto pktOpt = getTextPacket(event.getPacket());
+        if (!pktOpt) return;
+        const auto& pkt = *pktOpt;
+        auto* guiData = SDK::clientInstance->getGuiData();
+        if (!guiData) return;
+        std::vector<GuiMessage>& mesgVec = guiData->getGuiMessages();
 
         if (mesgVec.empty()) return;
 
         if (mesg.empty()) mesg = mesgVec.back().fullMsg;
 
-        if (pkt->message == mesgVec.back().msg) {
+        if (pkt.message == mesgVec.back().msg)
+        {
             count += 1;
 
-            std::string format = getOps<std::string>("format");
+            auto format = getOps<std::string>("format");
 
             replace(format, "{msg}", mesg);
             replace(format, "{count}", getCountText(count));
@@ -136,16 +153,18 @@ void CompactChat::onPacketReceive(PacketEvent& event) {
             refreshChat = true;
             event.cancel();
         }
-        else {
+        else
+        {
             count = 1;
             mesg = "";
         }
-
     }
 }
 
-void CompactChat::onChatScreenControllerTickEvent(ChatScreenControllerTickEvent& event) {
-    if (refreshChat) {
+void CompactChat::onChatScreenControllerTickEvent(ChatScreenControllerTickEvent& event)
+{
+    if (refreshChat)
+    {
         event.getChatScreenController()->refreshChatMessages = true;
         refreshChat = false;
     }

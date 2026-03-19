@@ -36,6 +36,24 @@ void ContainerScreenController::_handlePlaceAll(std::string collectionName, int3
     return Memory::CallVFuncI<void, std::string, int32_t>(off, this, collectionName, slot);
 }
 
+void ContainerScreenController::_handlePlaceOne(std::string collectionName, int32_t slot) {
+    static int off = GET_OFFSET("ContainerScreenController::_handlePlaceOne");
+    return Memory::CallVFuncI<void, std::string, int32_t>(off, this, collectionName, slot);
+}
+
+void ContainerScreenController::_handleAutoPlace(int32_t amount, std::string collectionName, int32_t slot) {
+    using func = void(__fastcall*)(ContainerScreenController*, int32_t, std::string, int32_t);
+    // Sig has 3 prefix bytes (49 8B F8) before the E8, so rel32 starts at offset 4
+    static auto fn = reinterpret_cast<func>(Memory::offsetFromSig(GET_SIG_ADDRESS("ContainerScreenController::_handleAutoPlace"), 4));
+    return fn(this, amount, collectionName, slot);
+}
+
+bool ContainerScreenController::_isCursorSelectedActive() {
+    using func = bool(__fastcall*)(ContainerScreenController*);
+    static auto fn = reinterpret_cast<func>(Memory::offsetFromSig(GET_SIG_ADDRESS("ContainerScreenController::_isCursorSelectedActive"), 1));
+    return fn(this);
+}
+
 void ContainerScreenController::_handleTakeAll(std::string collectionName, int32_t slot) {
     using func = void(__fastcall*)(ContainerScreenController *, std::string, int32_t);
     static auto handlePlaceAll = reinterpret_cast<func>(Memory::offsetFromSig(GET_SIG_ADDRESS("ContainerScreenController::_handleTakeAll"), 1));

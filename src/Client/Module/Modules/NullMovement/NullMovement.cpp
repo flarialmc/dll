@@ -1,9 +1,6 @@
 #include "NullMovement.hpp"
 
 
-#include "Hook/Hooks/Input/KeyHook.hpp"
-
-
 void NullMovement::onEnable()
 {
     parser.parseOptionsFile();
@@ -56,52 +53,50 @@ void NullMovement::onTick(TickEvent& event)
         SDK::getCurrentScreen() == "zoom_screen" ||
         SDK::getCurrentScreen() == "f3_screen"
         )) {
-        auto* handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
-        if (handler != nullptr) {
-            if (!movementKeyStack.empty()) {
-                int lastKey = movementKeyStack.back();
-                
-                if (getOps<bool>("vertical")) {
-                    if (lastKey == forwardKey) {
-                        handler->mInputState.forward = true;
-                        handler->mRawInputState.forward = true;
-                        handler->mInputState.backward = false;
-                        handler->mRawInputState.backward = false;
-                    } else if (lastKey == backwardKey) {
-                        handler->mInputState.forward = false;
-                        handler->mRawInputState.forward = false;
-                        handler->mInputState.backward = true;
-                        handler->mRawInputState.backward = true;
-                    }
+        auto handler = SDK::clientInstance->getLocalPlayer()->getHandler();
+        if (!movementKeyStack.empty()) {
+            int lastKey = movementKeyStack.back();
+
+            if (getOps<bool>("vertical")) {
+                if (lastKey == forwardKey) {
+                    handler.setForward(true);
+                    handler.setRawForward(true);
+                    handler.setBackward(false);
+                    handler.setRawBackward(false);
+                } else if (lastKey == backwardKey) {
+                    handler.setForward(false);
+                    handler.setRawForward(false);
+                    handler.setBackward(true);
+                    handler.setRawBackward(true);
                 }
-                
-                if (getOps<bool>("horizontal")) {
-                    if (lastKey == leftKey) {
-                        handler->mInputState.left = true;
-                        handler->mRawInputState.left = true;
-                        handler->mInputState.right = false;
-                        handler->mRawInputState.right = false;
-                    } else if (lastKey == rightKey) {
-                        handler->mInputState.left = false;
-                        handler->mRawInputState.left = false;
-                        handler->mInputState.right = true;
-                        handler->mRawInputState.right = true;
-                    }
+            }
+
+            if (getOps<bool>("horizontal")) {
+                if (lastKey == leftKey) {
+                    handler.setLeft(true);
+                    handler.setRawLeft(true);
+                    handler.setRight(false);
+                    handler.setRawRight(false);
+                } else if (lastKey == rightKey) {
+                    handler.setLeft(false);
+                    handler.setRawLeft(false);
+                    handler.setRight(true);
+                    handler.setRawRight(true);
                 }
-            } else {
-                if (getOps<bool>("vertical")) {
-                    handler->mInputState.forward = false;
-                    handler->mRawInputState.forward = false;
-                    handler->mInputState.backward = false;
-                    handler->mRawInputState.backward = false;
-                }
-                
-                if (getOps<bool>("horizontal")) {
-                    handler->mInputState.left = false;
-                    handler->mRawInputState.left = false;
-                    handler->mInputState.right = false;
-                    handler->mRawInputState.right = false;
-                }
+            }
+        } else {
+            if (getOps<bool>("vertical")) {
+                handler.setForward(false);
+                handler.setRawForward(false);
+                handler.setBackward(false);
+                handler.setRawBackward(false);
+            }
+
+            if (getOps<bool>("horizontal")) {
+                handler.setLeft(false);
+                handler.setRawLeft(false);
+                handler.setRight(false);
+                handler.setRawRight(false);
             }
         }
     }

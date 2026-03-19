@@ -20,7 +20,7 @@ void BlockHit::onItemInHandRender(RenderItemInHandEvent &event) {
     auto& matrix = SDK::clientInstance->getCamera().getWorldMatrixStack().top().matrix;
     auto itemStack = event.itemStack;
 
-    if (itemStack->item.get() != nullptr && MC::heldRight && itemStack->getItem()->name.contains("sword")) {
+    if (itemStack->mItem.get() != nullptr && MC::heldRight && itemStack->getItem()->name.contains("sword")) {
 
         switch (perspective) {
             case Perspective::FirstPerson:

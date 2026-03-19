@@ -208,8 +208,10 @@ struct UnifiedMobEffectData {
     MobEffect::EffectType id;
     int duration;
     int amplifier;
+    bool noCounter;
 
-    UnifiedMobEffectData(MobEffect::EffectType id, int duration, int amplifier) : id(id), duration(duration), amplifier(amplifier) {
+    UnifiedMobEffectData(MobEffect::EffectType id, int duration, int amplifier, bool noCounter = false)
+        : id(id), duration(duration), amplifier(amplifier), noCounter(noCounter) {
     }
 
     [[nodiscard]] bool isValid() const {
@@ -228,11 +230,16 @@ struct UnifiedMobEffectData {
         return getName() + MobEffect::amplifierToString(getAmplifier()) + "\n" + getTime();
     }
 
-    [[nodiscard]] std::string getTime() const {
-        const int &totalSeconds = duration / 20;
+    [[nodiscard]] bool isInfinite() const {
+        return noCounter || duration <= 0;
+    }
 
-        const int &minutes = totalSeconds / 60;
-        const int &seconds = totalSeconds % 60;
+    [[nodiscard]] std::string getTime() const {
+        if (isInfinite()) return "\u221E"; // ∞
+
+        const int totalSeconds = duration / 20;
+        const int minutes = totalSeconds / 60;
+        const int seconds = totalSeconds % 60;
 
         return std::format("{}:{:02}", minutes, seconds);
     }
@@ -274,13 +281,13 @@ public:
         if (VersionUtils::checkAboveOrEqual(21, 30)) {
             auto &_effects = hat::member_at<std::vector<MobEffectInstance1_21_30> >(this, 0x0);
             for (auto &effect: _effects) {
-                unifiedEffects.emplace_back(effect.id, effect.duration, effect.amplifier);
+                unifiedEffects.emplace_back(effect.id, effect.duration, effect.amplifier, effect.noCounter);
             }
         } else {
             auto &_effects = hat::member_at<std::vector<MobEffectInstance1_21_20> >(this, 0x0);
 
             for (auto &effect: _effects) {
-                unifiedEffects.emplace_back(effect.id, effect.duration, effect.amplifier);
+                unifiedEffects.emplace_back(effect.id, effect.duration, effect.amplifier, effect.noCounter);
             }
         }
         return unifiedEffects;

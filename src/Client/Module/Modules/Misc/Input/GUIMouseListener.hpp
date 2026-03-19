@@ -95,24 +95,26 @@ public:
         auto limiterMod = ModuleManager::getModule("CPS Limiter");
         //if (!limiterMod) return;
 
-        GUIMouseListener::leftLimiter.setRate(limiterMod->getOps<int>("Left"));
-        GUIMouseListener::rightLimiter.setRate(limiterMod->getOps<int>("Right"));
+        if (SDK::getCurrentScreen() == "hud_screen" || SDK::getCurrentScreen() == "f3_screen" || SDK::getCurrentScreen() == "zoom_screen") {
+            GUIMouseListener::leftLimiter.setRate(limiterMod->getOps<int>("Left"));
+            GUIMouseListener::rightLimiter.setRate(limiterMod->getOps<int>("Right"));
 
-        using MB = MouseButton;
+            using MB = MouseButton;
 
-        if (event.getButton() == MB::Left && MC::held) {
-            if (!GUIMouseListener::leftLimiter.allow() && limiterMod->getOps<bool>("enabled")) {
-                event.cancel();
-                return;
+            if (event.getButton() == MB::Left && MC::held) {
+                if (!GUIMouseListener::leftLimiter.allow() && limiterMod->getOps<bool>("enabled")) {
+                    event.cancel();
+                    return;
+                }
+                GUIMouseListener::AddLeftClick();
             }
-            GUIMouseListener::AddLeftClick();
-        }
-        else if (event.getButton() == MB::Right && MC::held) {
-            if (!GUIMouseListener::rightLimiter.allow() && limiterMod->getOps<bool>("enabled")) {
-                event.cancel();
-                return;
+            else if (event.getButton() == MB::Right && MC::held) {
+                if (!GUIMouseListener::rightLimiter.allow() && limiterMod->getOps<bool>("enabled")) {
+                    event.cancel();
+                    return;
+                }
+                GUIMouseListener::AddRightClick();
             }
-            GUIMouseListener::AddRightClick();
         }
     }
 

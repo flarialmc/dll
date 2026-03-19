@@ -6,6 +6,8 @@
 #include "SDK/Client/Network/Packet/TextPacket.hpp"
 #include "Utils/APIUtils.hpp"
 #include "Utils/WinrtUtils.hpp"
+#include "Utils/PlatformUtils.hpp"
+#include <atomic>
 #include <chrono>
 #include <algorithm>
 #include <Modules/Misc/Input/GUIMouseListener.hpp>
@@ -30,6 +32,12 @@ struct ScrollInfo {
 class ClickGUI : public Module {
 private:
     bool grab = false;
+    std::atomic<bool> pendingClose = false;
+    std::string pendingSearchString;
+    bool pendingGrabMouse = false;
+    bool pendingSaveScrollPos = false;
+    float pendingSavedAccumPos = 0;
+    float pendingSavedAccumBarPos = 0;
     float baseHeightReal = 0.f;
     float realBlurAmount = 0.00001f;
     float radioPushAmount1 = 0.0000001f;
@@ -67,12 +75,14 @@ public:
         {"Dev", "§b"},
         {"Staff", "§f"},
         {"Gamer", "§u"},
+        {"Media", "§a"},
         {"Booster", "§d"},
         {"Supporter", "§5"},
         {"Regular", "§4"}
     });
 
     static inline D2D_COLOR_F getColor(const std::string &text);
+    static D2D_COLOR_F getFormatColor(const std::string& colorName);
 
 private:
     template<typename WordContainer>
@@ -84,6 +94,7 @@ private:
 
 public:
     void onPacketReceive(PacketEvent &event);
+    void onDrawText(DrawTextEvent &event);
 
     ClickGUI();
 
@@ -163,6 +174,19 @@ public:
         setDef("enabledRadioButton", (std::string) "D0A0A8", 1.0f, false);
         setDef("disabledRadioButton", (std::string) "FFFFFF", 1.0f, false);
         setDef("_overrideAlphaValues_", 1.f);
+
+        // Format tag colors for HUD labels (used with {red}, {green}, etc. in label text)
+        setDef("formatColor_red", (std::string) "ff0000", 1.0f, false);
+        setDef("formatColor_green", (std::string) "00ff00", 1.0f, false);
+        setDef("formatColor_blue", (std::string) "0000ff", 1.0f, false);
+        setDef("formatColor_yellow", (std::string) "ffff00", 1.0f, false);
+        setDef("formatColor_orange", (std::string) "ffaa00", 1.0f, false);
+        setDef("formatColor_purple", (std::string) "aa55ff", 1.0f, false);
+        setDef("formatColor_pink", (std::string) "ff55ff", 1.0f, false);
+        setDef("formatColor_cyan", (std::string) "55ffff", 1.0f, false);
+        setDef("formatColor_white", (std::string) "ffffff", 1.0f, false);
+        setDef("formatColor_black", (std::string) "000000", 1.0f, false);
+        setDef("formatColor_gray", (std::string) "aaaaaa", 1.0f, false);
     }
 
     void settingsRender(float settingsOffset) override {
@@ -214,11 +238,49 @@ public:
         addColorPicker("Modcard 4", "Inner color of module settings icon", "modcard4");
         addColorPicker("Modcard Icon", "Color of the mod's icon", "modicon");
         addColorPicker("Setting Icon Color", "Color of the mod's settings icon", "modsettings");
+
+        addHeader("Format Tag Colors");
+        addElementText("Use {color} tags in HUD label text formats.", "Example: {red}Hello {reset}world!");
+        extraPadding();
+        addElementText("You can also use hex colors, for example: {#ff00ff}.", "Use {reset} to return to the module's text color.");
+        extraPadding();
+        addColorPicker("Red", "Color for {red} tag", "formatColor_red");
+        addColorPicker("Green", "Color for {green} tag", "formatColor_green");
+        addColorPicker("Blue", "Color for {blue} tag", "formatColor_blue");
+        addColorPicker("Yellow", "Color for {yellow} tag", "formatColor_yellow");
+        addColorPicker("Orange", "Color for {orange} tag", "formatColor_orange");
+        addColorPicker("Purple", "Color for {purple} tag", "formatColor_purple");
+        addColorPicker("Pink", "Color for {pink} tag", "formatColor_pink");
+        addColorPicker("Cyan", "Color for {cyan} tag", "formatColor_cyan");
+        addColorPicker("White", "Color for {white} tag", "formatColor_white");
+        addColorPicker("Black", "Color for {black} tag", "formatColor_black");
+        addColorPicker("Gray", "Color for {gray} tag", "formatColor_gray");
+
         FlarialGUI::UnsetScrollView();
         this->resetPadding();
     }
 
     static inline bool editmenu = false;
+    // True when the main ClickGUI menu or edit menu is open.
+    // Mirrors this->active but accessible statically from hooks.
+    static inline bool menuOpen = false;
+    // True when the ClickGUI background blur is visually active.
+    // HUD modules check this to skip rendering so they don't draw
+    // crisp on top of the blur (creating a half-blurred, half-sharp look).
+    static inline bool blurActive = false;
+    // Opacity for HUD elements during blur transitions (1.0 = fully visible, 0.0 = hidden).
+    // Fades inversely with the blur amount so HUD elements smoothly disappear.
+    static inline float hudOpacity = 1.0f;
+
+    // RAII guard that applies hudOpacity to all ImGui vertices drawn during its lifetime.
+    // Place after the blurActive early-return check in any HUD render function.
+    struct HudFadeGuard {
+        int vtxStart;
+        HudFadeGuard();
+        ~HudFadeGuard();
+        HudFadeGuard(const HudFadeGuard&) = delete;
+        HudFadeGuard& operator=(const HudFadeGuard&) = delete;
+    };
 
     static std::pair<float, float>
     centerChildRectangle(float parentWidth, float parentHeight, float childWidth, float childHeight) {
@@ -252,7 +314,8 @@ public:
         // #if !defined(__DEBUG__)
         if (SDK::getCurrentScreen() != "zoom_screen" &&
             SDK::getCurrentScreen() != "f3_screen" &&
-            SDK::getCurrentScreen() != "hud_screen"
+            SDK::getCurrentScreen() != "hud_screen" &&
+            SDK::getCurrentScreen() != "pause_screen"
 #if defined(__DEBUG__)
             && SDK::getServerIP() != "none"
 #endif
@@ -263,11 +326,22 @@ public:
         else if (event.getKey() == VK_CONTROL && event.getAction() == ActionType::Released) MC::holdingCTRL = false;
 
         if (this->isKeybind(event.keys) && this->isKeyPartOfKeybind(event.key) && event.getAction() == ActionType::Pressed) {
+            bool wasActive = this->active;
 #if !defined(__DEBUG__)
             if (SDK::getCurrentScreen() != "hud_screen" && SDK::getCurrentScreen() != "pause_screen" && SDK::getCurrentScreen() != "f3_screen" && SDK::getCurrentScreen() != "zoom_screen") {
                 WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType::Arrow);
-                this->active = false;
-                SDK::clientInstance->releaseMouse();
+                // Immediately hide cursor + set inactive, defer state cleanup to render thread
+                if (wasActive) {
+                    this->active = false;
+                    menuOpen = false;
+                    SDK::clientInstance->grabMouse(10);
+                    pendingGrabMouse = false;
+                    pendingSaveScrollPos = false;
+                    pendingSearchString = searchBarString;
+                    pendingClose = true;
+                } else {
+                    SDK::clientInstance->releaseMouse();
+                }
             } else {
 #endif
                 if (!editmenu) {
@@ -277,14 +351,38 @@ public:
                         Deafen(this, PacketEvent, &ClickGUI::onPacketReceive);
                     }
                     ModuleManager::cguiRefresh = true;
-                    keybindActions[0]({});
+                    if (wasActive) {
+                        // Immediately hide cursor + set inactive, defer state cleanup to render thread
+                        this->active = false;
+                        menuOpen = false;
+                        SDK::clientInstance->grabMouse(10);
+                        pendingGrabMouse = false;
+                        pendingSaveScrollPos = Client::settings.getSettingByName<bool>("saveScrollPos")->value;
+                        if (pendingSaveScrollPos) {
+                            pendingSavedAccumPos = accumilatedPos;
+                            pendingSavedAccumBarPos = accumilatedBarPos;
+                        }
+                        pendingSearchString = searchBarString;
+                        pendingClose = true;
+
+                        Client::SaveSettings();
+                        Client::SavePrivate();
+                    } else {
+                        // Opening - safe to toggle directly
+                        keybindActions[0]({});
+                    }
                 }
 #if !defined(__DEBUG__)
             }
 #endif
 
-
-            if (this->active) {
+            if (!wasActive && this->active) {
+                // Just opened — release any held mouse buttons so in-game
+                // clicks don't bleed into the GUI.
+                menuOpen = true;
+                MC::held = false;
+                MC::heldLeft = false;
+                MC::heldRight = false;
                 MC::lastMouseScroll = MouseAction::Release;
                 accumilatedPos = 0;
                 accumilatedBarPos = 0;
@@ -295,50 +393,42 @@ public:
 
                 page.type = "normal";
                 curr = "modules";
-            } else {
-                SDK::clientInstance->grabMouse(10);
-# if defined(__DEBUG__)
-                SDK::clientInstance->releaseMouse();
-# endif
-
-                if (Client::settings.getSettingByName<bool>("saveScrollPos")->value) {
-                    saved_acumilatedPos = accumilatedPos;
-                    saved_acumilatedBarPos = accumilatedBarPos;
-                }
-
-                FlarialGUI::ResetShit();
-                Client::SaveSettings();
-                Client::SavePrivate();
             }
         }
 
         // if clicked esc
         if ((event.getKey() == VK_ESCAPE && event.getAction() == ActionType::Released)) {
             if (!editmenu) {
-                if (this->active) {
-                    // exit ClickGUI
-                    //WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType::Arrow);
-                    if (
-                        SDK::getCurrentScreen() == "hud_screen" ||
-                        SDK::getCurrentScreen() == "f3_screen" ||
-                        SDK::getCurrentScreen() == "zoom_screen"
-                    )
-                        SDK::clientInstance->grabMouse(10); // let mouse control the view
-# if defined(__DEBUG__)
-                    SDK::clientInstance->releaseMouse();
-# endif
-
-                    MC::lastMouseScroll = MouseAction::Release;
-                    this->active = false;
-                    page.type = "normal";
-                    curr = "modules";
-
-                    if (Client::settings.getSettingByName<bool>("saveScrollPos")->value) {
-                        saved_acumilatedPos = accumilatedPos;
-                        saved_acumilatedBarPos = accumilatedBarPos;
+                // If color picker windows are open, close them instead of the whole GUI
+                // This prevents a crash from ResetUIState() modifying shared state
+                // while the render thread is still using it
+                if (this->active && FlarialGUI::activeColorPickerWindows > 0) {
+                    for (auto& [key, cp] : FlarialGUI::ColorPickers) {
+                        if (cp.isActive) {
+                            cp.isActive = false;
+                        }
                     }
+                    FlarialGUI::activeColorPickerWindows = 0;
+                    return;
+                }
+                if (this->active) {
+                    // Immediately hide cursor + set inactive, defer state cleanup to render thread
+                    this->active = false;
+                    menuOpen = false;
+                    if (SDK::getCurrentScreen() == "hud_screen" ||
+                        SDK::getCurrentScreen() == "f3_screen" ||
+                        SDK::getCurrentScreen() == "zoom_screen") {
+                        SDK::clientInstance->grabMouse(10);
+                    }
+                    pendingGrabMouse = false;
+                    pendingSaveScrollPos = Client::settings.getSettingByName<bool>("saveScrollPos")->value;
+                    if (pendingSaveScrollPos) {
+                        pendingSavedAccumPos = accumilatedPos;
+                        pendingSavedAccumBarPos = accumilatedBarPos;
+                    }
+                    pendingSearchString = searchBarString;
+                    pendingClose = true;
 
-                    FlarialGUI::ResetShit();
                     Client::SaveSettings();
                     Client::SavePrivate();
                 }
@@ -348,10 +438,11 @@ public:
                 MC::lastMouseScroll = MouseAction::Release;
                 editmenu = false;
                 this->active = true;
+                menuOpen = true;
             }
         }
 
-        if (this->active) {
+        if (this->active && !pendingClose.load()) {
             SDK::clientInstance->releaseMouse(); // release mouse lets cursor move
 
             // Check if any textbox is active to prevent Edit Menu from opening when typing
@@ -380,14 +471,14 @@ public:
                 };
             }
 
-            if (((!anyTextBoxActive && curr == "settings") || curr == "modules") && FlarialGUI::TextBoxes[0].text.empty() && isKeyPartOfAdditionalKeybind(event.key, this->settings.getSettingByName<std::string>("editmenubind")->value)) {
-                FlarialGUI::TextBoxes[0].isActive = false;
+            if (((!anyTextBoxActive && curr == "settings") || curr == "modules") && !FlarialGUI::TextBoxes[0].isActive && isKeyPartOfAdditionalKeybind(event.key, this->settings.getSettingByName<std::string>("editmenubind")->value)) {
                 event.setKey(MouseButton::None);
                 event.setAction(MouseAction::Release);
                 if (!editmenu) {
                     MC::lastMouseScroll = MouseAction::Release;
                     WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType::Arrow);
                     this->active = false;
+                    menuOpen = false;
                     FlarialGUI::Notify("Right click a module to directly go to their settings page.");
                     FlarialGUI::Notify("To disable this menu press ESC or " +
                                        getOps<std::string>("editmenubind"));
@@ -404,37 +495,101 @@ public:
             MC::lastMouseScroll = MouseAction::Release;
             editmenu = false;
             this->active = true;
+            menuOpen = true;
         }
 
-        if (this->active || editmenu && SDK::getCurrentScreen() == "hud_screen") SDK::clientInstance->releaseMouse(); // release mouse lets cursor move
+        if ((this->active && !pendingClose.load()) || editmenu && SDK::getCurrentScreen() == "hud_screen") SDK::clientInstance->releaseMouse(); // release mouse lets cursor move
 
         if (this->active || editmenu) event.cancel(); // do not pass key event to the game
     }
 
-    void onSetupAndRender(SetupAndRenderEvent &event) const {
-        if (this->active || editmenu) SDK::clientInstance->releaseMouse();
+    static inline bool gdkCursorReleased = false;
+
+    static HCURSOR getGdkCursorFromType(winrt::Windows::UI::Core::CoreCursorType type) {
+        using namespace winrt::Windows::UI::Core;
+        switch (type) {
+            case CoreCursorType::Hand: return LoadCursor(nullptr, IDC_HAND);
+            case CoreCursorType::IBeam: return LoadCursor(nullptr, IDC_IBEAM);
+            case CoreCursorType::SizeWestEast: return LoadCursor(nullptr, IDC_SIZEWE);
+            case CoreCursorType::SizeNorthSouth: return LoadCursor(nullptr, IDC_SIZENS);
+            case CoreCursorType::SizeAll: return LoadCursor(nullptr, IDC_SIZEALL);
+            case CoreCursorType::UniversalNo: return LoadCursor(nullptr, IDC_NO);
+            case CoreCursorType::Wait: return LoadCursor(nullptr, IDC_WAIT);
+            case CoreCursorType::Cross: return LoadCursor(nullptr, IDC_CROSS);
+            default: return LoadCursor(nullptr, IDC_ARROW);
+        }
+    }
+
+    void onSetupAndRender(SetupAndRenderEvent &event) {
+        if ((this->active && !pendingClose.load()) || editmenu) {
+            if (PlatformUtils::isGDK()) {
+                // On GDK, release mouse once
+                if (!gdkCursorReleased) {
+                    SDK::clientInstance->releaseMouse();
+                    gdkCursorReleased = true;
+                }
+                // Keep cursor unclipped each frame
+                ClipCursor(nullptr);
+                // Force cursor visible each frame (game may hide it)
+                while (ShowCursor(TRUE) < 0);
+                // Set cursor based on what the GUI requested
+                SetCursor(getGdkCursorFromType(WinrtUtils::currentCursorType));
+            } else {
+                SDK::clientInstance->releaseMouse();
+            }
+
+            // Clear movement inputs when menu is open to prevent player movement
+            if (SDK::clientInstance && SDK::clientInstance->getLocalPlayer()) {
+                auto handler = SDK::clientInstance->getLocalPlayer()->getHandler();
+                handler.setForward(false);
+                handler.setRawForward(false);
+                handler.setBackward(false);
+                handler.setRawBackward(false);
+                handler.setLeft(false);
+                handler.setRawLeft(false);
+                handler.setRight(false);
+                handler.setRawRight(false);
+            }
+        } else if (PlatformUtils::isGDK()) {
+            gdkCursorReleased = false;
+        }
     }
 
     void onMouse(MouseEvent &event) {
-        GUIMouseListener::handleMouse(event);
-        /*if (event.getMouseX() != 0) MC::mousePos.x = event.getMouseX();
-        if (event.getMouseX() != 0) MC::mousePos.y = event.getMouseY();
-        MC::mouseButton = event.getButton();
-        MC::mouseAction = event.getAction();
+        // On GDK platform, get mouse position directly from the window
+        if (PlatformUtils::isGDK() && (this->active || editmenu)) {
+            if (Client::window) {
+                POINT cursorPos;
+                if (GetCursorPos(&cursorPos)) {
+                    if (ScreenToClient(Client::window, &cursorPos)) {
+                        MC::mousePos.x = static_cast<float>(cursorPos.x);
+                        MC::mousePos.y = static_cast<float>(cursorPos.y);
+                    }
+                }
+            }
+            // Still process button state and other event data
+            MC::mouseButton = event.getButton();
+            MC::mouseAction = event.getAction();
+            if (event.getButton() != MouseButton::None) MC::lastMouseButton = event.getButton();
 
-        if (event.getButton() != MouseButton::None && event.getAction() == MouseAction::Press) {
-            MC::held = true;
-            if (event.getButton() == MouseButton::Left) MC::heldLeft = true;
-            if (event.getButton() == MouseButton::Right) MC::heldRight = true;
+            if (event.getButton() != MouseButton::None && event.getAction() == MouseAction::Press) {
+                MC::held = true;
+                if (event.getButton() == MouseButton::Left) MC::heldLeft = true;
+                if (event.getButton() == MouseButton::Right) MC::heldRight = true;
+            }
+            if (event.getButton() != MouseButton::None && event.getAction() == MouseAction::Release) {
+                MC::held = false;
+                if (event.getButton() == MouseButton::Left) MC::heldLeft = false;
+                if (event.getButton() == MouseButton::Right) MC::heldRight = false;
+            }
+        } else {
+            // Use standard event-based mouse handling for UWP/other platforms
+            GUIMouseListener::handleMouse(event);
         }
-        if (event.getButton() != MouseButton::None && event.getAction() == MouseAction::Release) {
-            MC::held = false;
-            if (event.getButton() == MouseButton::Left) MC::heldLeft = false;
-            if (event.getButton() == MouseButton::Right) MC::heldRight = false;
-        }
-        if (event.getButton() != MouseButton::None) MC::lastMouseButton = event.getButton();*/
 
         if (event.getButton() == MouseButton::Scroll) {
+            int scrollActionValue = static_cast<int>(event.getAction());
+
             if (editmenu == true) {
                 if (!MC::scrollId) MC::scrollId = -1;
                 MC::lastScrollId = MC::scrollId;
@@ -444,8 +599,6 @@ public:
             } else {
                 MC::lastMouseScroll = MouseAction::Release;
             }
-
-            int scrollActionValue = static_cast<int>(event.getAction());
 
             if (scrollActionValue == static_cast<int>(MouseAction::ScrollUp)) {
                 accumilatedPos += FlarialGUI::scrollposmodifier;
@@ -465,7 +618,7 @@ public:
 
 #if !defined(__DEBUG__)
         if (SDK::getCurrentScreen() != "hud_screen" && SDK::getCurrentScreen() != "pause_screen" && SDK::getCurrentScreen() != "f3_screen" && SDK::getCurrentScreen() != "zoom_screen") {
-            if (this->active) this->active = false;
+            if (this->active) { this->active = false; menuOpen = false; }
         }
 #endif
 

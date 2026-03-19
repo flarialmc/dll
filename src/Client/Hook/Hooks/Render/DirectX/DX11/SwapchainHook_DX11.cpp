@@ -93,10 +93,22 @@ void SwapchainHook::DX11Init() {
 
     Blur::InitializePipeline();
     DepthOfFieldHelper::InitializePipeline();
-    if (!MotionBlur::initted)
-    MotionBlur::initted = AvgPixelMotionBlurHelper::Initialize() && RealMotionBlurHelper::Initialize();
+    if (!MotionBlur::initted) {
+        bool avgInit = AvgPixelMotionBlurHelper::Initialize();
+        bool realInit = RealMotionBlurHelper::Initialize();
+        MotionBlur::initted = avgInit && realInit;
+        Logger::debug("[MotionBlur] Initialized: avgPixel={}, real={}, initted={}", avgInit, realInit, MotionBlur::initted);
+    }
 
     SaveBackbuffer();
+
+    // If we came from a DX12 fallback (Better Frames), we need to re-hook the DX11 functions
+    // because the initial enableHook() was called when isDX12 was true
+    extern bool dx11FallbackComplete;
+    if (dx11FallbackComplete) {
+        UnderUIHooks::rehookForDX11();
+    }
+
     init = true;
 }
 
@@ -129,15 +141,22 @@ void SwapchainHook::_DX11Render()
 
     D2D::context->BeginDraw();
 
-    ImGui_ImplDX11_NewFrame();
-    ImGui_ImplWin32_NewFrame();
-    ImGui::NewFrame();
+    {
+        std::lock_guard<std::mutex> lock(SwapchainHook::imguiInputMutex);
+        ImGui_ImplDX11_NewFrame();
+        ImGui_ImplWin32_NewFrame();
+        ImGui::NewFrame();
+    }
 
     ImGui::Begin("t", nullptr,
         ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
         ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground |
         ImGuiWindowFlags_NoDecoration);
 
+
+    // Process any pending module toggles before dispatching events
+    // This avoids deadlock when modules are toggled from within event callbacks
+    ModuleManager::processPendingToggles();
 
     auto event = nes::make_holder<RenderEvent>();
     event->RTV = cachedDX11RTV.get();
@@ -188,7 +207,7 @@ void SwapchainHook::_DX11RenderUnderUI()
 
     winrt::com_ptr<ID3D11Texture2D> backBuffer;
     if (FAILED(swapchain->GetBuffer(0, IID_PPV_ARGS(backBuffer.put())))) {
-        return;
+         return;/
     }
 
     D3D11_TEXTURE2D_DESC desc;

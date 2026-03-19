@@ -225,7 +225,7 @@ namespace persona {
     class ArmSize {
     public:
         // ArmSize inner types define
-        enum class Type : uint64_t {
+        enum class Type : uint8_t {
             Slim = 0,
             Wide = 1,
             Count = 2,
@@ -247,18 +247,32 @@ enum class TrustedSkinFlag : signed char {
 
 class PlayerSkin {
 public:
-    std::string mId; // this+0x0
-    std::string mPlayFabId; // this+0x20
-    std::string mFullId; // this+0x40
-    std::string mResourcePatch; // this+0x60
-    std::string mDefaultGeometryName; // this+0x80
-    Image mSkinImage; // this+0xA0
-    Image mCapeImage; // this+0xD0
+    std::string mId;                      // this+0x00
+    std::string mPlayFabId;               // this+0x20
+    std::string mFullId;                  // this+0x40
+    std::string mResourcePatch;           // this+0x60
+    std::string mDefaultGeometryName;     // this+0x80
+    Image mSkinImage;                     // this+0xA0
+    Image mCapeImage;                     // this+0xD0
 
-    std::vector<AnimatedImageData> mSkinAnimatedImages;
-    MinecraftJson::Value mGeometryData;
-    void* mGeometryDataMinEngineVersion;
-    MinecraftJson::Value mGeometryDataMutable;
+    std::vector<AnimatedImageData> mSkinAnimatedImages; // this+0x100
+    MinecraftJson::Value mGeometryData;                 // this+0x118
+    MinEngineVersion mGeometryDataMinEngineVersion;     // this+0x128 (32 bytes, not void*!)
+    MinecraftJson::Value mGeometryDataMutable;          // this+0x148
+
+    std::string mAnimationData;           // this+0x158
+    std::string mCapeId;                  // this+0x178
+    std::vector<SerializedPersonaPieceHandle> mPersonaPieces; // this+0x198
+    persona::ArmSize::Type mArmSizeType;  // this+0x1B0
+    char _pad1B1[7];                      // alignment padding
+    std::unordered_map<persona::PieceType, TintMapColor> mPieceTintColors; // this+0x1B8
+    MCCColor mSkinColor;                  // this+0x1F8
+    TrustedSkinFlag mIsTrustedSkin;       // this+0x208
+    bool mIsPremium;                      // this+0x209
+    bool mIsPersona;                      // this+0x20A
+    bool mIsPersonaCapeOnClassicSkin;     // this+0x20B
+    bool mIsPrimaryUser;                  // this+0x20C
+    bool mOverridesPlayerAppearance;      // this+0x20D
 };
 
 class PlayerSkin_1_21_90 {

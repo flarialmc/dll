@@ -40,17 +40,17 @@ void TextHotkey::settingsRender(float settingsOffset) {
 					auto player = SDK::clientInstance->getLocalPlayer();
 					//std::string xuid = *player->getXuid(&xuid);
 					std::shared_ptr<Packet> packet = SDK::createPacket(9);
-					auto* akbar = reinterpret_cast<TextPacket*>(packet.get());
+					const auto message =
+						std::regex_replace(
+							this->settings
+								.getSettingByName<std::string>("text" + count)
+								->value,
+							std::regex("�"),
+							"§"
+						);
 
-					akbar->type = TextPacketType::CHAT;
-					akbar->message = std::regex_replace(
-						this->settings.getSettingByName<std::string>("text" + count)->value, std::regex("�"), "§");
-					akbar->platformId = "";
-					akbar->translationNeeded = false;
-					//akbar->xuid = xuid;
-					akbar->name = player->getPlayerName();
-
-					SDK::clientInstance->getPacketSender()->sendToServer(akbar);
+					craftChatPacket(packet.get(), player->getPlayerName(), message);
+					SDK::clientInstance->getPacketSender()->sendToServer(packet.get());
 
 					last_used = std::chrono::high_resolution_clock::now();
 				}
@@ -72,7 +72,7 @@ void TextHotkey::settingsRender(float settingsOffset) {
 		if (settings.getSettingByName<std::string>(commandSettingName) != nullptr) {
 			this->addHeader(header);
 
-			this->addKeybind("Text Hotkey", "Hold for 2 seconds!", getKeybind(i));
+			this->addKeybind("Text Hotkey", "", getKeybind(i));
 
 			this->addTextBox(
 				"Text to Send",
@@ -107,17 +107,17 @@ void TextHotkey::onSetup() {
 					auto player = SDK::clientInstance->getLocalPlayer();
 					//std::string xuid = *player->getXuid(&xuid);
 					std::shared_ptr<Packet> packet = SDK::createPacket(9);
-					auto* akbar = reinterpret_cast<TextPacket*>(packet.get());
 
-					akbar->type = TextPacketType::CHAT;
-					akbar->message = std::regex_replace(
-						this->settings.getSettingByName<std::string>("text" + count)->value, std::regex("�"), "§");
-					akbar->platformId = "";
-					akbar->translationNeeded = false;
-					//akbar->xuid = xuid;
-					akbar->name = player->getPlayerName();
-
-					SDK::clientInstance->getPacketSender()->sendToServer(akbar);
+					const auto message =
+						std::regex_replace(
+							this->settings
+								.getSettingByName<std::string>("text" + count)
+								->value,
+							std::regex("�"),
+							"§"
+						);
+					craftChatPacket(packet.get(), player->getPlayerName(), message);
+					SDK::clientInstance->getPacketSender()->sendToServer(packet.get());
 
 					last_used = std::chrono::high_resolution_clock::now();
 				}
@@ -130,7 +130,7 @@ void TextHotkey::onSetup() {
 }
 
 void TextHotkey::onKey(KeyEvent& event) {
-	if (!SDK::clientInstance->getLocalPlayer()) return;
+	if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer()) return;
 	if (this->isEnabled()) {
 		for (int i = 0; i <= totalKeybinds; ++i) {
 			keybindActions[i]({ std::any(event) });

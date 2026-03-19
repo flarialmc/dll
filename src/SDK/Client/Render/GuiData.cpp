@@ -13,11 +13,11 @@ void GuiData::displayClientMessage(const std::string &str) {
     }
 
     if (VersionUtils::checkAboveOrEqual(21, 20)) {
-        char bruh[0x28]{};
+        char messageParams[0x28]{};
 
         using func_t = void(*)(GuiData*, const std::string&, char*, bool);
         static auto func = reinterpret_cast<func_t>(sig);
-        func(this, str, bruh, true);
+        func(this, str, messageParams, true);
     }
     else {
         using func_t = void(*)(GuiData*, const std::string&, bool);

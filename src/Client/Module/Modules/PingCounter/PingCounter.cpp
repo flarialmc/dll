@@ -1,63 +1,24 @@
 #include "PingCounter.hpp"
 
-
-
-
-void PingCounter::onEnable()
-{
-    Listen(this, RenderEvent, &PingCounter::onRender)
-    Module::onEnable();
-}
-
-void PingCounter::onDisable()
-{
-    Deafen(this, RenderEvent, &PingCounter::onRender)
-    Module::onDisable();
-}
-
-void PingCounter::defaultConfig()
-{
-    Module::defaultConfig("all");
-    setDef("spoof", false);
-    setDef("pingSpoofer", 1.0f);
-    setDef("text", (std::string)"{value}ms");
-    setDef("textscale", 0.8f);
-}
-
-void PingCounter::settingsRender(float settingsOffset)
-{
-    initSettingsPage();
-
-    addToggle("Spoof Ping", "", "spoof");
-    addConditionalSlider(getOps<bool>("spoof"), "Spoofer", "Adjusts the displayed ping.", "pingSpoofer", 10.0f);
-    extraPadding();
-    defaultAddSettings("main");
-    extraPadding();
-
-    addHeader("Text");
-    defaultAddSettings("text");
-    extraPadding();
-
-    addHeader("Colors");
-    defaultAddSettings("colors");
-    extraPadding();
-
-    addHeader("Misc");
-    defaultAddSettings("misc");
-
-    FlarialGUI::UnsetScrollView();
-    resetPadding();
-}
-
-void PingCounter::onRender(RenderEvent& event)
-{
-    if (!this->isEnabled()) return;
-
-    float ping = SDK::getServerPing();
+std::string PingCounter::getDisplayValue() {
+    float ping = getOps<bool>("useLastPing") ? SDK::getLastPing() : SDK::getServerPing();
 
     if (getOps<bool>("spoof")) ping *= round(getOps<float>("pingSpoofer"));
 
-    auto pingStr = FlarialGUI::cached_to_string((int)round(ping));
+    return FlarialGUI::cached_to_string((int)round(ping));
+}
 
-    this->normalRender(11, pingStr);
+void PingCounter::customConfig() {
+    setDef("text", (std::string)"{value}ms");
+    setDef("textscale", 0.8f);
+    setDef("useLastPing", false);
+    setDef("spoof", false);
+    setDef("pingSpoofer", 1.0f);
+}
+
+void PingCounter::customSettings() {
+    addToggle("Use Last Ping", "Uses the last ping sample instead of the average.", "useLastPing");
+    addToggle("Spoof Ping", "", "spoof");
+    addConditionalSlider(getOps<bool>("spoof"), "Spoofer", "Adjusts the displayed ping.", "pingSpoofer", 10.0f);
+    extraPadding();
 }

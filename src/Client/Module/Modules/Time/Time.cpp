@@ -1,28 +1,7 @@
 #include "Time.hpp"
 #include "Client.hpp"
 
-
-
-void Time::onEnable()
-{
-    Listen(this, RenderEvent, &Time::onRender)
-    Module::onEnable();
-}
-
-void Time::onDisable()
-{
-    Deafen(this, RenderEvent, &Time::onRender)
-    Module::onDisable();
-}
-
-void Time::onSetup() {
-    Listen(this, TimeEvent, &Time::onTimeEvent)
-}
-
-void Time::onRender(RenderEvent& event)
-{
-    if (!this->isEnabled()) return;
-
+std::string Time::getDisplayValue() {
     std::string text;
 
     if (getOps<bool>("igTime")) {
@@ -80,34 +59,22 @@ void Time::onRender(RenderEvent& event)
             if (getOps<bool>("timeBeforeDate")) text += "\n" + dateStr;
             else text = dateStr + "\n" + text;
         }
-
     }
 
-    this->normalRender(3, text);
+    return text;
 }
 
-void Time::defaultConfig()
-{
+void Time::customConfig() {
     setDef("textscale", 0.80f);
-    Module::defaultConfig("all");
     setDef("24", false);
     setDef("igTime", false);
     setDef("showDate", true);
     setDef("4letterYear", false);
     setDef("timeBeforeDate", false);
     setDef("donaldTrumpMode", false);
-    
 }
 
-void Time::settingsRender(float settingsOffset)
-{
-    initSettingsPage();
-
-
-    addHeader("Main");
-    defaultAddSettings("main");
-    extraPadding();
-
+void Time::customSettings() {
     addHeader("Module Settings");
     addToggle("24 Hour Format", "", "24");
     addToggle("In Game Time Mode", "", "igTime");
@@ -116,20 +83,10 @@ void Time::settingsRender(float settingsOffset)
     addConditionalToggle(!getOps<bool>("igTime"), "Show Time Before Date", "", "timeBeforeDate");
     addConditionalToggle(!getOps<bool>("igTime") && getOps<bool>("showDate"), "mm/dd/yyyy mode", "", "donaldTrumpMode");
     extraPadding();
+}
 
-    addHeader("Text");
-    defaultAddSettings("text");
-    extraPadding();
-
-    addHeader("Colors");
-    defaultAddSettings("colors");
-    extraPadding();
-
-    addHeader("Misc");
-    defaultAddSettings("misc");
-
-    FlarialGUI::UnsetScrollView();
-    resetPadding();
+void Time::onSetup() {
+    Listen(this, TimeEvent, &Time::onTimeEvent)
 }
 
 void Time::onTimeEvent(TimeEvent& event) {

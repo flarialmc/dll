@@ -10,8 +10,8 @@ private:
 	int color = 1;
 	float x = 0;
 	float y = 0;
-	float xv = 1;
-	float yv = 1;
+	float xDirection = 1;
+	float yDirection = 1;
 public:
 
 	DVD() : Module("DVD Screen", "Overlays the DVD Screensaver",

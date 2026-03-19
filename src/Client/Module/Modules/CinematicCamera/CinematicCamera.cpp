@@ -3,29 +3,37 @@
 #include "SDK/Client/Core/Options.hpp"
 
 void CinematicCamera::onEnable() {
+    Listen(this, KeyEvent, &CinematicCamera::onKey)
     Listen(this, TurnDeltaEvent, &CinematicCamera::onTurnDelta)
     Listen(this, RenderEvent, &CinematicCamera::onRender)
     Module::onEnable();
 }
 
 void CinematicCamera::onDisable() {
+    Deafen(this, KeyEvent, &CinematicCamera::onKey)
     Deafen(this, RenderEvent, &CinematicCamera::onRender)
     Module::onDisable();
 }
 
 void CinematicCamera::defaultConfig() {
+    getKeybind();
+
     setDef("smoothing", true);
     setDef("smoothness", 8.f);
     setDef("cinebars", false);
     setDef("cinebar", "000000", 1.f, false);
     setDef("cinebarHeight", 0.2f);
     Module::defaultConfig("core");
+
+    setDef("toggle", false);
 }
 
 void CinematicCamera::settingsRender(float settingsOffset) {
-    /* Border Start */
-
     initSettingsPage();
+
+    addToggle("Toggle (Java-like behaviour)", "", "toggle");
+    addKeybind("Keybind", "", "keybind", true);
+    extraPadding();
 
     addToggle("Enable Smoothing", "", "smoothing");
     addConditionalSlider(getOps<bool>("smoothing"), "Smoothing", "", "smoothness", 10.f);
@@ -38,8 +46,17 @@ void CinematicCamera::settingsRender(float settingsOffset) {
     resetPadding();
 }
 
+void CinematicCamera::onKey(KeyEvent &event) {
+    if (!this->isEnabled()) return;
+    if (this->isKeyPartOfKeybind(event.key)) {
+        if (this->isKeybind(event.keys)) {
+            keybindActions[0]({});
+        }
+    }
+}
+
 void CinematicCamera::onTurnDelta(TurnDeltaEvent &event) {
-    if (!isEnabled() || !getOps<bool>("smoothing")) {
+    if (!isEnabled() || (getOps<bool>("toggle") && !this->active) || !getOps<bool>("smoothing")) {
         smoothDelta = Vec2<float>{0.f, 0.f};
         return;
     };
@@ -56,7 +73,11 @@ void CinematicCamera::onTurnDelta(TurnDeltaEvent &event) {
 }
 
 void CinematicCamera::onRender(RenderEvent &event) {
-    if (!isEnabled() || !getOps<bool>("cinebars") || (SDK::getCurrentScreen() != "hud_screen" && SDK::getCurrentScreen() != "zoom_screen" && SDK::getCurrentScreen() != "f3_screen")) return;
+    if (
+        !isEnabled() || (getOps<bool>("toggle") && !this->active) ||
+        !getOps<bool>("cinebars") ||
+        (SDK::getCurrentScreen() != "hud_screen" && SDK::getCurrentScreen() != "zoom_screen" && SDK::getCurrentScreen() != "f3_screen")
+    ) return;
 
     float barHeight = MC::windowSize.y * getOps<float>("cinebarHeight") / 2.f;
 

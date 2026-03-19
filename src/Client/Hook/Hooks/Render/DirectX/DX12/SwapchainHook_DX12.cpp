@@ -18,7 +18,12 @@
 #include <imgui/imgui_impl_dx12.h>
 #include <imgui/imgui_impl_win32.h>
 #include "unknwnbase.h"
+#include "Utils/PlatformUtils.hpp"
 using ::IUnknown;
+
+// Track if we've already called RemoveDevice() to prevent infinite loops
+// Not static - needs external linkage for SwapchainHook.cpp to access
+bool dx12DeviceRemoved = false;
 
 void SwapchainHook::DX12Init() {
 
@@ -26,6 +31,19 @@ void SwapchainHook::DX12Init() {
 
     if (FAILED(swapchain->GetDevice(IID_PPV_ARGS(d3d12Device5.put())))) {
         Logger::error("Failed to get D3D12 device from swapchain");
+        return;
+    }
+
+    // Better Frames: Use RemoveDevice() to force DX11 fallback
+    // After RemoveDevice(), Present() will fail and the game will recreate the swapchain with DX11
+    if (!dx12DeviceRemoved && Client::settings.getSettingByName<bool>("killdx")->value)
+    {
+        Logger::success("[Swapchain] Better Frames: Calling RemoveDevice() to force DX11 fallback");
+        d3d12Device5->RemoveDevice();
+        dx12DeviceRemoved = true;
+        isDX12 = false;
+        d3d12Device5 = nullptr; // Release the removed device
+        // Don't try to init anything - wait for game to recreate swapchain with DX11
         return;
     }
 
@@ -233,9 +251,12 @@ void SwapchainHook::DX12Render(bool underui) {
 
     D2D::context->BeginDraw();
 
-    ImGui_ImplDX12_NewFrame();
-    ImGui_ImplWin32_NewFrame();
-    ImGui::NewFrame();
+    {
+        std::lock_guard<std::mutex> lock(SwapchainHook::imguiInputMutex);
+        ImGui_ImplDX12_NewFrame();
+        ImGui_ImplWin32_NewFrame();
+        ImGui::NewFrame();
+    }
 
     ImGui::Begin("t", nullptr,
         ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
@@ -257,6 +278,10 @@ void SwapchainHook::DX12Render(bool underui) {
             d3d11Device->CreateRenderTargetView(buffer2D.get(), nullptr, cachedDX12RTVs[currentBitmap].put());
         }
     }
+
+    // Process any pending module toggles before dispatching events
+    // This avoids deadlock when modules are toggled from within event callbacks
+    ModuleManager::processPendingToggles();
 
     if (!underui) {
         auto event = nes::make_holder<RenderEvent>();
@@ -318,10 +343,25 @@ void SwapchainHook::DX12Render(bool underui) {
 
     d3d12CommandList->Close();
     ID3D12CommandList* cmdListPtr = d3d12CommandList.get();
+
+    // Verify queue is still valid before using it
+    if (!queue)
+    {
+        Logger::error("DX12Render: Queue became null during render");
+        return;
+    }
+
     queue->ExecuteCommandLists(1, &cmdListPtr);
 
-    if (!cachedDX12Fence) {
-        d3d12Device5->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(cachedDX12Fence.put()));
+    if (!cachedDX12Fence)
+    {
+        HRESULT hr = d3d12Device5->CreateFence(0, D3D12_FENCE_FLAG_NONE,
+                                               IID_PPV_ARGS(cachedDX12Fence.put()));
+        if (FAILED(hr) || !cachedDX12Fence)
+        {
+            Logger::error("DX12Render: Failed to create fence");
+            return;
+        }
     }
 
     const UINT64 currentFenceValue = ++cachedDX12FenceValue;

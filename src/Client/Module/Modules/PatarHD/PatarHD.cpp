@@ -103,13 +103,13 @@ void PatarHD::onRender(RenderEvent& event)
     if (getOps<bool>("dvdmode")) {
         FlarialGUI::image(draw, D2D1::RectF(x, y, x + s, y + s), mode);
 
-        x += getOps<float>("xveloc") * xv;
-        y += getOps<float>("yveloc") * yv;
+        x += getOps<float>("xveloc") * xDirection;
+        y += getOps<float>("yveloc") * yDirection;
 
-        if (x >= MC::windowSize.x - s) xv = -1;
-        if (x < 0) xv = 1;
-        if (y >= MC::windowSize.y - s) yv = -1;
-        if (y < 0) yv = 1;
+        if (x >= MC::windowSize.x - s) xDirection = -1;
+        if (x < 0) xDirection = 1;
+        if (y >= MC::windowSize.y - s) yDirection = -1;
+        if (y < 0) yDirection = 1;
     }
     else {
         float s2 = s / 2;

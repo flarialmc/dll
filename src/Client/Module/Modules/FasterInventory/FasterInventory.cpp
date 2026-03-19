@@ -43,12 +43,12 @@ void FasterInventory::onRaknetTick(RaknetTickEvent &event) {
 
 void FasterInventory::onPacketSend(PacketSendEvent &event) {
     if (!this->isEnabled()) return;
-    if (!SDK::clientInstance->getLocalPlayer()) return;
+    if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer()) return;
     if (this->restricted || SDK::getServerPing() < 10) return;
     auto packet = event.getPacket();
     if (packet->getId() == MinecraftPacketIds::Interact) {
-        auto ip = (InteractPacket*)packet;
-        if (ip->Action == InteractPacket::Action::OpenInventory) {
+        auto interactPkt = (InteractPacket*)packet;
+        if (interactPkt->Action == InteractPacket::Action::OpenInventory) {
             OpenInventory();
             inventoryOpen = true;
             return;
@@ -56,17 +56,17 @@ void FasterInventory::onPacketSend(PacketSendEvent &event) {
     }
 
     if (packet->getId() == MinecraftPacketIds::ContainerClose) {
-        auto ccp = (ContainerClosePacket*)packet;
+        auto closePkt = (ContainerClosePacket*)packet;
         if (sendingClosePacket) return;
         if (!inventoryOpen) return;
-        if (ccp->ContainerId == ContainerID::None || ccp->ContainerId == ContainerID::Inventory) {
+        if (closePkt->ContainerId == ContainerID::None || closePkt->ContainerId == ContainerID::Inventory) {
             CloseInventory();
             event.cancel();
         }
         else {
             // Only allow valid closes if we have opened containers in queue
             std::lock_guard<std::mutex> lock(queueMutex);
-            if (!containerQueue.empty() && ccp->ContainerId == containerQueue.front()) {
+            if (!containerQueue.empty() && closePkt->ContainerId == containerQueue.front()) {
                 containerQueue.pop();
             }
         }
@@ -75,20 +75,20 @@ void FasterInventory::onPacketSend(PacketSendEvent &event) {
 
 void FasterInventory::onPacketReceive(PacketEvent &event) {
     if (!this->isEnabled()) return;
-    if (!SDK::clientInstance->getLocalPlayer()) return;
+    if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer()) return;
     if (this->restricted || SDK::getServerPing() < 10) return;
     auto packet = event.getPacket();
     if (packet->getId() == MinecraftPacketIds::ContainerOpen) {
-        auto cop = (ContainerOpenPacket*)packet;
-        if (cop->Type == ContainerType::Inventory) {
+        auto openPkt = (ContainerOpenPacket*)packet;
+        if (openPkt->Type == ContainerType::Inventory) {
             inventoryOpenServerside = true;
             if (!inventoryOpen) {
                 // If inventory is not open, immediately send a ContainerClose
-                SendClosePacket(cop->ContainerId);
+                SendClosePacket(openPkt->ContainerId);
             }
             else {
                 std::lock_guard<std::mutex> lock(queueMutex);
-                containerQueue.push(cop->ContainerId);
+                containerQueue.push(openPkt->ContainerId);
             }
             event.cancel();
         }
@@ -102,7 +102,7 @@ void FasterInventory::onPacketReceive(PacketEvent &event) {
 
 void FasterInventory::onTick(TickEvent &event) {
     if (!this->isEnabled()) return;
-    if (!SDK::clientInstance->getLocalPlayer()) return;
+    if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer()) return;
     if (this->restricted || SDK::getServerPing() < 10) return;
     if (inventoryOpen != inventoryOpenServerside) {
         desyncTicks++;
@@ -128,11 +128,11 @@ void FasterInventory::CloseInventory() {
 void FasterInventory::OpenInventory() {
     inventoryOpen = true;
     auto packet = SDK::createPacket((int)MinecraftPacketIds::ContainerOpen);
-    auto cop = (ContainerOpenPacket*)packet.get();
-    cop->ContainerId = ContainerID::Inventory;
-    cop->Type = ContainerType::Inventory;
-    cop->Pos = BlockPos(0, 0, 0);
-    cop->EntityUniqueID = -1;
+    auto openPkt = (ContainerOpenPacket*)packet.get();
+    openPkt->ContainerId = ContainerID::Inventory;
+    openPkt->Type = ContainerType::Inventory;
+    openPkt->Pos = BlockPos(0, 0, 0);
+    openPkt->EntityUniqueID = -1;
 
     if (SendPacketHook::PacketHandlerDispatcher && SendPacketHook::NetworkIdentifier && SendPacketHook::NetEventCallback) {
         SendPacketHook::receivePacketContainerOpenOriginal(SendPacketHook::PacketHandlerDispatcher,
@@ -144,10 +144,10 @@ void FasterInventory::OpenInventory() {
 
 void FasterInventory::SendClosePacket(ContainerID containerId) {
     auto packet = SDK::createPacket((int)MinecraftPacketIds::ContainerClose);
-    auto ccp = (ContainerClosePacket*)packet.get();
-    ccp->ContainerId = containerId;
-    ccp->ServerInitiatedClose = false;
+    auto closePkt = (ContainerClosePacket*)packet.get();
+    closePkt->ContainerId = containerId;
+    closePkt->ServerInitiatedClose = false;
     sendingClosePacket = true;
-    SDK::clientInstance->getPacketSender()->sendToServer(ccp);
+    SDK::clientInstance->getPacketSender()->sendToServer(closePkt);
     sendingClosePacket = false;
 }

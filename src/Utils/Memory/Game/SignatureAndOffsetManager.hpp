@@ -6,41 +6,32 @@
 
 #define DEPRECATE_SIG(name) \
     []{ \
-        constexpr unsigned int hash_val = Utils::hash(name); \
-        Mgr.removeSignature(hash_val); \
+        Mgr.removeSignature(Utils::hash(name)); \
     }()
 
 #define ADD_SIG(name, sig) \
     []{ \
-        constexpr unsigned int hash_val = Utils::hash(name); \
-        Mgr.addSignature(hash_val, sig, name); \
+        Mgr.addSignature(Utils::hash(name), sig, name); \
     }()
 
 #define GET_SIG(name) \
     []{ \
-        constexpr unsigned int hash_val = Utils::hash(name); \
-        static auto sig = Mgr.getSig(hash_val);\
-        return sig; \
+        return Mgr.getSig(Utils::hash(name)); \
     }()
 
 #define GET_SIG_ADDRESS(name) \
     []{ \
-        constexpr unsigned int hash_val = Utils::hash(name); \
-        static auto sig = Mgr.getSigAddress(hash_val);\
-        return sig; \
+        return Mgr.getSigAddress(Utils::hash(name)); \
     }()
 
 #define ADD_OFFSET(name, offset) \
     []{ \
-        constexpr unsigned int hash_val = Utils::hash(name); \
-        Mgr.addOffset(hash_val, offset); \
+        Mgr.addOffset(Utils::hash(name), offset); \
     }()
 
 #define GET_OFFSET(name) \
     []{ \
-        constexpr unsigned int hash_val = Utils::hash(name); \
-        static auto offset = Mgr.getOffset(hash_val);\
-        return offset; \
+        return Mgr.getOffset(Utils::hash(name)); \
     }()
 
 class SignatureAndOffsetManager {

@@ -1,23 +1,19 @@
 #pragma once
 
-#include "../Module.hpp"
-#include "Events/Render/RenderEvent.hpp"
+#include "../HUDModule.hpp"
 
-class PingCounter : public Module {
+class PingCounter : public HUDModule {
 
 public:
 
-	PingCounter() : Module("Ping Counter", "Displays your current latency to the server.",
-					IDR_PING_PNG, "", false, {"stats"}) {
+	PingCounter() : HUDModule(11, "Ping Counter", "Displays your current latency to the server.",
+					IDR_PING_PNG, "", {"stats"}) {
 	};
 
-	void onEnable() override;
+protected:
+	std::string getDisplayValue() override;
 
-	void onDisable() override;
+	void customConfig() override;
 
-	void defaultConfig() override;
-
-	void settingsRender(float settingsOffset) override;
-
-	void onRender(RenderEvent& event);
+	void customSettings() override;
 };

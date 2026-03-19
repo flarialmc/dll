@@ -35,14 +35,14 @@ void InstantHurtAnimation::settingsRender(float settingsOffset) {
 
 void InstantHurtAnimation::onPacketReceive(PacketEvent& event)  {
     if (!this->isEnabled()) return;
+    if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer()) return;
     auto player = SDK::clientInstance->getLocalPlayer();
-    if (!SDK::clientInstance->getLocalPlayer()) return;
     if (event.getPacket()->getId() == MinecraftPacketIds::ActorEvent) {
-        auto ee = (EntityEventPacket*)event.getPacket();
-        if (ee->RuntimeID != player->getRuntimeIDComponent()->runtimeID) {
-            if (ee->EventID == ActorEvent::Hurt) {
+        auto entityEventPkt = (EntityEventPacket*)event.getPacket();
+        if (entityEventPkt->RuntimeID != player->getRuntimeIDComponent()->runtimeID) {
+            if (entityEventPkt->EventID == ActorEvent::Hurt) {
                 // Cancel hurt anim packet, that was caused by our hit
-                auto it = hitEntities.find(ee->RuntimeID);
+                auto it = hitEntities.find(entityEventPkt->RuntimeID);
                 if (it != hitEntities.end()) {
                     auto now = std::chrono::steady_clock::now();
                     auto hitTime = it->second;
@@ -73,7 +73,7 @@ void InstantHurtAnimation::onAttack(AttackEvent &event) {
         ItemStack* leggingsItem = armorContainer->getItem(2);
         ItemStack* bootsItem = armorContainer->getItem(3);
 
-        if (!helmetItem->item || !chestplateItem->item || !leggingsItem->item || !bootsItem->item) return;
+        if (!helmetItem->mItem || !chestplateItem->mItem || !leggingsItem->mItem || !bootsItem->mItem) return;
     }
     if (getOps<bool>("tryToExcludeTeam"))
         if (event.getActor()->IsOnSameTeam(SDK::clientInstance->getLocalPlayer())) return;
@@ -93,9 +93,9 @@ void InstantHurtAnimation::onAttack(AttackEvent &event) {
     }
 
     std::shared_ptr<Packet> packet = SDK::createPacket((int)MinecraftPacketIds::ActorEvent);
-    auto ee = (EntityEventPacket*)packet.get();
-    ee->EventID = ActorEvent::Hurt;
-    ee->RuntimeID = runtimeID;
+    auto entityEventPkt = (EntityEventPacket*)packet.get();
+    entityEventPkt->EventID = ActorEvent::Hurt;
+    entityEventPkt->RuntimeID = runtimeID;
 
     hitEntities[runtimeID] = now;
 

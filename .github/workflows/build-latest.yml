@@ -1,4 +1,5 @@
-name: Build Flarial dll and add to newcdn as a release
+name: Build Flarial DLL
+
 on:
   push:
     branches: [ "*" ]
@@ -16,95 +17,121 @@ jobs:
   check-commit:
     runs-on: ubuntu-latest
     outputs:
-      should_build: ${{ steps.check.outputs.should_build }}
       type: ${{ steps.check.outputs.type }}
+      build_config: ${{ steps.check.outputs.build_config }}
     steps:
-      - name: Check if build is needed
+      - name: Determine build type
         id: check
         run: |
-          if [[ "${{ github.ref_type }}" == "tag" ]]; then
-              if [[ "${{ github.ref_name }}" == beta-* ]]; then
-                  echo "Build needed for beta tag"
-                  echo "should_build=true" >> "$GITHUB_OUTPUT"
-                  echo "type=2" >> "$GITHUB_OUTPUT"
-              elif [[ "${{ github.ref_name }}" == release-* ]]; then
-                  echo "Build needed for release tag"
-                  echo "should_build=true" >> "$GITHUB_OUTPUT"
-                  echo "type=1" >> "$GITHUB_OUTPUT"
-              else
-                  echo "Unknown tag type, skipping build"
-                  echo "should_build=false" >> "$GITHUB_OUTPUT"
-              fi
-          elif [[ "${{ github.event.head_commit.message }}" == *"nightly:"* ]] || [[ "${{ github.event.head_commit.message }}" == *"Revert"*"nightly:"* ]]; then
-              echo "Build needed for nightly"
-              echo "should_build=true" >> "$GITHUB_OUTPUT"
+          EVENT_NAME="${{ github.event_name }}"
+          REF_TYPE="${{ github.ref_type }}"
+          REF_NAME="${{ github.ref_name }}"
+          COMMIT_MSG="${{ github.event.head_commit.message }}"
+
+          if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
+              echo "Nightly build (workflow_dispatch)"
               echo "type=0" >> "$GITHUB_OUTPUT"
-          elif [[ "${{ github.event.head_commit.message }}" == *"release:"* ]] || [[ "${{ github.event.head_commit.message }}" == *"Revert"*"release:"* ]]; then
-              echo "Build needed for release"
-              echo "should_build=true" >> "$GITHUB_OUTPUT"
+              echo "build_config=Release" >> "$GITHUB_OUTPUT"
+          elif [[ "$REF_TYPE" == "tag" ]]; then
+              if [[ "$REF_NAME" == beta-* ]]; then
+                  echo "Beta build (tag: $REF_NAME)"
+                  echo "type=2" >> "$GITHUB_OUTPUT"
+                  echo "build_config=Release" >> "$GITHUB_OUTPUT"
+              elif [[ "$REF_NAME" == release-* ]]; then
+                  echo "Release build (tag: $REF_NAME)"
+                  echo "type=1" >> "$GITHUB_OUTPUT"
+                  echo "build_config=Release" >> "$GITHUB_OUTPUT"
+              else
+                  echo "Unknown tag, building as Debug"
+                  echo "type=3" >> "$GITHUB_OUTPUT"
+                  echo "build_config=Debug" >> "$GITHUB_OUTPUT"
+              fi
+          elif [[ "$COMMIT_MSG" == nightly:* ]] || [[ "$COMMIT_MSG" == *"Revert"*"nightly:"* ]]; then
+              echo "Nightly build"
+              echo "type=0" >> "$GITHUB_OUTPUT"
+              echo "build_config=Release" >> "$GITHUB_OUTPUT"
+          elif [[ "$COMMIT_MSG" == release:* ]] || [[ "$COMMIT_MSG" == *"Revert"*"release:"* ]]; then
+              echo "Release build"
               echo "type=1" >> "$GITHUB_OUTPUT"
-          elif [[ "${{ github.event.head_commit.message }}" == *"beta:"* ]] || [[ "${{ github.event.head_commit.message }}" == *"Revert"*"beta:"* ]]; then
-              echo "Build needed for beta"
-              echo "should_build=true" >> "$GITHUB_OUTPUT"
+              echo "build_config=Release" >> "$GITHUB_OUTPUT"
+          elif [[ "$COMMIT_MSG" == beta:* ]] || [[ "$COMMIT_MSG" == *"Revert"*"beta:"* ]]; then
+              echo "Beta build"
               echo "type=2" >> "$GITHUB_OUTPUT"
+              echo "build_config=Release" >> "$GITHUB_OUTPUT"
           else
-              echo "No build needed, skipping"
-              echo "should_build=false" >> "$GITHUB_OUTPUT"
+              echo "No release prefix, building as Debug"
+              echo "type=3" >> "$GITHUB_OUTPUT"
+              echo "build_config=Debug" >> "$GITHUB_OUTPUT"
           fi
 
   windows-build:
-    runs-on: windows-latest
+    runs-on: [self-hosted, linux, x64, wine, msvc]
     needs: check-commit
-    if: needs.check-commit.outputs.should_build == 'true'
     outputs:
       type: ${{ needs.check-commit.outputs.type }}
+      build_config: ${{ needs.check-commit.outputs.build_config }}
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set Up MSVC Environment
-        uses: ilammy/msvc-dev-cmd@v1
-
-      - name: Configure CMake
+      - name: Build DLL with Wine+MSVC (${{ needs.check-commit.outputs.build_config }})
         run: |
-          #echo 'hi'
-          
-          cmake -S . -B build -G "Ninja" -DCMAKE_BUILD_TYPE=Release
+          export WINEPREFIX=/opt/wine
+          source /opt/msvc/bin/x64/msvcenv.sh
+          CPPWINRT="/opt/msvc/Windows Kits/10/Include/10.0.26100.0/cppwinrt"
 
+          rm -rf build
+          mkdir build
+          cd build
 
-      - name: Build DLL
-        run: |
-           cmake --build build --target Flarial
-      - name: Upload a Build Artifact
+          cmake -G Ninja \
+            -DCMAKE_BUILD_TYPE=${{ needs.check-commit.outputs.build_config }} \
+            -DCMAKE_C_COMPILER=/opt/msvc/bin/x64/cl \
+            -DCMAKE_CXX_COMPILER=/opt/msvc/bin/x64/cl \
+            -DCMAKE_LINKER=/opt/msvc/bin/x64/link \
+            -DCMAKE_RC_COMPILER=/opt/msvc/bin/x64/rc \
+            -DCMAKE_SYSTEM_NAME=Windows \
+            "-DCMAKE_CXX_FLAGS=/I\"$CPPWINRT\"" \
+            ..
+
+          ninja -j$(nproc)
+
+      - name: Upload DLL and PDB Artifacts
         uses: actions/upload-artifact@v4.6.1
         with:
-           name: Flarial_DLL
-           path: C:\a\dll\dll\build\Flarial.dll
-      - name: Upload a Build Artifact
-        uses: actions/upload-artifact@v4.6.1
-        with:
-          name: Flarial_DLL
-          path: D:\a\dll\dll\build\Flarial.dll
+          name: Flarial_DLL_${{ needs.check-commit.outputs.build_config }}
+          path: |
+            build/Flarial.dll
+            build/Flarial.pdb
 
   upload-to-cdn:
     runs-on: ubuntu-latest
     needs: [check-commit, windows-build]
-    if: needs.check-commit.outputs.should_build == 'true'
+    if: needs.check-commit.outputs.type != '3' && github.event_name != 'workflow_dispatch'
     steps:
-      - name: Output commit type
-        run: echo " ${{env.OUTPUT1}} $OUTPUT1"
-        env:
-          OUTPUT1: ${{ needs.windows-build.outputs.type}}
       - name: Checkout newcdn repository
         uses: actions/checkout@v4
         with:
           repository: 'flarialmc/newcdn'
           ref: 'main'
           token: ${{ secrets.ACTIONS_GITHUB_TOKEN }}
-      - name: Download dll
+
+      - name: Install Git LFS
+        run: git lfs install
+
+      - name: Track PDB files with Git LFS
+        run: |
+          git lfs track "*.pdb"
+          git add .gitattributes
+          git commit -m "Track .pdb files with Git LFS" || echo ".gitattributes already tracked"
+
+      - name: Download DLL artifact
         uses: actions/download-artifact@v4.1.9
-      - name: setup tags
+        with:
+          name: Flarial_DLL_Release
+
+      - name: Setup tags
         id: tag
         run: |
           if [[ "${{ github.ref_type }}" == "tag" ]]; then
@@ -117,114 +144,147 @@ jobs:
             echo "TAG_NAME=beta-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
           fi
         env:
-          OUTPUT1: ${{ needs.windows-build.outputs.type}}
+          OUTPUT1: ${{ needs.windows-build.outputs.type }}
+
       - name: Nightly Release (CDN)
         uses: softprops/action-gh-release@v2
         with:
           files:
-            Flarial_DLL/Flarial.dll
-          tag_name: ${{ env.TAG_NAME}}
+            Flarial_DLL_Release/Flarial.dll
+          tag_name: ${{ env.TAG_NAME }}
           body: ${{ github.event.head_commit.message }}
           name: "Nightly Release"
           repository: flarialmc/newcdn
           token: ${{ secrets.ACTIONS_GITHUB_TOKEN }}
         if: ${{ env.OUTPUT1 == 0 }}
         env:
-          OUTPUT1: ${{ needs.windows-build.outputs.type}}
+          OUTPUT1: ${{ needs.windows-build.outputs.type }}
           TAG_NAME: ${{ steps.tag.outputs.TAG_NAME }}
+
+      - name: Nightly (CDN) - Upload PDB
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@example.com"
+          COMMIT_HASH="${GITHUB_SHA::7}"
+          mkdir -p "./pdb/${COMMIT_HASH}"
+          cp -f Flarial_DLL_Release/Flarial.pdb "./pdb/${COMMIT_HASH}/Flarial.pdb"
+          git add "./pdb/${COMMIT_HASH}/Flarial.pdb"
+          git commit -m "Add PDB for nightly ${COMMIT_HASH}"
+          git push origin main
+          echo "Uploaded PDB for nightly ${COMMIT_HASH}"
+        if: ${{ env.OUTPUT1 == 0 }}
+        env:
+          OUTPUT1: ${{ needs.windows-build.outputs.type }}
+
       - name: Nightly Release (Main Repo)
         uses: softprops/action-gh-release@v2
         with:
-          files:
-            Flarial_DLL/Flarial.dll
-          tag_name: ${{ env.TAG_NAME}}
+          files: |
+            Flarial_DLL_Release/Flarial.dll
+            Flarial_DLL_Release/Flarial.pdb
+          tag_name: ${{ env.TAG_NAME }}
           body: ${{ github.event.head_commit.message }}
           name: "Nightly Release"
           token: ${{ secrets.GITHUB_TOKEN }}
         if: ${{ env.OUTPUT1 == 0 }}
         env:
-          OUTPUT1: ${{ needs.windows-build.outputs.type}}
+          OUTPUT1: ${{ needs.windows-build.outputs.type }}
           TAG_NAME: ${{ steps.tag.outputs.TAG_NAME }}
+
       - name: Release (CDN) - File Upload
         run: |
           git config user.name "GitHub Actions Bot"
           git config user.email "actions@example.com"
-          cp -f Flarial_DLL/Flarial.dll "./dll/latest.dll"
-          git add ./dll/latest.dll
+          COMMIT_HASH="${GITHUB_SHA::7}"
+          cp -f Flarial_DLL_Release/Flarial.dll "./dll/latest.dll"
+          mkdir -p "./pdb/${COMMIT_HASH}"
+          cp -f Flarial_DLL_Release/Flarial.pdb "./pdb/${COMMIT_HASH}/Flarial.pdb"
+          git add ./dll/latest.dll "./pdb/${COMMIT_HASH}/Flarial.pdb"
           git commit -m "Add Release for Release Commit: '${{ github.event.head_commit.message }}'"
           git push origin main
-          echo "uploading as release"
+          echo "uploading as release with PDB"
         if: ${{ env.OUTPUT1 == 1 }}
         env:
-          OUTPUT1: ${{ needs.windows-build.outputs.type}}
+          OUTPUT1: ${{ needs.windows-build.outputs.type }}
           TAG_NAME: ${{ steps.tag.outputs.TAG_NAME }}
+
       - name: Release (CDN) - GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files:
-            Flarial_DLL/Flarial.dll
-          tag_name: ${{ env.TAG_NAME}}
+            Flarial_DLL_Release/Flarial.dll
+          tag_name: ${{ env.TAG_NAME }}
           body: ${{ github.event.head_commit.message }}
           name: "Release"
           repository: flarialmc/newcdn
           token: ${{ secrets.ACTIONS_GITHUB_TOKEN }}
         if: ${{ env.OUTPUT1 == 1 }}
         env:
-          OUTPUT1: ${{ needs.windows-build.outputs.type}}
+          OUTPUT1: ${{ needs.windows-build.outputs.type }}
           TAG_NAME: ${{ steps.tag.outputs.TAG_NAME }}
+
       - name: Release (Main Repo)
         uses: softprops/action-gh-release@v2
         with:
-          files:
-            Flarial_DLL/Flarial.dll
-          tag_name: ${{ env.TAG_NAME}}
+          files: |
+            Flarial_DLL_Release/Flarial.dll
+            Flarial_DLL_Release/Flarial.pdb
+          tag_name: ${{ env.TAG_NAME }}
           body: ${{ github.event.head_commit.message }}
           name: "Release"
           token: ${{ secrets.GITHUB_TOKEN }}
         if: ${{ env.OUTPUT1 == 1 }}
         env:
-          OUTPUT1: ${{ needs.windows-build.outputs.type}}
+          OUTPUT1: ${{ needs.windows-build.outputs.type }}
           TAG_NAME: ${{ steps.tag.outputs.TAG_NAME }}
+
       - name: Beta Release (CDN) - File Upload
         run: |
           git config user.name "GitHub Actions Bot"
           git config user.email "actions@example.com"
-          cp -f Flarial_DLL/Flarial.dll "./dll/beta.dll"
-          git add ./dll/beta.dll
+          COMMIT_HASH="${GITHUB_SHA::7}"
+          cp -f Flarial_DLL_Release/Flarial.dll "./dll/beta.dll"
+          mkdir -p "./pdb/${COMMIT_HASH}"
+          cp -f Flarial_DLL_Release/Flarial.pdb "./pdb/${COMMIT_HASH}/Flarial.pdb"
+          git add ./dll/beta.dll "./pdb/${COMMIT_HASH}/Flarial.pdb"
           git commit -m "Add Beta for Beta Commit: '${{ github.event.head_commit.message }}'"
           git push origin main
-          echo "uploading as beta"
+          echo "uploading as beta with PDB"
         if: ${{ env.OUTPUT1 == 2 }}
         env:
-          OUTPUT1: ${{ needs.windows-build.outputs.type}}
+          OUTPUT1: ${{ needs.windows-build.outputs.type }}
           TAG_NAME: ${{ steps.tag.outputs.TAG_NAME }}
+
       - name: Beta Release (CDN) - GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files:
-            Flarial_DLL/Flarial.dll
-          tag_name: ${{ env.TAG_NAME}}
+            Flarial_DLL_Release/Flarial.dll
+          tag_name: ${{ env.TAG_NAME }}
           body: ${{ github.event.head_commit.message }}
           name: "Beta Release"
           repository: flarialmc/newcdn
           token: ${{ secrets.ACTIONS_GITHUB_TOKEN }}
         if: ${{ env.OUTPUT1 == 2 }}
         env:
-          OUTPUT1: ${{ needs.windows-build.outputs.type}}
+          OUTPUT1: ${{ needs.windows-build.outputs.type }}
           TAG_NAME: ${{ steps.tag.outputs.TAG_NAME }}
+
       - name: Beta Release (Main Repo)
         uses: softprops/action-gh-release@v2
         with:
-          files:
-            Flarial_DLL/Flarial.dll
-          tag_name: ${{ env.TAG_NAME}}
+          files: |
+            Flarial_DLL_Release/Flarial.dll
+            Flarial_DLL_Release/Flarial.pdb
+          tag_name: ${{ env.TAG_NAME }}
           body: ${{ github.event.head_commit.message }}
           name: "Beta Release"
           token: ${{ secrets.GITHUB_TOKEN }}
         if: ${{ env.OUTPUT1 == 2 }}
         env:
-          OUTPUT1: ${{ needs.windows-build.outputs.type}}
+          OUTPUT1: ${{ needs.windows-build.outputs.type }}
           TAG_NAME: ${{ steps.tag.outputs.TAG_NAME }}
+
       - name: Cache Github API
         run: |
           git config user.name "GitHub Actions Bot"
@@ -236,5 +296,6 @@ jobs:
           git push origin main
         if: ${{ env.OUTPUT1 == 0 }}
         env:
-          OUTPUT1: ${{ needs.windows-build.outputs.type}}
+          OUTPUT1: ${{ needs.windows-build.outputs.type }}
           TAG_NAME: ${{ steps.tag.outputs.TAG_NAME }}
+

@@ -42,7 +42,7 @@ std::pair<long, std::string> APIUtils::Request(
         return { 0, "" };
     }
 
-    curl_easy_setopt(curl, CURLOPT_USERAGENT, "Samsung Smart Fridge");
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, "curl");
     curl_easy_setopt(curl, CURLOPT_ACCEPT_ENCODING, "gzip");
 
     // Ensure headers are initialized
@@ -54,6 +54,8 @@ std::pair<long, std::string> APIUtils::Request(
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseBody);
+    curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10L); // 10 second timeout
+    curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 5L); // 5 second connection timeout
 
     if (method == "GET") {
         // No need for CURLOPT_CUSTOMREQUEST, GET is default
@@ -122,6 +124,8 @@ std::pair<long, std::string> APIUtils::POST_Simple(const std::string& url, const
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postData.c_str());
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseBody);
+    curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10L); // 10 second timeout
+    curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 5L); // 5 second connection timeout
 
     CURLcode res = curl_easy_perform(curl);
     if (res != CURLE_OK) {
@@ -145,7 +149,7 @@ std::string APIUtils::legacyGet(const std::string &URL) {
         }
 
         std::string rtn;
-        HINTERNET urlFile = InternetOpenUrlA(interwebs, URL.c_str(), NULL, 0, INTERNET_FLAG_RELOAD, 0);
+        HINTERNET urlFile = InternetOpenUrlA(interwebs, URL.c_str(), "Content-Type: application/json\r\n", -1, INTERNET_FLAG_RELOAD, 0);
         if (urlFile) {
             char buffer[2000];
             DWORD bytesRead;
@@ -165,7 +169,7 @@ std::string APIUtils::legacyGet(const std::string &URL) {
 
      std::string APIUtils::get(const std::string &link) {
         try {
-            HINTERNET interwebs = InternetOpenA("Samsung Smart Fridge", INTERNET_OPEN_TYPE_DIRECT, NULL, NULL, 0);
+            HINTERNET interwebs = InternetOpenA("curl", INTERNET_OPEN_TYPE_DIRECT, NULL, NULL, 0);
             if (!interwebs) {
                 return "";
             }
@@ -370,11 +374,11 @@ std::string APIUtils::VectorToList(const std::vector<std::string>& vec) {
 
 std::vector<std::string> APIUtils::UpdateVector(
     const std::vector<std::string>& currentVec,
-    const std::vector<std::string>& commands) {
+    const std::vector<std::string>& commands, std::string localPlayerName) {
 
     std::vector<std::string> result = currentVec;
 
-    for (const auto& command : commands) {
+    for (const auto &command: commands) {
         if (command.empty()) {
             continue;
         }
@@ -386,8 +390,7 @@ std::vector<std::string> APIUtils::UpdateVector(
             if (std::find(result.begin(), result.end(), item) == result.end()) {
                 result.push_back(item);
             }
-        }
-        else if (prefix == '-') {
+        } else if (prefix == '-') {
             auto it = std::find(result.begin(), result.end(), item);
             if (it != result.end()) {
                 result.erase(it);
@@ -395,21 +398,19 @@ std::vector<std::string> APIUtils::UpdateVector(
         }
     }
 
-    if (SDK::clientInstance && SDK::clientInstance->getLocalPlayer()) {
-        try {
-            std::string name = SDK::clientInstance->getLocalPlayer()->getPlayerName();
-            std::string clearedName = String::removeNonAlphanumeric(String::removeColorCodes(name));
+    try {
+        std::string name = localPlayerName;
+        std::string clearedName = String::removeNonAlphanumeric(String::removeColorCodes(name));
 
-            if (clearedName.empty()) {
-                clearedName = String::removeColorCodes(name);
-            }
-
-            if (std::find(result.begin(), result.end(), clearedName) == result.end()) {
-                result.push_back(clearedName);
-            }
-        } catch (const std::exception& e) {
-            LOG_ERROR("Error processing local player name: {}", e.what());
+        if (clearedName.empty()) {
+            clearedName = String::removeColorCodes(name);
         }
+
+        if (std::find(result.begin(), result.end(), clearedName) == result.end()) {
+            result.push_back(clearedName);
+        }
+    } catch (const std::exception &e) {
+        LOG_ERROR("Error processing local player name: {}", e.what());
     }
 
     return result;
@@ -417,10 +418,10 @@ std::vector<std::string> APIUtils::UpdateVector(
 
 std::vector<std::string> APIUtils::UpdateVector(
     const std::vector<std::string>& currentVec,
-    const std::string& commandListStr) {
+    const std::string& commandListStr, std::string localPlayerName) {
 
     std::vector<std::string> commands = ListToVector(commandListStr);
-    return UpdateVector(currentVec, commands);
+    return UpdateVector(currentVec, commands, localPlayerName);
 }
 
 std::vector<std::string> APIUtils::UpdateVectorFast(

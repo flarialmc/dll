@@ -24,6 +24,8 @@ public:
 
     void settingsRender(float settingsOffset) override;
 
+    void onKey(KeyEvent& event);
+
     void onTurnDelta(TurnDeltaEvent &event);
 
     void onRender(RenderEvent &event);

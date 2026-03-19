@@ -47,7 +47,7 @@ private:
     {static_cast<int>(BuildPlatform::Xbox), IDR_XBOX_LOGO_PNG},
     {static_cast<int>(BuildPlatform::Linux), IDR_CHROMEOS_LOGO_PNG}
     };
-    std::map<std::string, int> roleLogos = {{"Dev", IDR_CYAN_LOGO_PNG}, {"Staff", IDR_WHITE_LOGO_PNG}, {"Gamer", IDR_GAMER_LOGO_PNG}, {"Booster", IDR_BOOSTER_LOGO_PNG}, {"Supporter", IDR_SUPPORTER_LOGO_PNG}, {"Default", IDR_RED_LOGO_PNG}};
+    std::map<std::string, int> roleLogos = {{"Dev", IDR_CYAN_LOGO_PNG}, {"Staff", IDR_WHITE_LOGO_PNG}, {"Gamer", IDR_GAMER_LOGO_PNG}, {"Media", IDR_MEDIA_LOGO_PNG}, {"Booster", IDR_BOOSTER_LOGO_PNG}, {"Supporter", IDR_SUPPORTER_LOGO_PNG}, {"Default", IDR_RED_LOGO_PNG}};
     static inline std::unordered_map<mcUUID, PlayerListEntry> pmap_cache;
     static inline auto lastPlayerMapUpdate = std::chrono::steady_clock::now();
 

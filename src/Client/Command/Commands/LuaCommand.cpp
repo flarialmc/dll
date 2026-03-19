@@ -1,14 +1,15 @@
 #include "LuaCommand.hpp"
 
+#include <Utils/WinrtUtils.hpp>
+#include <Utils/PlatformUtils.hpp>
+#include <Scripting/ScriptManager.hpp>
+
 #include <winrt/base.h>
 #include <winrt/Windows.Storage.Pickers.h>
 #include <winrt/Windows.Foundation.h>
 #include <winrt/Windows.Foundation.Collections.h>
 #include <winrt/Windows.Storage.h>
 #include <winrt/Windows.Web.Http.h>
-
-#include <Utils/WinrtUtils.hpp>
-#include <Scripting/ScriptManager.hpp>
 
 #include <string>
 

@@ -8,16 +8,19 @@ bool FlarialGUI::Button(float x, float y, const D2D_COLOR_F color, const D2D_COL
     if (isInScrollView) y += scrollpos;
     if (shouldAdditionalY) y += additionalY[additionalIndex];
 
-    D2D1_COLOR_F buttonColor = CursorInRect(x, y, width, height) ? D2D1::ColorF(color.r - darkenAmounts[(int)(x + y)],
-                                                                                color.g - darkenAmounts[(int)(x + y)],
-                                                                                color.b - darkenAmounts[(int)(x + y)], color.a)
-                                                                 : color;
+    // Simple hover darkening effect without using array indices
+    D2D1_COLOR_F buttonColor = color;
+    if (CursorInRect(x, y, width, height)) {
+        const float darkenAmount = 0.1f;
+        buttonColor = D2D1::ColorF(
+            std::max(0.0f, color.r - darkenAmount),
+            std::max(0.0f, color.g - darkenAmount),
+            std::max(0.0f, color.b - darkenAmount),
+            color.a
+        );
+    }
 
-    //D2D_RECT_F rect = D2D1::RectF(x, y, x + width, y + height);
-
-    //D2D::context->FillRectangle(rect, FlarialGUI::getBrush(buttonColor).get());
-
-    FlarialGUI::RoundedRect(x, y, color, width, height);
+    FlarialGUI::RoundedRect(x, y, buttonColor, width, height);
 
     FlarialGUI::FlarialTextWithFont(x, y, text, width, height, DWRITE_TEXT_ALIGNMENT_CENTER, 14.0f,
                                     DWRITE_FONT_WEIGHT_NORMAL, textColor);

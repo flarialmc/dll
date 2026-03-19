@@ -1,6 +1,7 @@
 #include "Waypoints.hpp"
 #include "Client.hpp"
 #include "Manager.hpp"
+#include "Modules/ClickGUI/ClickGUI.hpp"
 
 #include <Utils/Render/DrawUtil3D.hpp>
 #include "Utils/Render/MaterialUtils.hpp"
@@ -34,7 +35,7 @@ float Waypoints::random() {
 }
 
 
-void Waypoints::addWaypoint(int index, std::string name, std::string color, Vec3<float> position, bool state, bool config, bool rgb, float opacity) {
+void Waypoints::addWaypoint(int index, std::string name, std::string color, Vec3<float> position, bool state, bool config, bool rgb, float opacity, bool deathWp) {
 	if (config) {
 		std::string end = "-" + FlarialGUI::cached_to_string(index);
 		setDef("waypoint" + end, (std::string)name);
@@ -45,17 +46,21 @@ void Waypoints::addWaypoint(int index, std::string name, std::string color, Vec3
 		setDef("state" + end, (bool)state);
 		setDef("rgb" + end, (bool)rgb);
 		setDef("opacity" + end, (float)opacity);
-		setDef("world" + end, (std::string)SDK::clientInstance->getLocalPlayer()->getLevel()->getWorldFolderName());
-		setDef("dimension" + end, (std::string)SDK::clientInstance->getBlockSource()->getDimension()->getName());
+		auto* levelPtr = SDK::clientInstance->getLocalPlayer()->getLevel();
+		setDef("world" + end, levelPtr ? (std::string)levelPtr->getWorldFolderName() : std::string{});
+		auto* blockSrc = SDK::clientInstance->getBlockSource();
+		auto* dim = blockSrc ? blockSrc->getDimension() : nullptr;
+		setDef("dimension" + end, dim ? (std::string)dim->getName() : std::string{});
 		setDef("showInnerBeam" + end, true);
 		setDef("showOuterBeam" + end, true);
+		setDef("isDeathWp" + end, deathWp);
 		Client::SaveSettings();
 
-		Waypoint wp(position, false, 100.0f, index, state);
+		Waypoint wp(position, false, 100.0f, index, state, deathWp);
 		WaypointList[name] = wp;
 	}
 	else {
-		Waypoint wp(position, false, 100.0f, index, state);
+		Waypoint wp(position, false, 100.0f, index, state, deathWp);
 		WaypointList[name] = wp;
 	}
 }
@@ -81,7 +86,7 @@ void Waypoints::onSetup() {
 	keybindActions.clear();
 	// Clear WaypointList to avoid conflicts with stale data when config reloads
 	WaypointList.clear();
-	
+
 	keybindActions.push_back([this](std::vector<std::any> args) -> std::any {
 		std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - last_used;
 		if (duration.count() >= 0.1) {
@@ -112,6 +117,8 @@ void Waypoints::onSetup() {
 	for (int i = 0; i < 10000; i++) {
 		std::string end = "-" + FlarialGUI::cached_to_string(i);
 		if (!this->settings.getSettingByName<std::string>("waypoint" + end)) continue;
+		bool deathWp = false;
+		if (this->settings.getSettingByName<std::string>("isDeathWp" + end)) deathWp = getOps<bool>("isDeathWp" + end);
 		addWaypoint(
 			i,
 			getOps<std::string>("waypoint" + end),
@@ -124,7 +131,8 @@ void Waypoints::onSetup() {
 			getOps<bool>("state" + end),
 			false,
 			getOps<bool>("rgb" + end),
-			getOps<float>("opacity" + end)
+			getOps<float>("opacity" + end),
+			deathWp
 		);
 	}
 
@@ -192,7 +200,7 @@ void Waypoints::settingsRender(float settingsOffset) {
 		FlarialGUI::Notify("Added! Scroll down for options.");
 	});
 
-	addKeybind("Add waypoint keybind", "Hold for 2 seconds to set bind.", getKeybind());
+	addKeybind("Add waypoint keybind", "", getKeybind());
 	addSlider("Distance", "Change until which distance waypoints will be drawn.", "distance", 10000.f, 0.f, true);
 	addToggle("Randomize Waypoint Color", "", "randomizeColor");
 	extraPadding();
@@ -231,7 +239,10 @@ void Waypoints::settingsRender(float settingsOffset) {
 	for (auto pair : waypointListCopy) {
 		std::string end = "-" + FlarialGUI::cached_to_string(pair.second.index);
 		if (!this->settings.getSettingByName<std::string>("waypoint" + end)) continue;
-		if (getOps<std::string>("world" + end) != SDK::clientInstance->getLocalPlayer()->getLevel()->getWorldFolderName()) continue;
+		if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer()) continue;
+		auto* lvlSettings = SDK::clientInstance->getLocalPlayer()->getLevel();
+		if (!lvlSettings) continue;
+		if (getOps<std::string>("world" + end) != lvlSettings->getWorldFolderName()) continue;
 		addHeader(getOps<std::string>("waypoint" + end));
 		addToggle("Enabled", "Change if the waypoint should be shown or not.", "state" + end);
 		addColorPicker("Color", "Change the color of the waypoint.", getOps<std::string>("color" + end), getOps<float>("opacity" + end), getOps<bool>("rgb" + end));
@@ -311,10 +322,12 @@ bool Waypoints::deleteWaypoint(std::string name) {
 
 void Waypoints::onRender(RenderEvent& event) {
     if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer() || SDK::getCurrentScreen() != "hud_screen" ||
-       !SDK::clientInstance->getLocalPlayer()->getLevel() || !SDK::clientInstance->getBlockSource()->getDimension())
+       !SDK::clientInstance->getLocalPlayer()->getLevel() || !SDK::clientInstance->getBlockSource() ||
+       !SDK::clientInstance->getBlockSource()->getDimension())
        return;
 
-    if (FlarialGUI::inMenu || SDK::getCurrentScreen() != "hud_screen") return;
+    if (FlarialGUI::inMenu || ClickGUI::blurActive || SDK::getCurrentScreen() != "hud_screen") return;
+    ClickGUI::HudFadeGuard fadeGuard;
 
     Vec2<float> screen;
     D2D1_COLOR_F invis = FlarialGUI::HexToColorF("000000");
@@ -332,8 +345,10 @@ void Waypoints::onRender(RenderEvent& event) {
 			//get pos
 			Vec3<float> waypointPos = getPos(waypoint.index);
 
-			//check if its on screen
-			if (Matrix::WorldToScreen(waypointPos, screen)) {
+			// Project slightly above the marker for better visibility; fallback to exact position.
+			Vec3<float> labelPos = waypointPos;
+			labelPos.y += 1.6f;
+			if (Matrix::WorldToScreen(labelPos, screen) || Matrix::WorldToScreen(waypointPos, screen)) {
 				//get distance
 				Vec3<float> origin = MC::Transform.origin;
 				float distance = waypointPos.dist(origin);
@@ -394,13 +409,16 @@ void Waypoints::onRender(RenderEvent& event) {
 
 					//draw invisible text
 					std::string name = FlarialGUI::FlarialTextWithFont(screen.x, screen.y, widename.c_str(), fontSize, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize, DWRITE_FONT_WEIGHT_NORMAL, invis, true);
+					float textWidth = FlarialGUI::TextSizes[name];
+					float centeredX = screen.x - (textWidth * 0.5f);
+					float rectX = centeredX - 5.0f;
 
 					//draw bg
 					FlarialGUI::RoundedRect(
-						screen.x - 5.0F,
+						rectX,
 						screen.y - 20.0F,
 						rect,
-						FlarialGUI::TextSizes[name] + 10.0F,
+						textWidth + 10.0F,
 						40.0F,
 						getOps<float>("bgrounding"),
 						getOps<float>("bgrounding")
@@ -410,18 +428,18 @@ void Waypoints::onRender(RenderEvent& event) {
 					if (getOps<bool>("border"))
 					{
 						FlarialGUI::RoundedHollowRect(
-							screen.x - 5.0F,
+							rectX,
 							screen.y - 20.0F,
 							getOps<float>("borderthickness"),
 							border,
-							FlarialGUI::TextSizes[name] + 10.0F,
+							textWidth + 10.0F,
 							40.0F,
 							getOps<float>("bgrounding"),
 							getOps<float>("bgrounding")
 						);
 					}
 					//draw actual text
-					FlarialGUI::FlarialTextWithFont(screen.x, screen.y, widename.c_str(), fontSize, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize, DWRITE_FONT_WEIGHT_NORMAL, text, true);
+					FlarialGUI::FlarialTextWithFont(centeredX, screen.y, widename.c_str(), fontSize, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize, DWRITE_FONT_WEIGHT_NORMAL, text, true);
 				}
 			}
 		}
@@ -430,7 +448,6 @@ void Waypoints::onRender(RenderEvent& event) {
 
 
 void Waypoints::onKey(KeyEvent& event) {
-
 	if (this->isEnabled() && (
 		SDK::clientInstance->getScreenName() == "hud_screen" ||
 		SDK::clientInstance->getScreenName() == "f3_screen" ||
@@ -446,13 +463,20 @@ void Waypoints::onKey(KeyEvent& event) {
 
 void Waypoints::onRender3D(Render3DEvent& event) {
 	if (ModuleManager::getModule("ClickGUI")->active) return;
+	if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer()) return;
 
 	for (auto pair : WaypointList) {
 		std::string end = "-" + FlarialGUI::cached_to_string(pair.second.index);
 
 		if (!this->settings.getSettingByName<bool>("state" + end)) continue; //check if its enabled
-		if (getOps<std::string>("world" + end) != SDK::clientInstance->getLocalPlayer()->getLevel()->getWorldFolderName()) continue;
-		if (getOps<std::string>("dimension" + end) != SDK::clientInstance->getBlockSource()->getDimension()->getName()) continue;
+		auto* lvl3d = SDK::clientInstance->getLocalPlayer()->getLevel();
+		if (!lvl3d) continue;
+		if (getOps<std::string>("world" + end) != lvl3d->getWorldFolderName()) continue;
+		auto* bs3d = SDK::clientInstance->getBlockSource();
+		if (!bs3d) continue;
+		auto* dim3d = bs3d->getDimension();
+		if (!dim3d) continue;
+		if (getOps<std::string>("dimension" + end) != dim3d->getName()) continue;
 		if (getOps<bool>("state" + end))
 		{
 

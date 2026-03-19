@@ -1,48 +1,19 @@
 #include "ArrowCounter.hpp"
 
-
-#include "Events/Game/TickEvent.hpp"
-
-
-void ArrowCounter::onEnable() {
-    Listen(this, TickEvent, &ArrowCounter::onTick)
-    Listen(this, RenderEvent, &ArrowCounter::onRender)
-    Module::onEnable();
-}
-
-void ArrowCounter::onDisable() {
-    Deafen(this, TickEvent, &ArrowCounter::onTick)
-    Deafen(this, RenderEvent, &ArrowCounter::onRender)
-    Module::onDisable();
-}
-
-void ArrowCounter::defaultConfig() {
-    setDef("text", (std::string)"Arrows: {value}");
+void ArrowCounter::customConfig() {
     setDef("onlyRenderWhenHoldingBowOrCrossbow", false);
-    Module::defaultConfig("all");
-
 }
 
-void ArrowCounter::settingsRender(float settingsOffset) {
-    initSettingsPage();
-
+void ArrowCounter::customSettings() {
     addToggle("Only render when holding bow or crossbow", "", "onlyRenderWhenHoldingBowOrCrossbow");
-    defaultAddSettings("main");
-    extraPadding();
+}
 
-    addHeader("Text");
-    defaultAddSettings("text");
-    extraPadding();
+void ArrowCounter::customInit() {
+    Listen(this, TickEvent, &ArrowCounter::onTick)
+}
 
-    addHeader("Colors");
-    defaultAddSettings("colors");
-    extraPadding();
-
-    addHeader("Misc");
-    defaultAddSettings("misc");
-
-    FlarialGUI::UnsetScrollView();
-    resetPadding();
+void ArrowCounter::customCleanup() {
+    Deafen(this, TickEvent, &ArrowCounter::onTick)
 }
 
 void ArrowCounter::onTick(TickEvent& event) {
@@ -104,9 +75,7 @@ void ArrowCounter::onTick(TickEvent& event) {
     }
 }
 
-void ArrowCounter::onRender(RenderEvent& event) {
-    if (!this->isEnabled() || !shouldRender) return;
-
-    auto arrowsStr = FlarialGUI::cached_to_string(arrows);
-    this->normalRender(13, arrowsStr);
+std::string ArrowCounter::getDisplayValue() {
+    if (!shouldRender) return "";
+    return FlarialGUI::cached_to_string(arrows);
 }

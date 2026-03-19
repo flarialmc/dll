@@ -39,5 +39,9 @@ Level_addParticleEffect::Level_addParticleEffect(): Hook("Add Particle Effects H
 
 void Level_addParticleEffect::enableHookk()
 {
-    Memory::hookFunc(SDK::clientInstance->getLocalPlayer()->getLevel()->vtable[242], (void*)&Level_addParticleEffect::Level_addParticleEffectDetour, (void**)&funcOriginal, "Add Particle Effects Hook");
+    auto player = SDK::clientInstance->getLocalPlayer();
+    if (!player) return;
+    auto level = player->getLevel();
+    if (!level) return;
+    Memory::hookFunc(level->vtable[242], (void*)&Level_addParticleEffect::Level_addParticleEffectDetour, (void**)&funcOriginal, "Add Particle Effects Hook");
 }

@@ -174,6 +174,50 @@ enum class ActorCategory {
 
 class Level;
 
+class MoveInputComponentHandler {
+private:
+    Actor* actor;
+
+public:
+    explicit MoveInputComponentHandler(Actor* actor) : actor(actor) {}
+
+    // Getters for input state
+    bool forward();
+    bool backward();
+    bool left();
+    bool right();
+    bool mSneakDown();
+    bool mSprintDown();
+    bool mJumpDown();
+
+    // Getters for component state
+    bool getSneaking();
+    bool getSprinting();
+    bool getJumping();
+
+    // Setters for input state
+    void setForward(bool value);
+    void setBackward(bool value);
+    void setLeft(bool value);
+    void setRight(bool value);
+    void setMSneakDown(bool value);
+    void setMSprintDown(bool value);
+    void setMJumpDown(bool value);
+
+    // Setters for component state
+    void setSneaking(bool value);
+    void setSprinting(bool value);
+    void setJumping(bool value);
+
+    // Raw input state setters
+    void setRawForward(bool value);
+    void setRawBackward(bool value);
+    void setRawLeft(bool value);
+    void setRawRight(bool value);
+    void setRawMSneakDown(bool value);
+    void setRawMSprintDown(bool value);
+    void setRawMJumpDown(bool value);
+};
 
 class Actor {
 public:
@@ -195,6 +239,9 @@ public:
     ItemStack *getArmor(int slot);
 
     MoveInputComponent *getMoveInputHandler();
+    MoveInputComponentOLD* getMoveInputHandlerOLD();
+
+    MoveInputComponentHandler getHandler();
 
     bool getActorFlag(ActorFlags flag);
 
@@ -259,6 +306,12 @@ public:
     float getHunger();
 
     float getSaturation();
+
+    int getPlayerLevel();
+
+    float getExperienceProgress();
+
+    std::string getAlias();
 
     //class SerializedSkin* getSkin();
 };

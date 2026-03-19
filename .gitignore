@@ -19,12 +19,7 @@ build/
 .vs/
 .vscode/
 .idea/
-cmake-build-debug-ninja/
-cmake-build-release-ninja/
-cmake-build-debug-visual-studio/
-cmake-build-release-visual-studio/
-cmake-build-minsizerel-visual-studio/
-cmake-build-visual-profile/
+cmake-build-*/
 clion/
 clion-ninja/
 *.zip
@@ -32,9 +27,16 @@ localextras/
 _deps/
 *.pdb
 *.dll
+*.exe
 *.ilk
 Makefile
 cmake-build-debug/
 Testing/
 compiledoom.txt
 
+.ida-mcp/
+.ai/
+docs/
+*.diff
+/.codex/
+/slides-demo/

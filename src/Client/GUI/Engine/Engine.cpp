@@ -26,6 +26,7 @@
 #include <algorithm>
 
 #include "../../Module/Modules/ClickGUI/ClickGUI.hpp"
+#include "TextFormat.hpp"
 #include "imgui/imgui_freetype.h"
 //#include <misc/freetype/imgui_freetype.h>
 
@@ -83,6 +84,7 @@ namespace FlarialGUI {
     bool DoLoadFontLater;
     bool HasAFontLoaded = false;
     std::vector<std::pair<std::vector<std::byte>, FontKey>> FontMemoryToLoad;
+    std::mutex FontMemoryToLoadMutex;
 
     std::string currentKeybind;
 
@@ -155,6 +157,7 @@ LRUCache<uint64_t, winrt::com_ptr<ID2D1LinearGradientBrush>> FlarialGUI::gradien
 std::unordered_map<int, WindowRect> FlarialGUI::WindowRects;
 std::unordered_map<int, SliderRect> FlarialGUI::SliderRects;
 std::unordered_map<int, SliderIntRect> FlarialGUI::SliderIntRects;
+std::unordered_map<int, RangeSliderRect> FlarialGUI::RangeSliderRects;
 std::unordered_map<int, TextBoxStruct> FlarialGUI::TextBoxes;
 std::unordered_map<int, ColorPicker> FlarialGUI::ColorPickers;
 std::unordered_map<int, DropdownStruct> FlarialGUI::DropDownMenus;
@@ -729,7 +732,7 @@ bool hasEnding(std::string const& fullString, std::string const& ending) {
 
 ImVec2 FlarialGUI::getFlarialTextSize(const wchar_t* text, const float width, const float height,
 	const DWRITE_TEXT_ALIGNMENT alignment, const float fontSize,
-	const DWRITE_FONT_WEIGHT weight, bool moduleFont, bool troll) {
+	const DWRITE_FONT_WEIGHT weight, bool moduleFont, bool skipOpacityOverride) {
 
 	bool pixelate = Client::settings.getSettingByName<bool>("pixelateFonts")->value;
 
@@ -801,12 +804,12 @@ ImVec2 FlarialGUI::getFlarialTextSize(const wchar_t* text, const float width, co
 
 std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t* text, const float width, const float height,
 	const DWRITE_TEXT_ALIGNMENT alignment, const float fontSize,
-	const DWRITE_FONT_WEIGHT weight, bool moduleFont, bool troll) {
+	const DWRITE_FONT_WEIGHT weight, bool moduleFont, bool skipOpacityOverride) {
 
 	D2D1_COLOR_F color = ClickGUI::getColor("globalText");
 	color.a *= clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value;
 
-	if (FlarialGUI::inMenu && !troll && ClickGUI::settingsOpacity != 1 && ClickGUI::curr != "modules" && !ClickGUI::editmenu) color.a = ClickGUI::settingsOpacity;
+	if (FlarialGUI::inMenu && !skipOpacityOverride && ClickGUI::settingsOpacity != 1 && ClickGUI::curr != "modules" && !ClickGUI::editmenu) color.a = ClickGUI::settingsOpacity;
 
 	return FlarialTextWithFont(x, y, text, width, height, alignment, fontSize, weight, color, moduleFont);
 }
@@ -924,6 +927,80 @@ std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t* tex
 	}
 	
 	return fontedName;
+}
+
+ImVec2 FlarialGUI::getFlarialTextSizeFormatted(const std::string& text, float width, float height,
+	DWRITE_TEXT_ALIGNMENT alignment, float fontSize,
+	DWRITE_FONT_WEIGHT weight, bool moduleFont) {
+
+	// Strip format tags and measure the plain text
+	std::string strippedText = TextFormat::stripFormatTags(text);
+	return getFlarialTextSize(to_wide(strippedText).c_str(), width, height, alignment, fontSize, weight, moduleFont);
+}
+
+void FlarialGUI::FlarialTextWithFontFormatted(float x, float y, const std::string& text, float width, float height,
+	DWRITE_TEXT_ALIGNMENT alignment, float fontSize,
+	DWRITE_FONT_WEIGHT weight, D2D1_COLOR_F defaultColor, bool moduleFont) {
+
+	// Parse the text into color segments
+	auto segments = TextFormat::parseFormattedText(text, [](const std::string& colorName) -> D2D1_COLOR_F {
+		return ClickGUI::getFormatColor(colorName);
+	});
+
+	// If no segments or empty, nothing to render
+	if (segments.empty()) {
+		return;
+	}
+
+	// If only one segment with no color changes, use normal rendering
+	if (segments.size() == 1 && segments[0].useReset && !segments[0].color.has_value()) {
+		FlarialTextWithFont(x, y, to_wide(segments[0].text).c_str(), width, height, alignment, fontSize, weight, defaultColor, moduleFont);
+		return;
+	}
+
+	// Calculate total text width for alignment
+	std::string strippedText = TextFormat::stripFormatTags(text);
+	ImVec2 totalSize = getFlarialTextSize(to_wide(strippedText).c_str(), width, height, alignment, fontSize, weight, moduleFont);
+
+	// Apply alignment adjustment to starting X
+	float startX = x;
+	switch (alignment) {
+	case DWRITE_TEXT_ALIGNMENT_CENTER:
+		startX = x + (width / 2) - (totalSize.x / 2);
+		break;
+	case DWRITE_TEXT_ALIGNMENT_TRAILING:
+		startX = x + width - totalSize.x;
+		break;
+	case DWRITE_TEXT_ALIGNMENT_LEADING:
+	default:
+		break;
+	}
+
+	// Render each segment at sequential positions (always left-aligned relative to each other)
+	float currentX = startX;
+	for (const auto& segment : segments) {
+		if (segment.text.empty()) continue;
+
+		// Determine the color for this segment
+		D2D1_COLOR_F segmentColor = defaultColor;
+		if (segment.color.has_value()) {
+			segmentColor = segment.color.value();
+			// Preserve alpha from default color if segment color doesn't override it
+			// Actually, let's use the segment's alpha since it comes from settings
+		} else if (!segment.useReset) {
+			// This shouldn't happen, but handle gracefully
+			segmentColor = defaultColor;
+		}
+
+		// Render this segment (always left-aligned since we're positioning manually)
+		FlarialTextWithFont(currentX, y, to_wide(segment.text).c_str(), 1000000.f, height,
+			DWRITE_TEXT_ALIGNMENT_LEADING, fontSize, weight, segmentColor, moduleFont);
+
+		// Move X position for next segment
+		ImVec2 segSize = getFlarialTextSize(to_wide(segment.text).c_str(), 1000000.f, height,
+			DWRITE_TEXT_ALIGNMENT_LEADING, fontSize, weight, moduleFont);
+		currentX += segSize.x;
+	}
 }
 
 void FlarialGUI::ExtractImageResource(int resourceId, std::string fileName, LPCTSTR type) {
@@ -1109,54 +1186,68 @@ void FlarialGUI::queueFontMemoryLoad(std::wstring filepath, FontKey fontK, int R
 
 			dwFontSize = SizeofResource(Client::currentModule, hRes);
 
-			FontMemoryToLoad.push_back(std::pair(ConvertFontDataToVector(pFontData, dwFontSize), fontK));
+			{
+				std::lock_guard<std::mutex> lock(FontMemoryToLoadMutex);
+				FontMemoryToLoad.push_back(std::pair(ConvertFontDataToVector(pFontData, dwFontSize), fontK));
+			}
 		}
 		std::ifstream fontFile(tral, std::ios::binary);
 		if (fontFile.is_open()) {
 			Logger::debug("Path {}", tral);
 			std::vector<std::byte> fontData = Memory::readFile(filepath);
 			fontFile.close();
-			FontMemoryToLoad.push_back(std::pair(fontData, fontK));
+			{
+				std::lock_guard<std::mutex> lock(FontMemoryToLoadMutex);
+				FontMemoryToLoad.push_back(std::pair(fontData, fontK));
+			}
 		}
 		}).detach();
 }
 
 bool FlarialGUI::LoadFontFromFontFamily(FontKey fontK) {
 
-	if (!FlarialGUI::FontMemoryToLoad.empty()) {
-		for (auto it = FlarialGUI::FontMemoryToLoad.begin(); it != FlarialGUI::FontMemoryToLoad.end(); ) {
-			if (fontK.name == "Space Grotesk") fontK.name = "162";
-			auto ogit = it;
-			if (!FontMap[it->second])
-			{
-
-				ImFontConfig config;
-				if (Client::settings.getSettingByName<bool>("pixelateFonts")->value) {
-					config.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_Monochrome;
-					config.OversampleH = 1;
-					config.OversampleV = 1;
-				} else config.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_MonoHinting;
-
-				config.FontDataOwnedByAtlas = false;
-				int FontDataSize = static_cast<int>(it->first.size());
-
-				if (FontDataSize < 100) {
-					LOG_ERROR("Error Loading Font. Font size is less than 100");
-					return false;
-				};
-				const std::vector<int> fontSizeBuckets = { 16, 32, 64, 128, 256 };
-				FontKey og = it->second;
-				for (int rsize : fontSizeBuckets) {
-					it->second.size = rsize;
-					if (!FontMap[it->second])
-						FontMap[it->second] = ImGui::GetIO().Fonts->AddFontFromMemoryTTF(it->first.data(), static_cast<int>(it->first.size()), it->second.size, &config, ImGui::GetIO().Fonts->GetGlyphRangesDefault());
-				}
-				it->second.size = og.size;
-			}
-
-			it = FlarialGUI::FontMemoryToLoad.erase(ogit);
-			HasAFontLoaded = true;
+	// Move font data to local copy under lock, then process outside lock
+	// This prevents race condition with queueFontMemoryLoad threads
+	std::vector<std::pair<std::vector<std::byte>, FontKey>> localFontData;
+	{
+		std::lock_guard<std::mutex> lock(FontMemoryToLoadMutex);
+		if (!FlarialGUI::FontMemoryToLoad.empty()) {
+			localFontData = std::move(FlarialGUI::FontMemoryToLoad);
+			FlarialGUI::FontMemoryToLoad.clear();
 		}
+	}
+
+	// Process fonts outside the lock to avoid holding it during slow operations
+	for (auto& fontEntry : localFontData) {
+		if (fontK.name == "Space Grotesk") fontK.name = "162";
+		if (!FontMap[fontEntry.second])
+		{
+
+			ImFontConfig config;
+			if (Client::settings.getSettingByName<bool>("pixelateFonts")->value) {
+				config.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_Monochrome;
+				config.OversampleH = 1;
+				config.OversampleV = 1;
+			} else config.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_MonoHinting;
+
+			config.FontDataOwnedByAtlas = false;
+			int FontDataSize = static_cast<int>(fontEntry.first.size());
+
+			if (FontDataSize < 100) {
+				LOG_ERROR("Error Loading Font. Font size is less than 100");
+				return false;
+			};
+			const std::vector<int> fontSizeBuckets = { 16, 32, 64, 128, 256 };
+			FontKey og = fontEntry.second;
+			for (int rsize : fontSizeBuckets) {
+				fontEntry.second.size = rsize;
+				if (!FontMap[fontEntry.second])
+					FontMap[fontEntry.second] = ImGui::GetIO().Fonts->AddFontFromMemoryTTF(fontEntry.first.data(), static_cast<int>(fontEntry.first.size()), fontEntry.second.size, &config, ImGui::GetIO().Fonts->GetGlyphRangesDefault());
+			}
+			fontEntry.second.size = og.size;
+		}
+
+		HasAFontLoaded = true;
 	}
 
 	std::string name = fontK.name;
@@ -1317,10 +1408,10 @@ void FlarialGUI::SetWindowRect(float x, float y, float width, float height, int 
 	if (currentNum > maxRect) maxRect = currentNum;
 
 	int i = 0;
-	bool ye = false;
+	bool isOtherElementMoving = false;
 	for (const auto& [key, rect] : WindowRects) {
 		if (rect.isMovingElement && key != currentNum) {
-			ye = true;
+			isOtherElementMoving = true;
 			break;
 		}
 	}
@@ -1337,7 +1428,17 @@ void FlarialGUI::SetWindowRect(float x, float y, float width, float height, int 
 		WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType::Arrow);
 	}
 
-	if (!ye) {
+	// If a drag is active but the mouse button was released outside the window,
+	// the release event is never received and MC::held stays true. Poll the
+	// actual OS button state to catch this and cancel the stale drag.
+	if (WindowRects[currentNum].isMovingElement && !(GetAsyncKeyState(VK_LBUTTON) & 0x8000)) {
+		WindowRects[currentNum].isMovingElement = false;
+		WindowRects[currentNum].oriMouseX = -1;
+		WindowRects[currentNum].oriMouseY = -1;
+		MC::held = false;
+	}
+
+	if (!isOtherElementMoving) {
 		if ((CursorInRect(x, y, width, height) || WindowRects[currentNum].isMovingElement) && MC::held) {
 			if (!WindowRects[currentNum].isMovingElement) {
 				//WindowRects[currentNum].oriMouseX = (MC::mousePos.x);
@@ -1504,8 +1605,8 @@ Vec2<float> FlarialGUI::GetCenterXY(float rectWidth, float rectHeight) {
 	return xy;
 }
 
-void FlarialGUI::ResetShit() {
-	// Reset the variables to their initial values or desired values here
+/// Resets all GUI element states (windows, sliders, text boxes, color pickers, dropdowns)
+void FlarialGUI::ResetUIState() {
 	for (auto& i : WindowRects) {
 		i.second = WindowRect();
 	}
@@ -1515,7 +1616,7 @@ void FlarialGUI::ResetShit() {
 	}
 
 	for (auto& i : TextBoxes) {
-		i.second = TextBoxStruct();
+		i.second.reset();
 	}
 
 	for (auto& i : ColorPickers) {
@@ -1567,7 +1668,7 @@ void FlarialGUI::ImRotateEnd(float angle, ImVec2 center)
 std::vector<D2D_RECT_F> PreviousClippingRects = {};
 
 void FlarialGUI::PushImClipRect(ImVec2 pos, ImVec2 size, bool overridePreviousClipping) {
-
+	//lp;
 	ImVec2 max(pos.x + size.x, pos.y + size.y);
 
     if (!overridePreviousClipping and !PreviousClippingRects.empty())
@@ -1612,7 +1713,9 @@ void FlarialGUI::PushImClipRect(D2D_RECT_F rect, bool overridePreviousClipping) 
 }
 
 void FlarialGUI::PopImClipRect() {
-    PreviousClippingRects.pop_back();
+    if (!PreviousClippingRects.empty()) {
+        PreviousClippingRects.pop_back();
+    }
     ImGui::GetBackgroundDrawList()->PopClipRect();
 }
 
@@ -1630,10 +1733,9 @@ void FlarialGUI::Notify(const std::string& text) {
 }
 void FlarialGUI::NotifyHeartbeat() {
 
-	// if i dont do this i get a unresolved externals error????
-	float funnyTroll = 1.f;
-	FlarialGUI::lerp(funnyTroll, 40.f, 0.12f * FlarialGUI::frameFactor);
-	// end of torll
+	// Dummy lerp call to prevent unresolved externals linker error
+	float lerpWorkaround = 1.f;
+	FlarialGUI::lerp(lerpWorkaround, 40.f, 0.12f * FlarialGUI::frameFactor);
 
 
 	Vec2<float> round = Constraints::RoundingConstraint(20, 20);
@@ -1650,8 +1752,8 @@ void FlarialGUI::NotifyHeartbeat() {
 		float posyModif = -((height + Constraints::RelativeConstraint(0.01f, "height", true)) * i);
 
 		if (n.firstTime) {
-			float TrollSize = Constraints::RelativeConstraint(0.128, "height", true);
-			std::string sizeName = FlarialGUI::FlarialTextWithFont(n.currentPos, n.currentPosY, FlarialGUI::to_wide(n.text).c_str(), 10, 25, DWRITE_TEXT_ALIGNMENT_CENTER, TrollSize, DWRITE_FONT_WEIGHT_NORMAL, D2D1::ColorF(0, 0, 0, 0));
+			float notifFontSize = Constraints::RelativeConstraint(0.128, "height", true);
+			std::string sizeName = FlarialGUI::FlarialTextWithFont(n.currentPos, n.currentPosY, FlarialGUI::to_wide(n.text).c_str(), 10, 25, DWRITE_TEXT_ALIGNMENT_CENTER, notifFontSize, DWRITE_FONT_WEIGHT_NORMAL, D2D1::ColorF(0, 0, 0, 0));
 			if (FlarialGUI::TextSizes[sizeName] != 0) {
 				n.width = FlarialGUI::TextSizes[sizeName] + Constraints::RelativeConstraint(0.0345f, "height", true);
 				n.currentPos = Constraints::CenterConstraint(n.width, 0).x;
@@ -1709,17 +1811,15 @@ void FlarialGUI::NotifyHeartbeat() {
 		col.a = 0.4f;
 
 		if (notif.firstTime) {
-			 //   this fixes a bug where a part of the text would be off the screen on smaller screen sizes
-			 //  idk how to explain it but
-			 //   it just works
-			float TrollSize = Constraints::RelativeConstraint(0.128, "height", true);
-			std::string sizeName = FlarialGUI::FlarialTextWithFont(notif.currentPos, notif.currentPosY, FlarialGUI::to_wide(notif.text + "troll troll troll troll troll").c_str(), 10, 25, DWRITE_TEXT_ALIGNMENT_CENTER, TrollSize, DWRITE_FONT_WEIGHT_NORMAL, D2D1::ColorF(0, 0, 0, 0));
+			// Measure text with extra padding to prevent clipping on smaller screens
+			float notifFontSize = Constraints::RelativeConstraint(0.128, "height", true);
+			std::string sizeName = FlarialGUI::FlarialTextWithFont(notif.currentPos, notif.currentPosY, FlarialGUI::to_wide(notif.text + "                              ").c_str(), 10, 25, DWRITE_TEXT_ALIGNMENT_CENTER, notifFontSize, DWRITE_FONT_WEIGHT_NORMAL, D2D1::ColorF(0, 0, 0, 0));
 			if (FlarialGUI::TextSizes[sizeName] != 0 && Constraints::PercentageConstraint(0.3, "right", true) > MC::windowSize.x - FlarialGUI::TextSizes[sizeName]) {
 				notif.currentPos = Constraints::PercentageConstraint(0.4, "right", true);
 				notif.firstTime = false;
 			} else notif.currentPos = Constraints::PercentageConstraint(0.3, "right", true);
 
-			// end of wierd ahh method
+			// End of text position adjustment for small screens
 
 			notif.width = MC::windowSize.x; // js have it be as long as possible for it to go off the screen
 		}
@@ -1874,13 +1974,8 @@ std::wstring FlarialGUI::to_wide(const std::string& str) {
 template<typename T>
 void FlarialGUI::lerp(T& a, const T& b, float t) {
 	if (!Client::settings.getSettingByName<bool>("disableanims")->value) {
-		// Perform linear interpolation between a and b based on t
 		float interpolatedValue = a + (b - a) * t;
-
-		// Round up the interpolated value to three decimal places
 		float roundedValue = std::ceilf(interpolatedValue * 1000.0f) / 1000.0f;
-
-		// Assign the rounded value back to 'a'
 		a = roundedValue;
 	}
 	else a = b;
@@ -1896,6 +1991,6 @@ void FlarialGUI::UnSetIsInAdditionalYMode() {
 
 float FlarialGUI::SettingsTextWidth(const std::string& text) {
 
-	return 100; //what the fuck is this
+	return 100; // TODO: placeholder - needs proper text width calculation
 
 }

@@ -13,12 +13,12 @@
 #endif
 
 #if KIERO_INCLUDE_D3D11
-#include <dxgi.h>
+#include <dxgi1_4.h>
 #include <d3d11.h>
 #endif
 
 #if KIERO_INCLUDE_D3D12
-#include <dxgi.h>
+#include <dxgi1_4.h>
 #include <d3d12.h>
 #endif
 
@@ -328,14 +328,36 @@ kiero::Status::Enum kiero::init(RenderType::Enum _renderType)
 					return Status::UnknownError;
 				}
 
-				g_methodsTable = (uint150_t *)::calloc(205, sizeof(uint150_t));
-				::memcpy(g_methodsTable, *(uint150_t **)swapChain, 18 * sizeof(uint150_t));
-				::memcpy(g_methodsTable + 18, *(uint150_t **)device, 43 * sizeof(uint150_t));
-				::memcpy(g_methodsTable + 18 + 43, *(uint150_t **)context, 144 * sizeof(uint150_t));
+				// Query for IDXGISwapChain3 to get all methods from IDXGISwapChain through IDXGISwapChain3
+				IDXGISwapChain3 *swapChain3 = NULL;
+				swapChain->QueryInterface(__uuidof(IDXGISwapChain3), (void **)&swapChain3);
+
+				// Allocate space for 40 SwapChain methods (instead of 18), 43 Device methods, and 144 Context methods
+				g_methodsTable = (uint150_t *)::calloc(227, sizeof(uint150_t));
+
+				if (swapChain3)
+				{
+					// Copy all 40 methods from IDXGISwapChain3 (includes IDXGISwapChain, IDXGISwapChain1, IDXGISwapChain2, IDXGISwapChain3)
+					::memcpy(g_methodsTable, *(uint150_t **)swapChain3, 40 * sizeof(uint150_t));
+				}
+				else
+				{
+					// Fallback to base IDXGISwapChain if QueryInterface fails
+					::memcpy(g_methodsTable, *(uint150_t **)swapChain, 18 * sizeof(uint150_t));
+				}
+
+				::memcpy(g_methodsTable + 40, *(uint150_t **)device, 43 * sizeof(uint150_t));
+				::memcpy(g_methodsTable + 40 + 43, *(uint150_t **)context, 144 * sizeof(uint150_t));
 
 #if KIERO_USE_MINHOOK
 				MH_Initialize();
 #endif
+
+				if (swapChain3)
+				{
+					swapChain3->Release();
+					swapChain3 = NULL;
+				}
 
 				swapChain->Release();
 				swapChain = NULL;
@@ -470,12 +492,27 @@ kiero::Status::Enum kiero::init(RenderType::Enum _renderType)
 					return Status::UnknownError;
 				}
 
-				g_methodsTable = (uint150_t *)::calloc(150, sizeof(uint150_t));
+				// Query for IDXGISwapChain3 to get all methods from IDXGISwapChain through IDXGISwapChain3
+				IDXGISwapChain3 *swapChain3 = NULL;
+				swapChain->QueryInterface(__uuidof(IDXGISwapChain3), (void **)&swapChain3);
+
+				// Allocate space for 44 Device + 19 CommandQueue + 9 CommandAllocator + 60 CommandList + 40 SwapChain methods
+				g_methodsTable = (uint150_t *)::calloc(172, sizeof(uint150_t));
 				::memcpy(g_methodsTable, *(uint150_t **)device, 44 * sizeof(uint150_t));
 				::memcpy(g_methodsTable + 44, *(uint150_t **)commandQueue, 19 * sizeof(uint150_t));
 				::memcpy(g_methodsTable + 44 + 19, *(uint150_t **)commandAllocator, 9 * sizeof(uint150_t));
 				::memcpy(g_methodsTable + 44 + 19 + 9, *(uint150_t **)commandList, 60 * sizeof(uint150_t));
-				::memcpy(g_methodsTable + 44 + 19 + 9 + 60, *(uint150_t **)swapChain, 18 * sizeof(uint150_t));
+
+				if (swapChain3)
+				{
+					// Copy all 40 methods from IDXGISwapChain3 (includes IDXGISwapChain, IDXGISwapChain1, IDXGISwapChain2, IDXGISwapChain3)
+					::memcpy(g_methodsTable + 44 + 19 + 9 + 60, *(uint150_t **)swapChain3, 40 * sizeof(uint150_t));
+				}
+				else
+				{
+					// Fallback to base IDXGISwapChain if QueryInterface fails
+					::memcpy(g_methodsTable + 44 + 19 + 9 + 60, *(uint150_t **)swapChain, 18 * sizeof(uint150_t));
+				}
 
 #if KIERO_USE_MINHOOK
 				MH_Initialize();
@@ -492,6 +529,12 @@ kiero::Status::Enum kiero::init(RenderType::Enum _renderType)
 
 				commandList->Release();
 				commandList = NULL;
+
+				if (swapChain3)
+				{
+					swapChain3->Release();
+					swapChain3 = NULL;
+				}
 
 				swapChain->Release();
 				swapChain = NULL;

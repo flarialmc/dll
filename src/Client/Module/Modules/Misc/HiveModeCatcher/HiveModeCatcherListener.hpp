@@ -9,13 +9,17 @@
 #include "../../Client/Events/Network/PacketEvent.hpp"
 
 
-class HiveModeCatcherListener : public Listener {
+class HiveModeCatcherListener : public Listener
+{
 private:
     bool connectionExecuted = false;
     bool listenForServer = false;
+
 public:
-    void onPacketReceive(PacketEvent &event)  {
-        if (SDK::getServerIP().find("hive") == std::string::npos){
+    void onPacketReceive(PacketEvent& event)
+    {
+        if (SDK::getServerIP().find("hive") == std::string::npos)
+        {
             HiveModeCatcherListener::fullgamemodename = "";
             HiveModeCatcherListener::currentGame = "";
             return;
@@ -23,13 +27,15 @@ public:
 
         MinecraftPacketIds id = event.getPacket()->getId();
 
-        if (id == MinecraftPacketIds::ChangeDimension) {
-            auto *pkt = reinterpret_cast<ChangeDimensionPacket *>(event.getPacket());
-            if (pkt->mDimensionId == 0) {
+        if (id == MinecraftPacketIds::ChangeDimension)
+        {
+            auto* pkt = reinterpret_cast<ChangeDimensionPacket*>(event.getPacket());
+            if (pkt->mDimensionId == 0)
+            {
                 listenForServer = true;
                 connectionExecuted = false;
                 std::shared_ptr<Packet> packet = SDK::createPacket(77);
-                auto *command_packet = reinterpret_cast<CommandRequestPacket *>(packet.get());
+                auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
 
                 command_packet->command = "/connection";
 
@@ -42,15 +48,19 @@ public:
             }
         }
 
-        if (id == MinecraftPacketIds::Text) {
-            auto *pkt = reinterpret_cast<TextPacket *>(event.getPacket());
+        if (id == MinecraftPacketIds::Text)
+        {
+            auto pktOpt = getTextPacket(event.getPacket());
+            if (!pktOpt) return;
+            auto& pkt = *pktOpt;
 
             std::string textToCheck = "You are connected to server name ";
             std::string textToCheckToSilence = "You are connected";
 
-
-            if (pkt->message.find(textToCheck) != std::string::npos && listenForServer) {
-                std::string server = pkt->message.replace(0, textToCheck.length(), "");
+            if (pkt.message.find(textToCheck) != std::string::npos && listenForServer)
+            {
+                std::string newMessage(pkt.message);
+                std::string server = newMessage.replace(0, textToCheck.length(), "");
                 std::regex pattern("\\d+");
                 HiveModeCatcherListener::currentGame = std::regex_replace(server, pattern, "");
                 event.cancel();
@@ -70,61 +80,65 @@ public:
                 // BEDWARS
                 else if (fullgamemodename == "HUB-BED")
                 {
-                    fullgamemodename = "Bedwars Hub";
+                    fullgamemodename = "BedWars Hub";
                 }
                 else if (fullgamemodename == "BED")
                 {
-                    fullgamemodename = "Bedwars Solo";
+                    fullgamemodename = "BedWars Solos";
                 }
                 else if (fullgamemodename == "BED-DUOS")
                 {
-                    fullgamemodename = "Bedwars Duos";
+                    fullgamemodename = "BedWars Duos";
                 }
                 else if (fullgamemodename == "BED-SQUADS")
                 {
-                    fullgamemodename = "Bedwars Squads";
+                    fullgamemodename = "BedWars Squads";
                 }
                 else if (fullgamemodename == "BED-MANOR")
                 {
-                    fullgamemodename = "Bedwars Manor";
+                    fullgamemodename = "BedWars Manor";
+                }
+                else if (fullgamemodename == "BED-MEGA")
+                {
+                    fullgamemodename = "BedWars Mega";
                 }
                 // SKYWARS
                 else if (fullgamemodename == "HUB-SKY")
                 {
-                    fullgamemodename = "Skywars Hub";
+                    fullgamemodename = "SkyWars Hub";
                 }
                 else if (fullgamemodename == "SKY")
                 {
-                    fullgamemodename = "Skywars Solo";
+                    fullgamemodename = "SkyWars Solos";
                 }
                 else if (fullgamemodename == "SKY-DUOS")
                 {
-                    fullgamemodename = "Skywars Duos";
+                    fullgamemodename = "SkyWars Duos";
                 }
                 else if (fullgamemodename == "SKY-SQUADS")
                 {
-                    fullgamemodename = "Skywars Squads";
+                    fullgamemodename = "SkyWars Squads";
                 }
                 else if (fullgamemodename == "SKY-CLASSIC")
                 {
-                    fullgamemodename = "Skywars Classic Solo";
+                    fullgamemodename = "SkyWars Classic Solos";
                 }
                 else if (fullgamemodename == "SKY-CLASSIC-SQUADS")
                 {
-                    fullgamemodename = "Skywars Classic Squads";
+                    fullgamemodename = "SkyWars Classic Squads";
                 }
                 else if (fullgamemodename == "SKY-KITS")
                 {
-                    fullgamemodename = "Skywars Kits Solo";
+                    fullgamemodename = "SkyWars Kits Solos";
                 }
                 else if (fullgamemodename == "SKY-KITS-DUOS")
                 {
-                    fullgamemodename = "Skywars Kits Duos";
+                    fullgamemodename = "SkyWars Kits Duos";
                 }
                 // PARKOURWORLD
                 else if (fullgamemodename == "HUB-PARKOUR")
                 {
-                    fullgamemodename = "Parkour world";
+                    fullgamemodename = "Parkour World";
                 }
                 // BUILDBATTLE
                 else if (fullgamemodename == "HUB-BUILD")
@@ -133,7 +147,7 @@ public:
                 }
                 else if (fullgamemodename == "BUILD")
                 {
-                    fullgamemodename = "Build Battle Solo";
+                    fullgamemodename = "Build Battle Solos";
                 }
                 else if (fullgamemodename == "BUILD-DUOS")
                 {
@@ -141,7 +155,7 @@ public:
                 }
                 else if (fullgamemodename == "BUILDX")
                 {
-                    fullgamemodename = "Build Battle Solo Extended";
+                    fullgamemodename = "Build Battle Solos Extended";
                 }
                 else if (fullgamemodename == "BUILD-DUOSX")
                 {
@@ -188,11 +202,7 @@ public:
                 // SURVIVALGAME
                 else if (fullgamemodename == "SG")
                 {
-                    fullgamemodename = "Survival Games Solo";
-                }
-                else if (fullgamemodename == "SG-DUOS")
-                {
-                    fullgamemodename = "Survival Games Duos";
+                    fullgamemodename = "Survival Games Solos";
                 }
                 else if (fullgamemodename == "SG-DUOS")
                 {
@@ -219,7 +229,7 @@ public:
                 // TREASUREWARS
                 else if (fullgamemodename == "WARS")
                 {
-                    fullgamemodename = "Treasure Wars Solo";
+                    fullgamemodename = "Treasure Wars Solos";
                 }
                 else if (fullgamemodename == "WARS-DUOS")
                 {
@@ -247,19 +257,24 @@ public:
                 {
                     fullgamemodename = "Mob Game";
                 }
-            } else if (pkt->message.find(textToCheckToSilence) != std::string::npos) {
+            }
+            else if (pkt.message.find(textToCheckToSilence) != std::string::npos)
+            {
                 event.cancel();
             }
-
         }
     }
 
-    HiveModeCatcherListener() {
+    HiveModeCatcherListener()
+    {
         Listen(this, PacketEvent, &HiveModeCatcherListener::onPacketReceive);
     }
-    ~HiveModeCatcherListener() {
+
+    ~HiveModeCatcherListener()
+    {
         Deafen(this, PacketEvent, &HiveModeCatcherListener::onPacketReceive);
     }
+
     static inline std::string currentGame;
     static inline std::string fullgamemodename;
 };

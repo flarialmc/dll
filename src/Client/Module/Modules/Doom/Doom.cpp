@@ -73,7 +73,7 @@ void DoomModule::onRender(RenderEvent& event) {
     // fixedRateCaller.update();
 #ifdef COMPILE_DOOM
     doomgeneric_Tick();
-#endif //fix compiler complaining about this shit missing
+#endif // Required when COMPILE_DOOM is defined
     Logger::debug("Doom ticked");
     if (!textureReady) return;
     if (textureReady)

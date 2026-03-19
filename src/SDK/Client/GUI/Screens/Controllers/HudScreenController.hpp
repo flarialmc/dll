@@ -2,6 +2,6 @@
 
 class HudScreenController {
 public:
-    // I Have noe idea what the offset is pls someone find lol
+    // TODO: offset for mHasPresentedInitialChat is unknown - needs reverse engineering
     // BUILD_ACCESS(this, bool, mHasPresentedInitialChat, 4078);
 };

@@ -27,7 +27,7 @@ since this module is hella new, it may have some bugs and stuff that isnt suppos
    - hexen.wad (Hexen)
    - strife1.wad (Strife)
     </details>
-4. Rename the downloaded `.wad` file to `doom.wad` and place it on `%localappdata%\Packages\Microsoft.MinecraftUWP_8wekyb3d8bbwe\RoamingState\Flarial`
+4. Rename the downloaded `.wad` file to `doom.wad` and place it on `%localappdata%\Packages\MicrosoftUWP_8wekyb3d8bbwe\RoamingState\Flarial`
 5. Open Minecraft and inject the compiled `.dll`
 6. (If you haven't) Enable BetterFrames in the client settings (this doesn't run on dx12) and restart/reinject
 7. Enable Doom's Module in the ClickGUI!

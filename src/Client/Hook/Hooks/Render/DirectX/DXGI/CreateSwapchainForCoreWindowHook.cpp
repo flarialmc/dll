@@ -12,6 +12,9 @@ using ::IUnknown;
 // CreateSwapChainForCoreWindow hook
 // ==============================
 
+// Track if we've already attempted DX12 rejection (to prevent infinite retry loops)
+static bool dx12FallbackAttempted = false;
+
 HRESULT CreateSwapchainForCoreWindowHook::CreateSwapChainForCoreWindowCallback(
     IDXGIFactory2 *This,
     ::IUnknown *pDevice,
@@ -20,8 +23,24 @@ HRESULT CreateSwapchainForCoreWindowHook::CreateSwapChainForCoreWindowCallback(
     IDXGIOutput *pRestrictToOutput,
     IDXGISwapChain1 **ppSwapChain)
 {
-    /* EXTRA RELEASING PRECAUTIONS */
+    // First, check if this is a DX12 device and capture the command queue EARLY
+    // We need to do this before any cleanup that might affect the queue
+    winrt::com_ptr<ID3D12CommandQueue> pCommandQueue;
+    bool isDX12Device = SUCCEEDED(pDevice->QueryInterface(IID_PPV_ARGS(pCommandQueue.put())));
 
+    bool killdxEnabled = Client::settings.getSettingByName<bool>("killdx")->value;
+
+    Logger::debug(
+        "[Swapchain] CreateSwapChainForCoreWindow called - killdx={}, fallbackAttempted={}, isDX12Device={}",
+        killdxEnabled, dx12FallbackAttempted, isDX12Device);
+
+    // Note: Better Frames (killdx) is now handled via RemoveDevice() in DX12Init()
+    // which works on both UWP and GDK platforms
+
+    // If we reach here, we're proceeding with swapchain creation (either DX11 or DX12 after fallback failed)
+    // Now do the cleanup
+
+    /* EXTRA RELEASING PRECAUTIONS */
     if (SwapchainHook::d3d11On12Device && !SwapchainHook::D3D11Resources.empty()) {
         std::vector<ID3D11Resource*> toRelease;
         toRelease.reserve(SwapchainHook::D3D11Resources.size());
@@ -51,31 +70,50 @@ HRESULT CreateSwapchainForCoreWindowHook::CreateSwapChainForCoreWindowCallback(
             }
         }
     }
-
     /* EXTRA RELEASING PRECAUTIONS */
-    ResizeHook::cleanShit(true);
-    SwapchainHook::queue = nullptr;
-    SwapchainHook::swapchain = nullptr;
 
-    winrt::com_ptr<ID3D12CommandQueue> pCommandQueue;
-    Logger::debug("Recreating Swapchain");
-    if (Client::settings.getSettingByName<bool>("killdx")->value) SwapchainHook::queue = nullptr;
-    if (Client::settings.getSettingByName<bool>("killdx")->value && SUCCEEDED(pDevice->QueryInterface(IID_PPV_ARGS(pCommandQueue.put())))) {
+    SwapchainHook::init = false;
+    ResizeHook::cleanupResources(true);
+    SwapchainHook::swapchain = nullptr;
+    // Note: Don't null out queue here - we'll set it from pCommandQueue if DX12
+
+    // Capture the command queue for DX12
+    if (isDX12Device && pCommandQueue)
+    {
+        SwapchainHook::queue = pCommandQueue;
+        Logger::success("[Swapchain] Captured DX12 command queue");
+    }
+    else
+    {
+        // Only null queue if this is NOT a DX12 device (i.e., DX11 fallback worked)
         SwapchainHook::queue = nullptr;
-        SwapchainHook::isDX12 = false;
-        Logger::success("Fell back to DX11");
-        return DXGI_ERROR_INVALID_CALL;
     }
 
     auto vsync = Client::settings.getSettingByName<bool>("vsync")->value;
     SwapchainHook::currentVsyncState = vsync;
 
-    if (vsync) pDesc->Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
-//
+    if (vsync) pDesc->Flags |= DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
+
     SwapchainHook::recreate = false;
+    Logger::debug("[Swapchain] Calling original CreateSwapChainForCoreWindow...");
     HRESULT hr = funcOriginal(This, pDevice, pWindow, pDesc, pRestrictToOutput, ppSwapChain);
-    if (FAILED(hr)) {
-        Logger::error("Failed to create swapchain: {}", Logger::getHRESULTError(hr));
+
+    if (SUCCEEDED(hr))
+    {
+        Logger::success("[Swapchain] Created successfully (isDX12={})", isDX12Device);
+
+        // Phase 2: Re-hook Present and Resize from the live swapchain's vtable.
+        // This ensures our hooks intercept the game's actual functions, not the
+        // dummy vtable addresses from kiero which may differ on some systems.
+        if (ppSwapChain && *ppSwapChain) {
+            SwapchainHook::rehookPresentFromSwapchain(*ppSwapChain);
+            ResizeHook::rehookResizeFromSwapchain(*ppSwapChain, isDX12Device);
+        }
+    }
+    else
+    {
+        Logger::error("[Swapchain] Failed to create: {} (0x{:08X})", Logger::getHRESULTError(hr),
+                      static_cast<unsigned int>(hr));
         Client::settings.setValue<bool>("killdx", false);
         Client::settings.setValue<bool>("vsync", false);
     }

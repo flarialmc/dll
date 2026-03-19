@@ -269,3 +269,15 @@ public:
 };
 
 static_assert(sizeof(Packet) == 0x30);
+
+template <class PacketPayloadT>
+class PayloadPacket : public Packet, public PacketPayloadT {
+public:
+    using PayloadType = PacketPayloadT;
+
+    PayloadPacket() = default;
+
+    template <typename... Args>
+    explicit PayloadPacket(Args&&... args)
+        : Packet(), PacketPayloadT(std::forward<Args>(args)...) {}
+};

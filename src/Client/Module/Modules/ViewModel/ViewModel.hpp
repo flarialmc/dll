@@ -31,7 +31,4 @@ public:
 	void onGetFOV(FOVEvent& event);
 
 	void onRenderItemInHand(RenderItemInHandEvent& event);
-
-	glm::mat4x4 OriginalMatrix;
-	bool Matrixed = false;
 };

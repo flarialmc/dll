@@ -17,19 +17,19 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
     if (opacity == -600.f) opacity = ClickGUI::modcardOpacity;
     Vec2<float> round = Constraints::RoundingConstraint(34, 34);
 
-    if (index > sizesr.size() - 1 || index == 0) {
+    // Ensure vectors are large enough for this index
+    if (index >= static_cast<int>(sizesr.size())) {
         float h1 = Constraints::RelativeConstraint(0.19f, "height", true);
         float h2 = Constraints::RelativeConstraint(0.141f, "height", true);
-
-        sizesr.emplace_back(h1, h2);
+        sizesr.resize(index + 1, Vec2<float>(h1, h2));
     }
 
-    if (index > shadowsizesr.size() - 1 || index == 0) {
-        shadowsizesr.emplace_back(0.01, 0.01);
+    if (index >= static_cast<int>(shadowsizesr.size())) {
+        shadowsizesr.resize(index + 1, Vec2<float>(0.01f, 0.01f));
     }
 
-    if (index > hoveringFav.size() - 1 || index == 0) {
-        hoveringFav.emplace_back(false);
+    if (index >= static_cast<int>(hoveringFav.size())) {
+        hoveringFav.resize(index + 1, false);
     }
 
     if (!visible) return;
@@ -117,10 +117,11 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
     float modicony = Constraints::PercentageConstraint(0.11, "top");
 
     float paddingSize = Constraints::RelativeConstraint(0.28);
-    float scrollWidth = Constraints::RelativeConstraint(1.12);
-    float scrollHeight = Constraints::RelativeConstraint(0.84);
-    Vec2<float> scrollcenter = Constraints::CenterConstraint(scrollWidth, scrollHeight, "y", 0.0, 1);
-    if (FlarialGUI::CursorInRect(scrollcenter.x, scrollcenter.y, scrollWidth, scrollHeight) and !FlarialGUI::CursorInRect(modiconx, modicony + FlarialGUI::scrollpos, paddingSize, paddingSize) && !FlarialGUI::CursorInRect(Constraints::PercentageConstraint(0.43, "left"), Constraints::PercentageConstraint(0.15, "top") + FlarialGUI::scrollpos, paddingSize, paddingSize)) {
+    // Use the same rect for the push gate as what we pass to Tooltip, so the display
+    // path's CursorInRect check always agrees with this one. The old scrollcenter-based
+    // rect covered the bottom 84% while Tooltip checked the top 63.5%, causing a
+    // mismatch that broke tooltips after scrolling.
+    if (FlarialGUI::CursorInRect(x, realY, BottomRoundedWidth, TopRoundedHeight) && !FlarialGUI::CursorInRect(modiconx, modicony + FlarialGUI::scrollpos, paddingSize, paddingSize) && !FlarialGUI::CursorInRect(Constraints::PercentageConstraint(0.43, "left"), Constraints::PercentageConstraint(0.15, "top") + FlarialGUI::scrollpos, paddingSize, paddingSize)) {
         FlarialGUI::Tooltip("mod_" + FlarialGUI::cached_to_string(index), x, realY, mod->tooltip, BottomRoundedWidth, TopRoundedHeight, true, false, std::chrono::milliseconds(1));
     }
 
@@ -197,7 +198,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
         if (mod->settings.getSettingByName<bool>("favorite")->value/* && !FlarialGUI::CursorInRect(modiconx, modicony + FlarialGUI::scrollpos, paddingSize, paddingSize)*/) {
             modicon = D2D1::ColorF(D2D1::ColorF::Gold);
         }
-        if (FlarialGUI::CursorInRect(scrollcenter.x, scrollcenter.y, scrollWidth, scrollHeight) and FlarialGUI::CursorInRect(modiconx, modicony + FlarialGUI::scrollpos, paddingSize, paddingSize)) {
+        if (FlarialGUI::CursorInRect(x, realY, BottomRoundedWidth, TopRoundedHeight) && FlarialGUI::CursorInRect(modiconx, modicony + FlarialGUI::scrollpos, paddingSize, paddingSize)) {
             FlarialGUI::Tooltip("favorite_" + FlarialGUI::cached_to_string(index), x, realY, mod->settings.getSettingByName<bool>("favorite")->value ? "Unfavorite?" : "Favorite?", BottomRoundedWidth, TopRoundedHeight, true, false, std::chrono::milliseconds(1));
         }
     }
@@ -218,10 +219,16 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
 
     // actually button
 
-    if (FlarialGUI::buttonColors.size() >= index)
-        FlarialGUI::buttonColors[index] = FlarialGUI::LerpColor(FlarialGUI::buttonColors[index], to,
-                                                                0.15f * FlarialGUI::frameFactor);
-    else FlarialGUI::buttonColors.resize(index);
+    // Ensure vectors are large enough for this index
+    if (index >= FlarialGUI::buttonColors.size()) {
+        FlarialGUI::buttonColors.resize(index + 1, D2D1::ColorF(D2D1::ColorF::Red));
+    }
+    if (index >= FlarialGUI::darkenAmounts.size()) {
+        FlarialGUI::darkenAmounts.resize(index + 1, 0.0f);
+    }
+
+    FlarialGUI::buttonColors[index] = FlarialGUI::LerpColor(FlarialGUI::buttonColors[index], to,
+                                                            0.15f * FlarialGUI::frameFactor);
 
     round = Constraints::RoundingConstraint(22, 22);
 
@@ -241,17 +248,9 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
                                   L"", buttonWidth, buttonHeight, round.x,
                                   round.x)) {
         if (ClickGUI::baseHeightActual > 0.6f) {
-            if (mod->isScriptingModule) {
-                bool newState = !mod->settings.getSettingByName<bool>("enabled")->value;
-                if (newState) {
-                    mod->onEnable();
-                    mod->settings.getSettingByName<bool>("enabled")->value = newState;
-                } else {
-                    mod->onDisable();
-                    mod->settings.getSettingByName<bool>("enabled")->value = newState;
-                }
-            }
-            mod->toggle();
+            bool newState = !mod->settings.getSettingByName<bool>("enabled")->value;
+            // Queue the toggle to be processed outside of the render callback to avoid deadlock
+            ModuleManager::queueToggle(ModuleManager::getModule(mod->name), newState);
         }
     }
 
@@ -318,6 +317,11 @@ void ClickGUIElements::RotatingGear(int index, float x, float y, float width, fl
     if (ImagesClass::images[IDR_SETTINGS_WHITE_PNG] == nullptr) {
         FlarialGUI::LoadImageFromResource(IDR_SETTINGS_WHITE_PNG, &ImagesClass::images[IDR_SETTINGS_WHITE_PNG]);
     } else if (ImagesClass::images[IDR_SETTINGS_WHITE_PNG] != nullptr) {
+        // Ensure rotationAngles is large enough
+        if (index >= FlarialGUI::rotationAngles.size()) {
+            FlarialGUI::rotationAngles.resize(index + 1, 0.0f);
+        }
+
         if (FlarialGUI::CursorInRect(x, y, width, height)) {
             FlarialGUI::lerp(FlarialGUI::rotationAngles[index], FlarialGUI::rotationAngles[index] + 15, 0.24f * FlarialGUI::frameFactor);
         }

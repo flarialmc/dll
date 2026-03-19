@@ -26,6 +26,7 @@ void BaseActorRendererRenderTextHook::drawLogo(ScreenContext* screenContext, con
         {"Dev", "dev-logo.png"},
         {"Staff", "white-logo.png"},
         {"Gamer", "gamer-logo.png"},
+        {"Media", "media-logo.png"},
         {"Booster", "booster-logo.png"},
         {"Supporter", "supporter-logo.png"},
         {"Regular", "red-logo.png"}

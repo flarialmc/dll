@@ -43,23 +43,23 @@ void DVD::onRender(RenderEvent &event) {
         FlarialGUI::image(IDR_DVDLOGO_01_PNG - 1 + color,
                           D2D1::RectF(x, y, x + width, y + height));
 
-        x += getOps<float>("xveloc") * xv;
-        y += getOps<float>("yveloc") * yv;
+        x += getOps<float>("xveloc") * xDirection;
+        y += getOps<float>("yveloc") * yDirection;
 
         if (x >= MC::windowSize.x - width) {
-            xv = -1;
+            xDirection = -1;
             inc();
         }
         if (x < 0) {
-            xv = 1;
+            xDirection = 1;
             inc();
         }
         if (y >= MC::windowSize.y - height) {
-            yv = -1;
+            yDirection = -1;
             inc();
         }
         if (y < 0) {
-            yv = 1;
+            yDirection = 1;
             inc();
         }
     }

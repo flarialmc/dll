@@ -53,7 +53,7 @@ void FreeLook::onSetup() {
 }
 
 void FreeLook::onEnable() {
-    Listen(this, PerspectiveEvent, &FreeLook::onGetViewPerspective)
+    ListenOrdered(this, PerspectiveEvent, &FreeLook::onGetViewPerspective, EventOrder::IMMEDIATE)
     Listen(this, UpdatePlayerEvent, &FreeLook::onUpdatePlayer)
     Listen(this, KeyEvent, &FreeLook::onKey)
     Listen(this, MouseEvent, &FreeLook::onMouse)
@@ -96,7 +96,7 @@ void FreeLook::unpatch() {
 void FreeLook::defaultConfig() {
     getKeybind();
     Module::defaultConfig("core");
-    setDef("toggle", false);
+    setDef("toggle", true);
     setDef("mode", (std::string)"3rd Person back");
     
 }
@@ -105,7 +105,7 @@ void FreeLook::settingsRender(float settingsOffset) {
 
     initSettingsPage();
 
-    addKeybind("Freelook Keybind", "Hold for 2 seconds!", "keybind", true);
+    addKeybind("Freelook Keybind", "", "keybind", true);
     addToggle("Toggleable Mode", "Click to toggle or Hold to keep enabled", "toggle");
     addDropdown("Freelook View Mode", "",std::vector<std::string>{"1st Person", "3rd Person back", "3rd Person front"}, "mode", true);
 

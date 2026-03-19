@@ -17,7 +17,7 @@ float Constraints::PercentageConstraint(float percentage, const std::string &edg
         y = top.y;
     }
 
-    float position;
+    float position = 0.0f;
 
     if (edge == "top") {
         position = percentage * screenHeight;
@@ -37,7 +37,7 @@ float Constraints::PercentageConstraint(float percentage, const std::string &edg
 }
 
 float Constraints::RelativeConstraint(float percent, const std::string &dimension, bool ignore_stack) {
-    float length;
+    float length = 0.0f;
     float screenWidth;
     float screenHeight;
 

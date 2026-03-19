@@ -5,7 +5,7 @@ void PlayerNotifier::defaultConfig() {
 	Module::defaultConfig("core");
 	if (!this->settings.getSettingByName<float>("duration")) settings.addSetting<float>("duration", 80);
 	if (!this->settings.getSettingByName<std::string>("player0")) settings.addSetting<std::string>("player0", "TheBarii");
-	if (!this->settings.getSettingByName<std::string>("player0")) settings.addSetting<bool>("player0Enabled", true);
+	if (!this->settings.getSettingByName<bool>("player0Enabled")) settings.addSetting<bool>("player0Enabled", true);
 	if (!this->settings.getSettingByName<std::string>("keybind")) settings.addSetting<std::string>("keybind", "P");
 	
 }
@@ -33,6 +33,7 @@ void PlayerNotifier::onSetup() {
 void PlayerNotifier::loadSettings(bool softLoad) {
 
 	Module::loadSettings();
+	totalPlayers = 0;
 	for (const auto& settingPair : settings.settings) {
 		const std::string& name = settingPair.first;
 		if (name.find("player") != std::string::npos && name.find("Enabled") == std::string::npos) {
@@ -43,7 +44,11 @@ void PlayerNotifier::loadSettings(bool softLoad) {
 }
 
 void PlayerNotifier::check() {
-	std::unordered_map<mcUUID, PlayerListEntry> playerMap = SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap();
+	auto player = SDK::clientInstance->getLocalPlayer();
+	if (!player) return;
+	auto level = player->getLevel();
+	if (!level) return;
+	std::unordered_map<mcUUID, PlayerListEntry> playerMap = level->getPlayerMap();
 
 	for (const auto entry: playerMap | std::views::values) {
 		for (int i = 0; i < totalPlayers; i++) {
@@ -58,7 +63,9 @@ void PlayerNotifier::check() {
 }
 
 void PlayerNotifier::onTick(TickEvent& event) {
-	double intervalSeconds = this->settings.getSettingByName<float>("duration")->value;
+	auto* durationSetting = this->settings.getSettingByName<float>("duration");
+	if (!durationSetting) return;
+	double intervalSeconds = durationSetting->value;
 
 	auto now = std::chrono::steady_clock::now();
 	std::chrono::duration<double> elapsed = now - lastRun;
@@ -83,13 +90,16 @@ void PlayerNotifier::settingsRender(float settingsOffset) {
 		totalPlayers++;
 		});
 	this->addSlider("Re-check", "(Seconds) After how long should it re-check for players", this->settings.getSettingByName<float>("duration")->value, 500, 1, true);
-	this->addKeybind("Re-check Keybind", "Hold for 2 seconds!", getKeybind());
+	this->addKeybind("Re-check Keybind", "", getKeybind());
 	this->extraPadding();
 
 	for (int i = 0; i < totalPlayers; i++) {
-		this->addHeader(this->settings.getSettingByName<std::string>("player" + FlarialGUI::cached_to_string(i))->value);
-		this->addToggle("Enabled", "Should it notify you?", this->settings.getSettingByName<bool>("player" + FlarialGUI::cached_to_string(i))->value);
-		this->addTextBox("Player Name", "", this->settings.getSettingByName<std::string>("player" + FlarialGUI::cached_to_string(i))->value);
+		auto* nameSetting = this->settings.getSettingByName<std::string>("player" + FlarialGUI::cached_to_string(i));
+		auto* enabledSetting = this->settings.getSettingByName<bool>("player" + FlarialGUI::cached_to_string(i) + "Enabled");
+		if (!nameSetting || !enabledSetting) continue;
+		this->addHeader(nameSetting->value);
+		this->addToggle("Enabled", "Should it notify you?", enabledSetting->value);
+		this->addTextBox("Player Name", "", nameSetting->value);
 		this->extraPadding();
 	}
 

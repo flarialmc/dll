@@ -5,9 +5,9 @@ void FlarialGUI::ApplyDeepFry(float intensity) {
 
     if (SwapchainHook::init) {
 
-        ID2D1Effect *cum = nullptr;
+        ID2D1Effect *edgeDetectionEffect = nullptr;
 
-        D2D::context->CreateEffect(CLSID_D2D1EdgeDetection, &cum);
+        D2D::context->CreateEffect(CLSID_D2D1EdgeDetection, &edgeDetectionEffect);
 
         ID2D1Bitmap *bitmap = nullptr;
 
@@ -15,18 +15,18 @@ void FlarialGUI::ApplyDeepFry(float intensity) {
             FlarialGUI::CopyBitmap(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap].get(), &bitmap);
         else FlarialGUI::CopyBitmap(SwapchainHook::D2D1Bitmap.get(), &bitmap);
 
-        cum->SetInput(0, bitmap);
+        edgeDetectionEffect->SetInput(0, bitmap);
 
         // Set blur intensity
-        cum->SetValue(D2D1_EDGEDETECTION_PROP_STRENGTH, intensity);
-        cum->SetValue(D2D1_EDGEDETECTION_PROP_BLUR_RADIUS, 0.0f);
-        cum->SetValue(D2D1_EDGEDETECTION_PROP_MODE, D2D1_EDGEDETECTION_MODE_SOBEL);
-        cum->SetValue(D2D1_EDGEDETECTION_PROP_OVERLAY_EDGES, false);
-        cum->SetValue(D2D1_EDGEDETECTION_PROP_ALPHA_MODE, D2D1_ALPHA_MODE_PREMULTIPLIED);
+        edgeDetectionEffect->SetValue(D2D1_EDGEDETECTION_PROP_STRENGTH, intensity);
+        edgeDetectionEffect->SetValue(D2D1_EDGEDETECTION_PROP_BLUR_RADIUS, 0.0f);
+        edgeDetectionEffect->SetValue(D2D1_EDGEDETECTION_PROP_MODE, D2D1_EDGEDETECTION_MODE_SOBEL);
+        edgeDetectionEffect->SetValue(D2D1_EDGEDETECTION_PROP_OVERLAY_EDGES, false);
+        edgeDetectionEffect->SetValue(D2D1_EDGEDETECTION_PROP_ALPHA_MODE, D2D1_ALPHA_MODE_PREMULTIPLIED);
         // Draw the image with the Gaussian blur effect
-        D2D::context->DrawImage(cum);
+        D2D::context->DrawImage(edgeDetectionEffect);
 
         Memory::SafeRelease(bitmap);
-        Memory::SafeRelease(cum);
+        Memory::SafeRelease(edgeDetectionEffect);
     }
 }

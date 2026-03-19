@@ -8,6 +8,7 @@ void Zoom::onEnable() {
     Listen(this, KeyEvent, &Zoom::onKey)
     Listen(this, SetTopScreenNameEvent, &Zoom::onSetTopScreenName)
     Listen(this, TurnDeltaEvent, &Zoom::onTurnDeltaEvent)
+    Listen(this, SensitivityEvent, &Zoom::onSensitivity)
     Module::onEnable();
 }
 
@@ -16,7 +17,9 @@ void Zoom::onDisable() {
     Deafen(this, RenderEvent, &Zoom::onRender)
     Deafen(this, MouseEvent, &Zoom::onMouse)
     Deafen(this, KeyEvent, &Zoom::onKey)
+    Deafen(this, SetTopScreenNameEvent, &Zoom::onSetTopScreenName)
     Deafen(this, TurnDeltaEvent, &Zoom::onTurnDeltaEvent)
+    Deafen(this, SensitivityEvent, &Zoom::onSensitivity)
     Module::onDisable();
 }
 
@@ -50,7 +53,7 @@ void Zoom::defaultConfig() {
 void Zoom::settingsRender(float settingsOffset) {
     initSettingsPage();
 
-    addKeybind("Keybind", "Hold for 2 seconds!", "keybind", true);
+    addKeybind("Keybind", "", "keybind", true);
     addToggle("Use Scroll", "Allows to adjust zoom with scroll wheel.", "UseScroll");
     addToggle("Toggle Zoom", "No need to hold the keybind to zoom.", "toggleZoom");
     addSlider("Modifier", "How much to Zoom each time you scroll.", "modifier", 30, 0, false);
@@ -83,15 +86,22 @@ void Zoom::settingsRender(float settingsOffset) {
 void Zoom::onRender(RenderEvent &event) {
     if (!this->isEnabled()) return;
 
-    if (this->active && getOps<bool>("cinematicMode") && getOps<bool>("cinebars") && (SDK::getCurrentScreen() == "hud_screen" || SDK::getCurrentScreen() == "zoom_screen" || SDK::getCurrentScreen() == "f3_screen")) {
+    if (this->active && getOps<bool>("cinematicMode") && getOps<bool>("cinebars") && (SDK::getCurrentScreen() == "hud_screen" || SDK::getCurrentScreen() == "f1_screen" || SDK::getCurrentScreen() == "zoom_screen" || SDK::getCurrentScreen() == "f3_screen")) {
         float barHeight = MC::windowSize.y * getOps<float>("cinebarHeight") / 2.f;
 
         FlarialGUI::RoundedRect(0, 0, getColor("cinebar"), MC::windowSize.x, barHeight, 0, 0);
         FlarialGUI::RoundedRect(0, MC::windowSize.y - barHeight, getColor("cinebar"), MC::windowSize.x, barHeight, 0, 0);
     }
 
-    auto player = SDK::clientInstance->getLocalPlayer();
-    if (!player) return;
+    // Handle hand visibility every frame (more reliable than onSetTopScreenName)
+    if (getOps<bool>("hidehand")) {
+        Option* hideHand = Options::getOption("dev_disableRenderItemInHand");
+        if (hideHand != nullptr) {
+            hideHand->setvalue(this->active);
+        }
+    }
+
+    if (!Client::getPlayerState().isInWorld()) return; //
 
     if (fisrtTime) {
         currentZoomVal = currentFov;
@@ -116,8 +126,10 @@ void Zoom::onRender(RenderEvent &event) {
                 jdfAnimationFinished = true;
             }
             currentZoomVal = std::lerp(currentZoomVal, currentFov, animspeed * FlarialGUI::frameFactor);
-            if (currentZoomVal == zoomValue || std::abs(currentFov - currentZoomVal) < animspeed + unzoomAnimDisableTreshold) {
+            // Check if we're close enough to the target (currentFov) to finish the animation
+            if (std::abs(currentFov - currentZoomVal) < unzoomAnimDisableTreshold) {
                 animationFinished = true;
+                currentZoomVal = currentFov; // Snap to final value to avoid micro-jitters
             }
         } else {
             currentZoomVal = currentFov;
@@ -128,19 +140,32 @@ void Zoom::onRender(RenderEvent &event) {
 void Zoom::onGetFOV(FOVEvent &event) {
     if (!this->isEnabled()) return;
     auto fov = event.getFOV();
-    if (fov == 70 || fov == 60) return;
 
-    auto player = SDK::clientInstance->getLocalPlayer();
-    if (player) {
-        currentFov = fov;
-        if (ModuleManager::getModule("Java Dynamic FOV").get()->isEnabled()) {
-            if (player->getActorFlag(ActorFlags::FLAG_SPRINTING)) {
-                currentFov = ModuleManager::getModule("Java Dynamic FOV").get()->getOps<float>("fov_target");
+    // FOV 70 is the hand FOV - don't modify it during unzoom animation
+    // to prevent hand FOV desync
+    bool isHandFOV = (fov == 70);
+
+    // Only skip updating currentFov for default values, but still apply zoom
+    // This prevents feedback loops while maintaining zoom effect
+    if (fov != 70 && fov != 60) {
+        auto player = SDK::clientInstance->getLocalPlayer();
+        if (player) {
+            currentFov = fov;
+            if (ModuleManager::getModule("Java Dynamic FOV").get()->isEnabled()) {
+                if (player->getActorFlag(ActorFlags::FLAG_SPRINTING)) {
+                    currentFov = ModuleManager::getModule("Java Dynamic FOV").get()->getOps<float>("fov_target");
+                }
             }
         }
     }
 
-    event.setFOV(currentZoomVal);
+    // Apply zoom FOV when active, or during unzoom animation (but not for hand FOV)
+    if (this->active) {
+        event.setFOV(currentZoomVal);
+    } else if (!animationFinished && !isHandFOV) {
+        // Only animate main FOV back, let hand FOV return to normal immediately
+        event.setFOV(currentZoomVal);
+    }
 }
 
 void Zoom::onMouse(MouseEvent &event) {
@@ -184,9 +209,9 @@ void Zoom::onMouse(MouseEvent &event) {
                 else if (zoomValue > realFov) zoomValue = realFov;
 
                 if (event.getAction() == MouseAction::ScrollUp ||
-                    event.getAction() != MouseAction::ScrollUp && event.getButton() == MouseButton::Scroll) {
-                    event.setButton(MouseButton::None);
-                    event.setAction(MouseAction::Release);
+                    event.getAction() == MouseAction::ScrollDown ||
+                    event.getButton() == MouseButton::Scroll) {
+                    event.cancel(); // Prevent hotbar scrolling while zooming
                 }
             }
         }
@@ -197,7 +222,7 @@ void Zoom::onKey(KeyEvent &event) {
     if (this->isKeybind(event.keys) &&
         this->isKeyPartOfKeybind(event.key) &&
         (getOps<bool>("toggleZoom") ? event.getAction() == ActionType::Pressed : true)
-        && (SDK::getCurrentScreen() == "hud_screen" || SDK::getCurrentScreen() == "f3_screen" || SDK::getCurrentScreen() == "zoom_screen")) {
+        && (SDK::getCurrentScreen() == "hud_screen" || SDK::getCurrentScreen() == "f1_screen" || SDK::getCurrentScreen() == "f3_screen" || SDK::getCurrentScreen() == "zoom_screen")) {
         keybindActions[0]({});
         if (!getOps<bool>("SaveModifier")) zoomValue = 30.0f;
     } else if (getOps<bool>("toggleZoom") ? (this->isKeybind(event.keys) && this->isKeyPartOfKeybind(event.key)) : !this->isKeybind(event.keys) && (getOps<bool>("toggleZoom") ? event.getAction() == ActionType::Pressed : true)) this->active = false;
@@ -206,48 +231,24 @@ void Zoom::onKey(KeyEvent &event) {
 void Zoom::onSetTopScreenName(SetTopScreenNameEvent &event) {
     if (!this->isEnabled()) return;
 
-    Option *hideHand = nullptr;
-    Option *hideHud = nullptr;
-
-
-    hideHand = Options::getOption("dev_disableRenderItemInHand");
-    hideHud = Options::getOption("dev_disableRenderHud");
-
-
     if (this->active) {
         if (getOps<bool>("hidemodules")) {
             event.setCustomLayer("zoom_screen");
         }
-
-        if (getOps<bool>("hidehand")) {
-            if (hideHand != nullptr) hideHand->setvalue(true);
-        }
-    } else {
-        if (getOps<bool>("hidehand")) {
-            if (hideHand != nullptr) hideHand->setvalue(false);
-        }
-
-        //            if (getOps<bool>("hidehud")) { // TODO: there is a bug where it wont allow manual F1
-        //                if (hideHud != nullptr) hideHud->setvalue(false);
-        //            }
-
-        if (hideHud != nullptr && hideHud->getvalue()) {
-            event.setCustomLayer("f1_screen");
-        }
+        // Hand visibility is now handled in onRender for more reliable updates
     }
+    // F1 handling is done globally by F1Listener — no need to duplicate here.
 }
 
 void Zoom::onTurnDeltaEvent(TurnDeltaEvent &event) {
+    // Only used for cinematic camera smoothing now
+    // Sensitivity is handled by onSensitivity via getSensHook
     if (!this->isEnabled() || !this->active) {
         smoothDelta = Vec2<float>{0.f, 0.f};
         return;
     }
-    if (getOps<bool>("cinematicMode")) {
-        if (!getOps<bool>("smoothing")) {
-            smoothDelta = Vec2<float>{0.f, 0.f};
-            return;
-        };
-
+    if (getOps<bool>("cinematicMode") && getOps<bool>("smoothing"))
+    {
         auto now = std::chrono::steady_clock::now();
         float deltaTime = std::chrono::duration<float>(now - lastTime).count();
         lastTime = now;
@@ -257,11 +258,24 @@ void Zoom::onTurnDeltaEvent(TurnDeltaEvent &event) {
         smoothDelta += (event.delta - smoothDelta) * alpha;
 
         event.delta = smoothDelta;
-    } else {
-        float oSens = 1.f;
-        if (getOps<bool>("lowsens")) oSens = std::min(oSens, oSens * (1.0f + (((zoomValue / 2) / realFov) - 1.0f) * getOps<float>("lowsensStrength")));
-
-        event.delta.x *= oSens;
-        event.delta.y *= oSens;
     }
+}
+
+void Zoom::onSensitivity(SensitivityEvent& event)
+{
+    if (!this->isEnabled() || !this->active) return;
+    if (getOps<bool>("cinematicMode")) return; // Cinematic mode uses smoothing instead
+    if (!getOps<bool>("lowsens")) return;
+
+    // Calculate zoom ratio and reduce sensitivity proportionally
+    // Formula: sensitivity * (zoomValue / currentFov) * strength
+    // When zoomed to 30 FOV from 90 FOV, sensitivity becomes ~33% (feels natural)
+    float zoomRatio = zoomValue / currentFov;
+    float strength = getOps<float>("lowsensStrength");
+
+    // Interpolate between full sensitivity (1.0) and zoom-proportional sensitivity
+    float multiplier = 1.0f - (1.0f - zoomRatio) * strength;
+    multiplier = std::max(0.01f, std::min(1.0f, multiplier));
+
+    event.setSensitivity(event.getSensitivity() * multiplier);
 }

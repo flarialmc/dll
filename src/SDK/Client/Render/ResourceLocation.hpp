@@ -31,9 +31,8 @@ public:
 
     ResourceLocation(const std::string& filePath, bool external) {
         this->filePath = Core::PathBuffer<std::string>(filePath);
-        if (external)
-            this->fileSystem = ResourceFileSystem::Raw;
-        else this->fileSystem = ResourceFileSystem::UserPackage;
+        if (external) this->fileSystem = Raw;
+        else this->fileSystem = UserPackage;
 
         _computeHashes();
     };

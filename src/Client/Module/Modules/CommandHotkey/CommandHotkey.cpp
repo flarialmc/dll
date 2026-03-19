@@ -22,9 +22,11 @@ void CommandHotkey::addHotkey(int index) {
 					this->restricted = false;
 				}
 				if (!this->restricted) {
+					auto* commandSetting = this->settings.getSettingByName<std::string>("command" + count);
+					if (!commandSetting) return {};
 					std::shared_ptr<Packet> packet = SDK::createPacket(77);
 					auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
-					command_packet->command = this->settings.getSettingByName<std::string>("command" + count)->value;
+					command_packet->command = commandSetting->value;
 					command_packet->origin.type = CommandOriginType::Player;
 					command_packet->InternalSource = true;
 					SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
@@ -90,7 +92,7 @@ void CommandHotkey::settingsRender(float settingsOffset) {
 
 		if (settings.getSettingByName<std::string>(commandSettingName) != nullptr) {
 			this->addHeader(header);
-			this->addKeybind("Command Keybind", "Hold for 2 seconds!", getKeybind(i));
+			this->addKeybind("Command Keybind", "", getKeybind(i));
 			this->addTextBox(
 				"Command to Send",
 				"No need for /, And there's a spam limit!",
@@ -111,14 +113,19 @@ void CommandHotkey::settingsRender(float settingsOffset) {
 }
 
 void CommandHotkey::onKey(KeyEvent& event) {
-	if (!SDK::clientInstance->getLocalPlayer()) return;
+	if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer()) return;
 	if (this->isEnabled() && (
 		SDK::getCurrentScreen() == "hud_screen" ||
 		SDK::getCurrentScreen() == "zoom_screen" ||
 		SDK::getCurrentScreen() == "f3_screen"
 	)) {
-		for (int i = 0; i <= this->totalKeybinds; ++i) {
-			this->keybindActions[i]({ std::any(event) });
+		// keybindActions[0] is the module toggle action added by postLoad()
+		// Command hotkey actions start at index 1, so we offset by 1
+		for (int i = 0; i < this->totalKeybinds; ++i) {
+			int actionIndex = i + 1;
+			if (actionIndex < static_cast<int>(this->keybindActions.size())) {
+				this->keybindActions[actionIndex]({ std::any(event) });
+			}
 		}
 	}
 }

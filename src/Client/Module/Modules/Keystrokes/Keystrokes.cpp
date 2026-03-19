@@ -236,16 +236,15 @@ void Keystrokes::normalRender(int index, std::string &value) {
             D2D1_COLOR_F DtextShadowColor = getColor("DtextShadow");
             D2D1_COLOR_F textEnabledColor = getColor("textEnabled");
 
-            MoveInputComponent *handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
-
+            auto handler = SDK::clientInstance->getLocalPlayer()->getHandler();
             std::vector<bool> handlerRes = {
-                handler->mInputState.forward,
-                handler->mInputState.left,
-                handler->mInputState.backward,
-                handler->mInputState.right,
+                handler.forward(),
+                handler.left(),
+                handler.backward(),
+                handler.right(),
                 MC::heldLeft,
                 MC::heldRight,
-                handler->jumping
+                handler.getJumping()
             };
 
             for (size_t i = 0; i < handlerRes.size(); i++) {
@@ -426,6 +425,7 @@ void Keystrokes::normalRender(int index, std::string &value) {
 }
 
 void Keystrokes::onRender(RenderEvent &event) {
-    if (!this->isEnabled() || SDK::getCurrentScreen() != "hud_screen") return;
+    if (!this->isEnabled() || ClickGUI::blurActive || SDK::getCurrentScreen() != "hud_screen") return;
+    ClickGUI::HudFadeGuard fadeGuard;
     this->normalRender(7, (std::string &) "");
 }

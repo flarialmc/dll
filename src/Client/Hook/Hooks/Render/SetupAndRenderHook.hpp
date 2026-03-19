@@ -13,9 +13,11 @@
 #include "../../../../Utils/Render/MaterialUtils.hpp"
 #include "../../Hooks/Render/DirectX/DXGI/SwapchainHook.hpp"
 #include "../Visual/Level_addParticleEffect.hpp"
+#include "../../../Events/Render/PreSetupAndRenderEvent.hpp"
+#include "Client.hpp"
 
-__int64 *oDrawImage = nullptr;
-__int64 *oDrawNineSlice = nullptr;
+inline __int64 *oDrawImage = nullptr;
+inline __int64 *oDrawNineSlice = nullptr;
 inline bool renderedText = false;
 
 class SetUpAndRenderHook : public Hook {
@@ -114,10 +116,10 @@ private:
         TexturePtr *texturePtr,
         NinesliceInfo *nineSliceInfo
     ) {
-        float *x = reinterpret_cast<float *>((__int64) nineSliceInfo);
-        float *y = reinterpret_cast<float *>((__int64) nineSliceInfo + 0x4);
-        float *z = reinterpret_cast<float *>((__int64) nineSliceInfo + 0x60); // funny cuh offset
-        float *w = reinterpret_cast<float *>((__int64) nineSliceInfo + 0x64);
+        const auto *x = reinterpret_cast<float *>(reinterpret_cast<__int64>(nineSliceInfo));
+        const auto *y = reinterpret_cast<float *>(reinterpret_cast<__int64>(nineSliceInfo) + 0x4);
+        const auto *z = reinterpret_cast<float *>(reinterpret_cast<__int64>(nineSliceInfo) + 0x60); // funny cuh offset
+        const auto *w = reinterpret_cast<float *>(reinterpret_cast<__int64>(nineSliceInfo) + 0x64);
         Vec4<float> position(*x, *y, *z, *w);
         auto event = nes::make_holder<DrawNineSliceEvent>(texturePtr, position);
         eventMgr.trigger(event);
@@ -130,10 +132,10 @@ private:
         BedrockTextureData *textureData,
         NinesliceInfo *nineSliceInfo
     ) {
-        float *x = reinterpret_cast<float *>((__int64) nineSliceInfo);
-        float *y = reinterpret_cast<float *>((__int64) nineSliceInfo + 0x4);
-        float *z = reinterpret_cast<float *>((__int64) nineSliceInfo + 0x60); // funny cuh offset
-        float *w = reinterpret_cast<float *>((__int64) nineSliceInfo + 0x64);
+        const float *x = reinterpret_cast<float *>(reinterpret_cast<__int64>(nineSliceInfo));
+        const float *y = reinterpret_cast<float *>(reinterpret_cast<__int64>(nineSliceInfo) + 0x4);
+        const float *z = reinterpret_cast<float *>(reinterpret_cast<__int64>(nineSliceInfo) + 0x60); // funny cuh offset
+        const float *w = reinterpret_cast<float *>(reinterpret_cast<__int64>(nineSliceInfo) + 0x64);
         Vec4<float> position(*x, *y, *z, *w);
         auto event = nes::make_holder<DrawNineSliceEvent>(textureData, position);
         eventMgr.trigger(event);
@@ -143,10 +145,11 @@ private:
 
 
     static void hookDrawTextAndDrawImage(MinecraftUIRenderContext *muirc) {
-        auto vTable = *(uintptr_t **) muirc;
+        const auto vTable = *reinterpret_cast<uintptr_t**>(muirc);
 
         if (funcOriginalText == nullptr) {
-            Memory::hookFunc((void *) vTable[5], (void *) drawTextCallback, (void **) &funcOriginalText,
+            Memory::hookFunc(reinterpret_cast<void*>(vTable[5]), (void*)drawTextCallback,
+                             reinterpret_cast<void**>(&funcOriginalText),
                              "drawText");
         }
 
@@ -166,14 +169,30 @@ private:
         renderedText = false;
         MaterialUtils::update();
 
+        // Fail-safe: let vanilla path run when render context/screenview is not ready yet.
+        if (!pScreenView || !muirc) {
+            funcOriginal(pScreenView, muirc);
+            return;
+        }
+
         SDK::screenView = pScreenView;
         SDK::clientInstance = muirc->getClientInstance();
         SDK::scn = muirc->getScreenContext();
         SDK::hasInstanced = true;
 
+        if (!SDK::clientInstance) {
+            funcOriginal(pScreenView, muirc);
+            return;
+        }
+
+        Client::getPlayerState().update(SDK::clientInstance);
+
         if (funcOriginalText == nullptr || oDrawImage == nullptr) hookDrawTextAndDrawImage(muirc);
 
-        std::string layer = pScreenView->VisualTree->root->getLayerName();
+        std::string layer = "unknown_screen";
+        if (pScreenView->VisualTree && pScreenView->VisualTree->root) {
+            layer = pScreenView->VisualTree->root->getLayerName();
+        }
 
         if (layer != "debug_screen" && layer != "toast_screen") {
             // start_screen, play_screen, world_loading_progress_screen, pause_screen, hud_screen
@@ -183,19 +202,30 @@ private:
         }
 
         Vec3<float> origin{0, 0, 0};
-        Vec3<float> pos{0, 0, 0};
 
-        auto player = SDK::clientInstance->getLocalPlayer();
+        const auto player = SDK::clientInstance->getLocalPlayer();
 
-        if (player && SDK::clientInstance->getLevelRender()) {
-            origin = SDK::clientInstance->getLevelRender()->getOrigin();
+        if (player) {
+            // Use player's render position as the camera origin
+            // (LevelRender path was broken due to missing offsets for 21.110+)
+            if (const auto renderPos = player->getRenderPositionComponent()) {
+                // TODO: This thing is broken.
+                // auto renderPos = SDK::clientInstance->getLevelRender()->getOrigin();
+                origin = renderPos->renderPos;
+            }
         }
 
-        FrameTransform transform = {SDK::clientInstance->getViewMatrix(), origin, SDK::clientInstance->getFov()};
+        const FrameTransform transform = {SDK::clientInstance->getViewMatrix(), origin, SDK::clientInstance->getFov()};
 
         SwapchainHook::frameTransformsMtx.lock();
         SwapchainHook::FrameTransforms.push(transform);
         SwapchainHook::frameTransformsMtx.unlock();
+
+        // Fire PreSetupAndRenderEvent BEFORE the screen renders (for rendering under UI)
+        if (layer != "debug_screen" && layer != "toast_screen") {
+            auto preEvent = nes::make_holder<PreSetupAndRenderEvent>(muirc, layer);
+            eventMgr.trigger(preEvent);
+        }
 
         funcOriginal(pScreenView, muirc);
 

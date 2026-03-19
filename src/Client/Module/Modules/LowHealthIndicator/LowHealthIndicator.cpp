@@ -1,6 +1,7 @@
 #include "LowHealthIndicator.hpp"
 
 #include "GUI/Engine/Constraints.hpp"
+#include "Modules/ClickGUI/ClickGUI.hpp"
 
 
 void LowHealthIndicator::defaultConfig()
@@ -49,7 +50,8 @@ void LowHealthIndicator::onTick(TickEvent& event)
 void LowHealthIndicator::onRender(RenderEvent& event)
 {
     if (this->isEnabled() && this->health <= this->settings.getSettingByName<float>("health")->value &&
-        SDK::currentScreen == "hud_screen" && !ModuleManager::getModule("ClickGUI")->isEnabled()) {
+        SDK::currentScreen == "hud_screen" && !ClickGUI::blurActive) {
+        ClickGUI::HudFadeGuard fadeGuard;
 
         float maxOpacity = this->settings.getSettingByName<float>("maxopacity")->value;
 

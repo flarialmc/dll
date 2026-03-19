@@ -21,9 +21,10 @@ void RawInputBuffer::settingsRender(float settingsOffset)
 {
 
     initSettingsPage();
-    addHeader("troll");
-    std::string troll("troll");
-    addDropdown("troll", "the voices", std::vector<std::string>{ "troll", "troll", "troll even more", "most troll"}, troll);
+    // TODO: placeholder settings - replace with actual configuration options
+    addHeader("Settings");
+    std::string placeholder("placeholder");
+    addDropdown("placeholder", "Option", std::vector<std::string>{ "Option 1", "Option 2", "Option 3", "Option 4"}, placeholder);
     FlarialGUI::UnsetScrollView();
 
     resetPadding();

@@ -1,23 +1,10 @@
 #include "BlockBreakIndicator.hpp"
 
-
 #include "Events/Render/RenderEvent.hpp"
 #include "Modules/ClickGUI/ClickGUI.hpp"
-#include "Modules/CPS/CPSCounter.hpp"
 
-void BlockBreakIndicator::onEnable() {
-    Listen(this, RenderEvent, &BlockBreakIndicator::onRender)
-    Module::onEnable();
-}
-
-void BlockBreakIndicator::onDisable() {
-    Deafen(this, RenderEvent, &BlockBreakIndicator::onRender)
-    Module::onDisable();
-}
-
-void BlockBreakIndicator::defaultConfig() {
+void BlockBreakIndicator::customConfig() {
     settings.renameSetting("barFill", "barFillOpacity", "barFillRGB", "barFill");
-    Module::defaultConfig("all");
     setDef("textscale", 1.00f);
     setDef("pbmode", true);
     setDef("onlyShowWhileBreaking", false);
@@ -25,12 +12,10 @@ void BlockBreakIndicator::defaultConfig() {
     setDef("pbwidth", 0.91f);
     setDef("pbheight", 0.82f);
     setDef("barFill", (std::string) "a83232", 1.f, false);
-    
 }
 
 void BlockBreakIndicator::settingsRender(float settingsOffset) {
     initSettingsPage();
-
 
     addToggle("Progress Bar", "Whether to show a Progress Bar or text", "pbmode");
     defaultAddSettings("main");
@@ -71,6 +56,30 @@ void BlockBreakIndicator::settingsRender(float settingsOffset) {
 
     FlarialGUI::UnsetScrollView();
     resetPadding();
+}
+
+std::string BlockBreakIndicator::getDisplayValue() {
+    if (
+        SDK::hasInstanced && SDK::clientInstance != nullptr &&
+        SDK::clientInstance->getLocalPlayer() != nullptr &&
+        SDK::clientInstance->getLocalPlayer()->getGamemode() != nullptr
+    ) {
+        if (MC::heldLeft) {
+            Gamemode *gamemode = SDK::clientInstance->getLocalPlayer()->getGamemode();
+            auto progress = gamemode->getLastBreakProgress() * 100;
+            if (lastProgress != progress) {
+                if (lastProgress < progress || progress == 0.f) {
+                    currentProgress = progress;
+                }
+                lastProgress = progress;
+            }
+        } else {
+            currentProgress = 0.0f;
+        }
+
+        return std::format("{:.0f}%", currentProgress);
+    }
+    return "0%";
 }
 
 void BlockBreakIndicator::normalRender(int index, std::string &value) {
@@ -194,32 +203,5 @@ void BlockBreakIndicator::normalRender(int index, std::string &value) {
 
     if (ClickGUI::editmenu) {
         FlarialGUI::UnsetWindowRect();
-    }
-}
-
-void BlockBreakIndicator::onRender(RenderEvent &event) {
-    if (!this->isEnabled()) return;
-    if (
-        SDK::hasInstanced && SDK::clientInstance != nullptr &&
-        SDK::clientInstance->getLocalPlayer() != nullptr &&
-        SDK::clientInstance->getLocalPlayer()->getGamemode() != nullptr
-    ) {
-        if (SDK::getCurrentScreen() != "hud_screen") return;
-
-        if (MC::heldLeft) {
-            Gamemode *gamemode = SDK::clientInstance->getLocalPlayer()->getGamemode();
-            auto progress = gamemode->getLastBreakProgress() * 100;
-            if (lastProgress != progress) {
-                if (lastProgress < progress || progress == 0.f) {
-                    currentProgress = progress;
-                }
-                lastProgress = progress;
-            }
-        } else {
-            currentProgress = 0.0f;
-        }
-
-        std::string progress = std::format("{:.0f}%", currentProgress);
-        this->normalRender(16, progress);
     }
 }

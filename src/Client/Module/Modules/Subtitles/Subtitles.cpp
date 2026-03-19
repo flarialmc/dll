@@ -111,7 +111,6 @@ void Subtitles::updateSoundVec(std::vector<Sound> &soundVec, float diff) {
             soundVec.erase(soundVec.begin());
         }
     }
-
 }
 
 void Subtitles::onSoundEnginePlay(SoundEnginePlayEvent &event) {
@@ -139,7 +138,8 @@ void Subtitles::onTick(TickEvent &event) {
 
 void Subtitles::onRender(RenderEvent &event) {
     if (!SDK::clientInstance) return;
-    if (!this->isEnabled() || !SDK::clientInstance->getLocalPlayer()) return;
+    if (!this->isEnabled() || ClickGUI::blurActive || !SDK::clientInstance->getLocalPlayer()) return;
+    ClickGUI::HudFadeGuard fadeGuard;
     if (SDK::getCurrentScreen() != "hud_screen") return;
     if (sounds.empty() && !ClickGUI::editmenu) return;
 

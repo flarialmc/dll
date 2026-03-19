@@ -2,30 +2,23 @@
 
 #include "Client.hpp"
 #include "Modules/ClickGUI/ClickGUI.hpp"
+#include "SDK/Client/Actor/Components/ActorRotationComponent.hpp"
 
 
 void Mousestrokes::onEnable()
 {
 	Listen(this, RenderEvent, &Mousestrokes::onRender);
-	Listen(this, MouseEvent, &Mousestrokes::onMouse);
 	Module::onEnable();
 
-	std::thread normalizeCursor([&]() {
-		while (!Client::disable) {
-			std::this_thread::sleep_for(std::chrono::milliseconds(10));
-
-			X *= 0.01;
-			Y *= 0.01;
-		}
-		});
-
-	normalizeCursor.detach();
+	// Reset cursor position on enable
+	X = 0;
+	Y = 0;
+	CurrentCursorPos = Vec2<float>(0, 0);
 }
 
 void Mousestrokes::onDisable()
 {
 	Deafen(this, RenderEvent, &Mousestrokes::onRender);
-	Deafen(this, MouseEvent, &Mousestrokes::onMouse);
 	Module::onDisable();
 }
 
@@ -63,15 +56,9 @@ void Mousestrokes::settingsRender(float settingsOffset)
 
 void Mousestrokes::onRender(RenderEvent& event)
 {
-	if (!this->isEnabled() || SDK::getCurrentScreen() != "hud_screen") return;
+	if (!this->isEnabled() || ClickGUI::blurActive || SDK::getCurrentScreen() != "hud_screen") return;
+	ClickGUI::HudFadeGuard fadeGuard;
 	this->normalRender(31, (std::string&)"");
-}
-
-void Mousestrokes::onMouse(MouseEvent& event)
-{
-	if (!this->isEnabled()) return;
-	X += event.getMouseMovementX();
-	Y += event.getMouseMovementY();
 }
 
 void Mousestrokes::normalRender(int index, std::string& value)
@@ -79,6 +66,39 @@ void Mousestrokes::normalRender(int index, std::string& value)
 	if (!this->isEnabled()) return;
 	if (!SDK::hasInstanced) return;
 	if (SDK::clientInstance->getLocalPlayer() == nullptr) return;
+
+	// Get rotation delta from player's ActorRotationComponent
+	LocalPlayer* player = SDK::clientInstance->getLocalPlayer();
+	ActorRotationComponent* rotComponent = player->getActorRotationComponent();
+	if (rotComponent) {
+		// rot.x = pitch, rot.y = yaw
+		// rotPrev = previous frame's rotation
+		float deltaYaw = rotComponent->rot.y - rotComponent->rotPrev.y;
+		float deltaPitch = rotComponent->rot.x - rotComponent->rotPrev.x;
+
+		// Wrap deltaYaw to [-180, 180] so crossing the -180/180 boundary
+		// doesn't produce a ~360 degree jump
+		if (deltaYaw > 180.0f) deltaYaw -= 360.0f;
+		else if (deltaYaw < -180.0f) deltaYaw += 360.0f;
+
+		// Scale the rotation delta to cursor movement (adjust multiplier as needed)
+		float sensitivity = 3.0f;
+		X += deltaYaw * sensitivity;
+		Y += deltaPitch * sensitivity;
+	}
+
+	// Decay X and Y each frame (smooth return to center)
+	float decayRate = FlarialGUI::frameFactor * 0.15f;
+	if (decayRate > 0.95f) decayRate = 0.95f;
+	X *= (1.0f - decayRate);
+	Y *= (1.0f - decayRate);
+
+	// Clamp X and Y to prevent runaway values
+	float maxMovement = 200.0f;
+	if (X > maxMovement) X = maxMovement;
+	if (X < -maxMovement) X = -maxMovement;
+	if (Y > maxMovement) Y = maxMovement;
+	if (Y < -maxMovement) Y = -maxMovement;
 
 	float scale = getOps<float>("uiscale");
 
@@ -115,8 +135,11 @@ void Mousestrokes::normalRender(int index, std::string& value)
 
 	Vec2<float> RectPos = realcenter;
 
-	FlarialGUI::lerp<float>(CurrentCursorPos.x, X * (Constraints::PercentageConstraint(1, "top") / 1080) * scale, FlarialGUI::frameFactor * 0.25);
-	FlarialGUI::lerp<float>(CurrentCursorPos.y, Y * (Constraints::PercentageConstraint(1, "top") / 1080) * scale, FlarialGUI::frameFactor * 0.25);
+	float targetX = X * (Constraints::PercentageConstraint(1, "top") / 1080) * scale;
+	float targetY = Y * (Constraints::PercentageConstraint(1, "top") / 1080) * scale;
+
+	FlarialGUI::lerp<float>(CurrentCursorPos.x, targetX, FlarialGUI::frameFactor * 0.25);
+	FlarialGUI::lerp<float>(CurrentCursorPos.y, targetY, FlarialGUI::frameFactor * 0.25);
 
 	Vec2 CursorPos(RectSize.div(Vec2<float>(2, 2)).add(RectPos).add(CurrentCursorPos));
 	Vec2 Centre = RectSize.div(Vec2<float>(2, 2));

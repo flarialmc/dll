@@ -2,6 +2,7 @@
 
 #include <SDK/Client/Core/ClientInstance.hpp>
 #include <SDK/Client/Core/HashedString.hpp>
+#include <SDK/Client/GUI/RectangleArea.hpp>
 #include <Client/Module/Manager.hpp>
 #include <Utils/Memory/Memory.hpp>
 #include <Utils/Utils.hpp>
@@ -9,9 +10,17 @@
 #include "TexturePtr.hpp"
 #include "TextureGroup.hpp"
 #include "ScreenContext.hpp"
+#include "NineSliceData.hpp"
 
 #include <cstdint>
+#include <optional>
 #include <string>
+
+// Forward declarations for text rendering
+namespace ui {
+    enum class TextAlignment;
+}
+struct TextMeasureData;
 
 class MinecraftUIRenderContext {
 public:
@@ -55,8 +64,38 @@ public:
             Memory::CallVFunc<7, void, TexturePtr&, Vec2<float>&, Vec2<float>&, Vec2<float>&, Vec2<float>&>(this, texture, pos, size, uvPos, uvSize);
     }
 
+    void drawNineslice(TexturePtr& texture, NinesliceInfo const& info, RectangleArea const& rect) {
+        if (VersionUtils::checkAboveOrEqual(21, 50))
+            if (VersionUtils::checkAboveOrEqual(21, 120)) Memory::CallVFunc<8, void, BedrockTextureData*, NinesliceInfo const&>(
+                this, texture.clientTexture.get(), info, rect);
+            else
+            Memory::CallVFunc<8, void, BedrockTextureData*, NinesliceInfo const&, RectangleArea const&>(
+                this, texture.clientTexture.get(), info, rect);
+        else
+            Memory::CallVFunc<8, void, TexturePtr&, NinesliceInfo const&, RectangleArea const&>(
+                this, texture, info, rect);
+    }
+
     void flushImages(mce::Color &color, float opacity, HashedString &hashedString) {
         Memory::CallVFunc<9, void, mce::Color&, float, HashedString &>(this, color, opacity, hashedString);
+    }
+
+    void flushText(float deltaTime, std::optional<float> obfuscateSwitchTime = std::nullopt) {
+        Memory::CallVFunc<6, void, float, std::optional<float>>(this, deltaTime, obfuscateSwitchTime);
+    }
+
+    void drawDebugText(
+        RectangleArea const& rect,
+        std::string const& text,
+        mce::Color const& color,
+        float alpha,
+        ui::TextAlignment alignment,
+        TextMeasureData const& textData,
+        CaretMeasureData const& caretData
+    ) {
+        Memory::CallVFunc<4, void, RectangleArea const&, std::string const&, mce::Color const&, float,
+            ui::TextAlignment, TextMeasureData const&, CaretMeasureData const&>(
+            this, rect, text, color, alpha, alignment, textData, caretData);
     }
 
     void reloadTexture(const ResourceLocation& location) {

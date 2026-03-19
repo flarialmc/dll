@@ -12,6 +12,7 @@
 #include <fmt/ranges.h>
 #include <windows.h>  // For HRESULT
 
+#define LOG_DEBUG(fmt, ...) Logger::debug(fmt, __FILE__, __LINE__, ##__VA_ARGS__)
 #define LOG_ERROR(fmt, ...) Logger::error(fmt, __FILE__, __LINE__, ##__VA_ARGS__)
 #define LOG_FATAL(fmt, ...) Logger::fatal(fmt, __FILE__, __LINE__, ##__VA_ARGS__)
 #define LOG_HRESULT_ERROR(msg, hr) Logger::error("{}: {}", msg, Logger::getHRESULTError(hr))

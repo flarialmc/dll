@@ -3,35 +3,38 @@
 #include "../../../Client.hpp"
 #include "Events/EventManager.hpp"
 #include "Events/Game/ItemDropEvent.hpp"
-#include "Events/Game/TickEvent.hpp"
 #include "nes/event_dispatcher.hpp"
 #include "SDK/SDK.hpp"
 
 void ActorDropItem::enableHook() {
 
-    auto base = address; // Player vtable
-    int offset = *reinterpret_cast<int *>(base + 3);
-    auto **vft = reinterpret_cast<uintptr_t **>(base + offset + 7);
-
-    static auto vftOffset = GET_OFFSET("Actor::drop");
-
-    this->manualHook(vft[vftOffset], (void *) callback, (void **) &funcOriginal);
+    this->autoHook((void *) callback, (void **) &funcOriginal);
 
 }
 
-ActorDropItem::ActorDropItem() : Hook("ActorDropItem", GET_SIG_ADDRESS("Actor::baseTick")) {}
+ActorDropItem::ActorDropItem() : Hook("ActorDropItem", GET_SIG_ADDRESS("Actor::drop")) {}
 
 bool ActorDropItem::callback(Actor *actor, ItemStack *item, const bool randomly) {
+    std::string itemName;
+    int itemCount = 0;
 
-    bool DropItem = funcOriginal(actor, item, randomly);
-    auto event = nes::make_holder<ItemDropEvent>(actor, item, DropItem);
-
-    if (SDK::clientInstance)
-    if (actor == SDK::clientInstance->getLocalPlayer()) {
-        eventMgr.trigger(event);
+    if (item != nullptr) {
+        const auto droppedItem = item->getItem();
+        if (droppedItem != nullptr) {
+            itemName = droppedItem->name;
+            itemCount = static_cast<int>(item->count);
+        }
     }
 
-    return event->getDropItem();
+    bool dropItem = funcOriginal(actor, item, randomly);
+
+    if (SDK::clientInstance != nullptr && actor == SDK::clientInstance->getLocalPlayer()) {
+        auto event = nes::make_holder<ItemDropEvent>(actor, item, dropItem, itemName, itemCount);
+        eventMgr.trigger(event);
+        return event->getDropItem();
+    }
+
+    return dropItem;
 
 }
 

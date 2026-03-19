@@ -18,12 +18,16 @@ void DeathLogger::onDisable() {
 void DeathLogger::defaultConfig() {
     Module::defaultConfig("core");
     setDef("deathWaypoints", true);
+    setDef("limitDeathWaypoints", true);
+    setDef("maxDeathWaypoints", 10);
 }
 
 void DeathLogger::settingsRender(float settingsOffset) {
     initSettingsPage();
 
     addToggle("Death Waypoints", "waypoint settings are managed in the waypoints module.", "deathWaypoints");
+    // addToggle("Limit Death Waypoint Count", "limits the maximum number of death waypoints", "limitDeathWaypoints");
+    // addConditionalSliderInt(getOps<bool>("limitDeathWaypoints"), "Max Death Waypoints", "", "maxDeathWaypoints", 50, 1);
 
     FlarialGUI::UnsetScrollView();
     resetPadding();
@@ -40,7 +44,7 @@ std::string DeathLogger::getRawDimensionName() {
 }
 
 void DeathLogger::onTick(TickEvent& event) {
-    if (!SDK::clientInstance->getLocalPlayer()) return;
+    if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer()) return;
 
     LocalPlayer* player = SDK::clientInstance->getLocalPlayer();
     float health = player->getHealth();
@@ -54,7 +58,8 @@ void DeathLogger::onTick(TickEvent& event) {
 
     if (health == 0 && !death) {
         death = true;
-        deathPos = *player->getPosition();
+        auto* pos = player->getPosition();
+        if (pos) deathPos = *pos;
     };
 
     if (death && getOps<bool>("deathWaypoints") && !waypointed) {
@@ -69,22 +74,27 @@ void DeathLogger::onTick(TickEvent& event) {
         if (waypoints->settings.getSettingByName<bool>("randomizeColor") != nullptr) {
             if (waypoints->getOps<bool>("randomizeColor")) col = FlarialGUI::ColorFToHex(D2D1_COLOR_F(Waypoints::random(), Waypoints::random(), Waypoints::random(), 1.f));
         }
+        auto* deathWpPos = SDK::clientInstance->getLocalPlayer()->getPosition();
+        if (!deathWpPos) return;
         waypoints->addWaypoint(
             index,
             "(death) waypoint-" + FlarialGUI::cached_to_string(index),
             col,
-            Vec3{ SDK::clientInstance->getLocalPlayer()->getPosition()->x, SDK::clientInstance->getLocalPlayer()->getPosition()->y - 1, SDK::clientInstance->getLocalPlayer()->getPosition()->z },
+            Vec3{ deathWpPos->x, deathWpPos->y - 1, deathWpPos->z },
             true,
             true,
             false,
-            100.0f
+            100.0f,
+            true
         );
         FlarialGUI::Notify("Added death waypoint!");
         waypointed = true;
     }
 
     if (death && !printed) {
-        SDK::clientInstance->getGuiData()->displayClientMessage(std::format(
+        auto* guiData = SDK::clientInstance->getGuiData();
+        if (!guiData) return;
+        guiData->displayClientMessage(std::format(
             "Player died at <{}, {}, {}> in <{}>",
             static_cast<int>(deathPos.x),
             static_cast<int>(deathPos.y),

@@ -52,17 +52,23 @@ add_compile_options($<$<CONFIG:Release>:/Ob2>)
 add_compile_options(/bigobj)
 add_compile_options(/utf-8)
 if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "Test")
-    # Optimize for performance
-    add_compile_options(/O2 /Oi /Gy /Gw /GF /fp:fast /Gd /MT /Ob2)
+    # Optimize for performance with debug info for symbolication
+    add_compile_options(/O2 /Oi /Gy /Gw /GF /fp:fast /Gd /MT /Ob2 /Zi)
+    # Generate PDB with optimizations preserved
+    add_link_options(/DEBUG /OPT:REF /OPT:ICF)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
+    # Ignore debug runtime library to avoid conflicts
+    add_link_options(/NODEFAULTLIB:MSVCRTD)
 elseif (CMAKE_BUILD_TYPE STREQUAL "Debug")
     # Optimize for build time
     add_compile_options(/Od /Zi /MT)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
+    # Ignore debug runtime library to avoid conflicts
+    add_link_options(/NODEFAULTLIB:MSVCRTD)
 endif()
 
 # Generate version and build date
-string(TIMESTAMP BUILD_DATE "%Y %b %d %H:%M:%S")
+string(TIMESTAMP BUILD_DATE "%Y-%m-%d %H:%M:%S" UTC)
 set(FLARIAL_BUILD_DATE "${BUILD_DATE}")
 
 add_compile_definitions(
@@ -77,7 +83,8 @@ add_library(Flarial SHARED main.cpp ${SOURCE_FILES} ${LIB_FILES} src/Assets/Asse
         src/SDK/Client/Network/Packet/AnimatePacket.hpp
         src/Client/Module/Modules/Subtitles/Subtitles.cpp
         src/Client/Module/Modules/Subtitles/Subtitles.hpp
-        src/Client/Events/Game/SoundEnginePlayEvent.hpp)
+        src/Client/Events/Game/SoundEnginePlayEvent.hpp
+        src/SDK/Client/Network/Packet/TakeItemActorPacket.hpp)
 
 target_include_directories(Flarial PRIVATE
         "."
@@ -124,7 +131,7 @@ include(FetchContent)
 FetchContent_Declare(
         entt
         GIT_REPOSITORY https://github.com/skypjack/entt.git
-        GIT_TAG        f931687ff04d435871ac9664bb299f71f2a8fafc
+        GIT_TAG        303801c23bf116404fc687bdc103a3a696c17d97
 )
 
 FetchContent_Declare(
@@ -157,9 +164,34 @@ FetchContent_Declare(
         GIT_TAG        master
 )
 
-FetchContent_MakeAvailable(libhat entt nes fmt magic_enum LuaBridge)
+FetchContent_Declare(
+        safetyhook
+        GIT_REPOSITORY https://github.com/cursey/safetyhook.git
+        GIT_TAG main
+)
 
-target_link_libraries(Flarial PRIVATE libcurl ws2_32.lib crypt32.lib normaliz.lib wldap32.lib LuaBridge lua_static libhat fmt::fmt EnTT::EnTT NES windowscodecs.lib urlmon.lib dwrite.lib d3d12.lib dxgi.lib d3d11.lib d2d1.lib wininet.lib setupapi.lib version FreeType magic_enum runtimeobject)
+FetchContent_Declare(
+       jsoncpp
+       GIT_REPOSITORY https://github.com/EquinoxHouse/jsoncpp.git
+       GIT_TAG mcbe
+)
+
+FetchContent_Declare(
+        discord-rpc
+        GIT_REPOSITORY https://github.com/EclipseMenu/discord-presence.git
+        GIT_TAG main
+)
+
+FetchContent_Declare(
+        rift
+        GIT_REPOSITORY https://github.com/EclipseMenu/rift.git
+        GIT_TAG v2.0.2
+)
+
+set(FMT_MODULE OFF CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(libhat entt nes fmt magic_enum LuaBridge safetyhook jsoncpp discord-rpc rift)
+
+target_link_libraries(Flarial PRIVATE jsoncpp safetyhook libcurl ws2_32.lib crypt32.lib normaliz.lib wldap32.lib LuaBridge lua_static libhat fmt::fmt EnTT::EnTT NES windowscodecs.lib urlmon.lib dwrite.lib d3d12.lib dxgi.lib d3d11.lib d2d1.lib wininet.lib setupapi.lib version FreeType magic_enum runtimeobject discord-rpc rift)
 
 target_link_libraries(Flarial PUBLIC MinHook)
 
@@ -167,7 +199,8 @@ if (EXISTS "${CMAKE_SOURCE_DIR}/compiledoom.txt")
     message(WARNING "Compiling with Doom Module, Flarial may freeze or crash.")
     add_compile_definitions(COMPILE_DOOM)
     file(GLOB_RECURSE DOOM_SOURCES "src/Client/Module/Modules/Doom/doomgeneric/*.c" "src/Client/Module/Modules/Doom/doomgeneric/*.h")
-    add_library(DoomModule ${DOOM_SOURCES})
+    add_library(DoomModule ${DOOM_SOURCES}
+            src/SDK/Client/Network/Packet/TakeItemActorPacket.hpp)
     target_link_libraries(Flarial PRIVATE DoomModule)
 endif ()
 
@@ -177,3 +210,16 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
 set_property(TARGET Flarial PROPERTY UNITY_BUILD ON)
 set_property(TARGET Flarial PROPERTY UNITY_BUILD_BATCH_SIZE 16)
 endif ()
+
+# ===== Test executable =====
+# Lightweight unit tests for pure-logic components (no game dependency).
+# Build: cmake --build . --target FlarialTests
+# Run:   ./FlarialTests.exe
+
+add_executable(FlarialTests tests/ExpressionFormatTest.cpp)
+target_include_directories(FlarialTests PRIVATE "src" "lib")
+target_link_libraries(FlarialTests PRIVATE rift fmt::fmt)
+set_target_properties(FlarialTests PROPERTIES
+        MSVC_RUNTIME_LIBRARY "MultiThreaded"
+)
+target_compile_options(FlarialTests PRIVATE /utf-8 /bigobj)

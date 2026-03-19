@@ -38,16 +38,20 @@ void CrashTelemetry::sendCrashReport(
     const std::stacktrace& trace,
     int signal,
     const std::string& signalName,
-    EXCEPTION_POINTERS* exceptionPointers
+    EXCEPTION_POINTERS* exceptionPointers,
+    const std::string& crashDump,
+    const std::string& crashId,
+    const std::string& reportId
 ) {
     try {
         if (!s_initialized) {
             initialize();
         }
 
-        // Generate crash and report IDs
-        std::string crashId = generateCrashId();
-        std::string reportId = generateReportId();
+        // Use externally provided IDs when available so local crashlogs and telemetry
+        // can be correlated without ambiguity.
+        std::string resolvedCrashId = crashId.empty() ? generateCrashId() : crashId;
+        std::string resolvedReportId = reportId.empty() ? generateReportId() : reportId;
 
         // Get current timestamp
         auto now = std::chrono::system_clock::now();
@@ -57,7 +61,8 @@ void CrashTelemetry::sendCrashReport(
 
         // Build crash report JSON according to specification
         nlohmann::json crashReport = {
-            {"crashId", crashId},
+            {"crashId", resolvedCrashId},
+            {"reportId", resolvedReportId},
             {"timestamp", timestamp},
             {"clientInfo", getClientInfo()},
             {"crashInfo", getCrashInfo(trace, signal, signalName, exceptionPointers)},
@@ -67,17 +72,19 @@ void CrashTelemetry::sendCrashReport(
             {"additionalData", {
                 {"logFiles", nlohmann::json::array()}, // Could be populated later
                 {"moduleStates", getModuleStates()},
+                {"currentState", UserActionLogger::getCurrentState()},
                 {"userActions", UserActionLogger::getRecentActions(100)}, // Match exportToFile behavior
                 {"logs", getLatestLogContent()},
                 {"commitHash", COMMIT_HASH}, // Add commit hash like in crash log file
-                {"enabledModulesText", getEnabledModulesText()} // Add enabled modules list like in crash log file
+                {"enabledModulesText", getEnabledModulesText()}, // Add enabled modules list like in crash log file
+                {"crashDump", crashDump} // Full crash dump text (same as local crash log file)
             }}
         };
 
         // Send telemetry asynchronously
         sendTelemetryAsync(crashReport);
 
-        Logger::info("Crash telemetry sent - CrashID: {}, ReportID: {}", crashId, reportId);
+        Logger::info("Crash telemetry sent - CrashID: {}, ReportID: {}", resolvedCrashId, resolvedReportId);
     }
     catch (const std::exception& e) {
         Logger::warn("Failed to send crash telemetry: {}", e.what());
@@ -86,7 +93,7 @@ void CrashTelemetry::sendCrashReport(
 
 nlohmann::json CrashTelemetry::getClientInfo() {
     nlohmann::json clientInfo = {
-        {"version", Telemetry::getClientVersion()},
+        {"version", COMMIT_HASH}, // Use commit hash as version identifier
         {"platform", "windows"},
         {"architecture", getArchitecture()},
         {"buildNumber", "dev"}, // Could be made configurable
@@ -505,18 +512,44 @@ std::string CrashTelemetry::getEnabledModulesText() {
 }
 
 void CrashTelemetry::sendTelemetryAsync(const nlohmann::json& payload) {
-    std::thread([payload]() {
+    // Write debug info to a separate file that doesn't use Logger (which might not work during crash)
+    auto writeDebug = [](const std::string& msg) {
         try {
+            std::ofstream debug(Utils::getClientPath() + "\\logs\\crash_telemetry_debug.txt", std::ios::app);
+            auto now = std::chrono::system_clock::now();
+            auto time = std::chrono::system_clock::to_time_t(now);
+            debug << std::put_time(std::localtime(&time), "%Y-%m-%d %H:%M:%S") << " - " << msg << "\n";
+        } catch (...) {}
+    };
+
+    writeDebug("Starting telemetry thread...");
+
+    std::thread telemetryThread([payload, writeDebug]() {
+        try {
+            writeDebug("Thread started, dumping JSON...");
             std::string jsonData = payload.dump();
+            writeDebug("JSON size: " + std::to_string(jsonData.size()) + " bytes");
+
+            writeDebug("Sending POST request...");
             auto result = APIUtils::POST_Simple("https://api.flarial.xyz/api/v1/crash-logs", jsonData);
 
             if (result.first >= 200 && result.first < 300) {
-                Logger::debug("Crash telemetry sent successfully: HTTP {}", result.first);
+                writeDebug("SUCCESS: HTTP " + std::to_string(result.first));
+                Logger::info("[CrashTelemetry] SUCCESS: HTTP {}", result.first);
             } else {
-                Logger::warn("Crash telemetry failed: HTTP {}", result.first);
+                writeDebug("FAILED: HTTP " + std::to_string(result.first) + " - " + result.second);
+                Logger::warn("[CrashTelemetry] FAILED: HTTP {} - Response: {}", result.first, result.second);
             }
         } catch (const std::exception& e) {
-            Logger::warn("Failed to send crash telemetry: {}", e.what());
+            writeDebug("EXCEPTION: " + std::string(e.what()));
+            Logger::warn("[CrashTelemetry] EXCEPTION: {}", e.what());
         }
-    }).detach();
+    });
+
+    // Wait for the thread to complete before process exits
+    // This ensures telemetry actually sends before crash termination
+    if (telemetryThread.joinable()) {
+        telemetryThread.join();
+        writeDebug("Telemetry thread completed");
+    }
 }

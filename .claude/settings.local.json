@@ -1,29 +1,30 @@
 {
   "permissions": {
     "allow": [
-      "Bash(grep:*)",
-      "Bash(find:*)",
-      "Bash(rg:*)",
-      "Bash(build.bat)",
-      "Bash(cmd:*)",
-      "Bash(cmake:*)",
-      "WebFetch(domain:developer.nvidia.com)",
-      "Bash(git add:*)",
-      "Bash(dir:*)",
-      "Read(//d/Documents/**)",
-      "Bash(cat:*)",
-      "Bash(where cl)",
-      "Bash(where cmake)",
-      "WebFetch(domain:wickedengine.net)",
-      "WebFetch(domain:gamedev.net)",
+      "Bash(.build.bat D)",
+      "Bash(cmd /c \"build.bat D\")",
+      "WebFetch(domain:docs.nethergames.org)",
+      "WebFetch(domain:api.ngmc.co)",
+      "WebSearch",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:raw.githubusercontent.com)",
-      "WebSearch",
-      "WebFetch(domain:www.gamedev.net)",
-      "Bash(timeout:*)",
-      "Bash(.build.bat)",
-      "Bash(findstr:*)"
+      "Bash(cmd /c \"cd /d C:\\\\Users\\\\anshu\\\\source\\\\repos\\\\oAnshull\\\\FlarialClientOfficial && build.bat D\")",
+      "Bash(cmd /c \"cd /d C:\\\\Users\\\\anshu\\\\source\\\\repos\\\\flarialmc\\\\dll-css && call \"\"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\2022\\\\Community\\\\VC\\\\Auxiliary\\\\Build\\\\vcvarsall.bat\"\" x64 >nul 2>&1 && cd cmake-build-debug-ninja && ninja -j %NUMBER_OF_PROCESSORS% 2>&1\")",
+      "Bash(cmd /c \"cd /d C:\\\\Users\\\\anshu\\\\source\\\\repos\\\\flarialmc\\\\dll-css\\\\cmake-build-debug-ninja && dir CMakeCache.txt 2>&1\")",
+      "Bash(cmd /c \"cd /d C:\\\\Users\\\\anshu\\\\source\\\\repos\\\\flarialmc\\\\dll-css && build.bat D\")",
+      "Bash(cmd /c \"cd /d C:\\\\Users\\\\anshu\\\\source\\\\repos\\\\flarialmc\\\\dll-css && build.bat D 2>&1\")",
+      "Bash(cmd /c \"cd /d C:\\\\Users\\\\anshu\\\\source\\\\repos\\\\flarialmc\\\\dll-css && call build.bat D\")",
+      "Bash(while read:*)",
+      "Bash(do if grep -q \"void settingsRender\" \"$f\")",
+      "Bash(then echo \"$f\")",
+      "Bash(fi)",
+      "Bash(done)",
+      "Bash(cmd /c \"cd /d C:\\\\Users\\\\anshu\\\\source\\\\repos\\\\flarialmc\\\\dll-css && echo.|build.bat D\")"
     ],
-    "deny": []
-  }
+    "additionalDirectories": [
+      "C:\\Users\\Leslie\\AppData\\Roaming\\Minecraft Bedrock\\Users\\Shared\\games\\com.mojang\\resource_packs\\DéesseUIPa",
+      "C:\\Users\\Leslie\\Downloads\\MICROSOFT.MINECRAFTUWP_1.21.13004.0_x64__8wekyb3d8bbwe"
+    ]
+  },
+  "outputStyle": "Explanatory"
 }

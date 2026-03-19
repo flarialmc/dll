@@ -21,7 +21,7 @@ private:
         void *uvRot2,
         void **glintUVScale,
         void *uvAnim,
-        float brightness,
+        float brightness, 
         void *lightEmission
     );
 

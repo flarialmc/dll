@@ -7,6 +7,9 @@
 #include <deque>
 
 #include "Assets/Assets.hpp"
+#include "Events/Game/SoundEnginePlayEvent.hpp"
+#include "Events/Render/SomeCameraRelatedEvent.hpp"
+#include "Modules/Subtitles/Subtitles.hpp"
 
 
 class TimedObj {
@@ -44,6 +47,21 @@ private:
 	static inline auto last1PercLowUpdate = std::chrono::steady_clock::now();
 
 	std::deque<float> prevFrameTimes;
+
+	std::vector<Sound> sounds;
+
+#ifdef __DEBUG__
+	// SomeCameraRelatedEvent cached values
+	glm::quat camEventOrientation{};
+	glm::vec3 camEventPosition{};
+	float camEventAspectRatio = 0.f;
+	float camEventFieldOfView = 0.f;
+	float camEventNearPlane = 0.f;
+	float camEventFarPlane = 0.f;
+	glm::mat4 camEventPostViewTransform{1.f};
+	glm::mat4 camEventSavedProjection{1.f};
+	glm::mat4 camEventSavedModelView{1.f};
+#endif
 
 public:
 
@@ -83,6 +101,8 @@ public:
 
 	static std::string getFormattedTime(long long seconds);
 
+	void onSoundEnginePlay(SoundEnginePlayEvent &event);
+
 	void onTick(TickEvent& event);
 
 	void onSetupAndRender(SetupAndRenderEvent& event);
@@ -99,6 +119,10 @@ public:
 
 	void onGetViewPerspective(PerspectiveEvent& event);
 
-	void drawVector(ImDrawList* drawList, ImVec2 center, ImVec2 endPos, ImU32 col, float lineWidth, float lineLength, float guiscale);
+	static void drawVector(ImDrawList* drawList, ImVec2 center, ImVec2 endPos, ImU32 col, float lineWidth, float lineLength, float guiscale);
+
+#ifdef __DEBUG__
+	void onCameraRelated(SomeCameraRelatedEvent& event);
+#endif
 
 };

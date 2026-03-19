@@ -6,7 +6,7 @@
 class Mousestrokes : public Module
 {
 public:
-    Mousestrokes() : Module("Mouse Strokes", "Visualizes the position of your mouse.",
+    Mousestrokes() : Module("Mouse Strokes", "Visualizes your camera/mouse movement.",
         IDR_CURSOR_PNG, "") {
 
     }
@@ -19,11 +19,7 @@ public:
 
     void settingsRender(float settingsOffset) override;
 
-    std::chrono::steady_clock::time_point previousFrameTime = std::chrono::high_resolution_clock::now();
-
     void onRender(RenderEvent& event);
-
-    void onMouse(MouseEvent& event);
 
     struct CircleTrail
     {
@@ -32,12 +28,10 @@ public:
 
     std::vector<CircleTrail> trails = {};
 
-    float MousePosX, MousePosY;
-
     void normalRender(int index, std::string& value) override;
 
-    int X = 0;
-    int Y = 0;
+    float X = 0;  // Accumulated rotation delta (yaw)
+    float Y = 0;  // Accumulated rotation delta (pitch)
 
     Vec2<float> CurrentCursorPos = Vec2<float>(0, 0);
 };

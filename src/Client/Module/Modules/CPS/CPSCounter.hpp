@@ -5,6 +5,10 @@
 #include "../../../../Assets/Assets.hpp"
 
 class CPSCounter : public Module {
+
+private:
+	bool first = false;
+
 public:
 	CPSCounter() : Module("CPS", "Counts your Clicks per second.", IDR_CURSOR_PNG, "") {
 		

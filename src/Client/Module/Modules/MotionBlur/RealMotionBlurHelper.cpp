@@ -3,21 +3,28 @@
 #include <windows.h>
 #include <unknwn.h>
 #include <assert.h>
+#include <algorithm>
 #include "../../../Hook/Hooks/Render/DirectX/DXGI/SwapchainHook.hpp"
 #include "../../../Hook/Hooks/Render/DirectX/DXGI/UnderUIHooks.hpp"
+#include "../DepthOfField/DepthOfFieldHelper.hpp"
+#include "SDK/SDK.hpp"
+#include <glm/glm/gtc/matrix_transform.hpp>
 
+// GPU Gems 3, Chapter 27: Motion Blur as a Post-Processing Effect
+// https://developer.nvidia.com/gpugems/gpugems3/part-iv-image-effects/chapter-27-motion-blur-post-processing-effect
 const char* realMotionBlurPixelShaderSrc = R"(
 cbuffer CameraData : register(b0)
 {
     row_major matrix preWorldViewProjection;
     row_major matrix invWorldViewProjection;
     float intensity;
-    float3 padding;
+    int numSamples;
+    float2 padding;
 };
 
 Texture2D sceneTexture : register(t0);
 SamplerState samplerState : register(s0);
-Texture2D depthTexture : register(t1);
+Texture2D<float> depthTexture : register(t1);
 SamplerState depthSampler : register(s1);
 
 struct VS_OUTPUT {
@@ -29,33 +36,50 @@ float4 mainPS(VS_OUTPUT input) : SV_Target
 {
     float2 sampleCoord = input.Tex;
 
-    float depth = 1.0;
+    // Sample actual depth from depth buffer (GPU Gems approach)
+    // Depth is in [0,1] where 0 = near plane, 1 = far plane
+    float depth = depthTexture.Sample(depthSampler, sampleCoord);
 
-    float4 H = float4(sampleCoord.x * 2 - 1,
-                      (1 - sampleCoord.y) * 2 - 1,
-                      depth * 2 - 1,
-                      1);
+    // Convert screen position to clip space [-1, 1]
+    // Note: Y is flipped (1 - texCoord.y) because screen coords vs clip coords
+    float4 H = float4(sampleCoord.x * 2.0 - 1.0,
+                      (1.0 - sampleCoord.y) * 2.0 - 1.0,
+                      depth,
+                      1.0);
 
+    // Transform from clip space to world space using inverse view-projection
     float4 worldPos = mul(H, invWorldViewProjection);
     worldPos /= worldPos.w;
 
+    // Transform world position using previous frame's view-projection
     float4 previousPos = mul(worldPos, preWorldViewProjection);
     previousPos /= previousPos.w;
 
-    int numSamples = 32;
-    float2 velocity = ((H.xy - previousPos.xy) / numSamples) * float2(0.5f, -0.5f);
-    velocity *= intensity;
+    // Calculate per-pixel velocity in screen space
+    // Velocity = current position - previous position
+    float2 velocity = (H.xy - previousPos.xy) * 0.5;
+    velocity *= intensity / numSamples;
 
+    // Apply motion blur by sampling along velocity vector
     float4 color = sceneTexture.Sample(samplerState, sampleCoord);
-    [unroll]
+    float totalWeight = 1.0;
+
+    [loop]
     for (int i = 1; i < numSamples; ++i)
     {
-        sampleCoord += velocity;
-        sampleCoord = clamp(sampleCoord, 0.0, 1.0);
-        color += sceneTexture.Sample(samplerState, sampleCoord);
+        float2 offset = velocity * (float)i;
+        float2 samplePos = sampleCoord + offset;
+
+        // Only sample within valid texture bounds
+        if (samplePos.x >= 0.0 && samplePos.x <= 1.0 &&
+            samplePos.y >= 0.0 && samplePos.y <= 1.0)
+        {
+            color += sceneTexture.Sample(samplerState, samplePos);
+            totalWeight += 1.0;
+        }
     }
 
-    return color / (numSamples);
+    return color / totalWeight;
 }
 
 
@@ -83,7 +107,8 @@ struct CameraDataBuffer {
     float preWorldViewProjection[16];
     float invWorldViewProjection[16];
     float intensity;
-    float padding[3];
+    int numSamples;
+    float padding[2];
 };
 
 bool RealMotionBlurHelper::Initialize()
@@ -230,12 +255,42 @@ bool RealMotionBlurHelper::CompileShader(const char* srcData, const char* entryP
     return true;
 }
 
+// Track if we have a valid previous frame matrix
+static bool s_hasPrevMatrix = false;
+
+void RealMotionBlurHelper::Reset()
+{
+    s_hasPrevMatrix = false;
+    // Reset the previous matrix to identity
+    memset(m_prevWorldMatrix, 0, sizeof(m_prevWorldMatrix));
+    m_prevWorldMatrix[0] = m_prevWorldMatrix[5] = m_prevWorldMatrix[10] = m_prevWorldMatrix[15] = 1.0f;
+    Logger::debug("[RealMotionBlur] State reset");
+}
+
 void RealMotionBlurHelper::Render(ID3D11RenderTargetView* rtv, winrt::com_ptr<ID3D11ShaderResourceView>& frame)
 {
     ID3D11DeviceContext* context = SwapchainHook::context.get();
     ID3D11Device* device = SwapchainHook::d3d11Device.get();
     if (!context || !device || !rtv)
     {
+        return;
+    }
+
+    // CRITICAL: Skip if depth buffer is not available - sampling null causes driver crashes
+    if (!DepthOfFieldHelper::pDepthMapSRV) {
+        static int warnCounter = 0;
+        if (++warnCounter % 300 == 1) {
+            Logger::debug("[RealMotionBlur] Skipping render - no depth buffer available");
+        }
+        return;
+    }
+
+    // CRITICAL: Skip MSAA depth buffers - the shader doesn't support Texture2DMS
+    if (DepthOfFieldHelper::isMSAADepth) {
+        static int msaaWarnCounter = 0;
+        if (++msaaWarnCounter % 600 == 1) {
+            Logger::debug("[RealMotionBlur] Skipping render - MSAA depth buffers are not supported");
+        }
         return;
     }
 
@@ -266,7 +321,8 @@ void RealMotionBlurHelper::Render(ID3D11RenderTargetView* rtv, winrt::com_ptr<ID
     }
     context->RSSetViewports(1, &m_cachedViewport);
 
-    context->ClearRenderTargetView(rtv, BACKGROUND_COLOR);
+    // Don't clear - we're applying an effect to the existing scene
+    // context->ClearRenderTargetView(rtv, BACKGROUND_COLOR);
 
     context->OMSetRenderTargets(1, &rtv, originalDepthStencilView);
 
@@ -287,17 +343,63 @@ void RealMotionBlurHelper::Render(ID3D11RenderTargetView* rtv, winrt::com_ptr<ID
     frameTexture->GetDesc(&frameDesc);
     frameResource->Release();
 
-    glm::mat4 currWVP = Matrix::getMatrixCorrection(MC::Transform.modelView);
+    // Get the proper view-projection matrix from GameRenderer
+    // The GPU Gems approach requires the FULL view-projection matrix, not just the view matrix
+    glm::mat4 currWVP;
+
+    if (SDK::clientInstance) {
+        auto minecraftGame = SDK::clientInstance->getMinecraftGame();
+        if (minecraftGame) {
+            auto gameRenderer = minecraftGame->getGameRenderer();
+            if (gameRenderer) {
+                const glm::mat4& viewMatrix = gameRenderer->getLastViewMatrix();
+                const glm::mat4& projMatrix = gameRenderer->getLastProjectionMatrix();
+                // Combine view and projection: projection * view
+                currWVP = projMatrix * viewMatrix;
+            } else {
+                // Fallback to old method if GameRenderer unavailable
+                currWVP = Matrix::getMatrixCorrection(MC::Transform.modelView);
+            }
+        } else {
+            currWVP = Matrix::getMatrixCorrection(MC::Transform.modelView);
+        }
+    } else {
+        currWVP = Matrix::getMatrixCorrection(MC::Transform.modelView);
+    }
+
+    // Transpose for HLSL row_major layout (GLM is column-major, HLSL expects row-major)
+    glm::mat4 currWVPTransposed = glm::transpose(currWVP);
     glm::mat4 invCurrWVP = glm::inverse(currWVP);
+    glm::mat4 invCurrWVPTransposed = glm::transpose(invCurrWVP);
+
+    // CRITICAL: Skip rendering on first frame - we don't have valid previous matrix data yet
+    // This prevents the shader from using uninitialized/garbage matrix data which can cause
+    // extreme velocity values and GPU driver crashes
+    if (!s_hasPrevMatrix) {
+        // Just save the current matrix for next frame and skip rendering
+        memcpy(m_prevWorldMatrix, &currWVPTransposed[0][0], sizeof(m_prevWorldMatrix));
+        s_hasPrevMatrix = true;
+
+        // Restore original render targets
+        if (originalDepthStencilView) originalDepthStencilView->Release();
+        for (UINT i = 0; i < numRenderTargets; ++i) {
+            if (originalRenderTargetViews[i]) originalRenderTargetViews[i]->Release();
+        }
+        Logger::debug("[RealMotionBlur] First frame - storing matrix, skipping render");
+        return;
+    }
 
     auto module = ModuleManager::getModule("Motion Blur");
     D3D11_MAPPED_SUBRESOURCE mappedResource;
     if (SUCCEEDED(context->Map(m_constantBuffer.get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource)))
     {
         CameraDataBuffer* pData = (CameraDataBuffer*)mappedResource.pData;
-        pData->intensity = module->getOps<float>("intensity");
+        pData->intensity = module->getOps<float>("intensity_real");
+        // Clamp samples to a reasonable range to prevent GPU overload
+        int numSamples = static_cast<int>(module->getOps<float>("samples"));
+        pData->numSamples = std::clamp(numSamples, 1, 64);
         memcpy(pData->preWorldViewProjection, m_prevWorldMatrix, sizeof(pData->preWorldViewProjection));
-        memcpy(pData->invWorldViewProjection, &invCurrWVP[0][0], sizeof(pData->invWorldViewProjection));
+        memcpy(pData->invWorldViewProjection, &invCurrWVPTransposed[0][0], sizeof(pData->invWorldViewProjection));
         context->Unmap(m_constantBuffer.get(), 0);
     }
 
@@ -315,6 +417,11 @@ void RealMotionBlurHelper::Render(ID3D11RenderTargetView* rtv, winrt::com_ptr<ID
 
     context->PSSetShaderResources(0, 1, &sceneSRV);
 
+    // Bind depth buffer from DepthOfFieldHelper (shared resource)
+    // Note: We already checked for null/MSAA at function start, so this should always be valid
+    ID3D11ShaderResourceView* depthSRV = DepthOfFieldHelper::pDepthMapSRV;
+    context->PSSetShaderResources(1, 1, &depthSRV);
+
     // Use cached sampler state
     ID3D11SamplerState* samplerPtr = m_samplerState.get();
     context->PSSetSamplers(0, 1, &samplerPtr);
@@ -330,10 +437,11 @@ void RealMotionBlurHelper::Render(ID3D11RenderTargetView* rtv, winrt::com_ptr<ID
     context->PSSetShaderResources(0, 1, nullSRV);
     context->PSSetShaderResources(1, 1, nullSRV);
 
-    // Cached states are cleaned up in ResizeHook::cleanShit
+    // Cached states are cleaned up in ResizeHook::cleanupResources
     if (originalDepthStencilView) originalDepthStencilView->Release();
     for (UINT i = 0; i < numRenderTargets; ++i) {
         if (originalRenderTargetViews[i]) originalRenderTargetViews[i]->Release();
     }
-    memcpy(m_prevWorldMatrix, &currWVP[0][0], sizeof(m_prevWorldMatrix));
+    // Save the transposed matrix for next frame (shader expects row-major)
+    memcpy(m_prevWorldMatrix, &currWVPTransposed[0][0], sizeof(m_prevWorldMatrix));
 }

@@ -39,18 +39,30 @@ namespace Logger {
 
 #if defined(__DEBUG__)
         HWND console = GetConsoleWindow();
-        if (!console) {
+        if (!console)
+        {
             AllocConsole();
             SetConsoleTitleA("Flarial-Debugger");
-            freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
+
+            FILE* fp = nullptr;
+            freopen_s(&fp, "CONOUT$", "w", stdout);
+            freopen_s(&fp, "CONOUT$", "w", stderr);
 
             HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
             DWORD dwMode = 0;
             GetConsoleMode(hOut, &dwMode);
             dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
             SetConsoleMode(hOut, dwMode);
-        }
-        else {
+
+            fmt::print(fg(fmt::color::red),
+            "      _______     ______ _            _       _    _____ _ _            _   \n"
+            "     \\       /   |  ____| |          (_)     | |  / ____| (_)          | |  \n"
+            "  ____\\_____/    | |__  | | __ _ _ __ _  __ _| | | |    | |_  ___ _ __ | |_ \n"
+            " /     \\         |  __| | |/ _` | '__| |/ _` | | | |    | | |/ _ \\ '_ \\| __|\n"
+            "/   ____\\        | |    | | (_| | |  | | (_| | | | |____| | |  __/ | | | |_ \n"
+            "\\  /             |_|    |_|\\__,_|_|  |_|\\__,_|_|  \\_____|_|_|\\___|_| |_|\\__|\n"
+            " \\/\n");
+        } else {
             ShowWindow(console, SW_SHOW);
         }
 #endif

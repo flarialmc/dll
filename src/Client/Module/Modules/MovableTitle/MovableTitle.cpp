@@ -29,8 +29,10 @@ void MovableTitle::onRender(RenderEvent &event) {
     auto name = SDK::getCurrentScreen();
 
     if (name == "hud_screen" || name == "pause_screen") {
-        float width = currentSize.x;
-        float height = currentSize.y;
+        // Title control only exists when a title is displayed, so currentSize
+        // may be zero in the editor. Use a fallback so the rect is draggable.
+        float width = currentSize.x > 0 ? currentSize.x : Constraints::RelativeConstraint(0.15f, "width");
+        float height = currentSize.y > 0 ? currentSize.y : Constraints::RelativeConstraint(0.05f, "height");
 
 
         Vec2<float> settingperc = Vec2<float>(getOps<float>("percentageX"), getOps<float>("percentageY"));
@@ -38,15 +40,21 @@ void MovableTitle::onRender(RenderEvent &event) {
         if (settingperc.x != 0) currentPos = Vec2<float>(settingperc.x * (MC::windowSize.x - width), settingperc.y * (MC::windowSize.y - height));
         else if (settingperc.x == 0 and originalPos.x != 0.0f) currentPos = Vec2<float>{originalPos.x, originalPos.y};
 
+        // Title control is transient — it only exists when a /title is active.
+        // If we've never captured its position, default to screen center so the
+        // editor rect is visible and draggable.
+        if (currentPos.x == -120.0f && ClickGUI::editmenu) {
+            currentPos = Vec2<float>{ (MC::windowSize.x - width) / 2.0f, (MC::windowSize.y - height) / 2.0f };
+        }
+
         if (ClickGUI::editmenu) {
             FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, width, height, 30, this->name);
             checkForRightClickAndOpenSettings(currentPos.x, currentPos.y, width, height);
         }
 
+        Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(currentPos.x, currentPos.y, 30, width, height);
+
         if (currentPos.x != -120.0f) {
-            Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(currentPos.x, currentPos.y, 30, width, height);
-
-
             currentPos.x = vec2.x;
             currentPos.y = vec2.y;
 

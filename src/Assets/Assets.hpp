@@ -10,7 +10,7 @@
 #define IDR_CLICKGUI_PNG               110
 #define IDR_CLOUDY_PNG                 111
 #define IDR_COMBO_PNG                  112
-#define IDR_COORDINATES_PNG            113
+#define IDR_COORDINATES_PNG            113 
 #define IDR_CURSOR_PNG                 114
 #define IDR_DOWN_PNG                   115
 #define IDR_DVDLOGO_01_PNG             116
@@ -189,9 +189,11 @@
 #define IDR_WIN10_LOGO_PNG             290
 #define IDR_CHROMEOS_LOGO_PNG          291
 #define IDR_INVENTORYLOCK_PNG          292
+#define IDR_MEDIA_LOGO_PNG             293
+#define IDR_ITEMTRACKER_PNG            294
 
 // MAKE SURE YOU ALWAYS UPDATE THIS!
 
-#define MAX_IMAGE_ID                   292
+#define MAX_IMAGE_ID                   294
 
 

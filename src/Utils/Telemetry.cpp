@@ -2,6 +2,8 @@
 #include <json/json.hpp>
 #include "APIUtils.hpp"
 #include "Utils.hpp"
+#include "WinrtUtils.hpp"
+#include "Client/Client.hpp"
 #include "Logger/Logger.hpp"
 #include <windows.h>
 #include <wincrypt.h>
@@ -27,13 +29,29 @@ void Telemetry::sendModuleEvent(const std::string& moduleName, const std::string
         nlohmann::json payload = {
             {"userHash", s_userHash},
             {"moduleName", moduleName},
-            {"action", action},
-            {"version", getClientVersion()}
+            {"action", action}
         };
 
-        sendTelemetryAsync(payload);
+        sendTelemetryAsync("https://api.flarial.xyz/telemetry/module-events", payload);
     } catch (const std::exception& e) {
         Logger::warn("Telemetry error: {}", e.what());
+    }
+}
+
+void Telemetry::sendStartupVersionPing(const std::string& version) {
+    try {
+        std::call_once(s_initFlag, []() {
+            s_userHash = generateUserHash();
+        });
+
+        nlohmann::json payload = {
+            {"userHash", s_userHash},
+            {"version", version}
+        };
+
+        sendTelemetryAsync("https://api.flarial.xyz/telemetry/version-startup", payload);
+    } catch (const std::exception& e) {
+        Logger::warn("Startup telemetry error: {}", e.what());
     }
 }
 
@@ -133,14 +151,18 @@ std::string Telemetry::sha256(const std::string& input) {
 }
 
 std::string Telemetry::getClientVersion() {
-    return "2.5.0";
+    std::string version = Client::version;
+    if (version.empty()) {
+        version = WinrtUtils::impl::toRawString(WinrtUtils::impl::getGameVersion());
+    }
+    return version;
 }
 
-void Telemetry::sendTelemetryAsync(const nlohmann::json& payload) {
-    std::thread([payload]() {
+void Telemetry::sendTelemetryAsync(const std::string& endpoint, const nlohmann::json& payload) {
+    std::thread([endpoint, payload]() {
         try {
             std::string jsonData = payload.dump();
-            auto result = APIUtils::POST_Simple("https://api.flarial.xyz/telemetry/module-events", jsonData);
+            auto result = APIUtils::POST_Simple(endpoint, jsonData);
             
             if (result.first < 200 || result.first >= 300) {
                 Logger::warn("Telemetry failed: HTTP {}", result.first);

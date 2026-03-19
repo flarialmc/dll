@@ -1,27 +1,26 @@
 #include "AutoGG.hpp"
 
 
-
-
-void AutoGG::onEnable() {
+void AutoGG::onEnable()
+{
     Listen(this, PacketEvent, &AutoGG::onPacketReceive)
     Module::onEnable();
 }
 
-void AutoGG::onDisable() {
+void AutoGG::onDisable()
+{
     Deafen(this, PacketEvent, &AutoGG::onPacketReceive)
     Module::onDisable();
 }
 
-void AutoGG::defaultConfig() {
+void AutoGG::defaultConfig()
+{
     Module::defaultConfig("core");
     setDef("text", (std::string)"GG");
-    
 }
 
-void AutoGG::settingsRender(float settingsOffset) {
-
-
+void AutoGG::settingsRender(float settingsOffset)
+{
     initSettingsPage();
 
     addTextBox("Text", "The text to send.", 0, "text");
@@ -31,16 +30,18 @@ void AutoGG::settingsRender(float settingsOffset) {
     resetPadding();
 }
 
-void AutoGG::onPacketReceive(PacketEvent& event) {
+void AutoGG::onPacketReceive(PacketEvent& event)
+{
     if (!this->isEnabled()) return;
     MinecraftPacketIds id = event.getPacket()->getId();
 
     // TODO: add support for other servers (look for "won the game" text)
-    if (id == MinecraftPacketIds::SetTitle) {
+    if (id == MinecraftPacketIds::SetTitle)
+    {
         auto* pkt = reinterpret_cast<SetTitlePacket*>(event.getPacket());
         static const std::regex rgxChRu(R"(Is The §6§l(Chronos|Rush) (Champion|Champions)!)");
         if (
-            // Zeqa
+                // Zeqa
             pkt->text == "§f§aYou won the game!" || // pre s8
             pkt->text == "§f§cYou lost the game!" || // pre s8
             pkt->text == "   " || // s8
@@ -55,33 +56,33 @@ void AutoGG::onPacketReceive(PacketEvent& event) {
             // Mineville
             pkt->text == "§aYou Win!" ||
             pkt->text == "§cGame Over!"
-        ) SendGG();
+        )
+            SendGG();
     }
 
-    if (id == MinecraftPacketIds::Text) {
-        auto* pkt = reinterpret_cast<TextPacket*>(event.getPacket());
-        if (pkt->message == "§c§l» §r§c§lGame OVER!" || // The Hive
-            pkt->message.find("§a won the game!") != std::string::npos || // CubeCraft
-            pkt->message.find("§a has won the game!") != std::string::npos // Lifeboat
-        ) SendGG();
+    if (id == MinecraftPacketIds::Text)
+    {
+        auto pktOpt = getTextPacket(event.getPacket());
+        if (!pktOpt) return;
+        auto& pkt = *pktOpt;
+        if (pkt.message == "§c§l» §r§c§lGame OVER!" || // The Hive
+            pkt.message.find("§a won the game!") != std::string::npos || // CubeCraft
+            pkt.message.find("§a has won the game!") != std::string::npos // Lifeboat
+        )
+            SendGG();
     }
 }
 
-void AutoGG::SendGG() {
+void AutoGG::SendGG()
+{
     if (!this->isEnabled()) return;
     std::string win_message = getOps<std::string>("text");
-    if (!win_message.empty()) {
+    if (!win_message.empty())
+    {
         auto player = SDK::clientInstance->getLocalPlayer();
         std::shared_ptr<Packet> packet = SDK::createPacket(9);
-        auto* text = reinterpret_cast<TextPacket*>(packet.get());
+        craftChatPacket(packet.get(), player->getPlayerName(), win_message);
 
-        text->type = TextPacketType::CHAT;
-        text->message = win_message;
-        text->platformId = "";
-        text->translationNeeded = false;
-        text->xuid = "";
-        text->name = player->getPlayerName();
-
-        SDK::clientInstance->getPacketSender()->sendToServer(text);
+        SDK::clientInstance->getPacketSender()->sendToServer(packet.get());
     }
 };

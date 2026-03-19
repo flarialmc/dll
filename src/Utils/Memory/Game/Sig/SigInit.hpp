@@ -2,6 +2,10 @@
 
 class SigInit {
 public:
+    static void init260();
+    static void init21131();
+    static void init21130();
+    static void init21120();
     static void init21110();
     static void init21100();
     static void init2190();

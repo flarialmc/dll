@@ -8,6 +8,17 @@
 #define clickgui ModuleManager::getModule("ClickGUI")
 
 std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<std::string>& options, std::string& value, const std::string& label, std::string moduleName, std::string settingName) {
+	bool valueInOptions = false;
+	for (const auto& option : options) {
+		if (option == value) {
+			valueInOptions = true;
+			break;
+		}
+	}
+	if (!valueInOptions && !options.empty()) {
+		value = options.front();
+		FlarialGUI::DropDownMenus[index].selected = value;
+	}
 
 	Vec2<float> round = Constraints::RoundingConstraint(13, 13);
 	const bool isAdditionalY = shouldAdditionalY;
@@ -17,7 +28,7 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
 	y -= percHeight / 2.0f;
 
 	float childHeights = Constraints::RelativeConstraint(0.030, "height", true);
-	float maxHeight = ((float)options.size() - 1.0f) * childHeights + 2.0f;
+	float maxHeight = (static_cast<float>(options.size()) * childHeights) + 2.0f;
 	float addYVal = maxHeight + Constraints::SpacingConstraint(0.05, textWidth);
 	float clickingY = y;
 
@@ -264,9 +275,9 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
 		DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.00, textWidth),
 		DWRITE_FONT_WEIGHT_NORMAL);
 
-	float is = percHeight / 2;
-	float ix = x + Constraints::SpacingConstraint(1.8, textWidth) - is * 1.2f;
-	float iy = y + Constraints::SpacingConstraint(0.28, percHeight);
+	float iconSize = percHeight / 2;
+	float iconX = x + Constraints::SpacingConstraint(1.8, textWidth) - iconSize * 1.2f;
+	float iconY = y + Constraints::SpacingConstraint(0.28, percHeight);
 
 	if (ImagesClass::images[IDR_DOWN_PNG] == nullptr)
 		LoadImageFromResource(IDR_DOWN_PNG, &ImagesClass::images[IDR_DOWN_PNG]);
@@ -278,7 +289,7 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
 
 	/*
 
-	D2D1_POINT_2F rotationCenter = D2D1::Point2F(rectf.left + is / 2, rectf.top + is / 2);
+	D2D1_POINT_2F rotationCenter = D2D1::Point2F(rectf.left + iconSize / 2, rectf.top + iconSize / 2);
 	D2D1_MATRIX_3X2_F rotationMatrix = D2D1::Matrix3x2F::Rotation(FlarialGUI::DropDownMenus[index].rotation,
 																  rotationCenter);
 
@@ -290,12 +301,12 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
 	*/
 
 	if (FlarialGUI::isInScrollView) {
-		iy += FlarialGUI::scrollpos;
+		iconY += FlarialGUI::scrollpos;
 	}
-	auto rectf = D2D1::RectF(ix, iy, ix + is, iy + is);
+	auto rectf = D2D1::RectF(iconX, iconY, iconX + iconSize, iconY + iconSize);
 
 	float rotationAngle = FlarialGUI::DropDownMenus[index].rotation;
-	ImVec2 rotationCenter(ix + is / 2, iy + is / 2);
+	ImVec2 rotationCenter(iconX + iconSize / 2, iconY + iconSize / 2);
 
 	FlarialGUI::ImRotateStart();
 	FlarialGUI::image(IDR_DOWN_PNG, rectf, "PNG", false);
@@ -303,13 +314,13 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
 
 
 	if (FlarialGUI::isInScrollView) {
-		iy -= FlarialGUI::scrollpos;
+		iconY -= FlarialGUI::scrollpos;
 	}
 
-	FlarialGUI::RoundedRect(ix - 8, iy - 5,
+	FlarialGUI::RoundedRect(iconX - 8, iconY - 5,
 		FlarialGUI::DropDownMenus[index].isActive ? D2D1::ColorF(D2D1::ColorF::White)
 		: D2D1::ColorF(192.0f / 255.0f, 133.0f / 255.0f,
-			142.0f / 255.0f), 1, is + 8, 0, 0);
+			142.0f / 255.0f), 1, iconSize + 8, 0, 0);
 
 	FlarialGUI::DropDownMenus[index].selected = value;
 

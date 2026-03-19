@@ -1,29 +1,22 @@
 #pragma once
 
-#include "../Module.hpp"
-#include "Events/Render/RenderEvent.hpp"
+#include "../HUDModule.hpp"
 #include "Events/Render/SetupAndRenderEvent.hpp"
-#include "../../../../Assets/Assets.hpp"
 
-class EntityCounter : public Module {
-private:
-	int entityCount = 0;
+class EntityCounter : public HUDModule {
 public:
+    EntityCounter() : HUDModule(24, "Entity Counter", "Counts the entities in the surrounding area",
+        IDR_ENTITYCOUNTER_PNG, "") {}
 
-	EntityCounter() : Module("Entity Counter", "Counts the entities in the surrounding area",
-		IDR_ENTITYCOUNTER_PNG, "") {
-		
-	};
+protected:
+    std::string getDisplayValue() override;
 
-	void onEnable() override;
+    void customInit() override;
 
-	void onDisable() override;
+    void customCleanup() override;
 
-	void defaultConfig() override;
+private:
+    int entityCount = 0;
 
-	void settingsRender(float settingsOffset) override;
-
-	void onSetupAndRender(SetupAndRenderEvent& event);
-
-	void onRender(RenderEvent& event);
+    void onSetupAndRender(SetupAndRenderEvent& event);
 };

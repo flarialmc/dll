@@ -1,60 +1,31 @@
 #include "Sprint.hpp"
-
-
 #include "Modules/Sneak/Sneak.hpp"
 
-void Sprint::onEnable() {
-    Listen(this, KeyEvent, &Sprint::onKey)
-    Listen(this, MouseEvent, &Sprint::onMouse)
-    Listen(this, RenderEvent, &Sprint::onRender)
-    Listen(this, TickEvent, &Sprint::onTick)
-    Module::onEnable();
-}
-
-void Sprint::onDisable() {
-    Deafen(this, KeyEvent, &Sprint::onKey)
-    Deafen(this, MouseEvent, &Sprint::onMouse)
-    Deafen(this, RenderEvent, &Sprint::onRender)
-    Deafen(this, TickEvent, &Sprint::onTick)
-    Module::onDisable();
-}
-
-void Sprint::defaultConfig() {
-    getKeybind();
-    Module::defaultConfig("all");
+void Sprint::customConfig() {
     setDef("status", true);
     setDef("toggleStatus", true);
-    setDef("textscale", 0.80f);
     setDef("always", false);
-    
+    setDef("keybind", (std::string)"");
 }
 
-void Sprint::settingsRender(float settingsOffset) {
-    initSettingsPage();
-
-    addKeybind("Keybind", "Hold for 2 seconds!", "keybind", true);
+void Sprint::customSettings() {
+    addKeybind("Keybind", "", "keybind", true);
     addToggle("Always Sprint", "Also known as auto sprint", "always");
     addToggle("Show Status", "", "status");
     addConditionalToggle(getOps<bool>("status"), "Show Toggle Status", "", "toggleStatus");
     extraPadding();
+}
 
-    addHeader("Main");
-    defaultAddSettings("main");
-    extraPadding();
+void Sprint::customInit() {
+    Listen(this, KeyEvent, &Sprint::onKey)
+    Listen(this, MouseEvent, &Sprint::onMouse)
+    Listen(this, TickEvent, &Sprint::onTick)
+}
 
-    addHeader("Text");
-    defaultAddSettings("text");
-    extraPadding();
-
-    addHeader("Colors");
-    defaultAddSettings("colors");
-    extraPadding();
-
-    addHeader("Misc");
-    defaultAddSettings("misc");
-
-    FlarialGUI::UnsetScrollView();
-    resetPadding();
+void Sprint::customCleanup() {
+    Deafen(this, KeyEvent, &Sprint::onKey)
+    Deafen(this, MouseEvent, &Sprint::onMouse)
+    Deafen(this, TickEvent, &Sprint::onTick)
 }
 
 void Sprint::onSetup() {
@@ -79,65 +50,59 @@ void Sprint::onMouse(MouseEvent &event) {
     }
 }
 
-void Sprint::onRender(RenderEvent& event) {
-    if (!this->isEnabled()) return;
-    if (!this->isEnabled() || SDK::getCurrentScreen() != "hud_screen") return;
+std::string Sprint::getDisplayValue() {
+    if (!getOps<bool>("status")) return "";
+    if (!SDK::hasInstanced || SDK::clientInstance == nullptr) return "";
 
-    if (!getOps<bool>("status")) return;
+    std::shared_ptr<Sneak> toggleSneak = std::dynamic_pointer_cast<Sneak>(ModuleManager::getModule("Toggle Sneak"));
 
-    if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
+    if (SDK::clientInstance->getLocalPlayer() != nullptr) {
+        std::string text = "Standing";
+        bool showStatus = true;
+        bool status = toggleSprinting;
 
-        std::shared_ptr<Sneak> toggleSneak = std::dynamic_pointer_cast<Sneak>(ModuleManager::getModule("Toggle Sneak"));
+        if (SDK::clientInstance->getLocalPlayer()->getActorFlag(ActorFlags::FLAG_SNEAKING)) {
+            text = "Sneaking";
 
-        if (SDK::clientInstance->getLocalPlayer() != nullptr) {
-            std::string text = "Standing";
-            bool showStatus = true;
-            bool status = toggleSprinting;
-
-            if (SDK::clientInstance->getLocalPlayer()->getActorFlag(ActorFlags::FLAG_SNEAKING)) {
-                text = "Sneaking";
-
-                if (toggleSneak != nullptr && toggleSneak->getOps<bool>("enabled")) status = toggleSneak->toggled;
-                else showStatus = false;
-            }
-            else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(ActorFlags::FLAG_SWIMMING)) text = "Swimming";
-            else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(ActorFlags::FLAG_GLIDING)) {
-                text = "Gliding";
-                showStatus = false;
-            }
-            else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(ActorFlags::FLAG_SLEEPING)) {
-                text = "Sleeping";
-                showStatus = false;
-            }
-            else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(ActorFlags::FLAG_SPRINTING)) text = "Sprinting";
-            else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(FLAG_MOVING)) text = "Walking";
-
-            if (getOps<bool>("toggleStatus") && showStatus) {
-                std::string text2 = std::format("{} ({})", text, status ? "Toggled": "Vanilla");
-                this->normalRender(5, text2);
-            }
-            else this->normalRender(5, text);
-
+            if (toggleSneak != nullptr && toggleSneak->getOps<bool>("enabled")) status = toggleSneak->toggled;
+            else showStatus = false;
         }
+        else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(ActorFlags::FLAG_SWIMMING)) text = "Swimming";
+        else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(ActorFlags::FLAG_GLIDING)) {
+            text = "Gliding";
+            showStatus = false;
+        }
+        else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(ActorFlags::FLAG_SLEEPING)) {
+            text = "Sleeping";
+            showStatus = false;
+        }
+        else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(ActorFlags::FLAG_SPRINTING)) text = "Sprinting";
+        else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(FLAG_MOVING)) text = "Walking";
+
+        if (getOps<bool>("toggleStatus") && showStatus) {
+            return std::format("{} ({})", text, status ? "Toggled": "Vanilla");
+        }
+        else return text;
     }
+
+    return "";
 }
 
 void Sprint::onTick(TickEvent& event) {
     if (!this->isEnabled()) return;
     if (SDK::clientInstance != nullptr) {
         if (SDK::clientInstance->getLocalPlayer() != nullptr) {
-            auto* handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
-
-                if (getOps<bool>("always")) {
-                    handler->sprinting = true;
-                    handler->mInputState.mSprintDown = true;
-                    handler->mRawInputState.mSprintDown = true;
-                }
-                else {
-                    handler->sprinting = toggleSprinting;
-                    handler->mInputState.mSprintDown = toggleSprinting;
-                    handler->mRawInputState.mSprintDown = toggleSprinting;
-                }
+            auto handler = SDK::clientInstance->getLocalPlayer()->getHandler();
+            if (getOps<bool>("always")) {
+                handler.setSprinting(true);
+                handler.setMSprintDown(true);
+                handler.setRawMSprintDown(true);
+            }
+            else {
+                handler.setSprinting(toggleSprinting);
+                handler.setMSprintDown(toggleSprinting);
+                handler.setRawMSprintDown(toggleSprinting);
+            }
         }
     }
 }

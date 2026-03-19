@@ -1,27 +1,27 @@
 #pragma once
 
-#include "../Module.hpp"
+#include "../HUDModule.hpp"
 #include "Assets/Assets.hpp"
-#include "Events/Render/RenderEvent.hpp"
 #include "Events/Render/RenderUnderUIEvent.hpp"
 
-class FPS : public Module {
+class FPS : public HUDModule {
 
 public:
 
-	FPS() : Module("FPS", "Shows how much Frames Per Second (FPS)\nyour device is rendering.",
-		IDR_FPS_PNG, "", false, {"stats"}) {
+	FPS() : HUDModule(0, "FPS", "Shows how much Frames Per Second (FPS)\nyour device is rendering.",
+		IDR_FPS_PNG, "", {"stats"}) {
 	};
-
-	void onEnable() override;
-
-	void onDisable() override;
-
-	void defaultConfig() override;
-
-	void settingsRender(float settingsOffset) override;
 
 	void onRenderUnderUI(RenderUnderUIEvent& event);
 
-	void onRender(RenderEvent& event);
+protected:
+	std::string getDisplayValue() override;
+
+	void customConfig() override;
+
+	void customSettings() override;
+
+	void customInit() override;
+
+	void customCleanup() override;
 };

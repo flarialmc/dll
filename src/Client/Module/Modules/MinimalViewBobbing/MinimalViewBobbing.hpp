@@ -20,6 +20,7 @@ public:
     };
 
     void onEnable() override {
+        if (VersionUtils::checkAboveOrEqual(21, 130)) FlarialGUI::Notify("Minimal View Bobbing has been broken and will just tilt your camera instead. You may want to disable it.");
         patch();
         Module::onEnable();
     }
@@ -31,7 +32,6 @@ public:
 
     void defaultConfig() override {
         Module::defaultConfig("core");
-        
     }
 
     static void patch() {

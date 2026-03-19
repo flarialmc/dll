@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <winrt/base.h>
 
+#include "Client.hpp"
 #include "Command/Commands/SkinStealCommand.hpp"
 #include "Hook/Hooks/Render/DirectX/DXGI/SwapchainHook.hpp"
 #include "Modules/ClickGUI/ClickGUI.hpp"
@@ -19,6 +20,47 @@
 #include "../../Manager.hpp"
 
 bool logDebug = false;
+
+// Helper: look up highlight color for a player name in a Module's settings
+static D2D1_COLOR_F getTabListHighlightColor(Module* mod, const std::string& playerName, bool& found)
+{
+    found = false;
+    if (!mod->getOps<bool>("enableHighlight")) return D2D1::ColorF(1, 1, 1, 1);
+
+    int count = mod->getOps<int>("highlightCount");
+    std::string lowerName = playerName;
+    std::ranges::transform(lowerName, lowerName.begin(),
+                           [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+
+    for (int i = 0; i < count; i++)
+    {
+        std::string nameKey = "highlight-" + FlarialGUI::cached_to_string(i) + "-name";
+        auto* nameSetting = mod->settings.getSettingByName<std::string>(nameKey);
+        if (!nameSetting || nameSetting->value.empty()) continue;
+
+        std::string hlName = nameSetting->value;
+        std::ranges::transform(hlName, hlName.begin(),
+                               [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+
+        if (lowerName == hlName)
+        {
+            std::string colorKey = "highlight-" + FlarialGUI::cached_to_string(i);
+            auto* colSetting = mod->settings.getSettingByName<std::string>(colorKey + "Col");
+            auto* opacSetting = mod->settings.getSettingByName<float>(colorKey + "Opacity");
+            auto* rgbSetting = mod->settings.getSettingByName<bool>(colorKey + "RGB");
+
+            if (!colSetting) continue;
+
+            D2D1_COLOR_F color = (rgbSetting && rgbSetting->value)
+                ? FlarialGUI::rgbColor
+                : FlarialGUI::HexToColorF(colSetting->value);
+            color.a = opacSetting ? opacSetting->value : 1.0f;
+            found = true;
+            return color;
+        }
+    }
+    return D2D1::ColorF(1, 1, 1, 1);
+}
 
 
 // DX12 texture creation from raw bytes
@@ -720,6 +762,8 @@ void TabList::defaultConfig()
     Module::defaultConfig("colors");
     setDef("alphaOrder", true);
     setDef("flarialFirst", true);
+    setDef("enableHighlight", false);
+    setDef("highlightCount", 0);
 }
 
 void TabList::onSetup()
@@ -764,7 +808,42 @@ void TabList::settingsRender(float settingsOffset)
     addToggle("Flarial First",
               "Prioritize Flarial users (Dev > Staff > Gamer > Supporter > Booster > Default) at the top",
               "flarialFirst");
-    addKeybind("Keybind", "Hold for 2 seconds!", "keybind", true);
+    addKeybind("Keybind", "", "keybind", true);
+    extraPadding();
+
+    addHeader("Player Highlights");
+    addToggle("Enable Highlights", "Highlight specific players with custom name colors", "enableHighlight");
+    if (getOps<bool>("enableHighlight"))
+    {
+        int hlCount = getOps<int>("highlightCount");
+        addButton("Add Highlight", "Add a player to highlight", "Add", [this, hlCount]
+        {
+            std::string nameKey = "highlight-" + FlarialGUI::cached_to_string(hlCount) + "-name";
+            settings.addSetting(nameKey, static_cast<std::string>(""));
+            setDef("highlight-" + FlarialGUI::cached_to_string(hlCount), static_cast<std::string>("ff0000"), 1.f, false);
+            this->settings.setValue("highlightCount", hlCount + 1);
+            Client::SaveSettings();
+            FlarialGUI::Notify("Added! Scroll down to configure.");
+        });
+        for (int i = 0; i < hlCount; i++)
+        {
+            std::string nameKey = "highlight-" + FlarialGUI::cached_to_string(i) + "-name";
+            std::string colorKey = "highlight-" + FlarialGUI::cached_to_string(i);
+            if (settings.getSettingByName<std::string>(nameKey) != nullptr)
+            {
+                addTextBox(std::format("Player {}", i + 1), "Player name (case-insensitive)", 30, nameKey);
+                addColorPicker(std::format("Color {}", i + 1), "", colorKey);
+                addButton(std::format("Remove {}", i + 1), "", "Delete", [this, nameKey, colorKey]
+                {
+                    settings.deleteSetting(nameKey);
+                    settings.deleteSetting(colorKey + "Col");
+                    settings.deleteSetting(colorKey + "Opacity");
+                    settings.deleteSetting(colorKey + "RGB");
+                    Client::SaveSettings();
+                });
+            }
+        }
+    }
     extraPadding();
 
     addHeader("Colors");
@@ -782,18 +861,19 @@ void TabList::settingsRender(float settingsOffset)
 int TabList::getRolePriority(const std::string& name)
 {
     std::string clearedName = String::removeNonAlphanumeric(String::removeColorCodes(name));
-    if (clearedName.empty()) return 5; // Lowest priority for invalid names
+    if (clearedName.empty()) return 7; // Lowest priority for invalid names
 
     auto it = std::ranges::find(APIUtils::onlineUsers, clearedName);
-    if (it == APIUtils::onlineUsers.end()) return 5; // Non-Flarial users
+    if (it == APIUtils::onlineUsers.end()) return 7; // Non-Flarial users
 
     // Check roles in order of priority using ApiUtils
     if (APIUtils::hasRole("Dev", clearedName)) return 0;
     if (APIUtils::hasRole("Staff", clearedName)) return 1;
     if (APIUtils::hasRole("Gamer", clearedName)) return 2;
-    if (APIUtils::hasRole("Supporter", clearedName)) return 3;
-    if (APIUtils::hasRole("Booster", clearedName)) return 4;
-    return 5; // Default Flarial user (in onlineUsers but no specific role)
+    if (APIUtils::hasRole("Media", clearedName)) return 3;
+    if (APIUtils::hasRole("Supporter", clearedName)) return 4;
+    if (APIUtils::hasRole("Booster", clearedName)) return 5;
+    return 6; // Default Flarial user (in onlineUsers but no specific role)
 }
 
 std::vector<PlayerListEntry> TabList::sortVecmap(
@@ -1293,7 +1373,8 @@ int TabList::getPingImage(int ping)
 
 void TabList::onRender(RenderEvent& event)
 {
-    if (!this->isEnabled()) return;
+    if (!this->isEnabled() || ClickGUI::blurActive) return;
+    ClickGUI::HudFadeGuard fadeGuard;
     if (SDK::hasInstanced && (active || ClickGUI::editmenu))
     {
         // Process ready textures from background threads (adaptive rate based on performance)
@@ -1309,7 +1390,7 @@ void TabList::onRender(RenderEvent& event)
                 Logger::debug("PlayerHead usage: {} DX12 textures, {} DX11 textures",
                               g_playerHeadTextures.size(), g_playerHeadTexturesDX11.size());
         }
-        if (SDK::clientInstance->getLocalPlayer() != nullptr)
+        if (SDK::clientInstance && SDK::clientInstance->getLocalPlayer() != nullptr)
         {
             float keycardSize = Constraints::RelativeConstraint(0.05f * getOps<float>("uiscale"), "height", true);
 
@@ -1330,7 +1411,7 @@ void TabList::onRender(RenderEvent& event)
 
             float totalHeight = 0;
 
-            // do some caching bullshit
+            // Cache player map data (getPlayerMap() is expensive)
             // getPlayerMap() is expensive to run so we only check for updates every second
 
             auto now = std::chrono::steady_clock::now();
@@ -1406,7 +1487,8 @@ void TabList::onRender(RenderEvent& event)
 
             if (getOps<bool>("worldName"))
             {
-                std::string worldName = SDK::clientInstance->getLocalPlayer()->getLevel()->getLevelData()->
+                auto player = SDK::clientInstance->getLocalPlayer();
+                std::string worldName = player->getLevel()->getLevelData()->
                                                              getLevelName();
                 if (worldName != cache_worldName || refreshCache)
                 {
@@ -1926,6 +2008,16 @@ void TabList::onRender(RenderEvent& event)
                     }
                 }
                 auto pit = std::ranges::find(APIUtils::onlineUsers, vectab[i].clearedName);
+
+                // Compute per-player highlight color
+                bool hasHighlightColor = false;
+                D2D1_COLOR_F playerTextColor = textColor;
+                if (getOps<bool>("enableHighlight"))
+                {
+                    playerTextColor = getTabListHighlightColor(this, vectab[i].clearedName, hasHighlightColor);
+                    if (!hasHighlightColor) playerTextColor = textColor;
+                }
+
                 if (refreshCache)
                 {
                     // Safely access columnx with bounds checking to prevent crashes
@@ -2013,7 +2105,7 @@ void TabList::onRender(RenderEvent& event)
                                                     String::StrToWStr(vectab[i].clearedName).c_str(),
                                                     vectab[i].textWidth, keycardSize,
                                                     alignments[getOps<std::string>("textalignment")], floor(fontSize),
-                                                    DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
+                                                    DWRITE_FONT_WEIGHT_NORMAL, playerTextColor, true);
                 }
                 else
                 {
@@ -2068,7 +2160,7 @@ void TabList::onRender(RenderEvent& event)
                                                     String::StrToWStr(vectab[i].clearedName).c_str(),
                                                     vectab[i].textWidth, keycardSize,
                                                     alignments[getOps<std::string>("textalignment")], floor(fontSize),
-                                                    DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
+                                                    DWRITE_FONT_WEIGHT_NORMAL, playerTextColor, true);
                 }
                 realcenter.y += Constraints::SpacingConstraint(0.70, keycardSize);
                 if ((i + 1) % maxColumn == 0)

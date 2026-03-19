@@ -1,19 +1,106 @@
 #include "ClickGUI.hpp"
 
 #include <random>
+#include <algorithm>
 #include <Scripting/ScriptManager.hpp>
 #include <Scripting/ModuleScript.hpp>
 
 #include "Hook/Hooks/Render/DirectX/DXGI/SwapchainHook.hpp"
 #include "Modules/Misc/ScriptMarketplace/ScriptMarketplace.hpp"
+#include "Utils/PlatformUtils.hpp"
+#include <imgui/imgui.h>
+#include <imgui/imgui_internal.h>
 
 std::chrono::time_point<std::chrono::high_resolution_clock> ClickGUI::favoriteStart;
+
+ClickGUI::HudFadeGuard::HudFadeGuard()
+    : vtxStart(ImGui::GetBackgroundDrawList()->VtxBuffer.Size) {}
+
+ClickGUI::HudFadeGuard::~HudFadeGuard() {
+    if (hudOpacity >= 1.0f) return;
+    auto* drawList = ImGui::GetBackgroundDrawList();
+    for (int i = vtxStart; i < drawList->VtxBuffer.Size; i++) {
+        ImU32& col = drawList->VtxBuffer[i].col;
+        ImU32 a = (col >> IM_COL32_A_SHIFT) & 0xFF;
+        a = static_cast<ImU32>(a * hudOpacity);
+        col = (col & ~(static_cast<ImU32>(0xFF) << IM_COL32_A_SHIFT)) | (a << IM_COL32_A_SHIFT);
+    }
+}
+
+namespace {
+    constexpr size_t FRAME_COUNT = 7;
+    size_t currentFrame = 0;
+    std::chrono::time_point<std::chrono::high_resolution_clock> lastUpdate = std::chrono::high_resolution_clock::now();
+
+    // Color mapping: base color -> {primary, secondary}
+    struct ColorPair {
+        char primary;
+        char secondary;
+    };
+
+    const std::map<char, ColorPair> colorMap = {
+        {'b', {'3', 'b'}}, // Dev: §b -> §3 and §b
+        {'f', {'7', 'f'}}, // Staff: §f -> §7 and §f
+        {'u', {'d', 'u'}}, // Gamer: §u -> §d and §u (using magenta/light purple)
+        {'a', {'2', 'a'}}, // Media: §a -> §2 and §a
+        {'d', {'5', 'd'}}, // Booster: §d -> §5 and §d
+        {'5', {'d', '5'}}, // Supporter: §5 -> §d and §5
+        {'4', {'c', '4'}}  // Regular: §4 -> §c and §4
+    };
+
+    // Generate animation frame based on primary and secondary color codes
+    std::string getAnimationFrame(size_t frame, char primaryColor, char secondaryColor) {
+        std::string frames[7] = {
+            std::string("§") + primaryColor + "FLA§" + secondaryColor + "RIAL",
+            std::string("§") + secondaryColor + "F§" + primaryColor + "LAR§" + secondaryColor + "IAL",
+            std::string("§") + secondaryColor + "FL§" + primaryColor + "ARI§" + secondaryColor + "AL",
+            std::string("§") + secondaryColor + "FLA§" + primaryColor + "RIA§" + secondaryColor + "L",
+            std::string("§") + secondaryColor + "FLAR§" + primaryColor + "IAL",
+            std::string("§") + primaryColor + "F§" + secondaryColor + "LARI§" + primaryColor + "AL",
+            std::string("§") + primaryColor + "FL§" + secondaryColor + "ARIA§" + primaryColor + "L"
+        };
+        return frames[frame];
+    }
+}
 
 // Moved static method implementations from header for better compilation performance
 D2D_COLOR_F ClickGUI::getColor(const std::string& text) {
     if(!clickgui->settings.getSettingByName<bool>(text + "RGB")) return D2D1::ColorF(D2D1::ColorF::White);
     D2D_COLOR_F col = clickgui->settings.getSettingByName<bool>(text + "RGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>(text + "Col")->value);
     col.a = clickgui->settings.getSettingByName<float>(text + "Opacity")->value;
+    return col;
+}
+
+D2D_COLOR_F ClickGUI::getFormatColor(const std::string& colorName) {
+    // Convert to lowercase for consistent lookup
+    std::string lowerName = colorName;
+    for (char& c : lowerName) {
+        c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+    }
+
+    std::string settingName = "formatColor_" + lowerName;
+
+    // Check if the setting exists
+    auto* colSetting = clickgui->settings.getSettingByName<std::string>(settingName + "Col");
+    if (!colSetting) {
+        // Return white as fallback if setting doesn't exist
+        return D2D1::ColorF(D2D1::ColorF::White);
+    }
+
+    // Get color similar to getColor but for format colors
+    bool useRGB = false;
+    auto* rgbSetting = clickgui->settings.getSettingByName<bool>(settingName + "RGB");
+    if (rgbSetting) {
+        useRGB = rgbSetting->value;
+    }
+
+    D2D_COLOR_F col = useRGB ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(colSetting->value);
+
+    auto* opacitySetting = clickgui->settings.getSettingByName<float>(settingName + "Opacity");
+    if (opacitySetting) {
+        col.a = opacitySetting->value;
+    }
+
     return col;
 }
 
@@ -32,7 +119,46 @@ ClickGUI::ClickGUI() : Module("ClickGUI", "What do you think it is?",
     ListenOrdered(this, PacketEvent, &ClickGUI::onPacketReceive, EventOrder::IMMEDIATE)
     ListenOrdered(this, RenderEvent, &ClickGUI::onRender, EventOrder::IMMEDIATE)
     Listen(this, SetupAndRenderEvent, &ClickGUI::onSetupAndRender)
+    Listen(this, DrawTextEvent, &ClickGUI::onDrawText)
     //Module::onEnable();
+}
+
+void ClickGUI::onDrawText(DrawTextEvent &event) {
+    std::string* text = event.getText();
+
+    // Look for "FLARIAL" preceded by a color code
+    size_t pos = text->find("FLARIAL");
+    if (pos != std::string::npos && pos >= 3) {
+        // Check if there's a color code before "FLARIAL" (§ is 2 bytes + 1 byte for color code)
+        // § symbol is at pos-3 and pos-2, color character is at pos-1
+        if ((*text)[pos - 3] == '\xC2' && (*text)[pos - 2] == '\xA7') {
+            char colorCode = (*text)[pos - 1]; // Get the color character (the one right before "FLARIAL")
+
+            // Look up the color mapping
+            auto it = colorMap.find(colorCode);
+            if (it == colorMap.end()) {
+                return; // Don't animate if not a supported color
+            }
+
+            char primaryColor = it->second.primary;
+            char secondaryColor = it->second.secondary;
+
+            auto now = std::chrono::high_resolution_clock::now();
+            auto elapsed = std::chrono::duration<double>(now - lastUpdate).count();
+
+            if (elapsed > 0.15) {
+                currentFrame = (currentFrame + 1) % FRAME_COUNT;
+                lastUpdate = now;
+            }
+
+            // Find the start of the color-coded FLARIAL (including the § symbol)
+            size_t startPos = pos - 3; // Go back to the § character
+            size_t length = 10; // Length of "§XFLARIAL" (2 bytes for §, 1 for color, 7 for FLARIAL)
+
+            // Replace with the animated frame
+            text->replace(startPos, length, getAnimationFrame(currentFrame, primaryColor, secondaryColor));
+        }
+    }
 }
 
 
@@ -93,123 +219,210 @@ std::string& ClickGUI::getMutableTextForWatermark(TextPacket& pkt) {
 }
 */
 
+// ============================================================================
+// Chat [FLARIAL] watermark - prefixes Flarial usernames with a colored tag
+// ============================================================================
 void ClickGUI::onPacketReceive(PacketEvent& event) {
+    try {
+        if (!SDK::clientInstance) return;
+        auto* player = SDK::clientInstance->getLocalPlayer();
+        if (!player || !player->getLevel()) return;
+        if (event.getPacket()->getId() != MinecraftPacketIds::Text) return;
 
-    if (!SDK::clientInstance) return;
-    if (!SDK::clientInstance->getLocalPlayer()) return;
-    if (!SDK::clientInstance->getLocalPlayer()->getLevel()) return;
+        // Read-only view for initial validation
+        auto pktView = getTextPacket(event.getPacket());
+        if (!pktView) return;
 
-    if (event.getPacket()->getId() != MinecraftPacketIds::Text) return;
-    auto* pkt = reinterpret_cast<TextPacket*>(event.getPacket());
-    if (pkt->message == " ") event.cancel(); // remove onix promotion on zeqa
-    if (Client::settings.getSettingByName<bool>("nochaticon")->value) return;
-
-    auto getPrefix = [&](const std::string& name)->std::optional<std::string> {
-        for (const auto& [role, color] : roleColors)
-            if (APIUtils::hasRole(role, name))
-                return std::format("{}{}{}", "§r§f[", color, "FLARIAL§f]§r ");
-        return std::nullopt;
-    };
-
-    std::unordered_set<std::string> onlinePlayers;
-    for (auto& pair : SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap()) {
-        if (!pair.second.name.empty()) {
-            onlinePlayers.insert(String::removeColorCodes(pair.second.name));
+        if (pktView->message == "\uE250 \uE251") {
+            event.cancel(); // remove onix promotion on zeqa
+            return;
         }
-    }
 
-    std::string& txt1 = pkt->name;
-    if (!txt1.empty()) {
-        bool found = false;
-        for (std::string username : APIUtils::onlineUsers) {
-            if (username == txt1) {
-                found = true;
-                break;
+        if (Client::settings.getSettingByName<bool>("nochaticon")->value) return;
+
+        // ----------------------------------------------------------------
+        // Get mutable pointers directly into the original packet's fields.
+        // Modifying via insert() avoids copy + write-back entirely.
+        // ----------------------------------------------------------------
+        std::string* nameField = nullptr;
+        std::string* msgField  = nullptr;
+
+        if (VersionUtils::checkAboveOrEqual(21, 130)) {
+            auto* p = static_cast<TextPacket_v21130*>(static_cast<void*>(event.getPacket()));
+            if (std::holds_alternative<std::string>(p->data)) {
+                nameField = &p->str;
+                msgField  = &std::get<std::string>(p->data);
+            } else {
+                msgField = &p->str;
             }
+        } else {
+            auto* p = static_cast<TextPacket*>(event.getPacket());
+            nameField = &p->name;
+            msgField  = &p->message;
         }
-        if (found) {
-            auto prefix = getPrefix(txt1);
-            if (prefix) txt1.insert(0, *prefix);
-        }
-    }
 
-    std::string& txt2 = pkt->message;
-    if (lastmesg != pkt->message) {
-        const auto sanitized = String::removeColorCodes(txt2);
+        if (!msgField) return;
 
-        std::vector<std::pair<std::string, size_t>> hits;
-        bool breakloop = false;
-        for (auto& user : APIUtils::onlineUsers) {
-            if (breakloop) break;
-            size_t pos = 0;
-            while ((pos = sanitized.find(user, pos)) != std::string_view::npos) {
-
-                if (sanitized[pos - 1] == '\"' && sanitized[pos - 2] == '@') pos -= 2;
-                else if (sanitized[pos - 1] == '@' || sanitized[pos - 1] == '\"') pos -= 1;
-
-                hits.emplace_back(user, pos);
-
-                if (Client::settings.getSettingByName<bool>("singlewatermark")->value) {
-                    breakloop = true;
-                    break;
-                };
-
-                pos += user.length();
-            }
-        }
-        if (hits.empty()) return;
-
-        auto originalFormat = [&](size_t rawIndex){
-            std::string res;
-            const size_t N = std::min(rawIndex, txt2.size());
-
-            for (size_t i = 0; i + 2 <= N && i + 2 <= txt2.size(); ++i) {
-                if (
-                    static_cast<uint8_t>(txt2[i]) == section1stPart &&
-                    static_cast<uint8_t>(txt2[i+1]) == section2ndPart
-                ) {
-                    if (i + 2 < txt2.size()) {
-                        res.append(txt2, i, 3);
-                        i += 2;
-                    }
-                }
-            }
-            return res;
+        // Lambda: build the colored [FLARIAL] prefix for a given username
+        auto getPrefix = [](const std::string& name) -> std::optional<std::string> {
+            for (const auto& [role, color] : roleColors)
+                if (APIUtils::hasRole(role, name))
+                    return std::format("{}{}{}",  "§r§f[", color, "FLARIAL§f]§r ");
+            return std::nullopt;
         };
 
-        std::unordered_set<std::string> seen;
-        std::vector<std::pair<size_t,std::string>> ins;
-
-        for (auto& [name, sanitizedIndex] : hits) {
-            if (!Client::settings.getSettingByName<bool>("watermarkduplicates")->value && seen.contains(name)) continue;
-            if (!onlinePlayers.contains(name)) continue;
-
-            auto prefix = getPrefix(name);
-            if (!prefix) continue;
-
-            const size_t rawIndex = sanitizedToRawIndex(txt2, sanitizedIndex);
-            ins.emplace_back(rawIndex, *prefix + originalFormat(rawIndex));
-            seen.insert(name);
+        // Build set of currently online players for validation
+        std::unordered_set<std::string> onlinePlayers;
+        for (auto& pair : player->getLevel()->getPlayerMap()) {
+            if (!pair.second.name.empty())
+                onlinePlayers.insert(String::removeColorCodes(pair.second.name));
         }
 
-        if (ins.empty()) return;
+        // ------------------------------------------------------------------
+        // 1) Name field: prefix the sender's name if they are a Flarial user
+        //    BUT only if their name does NOT also appear in the message body
+        //    (the message-body scan below would handle it, causing a dupe).
+        // ------------------------------------------------------------------
+        if (nameField && !nameField->empty()) {
+            const std::string cleanName = String::removeColorCodes(*nameField);
+            bool isFlarialUser = std::ranges::any_of(APIUtils::onlineUsers,
+                [&](const std::string& u) { return u == cleanName; });
 
-        std::ranges::sort(ins, [](auto& a, auto& b) {
-            return a.first > b.first;
-        });
-
-        for (auto& t : ins) {
-            txt2.insert(std::min(t.first, txt2.size()), t.second);
+            if (isFlarialUser) {
+                const std::string cleanMsg = String::removeColorCodes(*msgField);
+                if (cleanMsg.find(cleanName) == std::string::npos) {
+                    auto prefix = getPrefix(cleanName);
+                    if (prefix) nameField->insert(0, *prefix);
+                }
+            }
         }
-        lastmesg = pkt->message;
+
+        // ------------------------------------------------------------------
+        // 2) Message body: scan for any Flarial usernames and insert tags.
+        //    Save the original message before modification for dedup check.
+        // ------------------------------------------------------------------
+        const std::string originalMsg = *msgField;
+        if (lastmesg != originalMsg) {
+            const std::string sanitized = String::removeColorCodes(msgField->c_str());
+
+            // Collect all username occurrences in the sanitized message
+            std::vector<std::pair<std::string, size_t>> hits;
+            bool singleOnly = Client::settings.getSettingByName<bool>("singlewatermark")->value;
+            bool breakloop = false;
+
+            for (const auto& user : APIUtils::onlineUsers) {
+                if (breakloop) break;
+                size_t pos = 0;
+                while ((pos = sanitized.find(user, pos)) != std::string::npos) {
+                    const size_t matchPos = pos;
+
+                    // Check for @mention prefix and adjust hit position
+                    size_t hitPos = pos;
+                    if (pos >= 2 && sanitized[pos - 1] == '"' && sanitized[pos - 2] == '@')
+                        hitPos = pos - 2;
+                    else if (pos >= 1 && (sanitized[pos - 1] == '@' || sanitized[pos - 1] == '"'))
+                        hitPos = pos - 1;
+
+                    // Skip if this specific occurrence is already tagged.
+                    // Our tag sanitizes to "[FLARIAL] " (10 chars) placed exactly at hitPos,
+                    // so on re-entry the 10 chars immediately before hitPos are the tag.
+                    if (hitPos >= 10 && sanitized.substr(hitPos - 10, 10) == "[FLARIAL] ") {
+                        pos = matchPos + user.length();
+                        continue;
+                    }
+
+                    hits.emplace_back(user, hitPos);
+
+                    if (singleOnly) { breakloop = true; break; }
+                    pos = matchPos + user.length();
+                }
+            }
+
+            if (!hits.empty()) {
+                // Extract formatting codes (§X sequences) preceding a raw index
+                auto extractFormat = [&](size_t rawIndex) {
+                    std::string fmt;
+                    const size_t limit = std::min(rawIndex, msgField->size());
+                    for (size_t i = 0; i + 2 <= limit; ++i) {
+                        if (static_cast<uint8_t>((*msgField)[i]) == section1stPart &&
+                            static_cast<uint8_t>((*msgField)[i + 1]) == section2ndPart) {
+                            if (i + 2 < msgField->size()) {
+                                fmt.append(*msgField, i, 3);
+                                i += 2;
+                            }
+                        }
+                    }
+                    return fmt;
+                };
+
+                bool allowDupes = Client::settings.getSettingByName<bool>("watermarkduplicates")->value;
+                std::unordered_set<std::string> seen;
+                std::vector<std::pair<size_t, std::string>> insertions;
+
+                for (auto& [name, sanitizedIdx] : hits) {
+                    if (!allowDupes && seen.contains(name)) continue;
+                    if (!onlinePlayers.contains(name)) continue;
+
+                    auto prefix = getPrefix(name);
+                    if (!prefix) continue;
+
+                    const size_t rawIdx = sanitizedToRawIndex(*msgField, sanitizedIdx);
+                    insertions.emplace_back(rawIdx, *prefix + extractFormat(rawIdx));
+                    seen.insert(name);
+                }
+
+                if (!insertions.empty()) {
+                    // Sort right-to-left so earlier insertions don't shift later positions
+                    std::ranges::sort(insertions, [](auto& a, auto& b) {
+                        return a.first > b.first;
+                    });
+
+                    for (auto& [insertPos, text] : insertions) {
+                        msgField->insert(std::min(insertPos, msgField->size()), text);
+                    }
+
+                    lastmesg = originalMsg;
+                }
+            }
+        }
     }
-
+    catch (...) {
+        // Invalid packet data (can happen when exiting world)
+    }
 }
 
 
 void ClickGUI::onRender(RenderEvent &event) {
-    float allahu = Constraints::RelativeConstraint(0.65);
-    float akbar = Constraints::RelativeConstraint(0.25);
+    // Handle deferred close from the key handler thread safely on the render thread.
+    // All shared state modifications (strings, maps, etc.) happen here on the render
+    // thread to avoid data races with concurrent reads during rendering.
+    if (pendingClose.exchange(false)) {
+        // Mouse grab + active=false already done immediately in the key handler.
+        // Only the unsafe state cleanup (strings, maps, ResetUIState) is deferred here.
+        MC::lastMouseScroll = MouseAction::Release;
+        page.type = "normal";
+        curr = "modules";
+        if (pendingSaveScrollPos) {
+            saved_acumilatedPos = pendingSavedAccumPos;
+            saved_acumilatedBarPos = pendingSavedAccumBarPos;
+        }
+        FlarialGUI::ResetUIState();
+        searchBarString = pendingSearchString;
+        // Don't write TextBoxes[0].text here — the GUI is closed, so no widget
+        // is reading it. The text will sync naturally when the SearchBar renders
+        // again on reopen (via TextBox's inactive-sync path).
+        // Writing to TextBoxes while the input thread may be reading was a race.
+
+        // Clear ImGui's active widget and input queue so stale text input
+        // doesn't carry over to the next frame's NewFrame() processing.
+        if (ImGui::GetCurrentContext()) {
+            ImGui::ClearActiveID();
+            ImGui::GetIO().ClearInputKeys();
+        }
+    }
+
+    float watermarkWidth = Constraints::RelativeConstraint(0.65);
+    float watermarkHeight = Constraints::RelativeConstraint(0.25);
 
     if (editmenu) {
         D2D1_COLOR_F c = D2D1::ColorF(D2D1::ColorF::Black);
@@ -228,34 +441,58 @@ void ClickGUI::onRender(RenderEvent &event) {
                                         Constraints::RelativeConstraint(0.128, "height", true),
                                         DWRITE_FONT_WEIGHT_NORMAL, false);
     }
-    Vec2<float> allahuakbar = Constraints::CenterConstraint(allahu, akbar, "y", 1.175, 1.175);
+    Vec2<float> watermarkPos = Constraints::CenterConstraint(watermarkWidth, watermarkHeight, "y", 1.175, 1.175);
     // TODO: add inventory screen to onRender?
     // watermark
     if (SDK::getCurrentScreen() == "inventory_screen" || SDK::getCurrentScreen().contains("chest"))
         if (Client::settings.getSettingByName<bool>("watermark")->value)
-            FlarialGUI::image(IDR_FLARIAL_TITLE_PNG, D2D1::RectF(allahuakbar.x, allahuakbar.y, allahuakbar.x + allahu,
-                                                                 allahuakbar.y + akbar));
+            FlarialGUI::image(IDR_FLARIAL_TITLE_PNG, D2D1::RectF(watermarkPos.x, watermarkPos.y, watermarkPos.x + watermarkWidth,
+                                                                 watermarkPos.y + watermarkHeight));
 
 
     if (FlarialGUI::scrollposmodifier == 0) {
         FlarialGUI::scrollposmodifier = Constraints::RelativeConstraint(0.1f);
     }
 
+    // When viewing a module's settings page, lerp blur out so HUD modules
+    // smoothly reappear and sliders can be previewed in real time.
+    const bool onSettingsPage = (page.type != "normal");
+
     if (this->active) {
         setEnabled(true);
-        FlarialGUI::lerp(baseHeightActual, 0.64f, 0.18f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
-        FlarialGUI::lerp(realBlurAmount, Client::settings.getSettingByName<float>("blurintensity")->value,
-                         0.1f * FlarialGUI::frameFactor);
+        float openFactor = floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f;
+        FlarialGUI::lerp(baseHeightActual, 0.64f, 0.18f * openFactor);
+
+        if (onSettingsPage) {
+            // Fade blur out when entering a settings page
+            FlarialGUI::lerp(realBlurAmount, 0.00001f, 0.18f * openFactor);
+        } else {
+            FlarialGUI::lerp(realBlurAmount, Client::settings.getSettingByName<float>("blurintensity")->value,
+                             0.18f * openFactor);
+        }
     } else {
-        FlarialGUI::lerp(baseHeightReal, 0.0001f, 0.22f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
-        FlarialGUI::lerp(baseHeightActual, 0.00001f, 0.30f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
-        FlarialGUI::lerp(realBlurAmount, 0.00001f, 0.1f * FlarialGUI::frameFactor);
+        float closeFactor = floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f;
+        FlarialGUI::lerp(baseHeightReal, 0.0001f, 0.22f * closeFactor);
+        FlarialGUI::lerp(baseHeightActual, 0.00001f, 0.30f * closeFactor);
+        FlarialGUI::lerp(realBlurAmount, 0.00001f, 0.30f * closeFactor);
 
         for (auto &box: FlarialGUI::TextBoxes) box.second.isActive = false;
     }
 
-    if (realBlurAmount > 0.05f)
+    // Render blur when there's any meaningful blur amount.
+    bool shouldRenderBlur = !editmenu && realBlurAmount > 0.05f;
+    if (shouldRenderBlur)
         Blur::RenderBlur(event.RTV, 3, realBlurAmount);
+
+    // Compute HUD fade opacity — inverse of blur progress.
+    // As blur fades in, HUD elements smoothly fade out and vice versa.
+    float maxBlur = Client::settings.getSettingByName<float>("blurintensity")->value;
+    if (!editmenu && maxBlur > 0.001f) {
+        hudOpacity = 1.0f - std::clamp(realBlurAmount / maxBlur, 0.0f, 1.0f);
+    } else {
+        hudOpacity = 1.0f;
+    }
+    blurActive = hudOpacity <= 0.01f;
 
     if (SwapchainHook::init && baseHeightActual > 0.1f) {
         /* Base Rectangle Start */
@@ -336,19 +573,19 @@ void ClickGUI::onRender(RenderEvent &event) {
         D2D1_COLOR_F RadioButtonEnabled = ClickGUI::getColor("enabledRadioButton");
         D2D1_COLOR_F RadioButtonDisabled = ClickGUI::getColor("disabledRadioButton");
 
-        float shit = Constraints::RelativeConstraint(0.448f);
+        float tabBaseWidth = Constraints::RelativeConstraint(0.448f);
 
         float RadioButtonWidth = Constraints::RelativeConstraint(0.134, "width");
-        float RadioButtonHeight = shit;
+        float RadioButtonHeight = tabBaseWidth;
 
         if (curr == "modules") FlarialGUI::lerp(width1, RadioButtonWidth, 0.15f * FlarialGUI::frameFactor);
-        else FlarialGUI::lerp(width1, shit, 0.15f * FlarialGUI::frameFactor);
+        else FlarialGUI::lerp(width1, tabBaseWidth, 0.15f * FlarialGUI::frameFactor);
 
         if (curr == "settings") FlarialGUI::lerp(width2, RadioButtonWidth, 0.15f * FlarialGUI::frameFactor);
-        else FlarialGUI::lerp(width2, shit, 0.15f * FlarialGUI::frameFactor);
+        else FlarialGUI::lerp(width2, tabBaseWidth, 0.15f * FlarialGUI::frameFactor);
 
         if (curr == "scripting") FlarialGUI::lerp(width3, RadioButtonWidth, 0.15f * FlarialGUI::frameFactor);
-        else FlarialGUI::lerp(width3, shit, 0.15f * FlarialGUI::frameFactor);
+        else FlarialGUI::lerp(width3, tabBaseWidth, 0.15f * FlarialGUI::frameFactor);
 
         float radioX = navx - Constraints::SpacingConstraint(-0.85, logoWidth);
         float radioY(navy + navigationBarHeight / 2.0f - RadioButtonHeight / 2.0f);
@@ -387,7 +624,12 @@ void ClickGUI::onRender(RenderEvent &event) {
             curr = "modules";
             page.type = "normal";
 
-            FlarialGUI::ResetShit();
+            // Save search string before ResetUIState clears TextBoxes
+            std::string savedSearch = searchBarString;
+            FlarialGUI::ResetUIState();
+            // Restore the search state so filtering continues to work
+            searchBarString = savedSearch;
+            FlarialGUI::TextBoxes[0].text = savedSearch;
 
             auto &scrollData = scrollInfo[curr];
 
@@ -403,7 +645,7 @@ void ClickGUI::onRender(RenderEvent &event) {
         }
 
 
-        logoWidth = shit * 0.625f;
+        logoWidth = tabBaseWidth * 0.625f;
 
         radioX += Constraints::SpacingConstraint(0.29f, logoWidth);
         radioY += Constraints::SpacingConstraint(0.29f, logoWidth);
@@ -482,9 +724,9 @@ void ClickGUI::onRender(RenderEvent &event) {
         }
 
         const float h = Constraints::RelativeConstraint(0.42, "height");
-        const float allahY = (navy + navigationBarHeight / 2.0f - h / 2.0f);
+        const float searchBarY = (navy + navigationBarHeight / 2.0f - h / 2.0f);
         ClickGUIElements::SearchBar(0, searchBarString, 12, Constraints::PercentageConstraint(0.022, "right"),
-                                    allahY);
+                                    searchBarY);
 
 
         // radiobutton of scripting
@@ -518,7 +760,13 @@ void ClickGUI::onRender(RenderEvent &event) {
 
             curr = "scripting";
             page.type = "normal";
-            FlarialGUI::ResetShit();
+
+            // Save search string before ResetUIState clears TextBoxes
+            std::string savedSearch = searchBarString;
+            FlarialGUI::ResetUIState();
+            // Restore the search state so filtering continues to work
+            searchBarString = savedSearch;
+            FlarialGUI::TextBoxes[0].text = savedSearch;
 
             auto &scrollData = scrollInfo[curr];
 
@@ -558,12 +806,12 @@ void ClickGUI::onRender(RenderEvent &event) {
         }
 
         FlarialGUI::ShadowRect(Vec2{radioX, radioY + Constraints::SpacingConstraint(0.115f, logoWidth)},
-                               Vec2{shit, RadioButtonHeight + Constraints::SpacingConstraint(0.015f, logoWidth)},
+                               Vec2{tabBaseWidth, RadioButtonHeight + Constraints::SpacingConstraint(0.015f, logoWidth)},
                                D2D1::ColorF(D2D1::ColorF::Black), round.x, 3);
         if (!FlarialGUI::activeColorPickerWindows && FlarialGUI::RoundedRadioButton(2, radioX, radioY,
                 tabBgCol3,
                 modTextCol, L"",
-                shit,
+                tabBaseWidth,
                 RadioButtonHeight, round.x,
                 round.x, "editmenu",
                 curr)) {
@@ -648,10 +896,44 @@ void ClickGUI::onRender(RenderEvent &event) {
 
                 FlarialGUI::PopSize();
 
+                if (ModuleManager::cguiRefresh && ScriptManager::initialized && ModuleManager::initialized) {
+                    ModuleManager::updateModulesVector();
+                    ModuleManager::cguiRefresh = false;
+                }
+                auto modules = ModuleManager::modulesVector;
+
+                // Count how many modules will actually be displayed (accounting for search filter)
+                int visibleModuleCount = 0;
+                if (!searchBarString.empty()) {
+                    std::string search = searchBarString;
+                    for (char &c: search) {
+                        c = (char) std::tolower(c);
+                    }
+                    for (const auto &pModule: modules) {
+                        std::string name = pModule->name;
+                        for (char &c: name) {
+                            c = (char) std::tolower(c);
+                        }
+                        bool showMod = name.starts_with(search) || name.find(search) != std::string::npos;
+                        if (!showMod && !pModule->aliases.empty()) {
+                            for (const std::string& alias : pModule->aliases) {
+                                if (String::toLower(alias).starts_with(search) ||
+                                    String::toLower(alias).find(search) != std::string::npos) {
+                                    showMod = true;
+                                    break;
+                                }
+                            }
+                        }
+                        if (showMod) visibleModuleCount++;
+                    }
+                } else {
+                    visibleModuleCount = static_cast<int>(modules.size());
+                }
+
+                // Calculate content height based on visible modules (3 per row)
                 int i3 = 0;
                 float i2 = 0;
-
-                for (const auto &pair: ModuleManager::moduleMap) {
+                for (int idx = 0; idx < visibleModuleCount; idx++) {
                     if ((++i3 % 3) == 0) {
                         i2 += Constraints::SpacingConstraint(0.8, modWidth);
                     }
@@ -665,13 +947,6 @@ void ClickGUI::onRender(RenderEvent &event) {
                 float yModifier = 0.0f;
 
                 int i = 0;
-
-                if (ModuleManager::cguiRefresh && ScriptManager::initialized && ModuleManager::initialized) {
-                    ModuleManager::updateModulesVector();
-                    ModuleManager::cguiRefresh = false;
-                }
-                auto modules = ModuleManager::modulesVector;
-
 
                 for (const auto &pModule: modules) {
                     bool visible = (modcenter.y + yModifier + FlarialGUI::scrollpos + 55 > center.y) &&
@@ -860,7 +1135,7 @@ void ClickGUI::onRender(RenderEvent &event) {
                 c->extraPadding();
 
                 c->addHeader("Keybinds");
-                c->addKeybind("Eject Keybind", "When setting, hold the new bind for 2 seconds",
+                c->addKeybind("Eject Keybind", "",
                               Client::settings.getSettingByName<std::string>("ejectKeybind")->value);
 
                 c->extraPadding();
@@ -881,10 +1156,14 @@ void ClickGUI::onRender(RenderEvent &event) {
                                Client::settings.getSettingByName<std::string>("fontWeight")->value);
                 c->extraPadding();
 
+
                 c->addHeader("Rendering");
-                c->addButton("Force Reload Minecraft", "Forces the swapchain to recreate.", "RELOAD", []() {
-                    SwapchainHook::recreate = true;
-                });
+
+                if (PlatformUtils::isUWP()) {
+                    c->addButton("Force Reload Minecraft", "Forces the swapchain to recreate.", "RELOAD", []() {
+                        SwapchainHook::recreate = true;
+                    });
+                }
 
 
                 c->addButton("Reload Scripts", "", "RELOAD", [&]() {
@@ -896,11 +1175,17 @@ void ClickGUI::onRender(RenderEvent &event) {
 
                 c->addToggle("Better Frames", "RTX Disabled, Restart Required.",
                              Client::settings.getSettingByName<bool>("killdx")->value);
-                c->addToggle("V-SYNC Disabler", "Works on all devices.",
+
+                // VSync Disabler works on both UWP and GDK
+                c->addToggle("V-SYNC Disabler", "Restart Required.",
                              Client::settings.getSettingByName<bool>("vsync")->value);
 
-                c->addToggle("Recreate Swapchain At Start", "May help with Better RenderDragon",
-                             Client::settings.getSettingByName<bool>("recreateAtStart")->value);
+                if (PlatformUtils::isUWP())
+                {
+                    c->addToggle("Recreate Swapchain At Start",
+                                 "May help with Better RenderDragon",
+                                 Client::settings.getSettingByName<bool>("recreateAtStart")->value);
+                }
                 c->extraPadding();
 
                 c->addElementText("Following Does Not Require Restart");
@@ -932,6 +1217,9 @@ void ClickGUI::onRender(RenderEvent &event) {
                 c->addToggle("Save Scroll Position",
                              "Save scroll position in ClickGUI",
                              Client::settings.getSettingByName<bool>("saveScrollPos")->value);
+                c->addSlider("Page Up/Down Scroll Speed",
+                             "How much to scroll when pressing Page Up or Page Down keys",
+                             Client::settings.getSettingByName<float>("pageScrollMultiplier")->value, 15.0f, 1.0f);
                 c->addToggle("Auto Search ClickGUI",
                              "Start searching for modules already when you press a key in ClickGUI",
                              Client::settings.getSettingByName<bool>("autosearch")->value);
@@ -991,10 +1279,32 @@ void ClickGUI::onRender(RenderEvent &event) {
 
                 FlarialGUI::PopSize();
 
+                auto scriptModules = ScriptManager::getLoadedModules();
+
+                // Count how many script modules will actually be displayed (accounting for search filter)
+                int visibleScriptCount = 0;
+                if (!searchBarString.empty()) {
+                    std::string search = searchBarString;
+                    for (char &c: search) {
+                        c = (char) std::tolower(c);
+                    }
+                    for (const auto &pModule: scriptModules) {
+                        std::string name = pModule->name;
+                        for (char &c: name) {
+                            c = (char) std::tolower(c);
+                        }
+                        if (name.starts_with(search) || name.find(search) != std::string::npos) {
+                            visibleScriptCount++;
+                        }
+                    }
+                } else {
+                    visibleScriptCount = static_cast<int>(scriptModules.size());
+                }
+
+                // Calculate content height based on visible script modules (3 per row)
                 int i3 = 0;
                 float i2 = 0;
-
-                for (const auto &pair: ModuleManager::moduleMap) {
+                for (int idx = 0; idx < visibleScriptCount; idx++) {
                     if ((++i3 % 3) == 0) {
                         i2 += Constraints::SpacingConstraint(0.8, modWidth);
                     }
@@ -1008,9 +1318,6 @@ void ClickGUI::onRender(RenderEvent &event) {
                 float yModifier = 0.0f;
 
                 int i = 0;
-
-
-                auto scriptModules = ScriptManager::getLoadedModules();
 
                 for (const auto &pModule: scriptModules) {
                     bool visible = (modcenter.y + yModifier + FlarialGUI::scrollpos + 55 > center.y) &&
@@ -1124,15 +1431,9 @@ void ClickGUI::onRender(RenderEvent &event) {
                                  rectY + Constraints::SpacingConstraint(0.01, rectWidth), rectWidth,
                                  rectHeight);
 
-
-            FlarialGUI::SetScrollView(
-                rectXNoOff + Constraints::SpacingConstraint(0.0085, rectWidth),
-                rectY + Constraints::SpacingConstraint(0.01, rectWidth), rectWidth, rectHeight);
-
-
+            // Module's settingsRender handles its own scroll view via initSettingsPage()
+            // No need to set up an outer scroll view here - it would conflict
             settingMod->settingsRender(settingsOffset);
-
-            FlarialGUI::UnsetScrollView();
 
             FlarialGUI::PopSize();
 
@@ -1164,7 +1465,7 @@ void ClickGUI::onRender(RenderEvent &event) {
                         currentModule->active = false;
                         currentModule->settings.reset();
                         currentModule->postLoad(true);
-                        FlarialGUI::ResetShit();
+                        FlarialGUI::ResetUIState();
                         if (wasEnabled) {
                             currentModule->settings.setValue("enabled", true);
                             currentModule->enabledState = true;
@@ -1185,7 +1486,7 @@ void ClickGUI::onRender(RenderEvent &event) {
                         currentModule->settings.deleteSetting("percentageX");
                         currentModule->settings.deleteSetting("percentageY");
                         currentModule->defaultConfig();
-                        FlarialGUI::ResetShit();
+                        FlarialGUI::ResetUIState();
                     }
                 }
             }

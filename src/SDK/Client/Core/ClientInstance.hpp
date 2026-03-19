@@ -5,6 +5,7 @@
 #include "../Block/BlockSource.hpp"
 #include "../Render/GuiData.hpp"
 #include <cstdint>
+#include <cmath>
 #include "../../../Utils/Memory/Memory.hpp"
 #include "../Network/Packet/LoopbackPacketSender.hpp"
 #include "Minecraft.hpp"
@@ -13,6 +14,7 @@
 #include "../Network/Raknet/RaknetConnector.hpp"
 #include "../Render/Camera.hpp"
 
+/// Primary interface to the Minecraft client; provides access to player, world, rendering, and network state.
 class ClientInstance {
 public:
     MinecraftGame* getMinecraftGame() {
@@ -33,36 +35,44 @@ public:
         return hat::member_at<mce::Camera>(this, off);
     }
 
+    /// Returns the local player entity, or nullptr if not in a world.
     LocalPlayer *getLocalPlayer();
 
+    /// Returns the block source for the current dimension; used for block queries.
     BlockSource *getBlockSource();
 
+    /// Captures the mouse cursor (hides it and locks to window).
     void grabMouse(int delay = 0);
 
+    /// Releases the mouse cursor back to normal system control.
     void releaseMouse();
 
     static std::string getTopScreenName();
 
     std::string getScreenName();
 
+    /// Returns the level renderer; uses vfunc on 1.21.20+, direct member access on older versions.
     LevelRender *getLevelRender();
 
     float getFovX() {
-        if (!VersionUtils::checkAboveOrEqual(21, 110)) return hat::member_at<float>(this, GET_OFFSET("ClientInstance::getFovX"));
-
-        if (this->getLevelRender()) if (this->getLevelRender()->getLevelRendererPlayer())
-        return this->getLevelRender()->getLevelRendererPlayer()->getFovX();
-
-        return 0.0f;
+        float fov = hat::member_at<float>(this, GET_OFFSET("ClientInstance::getFovX"));
+        // Sanity check - FOV should be a reasonable positive value (typically 0.5 to 3.0 radians)
+        // Values below 0.1 are definitely invalid (would be less than 6 degrees)
+        // If invalid, return a default value based on ~70 degree FOV
+        if (fov < 0.1f || fov > 10.0f || std::isnan(fov) || std::isinf(fov)) {
+            return 1.22f; // Default ~70 degree FOV in radians
+        }
+        return fov;
     };
 
     float getFovY() {
-        if (!VersionUtils::checkAboveOrEqual(21, 110)) return hat::member_at<float>(this, GET_OFFSET("ClientInstance::getFovY"));
-
-        if (this->getLevelRender()) if (this->getLevelRender()->getLevelRendererPlayer())
-        return this->getLevelRender()->getLevelRendererPlayer()->getFovY();
-
-        return 0.0f;
+        float fov = hat::member_at<float>(this, GET_OFFSET("ClientInstance::getFovY"));
+        // Sanity check - FOV should be a reasonable positive value (typically 0.5 to 3.0 radians)
+        // Values below 0.1 are definitely invalid
+        if (fov < 0.1f || fov > 10.0f || std::isnan(fov) || std::isinf(fov)) {
+            return 1.22f; // Default ~70 degree FOV in radians
+        }
+        return fov;
     };
 
     Vec2<float> getFov() {
@@ -80,5 +90,6 @@ public:
         return getPacketSender()->networkSystem->remoteConnectorComposite->rakNetConnector;
     }
 
+    /// Forces a recalculation of screen size and GUI scale (used for custom GUI scale overrides).
     void _updateScreenSizeVariables(Vec2<float> *totalScreenSize, Vec2<float> *safeZone, float forcedGuiScale);
 };

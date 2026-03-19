@@ -150,9 +150,23 @@ public:
 
 
     void onKey(KeyEvent &event)  {
-        if (!SwapchainHook::init || !ImGui::GetCurrentContext()) return;
+        // Multiple safety checks to prevent crashes during initialization/teardown
+        if (!SwapchainHook::init.load()) return;
+        if (!SwapchainHook::initImgui.load()) return;
+        if (SwapchainHook::imguiCleanupInProgress.load()) return;
+
+        ImGuiContext* ctx = ImGui::GetCurrentContext();
+        if (!ctx) return;
+
+        ImGuiIO& io = ImGui::GetIO();
+        if (!io.BackendPlatformUserData || !io.BackendRendererUserData) return;
+
+        // Check if ImGui is currently accepting events (safe to access input queue)
+        if (!io.AppAcceptingEvents) return;
+
         if (!Client::disable) {
-            ImGuiIO& io = ImGui::GetIO();
+            std::lock_guard<std::mutex> lock(SwapchainHook::imguiInputMutex);
+
             const ImGuiKey mod = keycodeToImGuiMod(event.getKey());
             if (mod != ImGuiKey_None)
             {

@@ -9,7 +9,8 @@ private:
     float* newPosRel = nullptr;
     bool patched = false;
 
-    std::unordered_map<Actor*, std::tuple<Vec3<float>, Vec3<int>, std::chrono::steady_clock::time_point>> actorData;
+    // Keyed by Actor runtime ID to avoid dangling-pointer issues when entities are destroyed.
+    std::unordered_map<int64_t, std::tuple<Vec3<float>, Vec3<int>, std::chrono::steady_clock::time_point>> actorData;
     ActorRenderData* currentRenderData = nullptr;
 
 public:

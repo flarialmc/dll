@@ -1,51 +1,35 @@
 #include "TotemCounter.hpp"
 
-
-#include "Events/Game/TickEvent.hpp"
-
-
-void TotemCounter::onEnable() {
+void TotemCounter::onEnable()
+{
+    HUDModule::onEnable();
     Listen(this, TickEvent, &TotemCounter::onTick)
-    Listen(this, RenderEvent, &TotemCounter::onRender)
-    Module::onEnable();
 }
 
-void TotemCounter::onDisable() {
+void TotemCounter::onDisable()
+{
     Deafen(this, TickEvent, &TotemCounter::onTick)
-    Deafen(this, RenderEvent, &TotemCounter::onRender)
-    Module::onDisable();
+    HUDModule::onDisable();
 }
 
-void TotemCounter::defaultConfig() {
-    setDef("text", (std::string)"Totems: {value}");
+void TotemCounter::customConfig()
+{
     setDef("onlyRenderWhenHoldingTotem", false);
-    Module::defaultConfig("all");
-
 }
 
-void TotemCounter::settingsRender(float settingsOffset) {
-    initSettingsPage();
-
+void TotemCounter::customSettings()
+{
     addToggle("Only render when holding totem.", "", "onlyRenderWhenHoldingTotem");
-    defaultAddSettings("main");
-    extraPadding();
-
-    addHeader("Text");
-    defaultAddSettings("text");
-    extraPadding();
-
-    addHeader("Colors");
-    defaultAddSettings("colors");
-    extraPadding();
-
-    addHeader("Misc");
-    defaultAddSettings("misc");
-
-    FlarialGUI::UnsetScrollView();
-    resetPadding();
 }
 
-void TotemCounter::onTick(TickEvent& event) {
+std::string TotemCounter::getDisplayValue()
+{
+    if (!shouldRender) return "";
+    return FlarialGUI::cached_to_string(totems);
+}
+
+void TotemCounter::onTick(TickEvent& event)
+{
     if (!this->isEnabled()) return;
     if (!SDK::hasInstanced || SDK::clientInstance == nullptr) return;
 
@@ -100,11 +84,4 @@ void TotemCounter::onTick(TickEvent& event) {
 
         totems = lastTotemCount;
     }
-}
-
-void TotemCounter::onRender(RenderEvent& event) {
-    if (!this->isEnabled() || !shouldRender) return;
-
-    auto totemsStr = FlarialGUI::cached_to_string(totems);
-    this->normalRender(35, totemsStr);
 }

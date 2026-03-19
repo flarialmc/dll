@@ -15,12 +15,11 @@ void ActorBaseTick::enableHook() {
 
 }
 
-ActorBaseTick::ActorBaseTick() : Hook("ActorBaseTick", GET_SIG_ADDRESS("Actor::baseTick")) {}
+ActorBaseTick::ActorBaseTick() : Hook("ActorBaseTick", GET_SIG_ADDRESS("Actor::vtable")) {}
 
-void ActorBaseTick::callback(Actor *actor) {
-    // TODO: Might be wrong, req checking
-    funcOriginal(actor);
-    if (Client::disable) return;
+__int64 ActorBaseTick::callback(Actor *actor) {
+    auto result = funcOriginal(actor);
+    if (Client::disable) return result;
     if (actor != nullptr) {
         if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
             if (SDK::clientInstance->getLocalPlayer() != nullptr) {
@@ -31,6 +30,7 @@ void ActorBaseTick::callback(Actor *actor) {
             }
         }
     }
+    return result;
 }
 
 

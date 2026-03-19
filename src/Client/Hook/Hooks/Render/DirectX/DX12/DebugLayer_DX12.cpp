@@ -3,9 +3,13 @@
 #include <d3d12.h>
 #include <windows.h>
 
+// D3D12CreateDevice hook - only used for debug layer in debug builds
+// Note: This hook is installed after game load, so it can't block initial device creation
+// Better Frames uses RemoveDevice() approach instead (UWP only)
+
 #if defined(__DEBUG__)
 
-typedef HRESULT (WINAPI *PFN_D3D12CreateDevice)(
+typedef HRESULT(WINAPI* PFN_D3D12CreateDevice)(
     IUnknown*,
     D3D_FEATURE_LEVEL,
     REFIID,
@@ -13,13 +17,18 @@ typedef HRESULT (WINAPI *PFN_D3D12CreateDevice)(
 
 static PFN_D3D12CreateDevice g_OrigD3D12CreateDevice = nullptr;
 
-static void EnableD3D12DebugLayerIfAvailable() {
+static void EnableD3D12DebugLayerIfAvailable()
+{
     winrt::com_ptr<ID3D12Debug> debugController;
-    if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(debugController.put())))) {
+    if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(debugController.put()))))
+    {
         debugController->EnableDebugLayer();
         Logger::success("D3D12 debug layer enabled");
-    } else {
-        Logger::debug("D3D12GetDebugInterface failed (Graphics Tools not installed?) — continuing without D3D12 debug layer");
+    }
+    else
+    {
+        Logger::debug(
+            "D3D12GetDebugInterface failed (Graphics Tools not installed?) — continuing without D3D12 debug layer");
     }
 }
 
@@ -34,24 +43,32 @@ static HRESULT WINAPI Hook_D3D12CreateDevice(
 }
 
 
-void CreateSwapchainForCoreWindowHook::HookD3D12Exports() {
+void CreateSwapchainForCoreWindowHook::HookD3D12Exports()
+{
     HMODULE hD3D12 = GetModuleHandleW(L"d3d12.dll");
-    if (!hD3D12) {
+    if (!hD3D12)
+    {
         hD3D12 = LoadLibraryW(L"d3d12.dll");
     }
 
-    if (hD3D12) {
+    if (hD3D12)
+    {
         FARPROC pCreateDevice = GetProcAddress(hD3D12, "D3D12CreateDevice");
-        if (pCreateDevice) {
+        if (pCreateDevice)
+        {
             Memory::hookFunc(reinterpret_cast<LPVOID>(pCreateDevice),
                              reinterpret_cast<void*>(Hook_D3D12CreateDevice),
                              reinterpret_cast<void**>(&g_OrigD3D12CreateDevice),
                              "D3D12CreateDevice");
             Logger::success("Hooked D3D12CreateDevice");
-        } else {
+        }
+        else
+        {
             Logger::debug("Failed to get proc address for D3D12CreateDevice");
         }
-    } else {
+    }
+    else
+    {
         Logger::debug("d3d12.dll not loaded (yet); D3D12 hooks not installed");
     }
 }

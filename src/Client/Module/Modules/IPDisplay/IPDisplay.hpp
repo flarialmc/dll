@@ -1,27 +1,18 @@
 #pragma once
 
-#include "../Module.hpp"
+#include "../HUDModule.hpp"
 #include "../../../Client.hpp"
 
-
-class IPDisplay : public Module {
+class IPDisplay : public HUDModule {
 
 public:
-
-
-	IPDisplay() : Module("IP Display", "Displays the current server IP you're playing on.",
-		IDR_SERVER_IP_PNG, "", false, {"server", "address"}) {
-
+	IPDisplay() : HUDModule(10, "IP Display",
+		"Displays the current server IP you're playing on.",
+		IDR_SERVER_IP_PNG, "", {"server", "address"}) {
 	};
 
-	void onEnable() override;
-
-	void onDisable() override;
-
-	void defaultConfig() override;
-
-	void settingsRender(float settingsOffset) override;
-
-	void onRender(RenderEvent& event);
+protected:
+	std::string getDisplayValue() override;
+	void customConfig() override;
+	void customSettings() override;
 };
-

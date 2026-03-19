@@ -9,6 +9,6 @@
 
 class LevelData {
 public:
-    std::string getLevelName() { return hat::member_at<std::string>(this, GET_OFFSET("LevelData::worldName")); }
+            std::string getLevelName() { return hat::member_at<std::string>(this, GET_OFFSET("LevelData::worldName")); }
 
 };

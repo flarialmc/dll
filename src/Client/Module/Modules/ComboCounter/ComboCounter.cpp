@@ -1,54 +1,26 @@
 #include "ComboCounter.hpp"
 
-
-#include "Events/Game/TickEvent.hpp"
-#include "Events/Render/RenderEvent.hpp"
-
-void ComboCounter::onEnable() {
-    Listen(this, AttackEvent, &ComboCounter::onAttack)
-    Listen(this, TickEvent, &ComboCounter::onTick)
-    Listen(this, RenderEvent, &ComboCounter::onRender)
-    Module::onEnable();
+std::string ComboCounter::getDisplayValue() {
+    return FlarialGUI::cached_to_string(Combo);
 }
 
-void ComboCounter::onDisable() {
-    Deafen(this, AttackEvent, &ComboCounter::onAttack)
-    Deafen(this, TickEvent, &ComboCounter::onTick)
-    Deafen(this, RenderEvent, &ComboCounter::onRender)
-    Module::onDisable();
-}
-
-void ComboCounter::defaultConfig() {
+void ComboCounter::customConfig() {
     setDef("text", (std::string)"Combo: {value}");
-    Module::defaultConfig("all");
     setDef("negatives", false);
 }
 
-void ComboCounter::settingsRender(float settingsOffset) {
-
-    /* Border Start */
-
-    initSettingsPage();
-
-    defaultAddSettings("main");
-    extraPadding();
-
-    addHeader("Text");
-    defaultAddSettings("text");
-    extraPadding();
-
-    addHeader("Colors");
-    defaultAddSettings("colors");
-
-    addHeader("Misc");
+void ComboCounter::customSettings() {
     addToggle("Count to Negatives", "Allows the count to keep going down", "negatives");
-    defaultAddSettings("misc");
-    
+}
 
-    FlarialGUI::UnsetScrollView();
+void ComboCounter::customInit() {
+    Listen(this, AttackEvent, &ComboCounter::onAttack)
+    Listen(this, TickEvent, &ComboCounter::onTick)
+}
 
-    resetPadding();
-
+void ComboCounter::customCleanup() {
+    Deafen(this, AttackEvent, &ComboCounter::onAttack)
+    Deafen(this, TickEvent, &ComboCounter::onTick)
 }
 
 void ComboCounter::onAttack(AttackEvent &event) {
@@ -71,7 +43,7 @@ void ComboCounter::onAttack(AttackEvent &event) {
 void ComboCounter::onTick(TickEvent &event) {
     if (!this->isEnabled()) return;
 
-    if (!SDK::clientInstance->getLocalPlayer()) return;
+    if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer()) return;
 
     int currentHurtTime = reinterpret_cast<LocalPlayer*>(event.getActor())->getHurtTime();
     bool meow = getOps<bool>("negatives");
@@ -87,11 +59,4 @@ void ComboCounter::onTick(TickEvent &event) {
 
     std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - last_hit;
     if (duration.count() >= 15) Combo = 0;
-}
-
-void ComboCounter::onRender(RenderEvent &event) {
-    if (this->isEnabled()) {
-        auto comboStr = FlarialGUI::cached_to_string(Combo);
-        this->normalRender(8, comboStr);
-    }
 }

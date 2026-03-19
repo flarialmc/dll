@@ -6,6 +6,22 @@
 
 std::string RaknetTickHook::towriteip = "";
 
+// SEH wrapper to safely read JoinedIp
+static void tryGetJoinedIp(RaknetConnector* raknet, char* buffer, size_t bufferSize) {
+    buffer[0] = '\0';
+    __try {
+        const auto* strPtr = &direct_access<std::string>(raknet, GET_OFFSET("RaknetConnector::JoinedIp"));
+        const char* data = strPtr->c_str();
+        const size_t len = strPtr->size();
+
+        if (len < bufferSize && len < 256) {
+            memcpy(buffer, data, len + 1);
+        }
+    } __except(EXCEPTION_EXECUTE_HANDLER) {
+        buffer[0] = '\0';
+    }
+}
+
 void RaknetTickHook::callback(RaknetConnector *raknet) {
     if (getAveragePingOriginal == nullptr) {
         uintptr_t getAveragePingAddr = Memory::GetAddressByIndex(raknet->peer->vTable,
@@ -18,21 +34,16 @@ void RaknetTickHook::callback(RaknetConnector *raknet) {
     raknetTickOriginal(raknet);
     if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
         if (SDK::clientInstance->getLocalPlayer() != nullptr) {
+            char ipBuffer[256];
+            tryGetJoinedIp(raknet, ipBuffer, sizeof(ipBuffer));
 
-            std::string ip = raknet->JoinedIp;
-
-            if (ip.empty() && SDK::clientInstance == nullptr) {
+            std::string ip = ipBuffer;
+            if (ip.empty()) {
                 ip = "none";
             }
 
-            if (ip.empty() && SDK::clientInstance != nullptr) {
-
-                if (SDK::clientInstance->getLocalPlayer() == nullptr) {
-                    ip = "none";
-                }
-            }
-
             towriteip = ip;
+
         }
 
         auto event = nes::make_holder<RaknetTickEvent>();
@@ -41,8 +52,13 @@ void RaknetTickHook::callback(RaknetConnector *raknet) {
 }
 
 __int64 RaknetTickHook::getAveragePingCallback(RakPeer *_this, void *guid) {
-    auto avgPing = getAveragePingOriginal(_this, guid);
+    const auto avgPing = getAveragePingOriginal(_this, guid);
     SDK::serverPing = avgPing;
+
+    const auto getLastPingFn = reinterpret_cast<originalRakPeer>(
+        Memory::GetAddressByIndex(_this->vTable, GET_OFFSET("RakPeer::GetAveragePing") + 1));
+    SDK::lastPing = getLastPingFn(_this, guid);
+
     return avgPing;
 }
 

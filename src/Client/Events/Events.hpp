@@ -37,6 +37,7 @@
 #include "Render/RenderUnderUIEvent.hpp"
 #include "Render/SetTopScreenNameEvent.hpp"
 #include "Render/SetupAndRenderEvent.hpp"
+#include "Render/PreSetupAndRenderEvent.hpp"
 #include "Render/RenderOrderExecuteEvent.hpp"
 #include "Render/HandleVisibilityUpdatesEvent.hpp"
 #include "Render/UIControlGetPositionEvent.hpp"

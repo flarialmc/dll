@@ -28,7 +28,7 @@ void Sneak::defaultConfig() {
 void Sneak::settingsRender(float settingsOffset) {
     initSettingsPage();
 
-    addKeybind("Keybind", "Hold for 2 seconds!", "keybind", true);
+    addKeybind("Keybind", "", "keybind", true);
 
     FlarialGUI::UnsetScrollView();
     resetPadding();
@@ -53,17 +53,17 @@ void Sneak::onTick(TickEvent& event) {
     if (!this->isEnabled()) return;
     if (SDK::clientInstance != nullptr) {
         if (SDK::clientInstance->getLocalPlayer() != nullptr) {
-            auto* handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
+            auto handler = SDK::clientInstance->getLocalPlayer()->getHandler();
             if (toggleSneaking) {
-                handler->sneaking = true;
-                handler->mInputState.mSneakDown = true;
-                handler->mRawInputState.mSneakDown = true;
+                handler.setSneaking(true);
+                handler.setMSneakDown(true);
+                handler.setRawMSneakDown(true);
                 toggled = true;
             }
             if (!toggleSneaking and toggled) {
-                handler->sneaking = false;
-                handler->mInputState.mSneakDown = false;
-                handler->mRawInputState.mSneakDown = false;
+                handler.setSneaking(false);
+                handler.setMSneakDown(false);
+                handler.setRawMSneakDown(false);
                 toggled = false;
             }
         }

@@ -45,15 +45,17 @@ float4 main(float4 screenSpace : SV_Position) : SV_TARGET
 {
     float2 uv = screenSpace.xy / resolution;
 
-    // Clean Kawase blur implementation
-    float2 texelSize = halfPixel * intensity;
+    // Kawase diagonal sampling pattern — 4 corner samples + center
+    // Using diagonal offsets eliminates axis-aligned "boxy" artifacts
+    // that occur with cross (+) sampling patterns
+    float2 d = halfPixel * intensity;
 
-    // Standard Kawase sampling pattern - 4 samples + center
-    float4 color = texture0.Sample(sampler0, uv) * 0.25;
-    color += texture0.Sample(sampler0, uv + float2(texelSize.x, 0.0)) * 0.1875;
-    color += texture0.Sample(sampler0, uv + float2(-texelSize.x, 0.0)) * 0.1875;
-    color += texture0.Sample(sampler0, uv + float2(0.0, texelSize.y)) * 0.1875;
-    color += texture0.Sample(sampler0, uv + float2(0.0, -texelSize.y)) * 0.1875;
+    float4 color = texture0.Sample(sampler0, uv) * 4.0;
+    color += texture0.Sample(sampler0, uv + float2(-d.x, -d.y));
+    color += texture0.Sample(sampler0, uv + float2( d.x, -d.y));
+    color += texture0.Sample(sampler0, uv + float2(-d.x,  d.y));
+    color += texture0.Sample(sampler0, uv + float2( d.x,  d.y));
+    color *= (1.0 / 8.0);
 
     return color;
 }
@@ -76,23 +78,20 @@ float4 main(float4 screenSpace : SV_Position) : SV_TARGET
 {
     float2 uv = screenSpace.xy / resolution;
 
-    // Kawase blur upsample with tent filter
-    float2 texelSize = halfPixel * intensity;
+    // Dual-Kawase upsample — 8 samples in cardinal + diagonal ring
+    // Cardinals at 2x offset (weight 1), diagonals at 1x offset (weight 2)
+    // Complements the diagonal downsample for uniform blur distribution
+    float2 d = halfPixel * intensity;
 
-    // 9-tap tent filter for smooth upsampling
-    float4 color = texture0.Sample(sampler0, uv) * 0.25;
-
-    // Cross pattern
-    color += texture0.Sample(sampler0, uv + float2(0.0, texelSize.y)) * 0.125;
-    color += texture0.Sample(sampler0, uv + float2(0.0, -texelSize.y)) * 0.125;
-    color += texture0.Sample(sampler0, uv + float2(texelSize.x, 0.0)) * 0.125;
-    color += texture0.Sample(sampler0, uv + float2(-texelSize.x, 0.0)) * 0.125;
-
-    // Diagonal pattern
-    color += texture0.Sample(sampler0, uv + float2(texelSize.x, texelSize.y)) * 0.0625;
-    color += texture0.Sample(sampler0, uv + float2(-texelSize.x, texelSize.y)) * 0.0625;
-    color += texture0.Sample(sampler0, uv + float2(texelSize.x, -texelSize.y)) * 0.0625;
-    color += texture0.Sample(sampler0, uv + float2(-texelSize.x, -texelSize.y)) * 0.0625;
+    float4 color  = texture0.Sample(sampler0, uv + float2(-d.x * 2.0, 0.0));
+    color += texture0.Sample(sampler0, uv + float2(-d.x,  d.y)) * 2.0;
+    color += texture0.Sample(sampler0, uv + float2( 0.0,  d.y * 2.0));
+    color += texture0.Sample(sampler0, uv + float2( d.x,  d.y)) * 2.0;
+    color += texture0.Sample(sampler0, uv + float2( d.x * 2.0, 0.0));
+    color += texture0.Sample(sampler0, uv + float2( d.x, -d.y)) * 2.0;
+    color += texture0.Sample(sampler0, uv + float2( 0.0, -d.y * 2.0));
+    color += texture0.Sample(sampler0, uv + float2(-d.x, -d.y)) * 2.0;
+    color *= (1.0 / 12.0);
 
     return color;
 }
@@ -346,7 +345,8 @@ void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iteratio
 
     intensity *= 3.5f;
 
-    if (!SwapchainHook::GetBackbuffer()) return;
+    auto backbuffer = SwapchainHook::GetBackbuffer();
+    if (!backbuffer) return;
 
     winrt::com_ptr<ID3D11ShaderResourceView> pOrigShaderResourceView = MotionBlur::BackbufferToSRVExtraMode();
     if (!pOrigShaderResourceView) {
@@ -356,7 +356,7 @@ void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iteratio
     if (!SwapchainHook::context) return;
 
     D3D11_TEXTURE2D_DESC desc;
-    SwapchainHook::GetBackbuffer()->GetDesc(&desc);
+    backbuffer->GetDesc(&desc);
 
     // Ensure intermediate textures are available and correct size
     if (!EnsureIntermediateTextures(desc.Width, desc.Height)) {
@@ -365,11 +365,11 @@ void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iteratio
 
     XMFLOAT2 renderSize = XMFLOAT2(static_cast<float>(desc.Width), static_cast<float>(desc.Height));
 
-    // Calculate number of passes based on intensity to reduce boxiness
-    int numPasses = std::max(1, std::min(6, (int)(intensity * 2.0f + 1.0f)));
+    // Use iterations as the base pass count, extend for higher intensities
+    int numPasses = std::max(iterations, std::min(8, iterations + static_cast<int>(intensity * 0.3f)));
 
-    // Distribute intensity across passes - each pass gets a fraction
-    float passIntensity = intensity / (float)numPasses * 0.8f;
+    // Scale factor for Kawase offsets — distributes the blur radius across passes
+    float kernelScale = std::max(0.5f, intensity / static_cast<float>(numPasses));
 
     constantBuffer.offset = XMFLOAT2(1.0f, 1.0f);
 
@@ -378,13 +378,15 @@ void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iteratio
     SwapchainHook::context->PSSetShaderResources(0, 1, &nullSRV);
 
     // Multi-pass blur with ping-pong between textures
+    // Each pass uses a progressively larger Kawase offset (0.5, 1.5, 2.5, ...)
+    // to build up a wide, smooth blur without axis-aligned artifacts
     ID3D11ShaderResourceView* currentInput = pOrigShaderResourceView.get();
     ID3D11RenderTargetView* currentOutput = nullptr;
     ID3D11ShaderResourceView* currentOutputSRV = nullptr;
 
     for(int pass = 0; pass < numPasses; pass++) {
-        // Update intensity for this pass
-        constantBuffer.intensity = passIntensity;
+        // Progressive Kawase offset — each pass samples further out
+        constantBuffer.intensity = (static_cast<float>(pass) + 0.5f) * kernelScale;
 
         // Ping-pong between intermediate textures
         if(pass % 2 == 0) {
@@ -395,7 +397,7 @@ void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iteratio
             currentOutputSRV = pIntermediateSRV2.get();
         }
 
-        // Use downsample shader for all intermediate passes
+        // Downsample pass with diagonal Kawase sampling
         SwapchainHook::context->PSSetShader(pGaussianBlurHorizontalShader.get(), nullptr, 0);
         RenderToRTV(currentOutput, currentInput, renderSize);
 
@@ -406,7 +408,8 @@ void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iteratio
         currentInput = currentOutputSRV;
     }
 
-    // Final upsample pass to destination
+    // Final upsample pass to destination with matching kernel scale
+    constantBuffer.intensity = kernelScale;
     SwapchainHook::context->PSSetShader(pGaussianBlurVerticalShader.get(), nullptr, 0);
     RenderToRTV(pDstRenderTargetView, currentInput, renderSize);
 }
@@ -485,7 +488,7 @@ void FlarialGUI::PrepareBlur(float intensity) {
     }
 }
 
-void FlarialGUI::AllahBlur(float intensity) {
+void FlarialGUI::ApplyBlur(float intensity) {
     FlarialGUI::PrepareBlur(intensity);
     if (FlarialGUI::blur_bitmap_cache != nullptr)
         D2D::context->DrawImage(FlarialGUI::blur_bitmap_cache);

@@ -11,7 +11,8 @@ void FlarialGUI::ColorPickerWindow(int index, std::string moduleName, std::strin
 		FlarialGUI::lerp(ColorPickers[index].openProgress, 1.f, 0.25f * FlarialGUI::frameFactor);
 		// 75% opacity black rect
 
-		FlarialGUI::UnsetScrollView();
+		bool wasInScrollView = FlarialGUI::isInScrollView;
+		if (wasInScrollView) FlarialGUI::UnsetScrollView();
 		FlarialGUI::RoundedRect(0, 0, D2D1::ColorF(D2D1::ColorF::Black, ColorPickers[index].openProgress * 0.75f),
 			Constraints::RelativeConstraint(1.5, "width", true),
 			Constraints::RelativeConstraint(1.5, "height", true), 0, 0);
@@ -317,10 +318,10 @@ void FlarialGUI::ColorPickerWindow(int index, std::string moduleName, std::strin
 
 		FlarialGUI::UnsetWindowRect();
 
-		FlarialGUI::SetScrollView(ScrollViewRect.left, ScrollViewRect.top, ScrollViewRect.right - ScrollViewRect.left, ScrollViewRect.bottom - ScrollViewRect.top);
+		if (wasInScrollView) FlarialGUI::SetScrollView(ScrollViewRect.left, ScrollViewRect.top, ScrollViewRect.right - ScrollViewRect.left, ScrollViewRect.bottom - ScrollViewRect.top);
 
 
-		// rect containing shit
+		// Color picker control area
 
 		// saves this hex to ColorPickers[index].oldHex
 
@@ -341,13 +342,14 @@ void FlarialGUI::ColorPickerWindow(int index, std::string moduleName, std::strin
 		FlarialGUI::lerp(ColorPickers[index].openProgress, 0.0f, 0.25f * FlarialGUI::frameFactor);
 
 		if (ColorPickers[index].openProgress > 0.05f) {
-			FlarialGUI::UnsetScrollView();
+			bool wasInScrollView = FlarialGUI::isInScrollView;
+			if (wasInScrollView) FlarialGUI::UnsetScrollView();
 
 			FlarialGUI::RoundedRect(0, 0, D2D1::ColorF(D2D1::ColorF::Black, ColorPickers[index].openProgress * 0.75f),
 				Constraints::RelativeConstraint(1.5, "width", true),
 				Constraints::RelativeConstraint(1.5, "height", true), 0, 0);
 
-			FlarialGUI::SetScrollView(ScrollViewRect.left, ScrollViewRect.top, ScrollViewRect.right - ScrollViewRect.left, ScrollViewRect.bottom - ScrollViewRect.top);
+			if (wasInScrollView) FlarialGUI::SetScrollView(ScrollViewRect.left, ScrollViewRect.top, ScrollViewRect.right - ScrollViewRect.left, ScrollViewRect.bottom - ScrollViewRect.top);
 		}
 	}
 }
@@ -357,7 +359,8 @@ void FlarialGUI::ColorPickerWindow(int index, std::string& hex, float& opacity, 
 		FlarialGUI::lerp(ColorPickers[index].openProgress, 1.f, 0.25f * FlarialGUI::frameFactor);
 		// 75% opacity black rect
 
-		FlarialGUI::UnsetScrollView();
+		bool wasInScrollView = FlarialGUI::isInScrollView;
+		if (wasInScrollView) FlarialGUI::UnsetScrollView();
 		FlarialGUI::RoundedRect(0, 0, D2D1::ColorF(D2D1::ColorF::Black, ColorPickers[index].openProgress * 0.75f),
 			Constraints::RelativeConstraint(1.5, "width", true),
 			Constraints::RelativeConstraint(1.5, "height", true), 0, 0);
@@ -664,10 +667,10 @@ void FlarialGUI::ColorPickerWindow(int index, std::string& hex, float& opacity, 
 
 		FlarialGUI::UnsetWindowRect();
 
-		FlarialGUI::SetScrollView(ScrollViewRect.left, ScrollViewRect.top, ScrollViewRect.right - ScrollViewRect.left, ScrollViewRect.bottom - ScrollViewRect.top);
+		if (wasInScrollView) FlarialGUI::SetScrollView(ScrollViewRect.left, ScrollViewRect.top, ScrollViewRect.right - ScrollViewRect.left, ScrollViewRect.bottom - ScrollViewRect.top);
 
 
-		// rect containing shit
+		// Color picker control area
 
 		// saves this hex to ColorPickers[index].oldHex
 
@@ -688,13 +691,14 @@ void FlarialGUI::ColorPickerWindow(int index, std::string& hex, float& opacity, 
 		FlarialGUI::lerp(ColorPickers[index].openProgress, 0.0f, 0.25f * FlarialGUI::frameFactor);
 
 		if (ColorPickers[index].openProgress > 0.05f) {
-			FlarialGUI::UnsetScrollView();
+			bool wasInScrollView = FlarialGUI::isInScrollView;
+			if (wasInScrollView) FlarialGUI::UnsetScrollView();
 
 			FlarialGUI::RoundedRect(0, 0, D2D1::ColorF(D2D1::ColorF::Black, ColorPickers[index].openProgress * 0.75f),
 				Constraints::RelativeConstraint(1.5, "width", true),
 				Constraints::RelativeConstraint(1.5, "height", true), 0, 0);
 
-			FlarialGUI::SetScrollView(ScrollViewRect.left, ScrollViewRect.top, ScrollViewRect.right - ScrollViewRect.left, ScrollViewRect.bottom - ScrollViewRect.top);
+			if (wasInScrollView) FlarialGUI::SetScrollView(ScrollViewRect.left, ScrollViewRect.top, ScrollViewRect.right - ScrollViewRect.left, ScrollViewRect.bottom - ScrollViewRect.top);
 		}
 	}
 }

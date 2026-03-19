@@ -6,6 +6,8 @@ class DrawUtils {
 public:
     static void addLine(Vec2<float> start, Vec2<float> end, float lineWidth, D2D_COLOR_F color);
 
+    static void addLine3D(Vec3<float> start, Vec3<float> end, float lineWidth, D2D_COLOR_F color);
+
     static void addBox(Vec3<float> lower, Vec3<float> upper, float lineWidth, int mode = 1,
                        D2D_COLOR_F color = D2D1::ColorF(D2D1::ColorF::White));
 

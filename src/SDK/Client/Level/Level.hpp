@@ -11,6 +11,7 @@
 #include <SDK/Client/Util/mce.hpp>
 
 #include "LevelData.hpp"
+#include "../Item/ItemRegistryRef.hpp"
 
 enum class BuildPlatform : int {
     Google = 1,
@@ -65,11 +66,9 @@ public:
     std::unordered_map<mcUUID, PlayerListEntry> getPlayerMap() {
         if (VersionUtils::checkAboveOrEqual(21, 90)) {
             // For 1.21.90+ versions, create a temporary map on each call to avoid memory issues
-            static thread_local std::unordered_map<mcUUID, PlayerListEntry> tempMap;
+            std::unordered_map<mcUUID, PlayerListEntry> tempMap;
 
             auto &newMap = *hat::member_at<std::unordered_map<mcUUID, PlayerListEntry_1_21_90> *>(this, GET_OFFSET("Level::getPlayerMap"));
-
-            tempMap.clear();
 
             for (const auto &[uuid, entry_1_21_90]: newMap) {
                 PlayerListEntry entry;
@@ -144,4 +143,16 @@ public:
     std::string getWorldFolderName() { return hat::member_at<std::string>(this, GET_OFFSET("Level::worldFolderName")); }
 
     std::vector<Actor *> getRuntimeActorList();
+
+    /// Returns the item registry for the current level.
+    /// The returned ItemRegistryRef holds a weak reference — lock it before use.
+    ItemRegistryRef getItemRegistry();
+
+    /// Returns true if the level is in multiplayer mode (server, Realm, or LAN via NetherNet).
+    /// Reads LevelData::mMultiplayerGame directly via field offset.
+    bool isMultiplayerGame() {
+        auto* levelData = getLevelData();
+        if (!levelData) return false;
+        return hat::member_at<bool>(levelData, GET_OFFSET("LevelData::isMultiplayerGame"));
+    }
 };

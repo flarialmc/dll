@@ -8,6 +8,10 @@
 
 // Forward declarations
 class Settings;
+class ConfigManager;
+class ClientSettingsManager;
+class WindowManager;
+class InitializationManager;
 
 #define ADD_SETTING(setting, value) \
 if (Client::settings.getSettingByName<decltype(value)>(setting) == nullptr) \
@@ -15,54 +19,90 @@ Client::settings.addSetting(setting, value);
 
 namespace fs = std::filesystem;
 
+// Legacy Client class - forwards to new managers for backward compatibility
+// New code should use the manager classes directly:
+//   ConfigManager::instance()
+//   ClientSettingsManager::instance()
+//   WindowManager::instance()
+//   InitializationManager::instance()
 class Client {
-	static std::string privatePath;
 public:
-	static std::string current_commit;
-	static float elapsed;
-	static uint64_t start;
-	static std::vector<std::string> availableConfigs;
-	static std::vector<std::string> getPlayersVector(const nlohmann::json& data);
-	static bool init;
+    // Thread ID - forwards to WindowManager
+    static std::thread::id g_mainThreadId;
 
-	static void UnregisterActivationHandler();
+    // Version info - forwards to InitializationManager
+    static std::string current_commit;
+    static float elapsed;
+    static uint64_t start;
+    static std::string version;
 
-	static void createConfig(std::string name);
-	static void switchConfig(std::string name, bool deleting = false);
-	static void deleteConfig(std::string name);
+    // Config - forwards to ConfigManager
+    static std::vector<std::string> availableConfigs;
+    static std::string activeConfig;
+    static std::string path;
+    static std::string legacyPath;
+    static std::string legacyDir;
 
-	static void loadAvailableConfigs();
+    // Window - forwards to WindowManager
+    static HWND window;
+    static HMODULE currentModule;
 
-	static void PerformPostLegacySetup();
+    // Settings - forwards to ClientSettingsManager
+    static Settings settings;
+    static Settings legacySettings;
+    static nlohmann::json globalSettings;
+    static bool hasLegacySettings;
+    static bool softLoadLegacy;
+    static bool privateInit;
+    static bool savingSettings;
+    static bool savingPrivate;
 
-	static void initialize();
+    // Initialization state - forwards to InitializationManager
+    static bool init;
+    static bool disable;
 
-	static bool disable;
+    class LocalPlayerState {
+    private:
+        bool _isInWorld{};
+        std::string lastKnownUserName{};
+        std::string lastKnownServerIP{};
 
-	static void centerCursor();
+        mutable std::shared_mutex playerStateMutex;
+    public:
+        const bool isInWorld();
+        const std::string getUserName();
+        const std::string getServerIP();
 
-	static std::string activeConfig;
-	static bool hasLegacySettings;
-	static bool softLoadLegacy;
-	static bool privateInit;
-	static bool savingSettings;
-	static bool savingPrivate;
+        void update(ClientInstance* client);
+    };
 
-	static Settings settings;
-	static Settings legacySettings;
+    static LocalPlayerState& getPlayerState();
 
-	static nlohmann::json globalSettings;
-	static std::string version;
-	static HMODULE currentModule; // Keep as HMODULE for Windows API compatibility
+    // Helper functions
+    static std::vector<std::string> getPlayersVector(const nlohmann::json& data);
 
-	static std::string path;
-	static std::string legacyPath;
-	static std::string legacyDir;
+    // Protocol handler
+    static void UnregisterActivationHandler();
 
-	static void LoadLegacySettings();
-	static void SavePrivate();
-	static void LoadPrivate();
-	static void SaveSettings();
-	static void LoadSettings();
-	static void CheckSettingsFile();
+    // Config operations - forward to ConfigManager
+    static void createConfig(std::string name);
+    static void switchConfig(std::string name, bool deleting = false);
+    static void deleteConfig(std::string name);
+    static void loadAvailableConfigs();
+
+    // Settings operations - forward to ClientSettingsManager
+    static void LoadLegacySettings();
+    static void SavePrivate();
+    static void LoadPrivate();
+    static void SaveSettings();
+    static void LoadSettings();
+    static void CheckSettingsFile();
+
+    // Window operations - forward to WindowManager
+    static void setWindowTitle(std::string title);
+    static void centerCursor();
+
+    // Initialization - forward to InitializationManager
+    static void PerformPostLegacySetup();
+    static void initialize();
 };

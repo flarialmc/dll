@@ -3,6 +3,9 @@
 #include "Components/AABBShapeComponent.hpp"
 #include "Components/RuntimeIDComponent.hpp"
 #include "Components/ActorDataFlagComponent.hpp"
+#include "Components/ActorUniqueIDComponent.hpp"
+#include "Components/ActorDefinitionIdentifierComponent.hpp"
+#include "Components/MobBodyRotationComponent.hpp"
 #include "../../SDK.hpp"
 #include "../../../Client/GUI/Engine/Engine.hpp"
 #include "Components/OnGroundFlagComponent.hpp"
@@ -59,6 +62,10 @@ Level *Actor::getLevel() {
     return hat::member_at<Level*>(this, GET_OFFSET("Actor::level"));
 }
 
+std::string Actor::getAlias() {
+    return hat::member_at<std::string>(this, GET_OFFSET("Actor::mAlias"));
+}
+
 ActorCategory Actor::getCategories() {
     return hat::member_at<ActorCategory>(this, GET_OFFSET("Actor::categories"));
 }
@@ -104,7 +111,9 @@ bool Actor::getActorFlag(ActorFlags flag) {
 }
 
 Vec3<float> *Actor::getPosition() {
-    return &this->getStateVectorComponent()->Pos;
+    auto* stateVec = this->getStateVectorComponent();
+    if (!stateVec) return nullptr;
+    return &stateVec->Pos;
 }
 
 SimpleContainer* Actor::getArmorContainer() {
@@ -119,7 +128,8 @@ SimpleContainer* Actor::getArmorContainer() {
         }
     }
 
-    return tryGet<ActorEquipmentComponent>(sig)->mArmorContainer;
+    auto* equip = tryGet<ActorEquipmentComponent>(sig);
+    return equip ? equip->mArmorContainer : nullptr;
 }
 
 SimpleContainer* Actor::getOffhandContainer() {
@@ -134,12 +144,14 @@ SimpleContainer* Actor::getOffhandContainer() {
         }
     }
 
-    return tryGet<ActorEquipmentComponent>(sig)->mOffhandContainer;
+    auto* equip = tryGet<ActorEquipmentComponent>(sig);
+    return equip ? equip->mOffhandContainer : nullptr;
 }
 
 ItemStack *Actor::getArmor(int slot) {
     if(VersionUtils::checkAboveOrEqual(20, 80)) {
-        return Actor::getArmorContainer()->getItem(slot);
+        auto* container = Actor::getArmorContainer();
+        return container ? container->getItem(slot) : nullptr;
     } else {
         static uintptr_t sig;
 
@@ -153,6 +165,10 @@ ItemStack *Actor::getArmor(int slot) {
 }
 
 MoveInputComponent *Actor::getMoveInputHandler() { //??$try_get@UMoveInputComponent
+    return tryGet<MoveInputComponent>(0);
+}
+
+MoveInputComponentOLD *Actor::getMoveInputHandlerOLD() { //??$try_get@UMoveInputComponent
     static uintptr_t sig;
 
     if(!VersionUtils::checkAboveOrEqual(21, 00)) {
@@ -161,7 +177,7 @@ MoveInputComponent *Actor::getMoveInputHandler() { //??$try_get@UMoveInputCompon
         }
     }
 
-    return tryGet<MoveInputComponent>(sig);
+    return tryGet<MoveInputComponentOLD>(sig);
 }
 
 ActorGameTypeComponent *Actor::getGameModeType() {
@@ -185,7 +201,6 @@ AABBShapeComponent *Actor::getAABBShapeComponent() {
             sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getAABBShapeComponent"), "Actor::getAABBShapeComponent");
         }
     }
-
     return tryGet<AABBShapeComponent>(sig);
 }
 
@@ -197,7 +212,6 @@ StateVectorComponent *Actor::getStateVectorComponent() {
             sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getStateVectorComponent"), "Actor::getStateVectorComponent");
         }
     }
-
     return tryGet<StateVectorComponent>(sig);
 }
 
@@ -227,7 +241,8 @@ SynchedActorDataComponent* Actor::getSynchedActorDataComponent() {
 
 ItemStack *Actor::getOffhandSlot() {
     if(VersionUtils::checkAboveOrEqual(20, 80)) {
-        return getOffhandContainer()->getItem(1);
+        auto* container = getOffhandContainer();
+        return container ? container->getItem(1) : nullptr;
     } else {
         static uintptr_t sig;
 
@@ -362,12 +377,17 @@ bool Actor::isOnGround() {
 }
 
 Vec3<float> Actor::getLerpedPosition() {
-    return this->getRenderPositionComponent()->renderPos;
+    auto* renderPos = this->getRenderPositionComponent();
+    if (!renderPos) return Vec3<float>{0.f, 0.f, 0.f};
+    return renderPos->renderPos;
 }
 
 AABB Actor::getLerpedAABB(bool asHitbox) {
-    auto renderPos = this->getRenderPositionComponent()->renderPos;
-    auto aabbSize = this->getAABBShapeComponent()->size;
+    auto* renderPosComp = this->getRenderPositionComponent();
+    auto* aabbComp = this->getAABBShapeComponent();
+    if (!renderPosComp || !aabbComp) return {};
+    auto renderPos = renderPosComp->renderPos;
+    auto aabbSize = aabbComp->size;
 
     float mod = 0.f;
 
@@ -443,21 +463,322 @@ AttributesComponent* Actor::getAttributesComponent() {
 }
 
 float Actor::getHealth() {
-    if (SDK::getCurrentScreen() != "hud_screen") return 20.f;
-    auto attri = Attribute(GET_OFFSET("Attribute::Health"), "minecraft:health").mIDValue;
     auto comp = getAttributesComponent();
     if (!comp) return 20.f;
-    auto health = comp->baseAttributes.getInstance(attri);
-
-    if (!health) return 20.f;
-    return health->GetValue();
-
+    auto inst = comp->getInstance(static_cast<unsigned int>(GET_OFFSET("Attribute::Health")));
+    if (!inst) return 20.f;
+    return inst->getValue();
 }
 
 float Actor::getHunger() {
-    return getAttributesComponent()->baseAttributes.getInstance(Attribute(GET_OFFSET("Attribute::Hunger"), "minecraft:hunger").mIDValue)->GetValue();
+    auto comp = getAttributesComponent();
+    if (!comp) return 20.f;
+    auto inst = comp->getInstance(static_cast<unsigned int>(GET_OFFSET("Attribute::Hunger")));
+    if (!inst) return 20.f;
+    return inst->getValue();
 }
 
 float Actor::getSaturation() {
-    return getAttributesComponent()->baseAttributes.getInstance(Attribute(GET_OFFSET("Attribute::Saturation"), "minecraft:saturation").mIDValue)->GetValue();
+    auto comp = getAttributesComponent();
+    if (!comp) return 20.f;
+    auto inst = comp->getInstance(static_cast<unsigned int>(GET_OFFSET("Attribute::Saturation")));
+    if (!inst) return 20.f;
+    return inst->getValue();
 }
+
+int Actor::getPlayerLevel() {
+    auto comp = getAttributesComponent();
+    if (!comp) return 0;
+    auto inst = comp->getInstance(static_cast<unsigned int>(GET_OFFSET("Attribute::PlayerLevel")));
+    if (!inst) return 0;
+    return static_cast<int>(inst->getValue());
+}
+
+float Actor::getExperienceProgress() {
+    auto comp = getAttributesComponent();
+    if (!comp) return 0.f;
+    auto inst = comp->getInstance(static_cast<unsigned int>(GET_OFFSET("Attribute::PlayerExperience")));
+    if (!inst) return 0.f;
+    return inst->getValue();
+}
+
+MoveInputComponentHandler Actor::getHandler() {
+    return MoveInputComponentHandler(this);
+}
+
+// MoveInputComponentHandler implementations
+
+bool MoveInputComponentHandler::forward() {
+    if (VersionUtils::checkAboveOrEqual(21, 120)) {
+        auto* handler = actor->getMoveInputHandler();
+        return handler ? handler->mInputState.forward() : false;
+    } else {
+        auto* handler = actor->getMoveInputHandlerOLD();
+        return handler ? handler->mInputState.forward : false;
+    }
+}
+
+bool MoveInputComponentHandler::backward() {
+    if (VersionUtils::checkAboveOrEqual(21, 120)) {
+        auto* handler = actor->getMoveInputHandler();
+        return handler ? handler->mInputState.backward() : false;
+    } else {
+        auto* handler = actor->getMoveInputHandlerOLD();
+        return handler ? handler->mInputState.backward : false;
+    }
+}
+
+bool MoveInputComponentHandler::left() {
+    if (VersionUtils::checkAboveOrEqual(21, 120)) {
+        auto* handler = actor->getMoveInputHandler();
+        return handler ? handler->mInputState.left() : false;
+    } else {
+        auto* handler = actor->getMoveInputHandlerOLD();
+        return handler ? handler->mInputState.left : false;
+    }
+}
+
+bool MoveInputComponentHandler::right() {
+    if (VersionUtils::checkAboveOrEqual(21, 120)) {
+        auto* handler = actor->getMoveInputHandler();
+        return handler ? handler->mInputState.right() : false;
+    } else {
+        auto* handler = actor->getMoveInputHandlerOLD();
+        return handler ? handler->mInputState.right : false;
+    }
+}
+
+bool MoveInputComponentHandler::mSneakDown() {
+    if (VersionUtils::checkAboveOrEqual(21, 120)) {
+        auto* handler = actor->getMoveInputHandler();
+        return handler ? handler->mInputState.mSneakDown() : false;
+    } else {
+        auto* handler = actor->getMoveInputHandlerOLD();
+        return handler ? handler->mInputState.mSneakDown : false;
+    }
+}
+
+bool MoveInputComponentHandler::mSprintDown() {
+    if (VersionUtils::checkAboveOrEqual(21, 120)) {
+        auto* handler = actor->getMoveInputHandler();
+        return handler ? handler->mInputState.mSprintDown() : false;
+    } else {
+        auto* handler = actor->getMoveInputHandlerOLD();
+        return handler ? handler->mInputState.mSprintDown : false;
+    }
+}
+
+bool MoveInputComponentHandler::mJumpDown() {
+    if (VersionUtils::checkAboveOrEqual(21, 120)) {
+        auto* handler = actor->getMoveInputHandler();
+        return handler ? handler->mInputState.mJumpDown() : false;
+    } else {
+        auto* handler = actor->getMoveInputHandlerOLD();
+        return handler ? handler->mInputState.mJumpDown : false;
+    }
+}
+
+bool MoveInputComponentHandler::getSneaking() {
+    if (VersionUtils::checkAboveOrEqual(21, 120)) {
+        auto* handler = actor->getMoveInputHandler();
+        return handler ? handler->getSneaking() : false;
+    } else {
+        auto* handler = actor->getMoveInputHandlerOLD();
+        return handler ? handler->sneaking : false;
+    }
+}
+
+bool MoveInputComponentHandler::getSprinting() {
+    if (VersionUtils::checkAboveOrEqual(21, 120)) {
+        auto* handler = actor->getMoveInputHandler();
+        return handler ? handler->getSprinting() : false;
+    } else {
+        auto* handler = actor->getMoveInputHandlerOLD();
+        return handler ? handler->sprinting : false;
+    }
+}
+
+bool MoveInputComponentHandler::getJumping() {
+    if (VersionUtils::checkAboveOrEqual(21, 120)) {
+        auto* handler = actor->getMoveInputHandler();
+        return handler ? handler->getJumping() : false;
+    } else {
+        auto* handler = actor->getMoveInputHandlerOLD();
+        return handler ? handler->jumping : false;
+    }
+}
+
+void MoveInputComponentHandler::setForward(bool value) {
+    if (VersionUtils::checkAboveOrEqual(21, 120)) {
+        auto* handler = actor->getMoveInputHandler();
+        if (handler) handler->mInputState.setForward(value);
+    } else {
+        auto* handler = actor->getMoveInputHandlerOLD();
+        if (handler) handler->mInputState.forward = value;
+    }
+}
+
+void MoveInputComponentHandler::setBackward(bool value) {
+    if (VersionUtils::checkAboveOrEqual(21, 120)) {
+        auto* handler = actor->getMoveInputHandler();
+        if (handler) handler->mInputState.setBackward(value);
+    } else {
+        auto* handler = actor->getMoveInputHandlerOLD();
+        if (handler) handler->mInputState.backward = value;
+    }
+}
+
+void MoveInputComponentHandler::setLeft(bool value) {
+    if (VersionUtils::checkAboveOrEqual(21, 120)) {
+        auto* handler = actor->getMoveInputHandler();
+        if (handler) handler->mInputState.setLeft(value);
+    } else {
+        auto* handler = actor->getMoveInputHandlerOLD();
+        if (handler) handler->mInputState.left = value;
+    }
+}
+
+void MoveInputComponentHandler::setRight(bool value) {
+    if (VersionUtils::checkAboveOrEqual(21, 120)) {
+        auto* handler = actor->getMoveInputHandler();
+        if (handler) handler->mInputState.setRight(value);
+    } else {
+        auto* handler = actor->getMoveInputHandlerOLD();
+        if (handler) handler->mInputState.right = value;
+    }
+}
+
+void MoveInputComponentHandler::setMSneakDown(bool value) {
+    if (VersionUtils::checkAboveOrEqual(21, 120)) {
+        auto* handler = actor->getMoveInputHandler();
+        if (handler) handler->mInputState.setMSneakDown(value);
+    } else {
+        auto* handler = actor->getMoveInputHandlerOLD();
+        if (handler) handler->mInputState.mSneakDown = value;
+    }
+}
+
+void MoveInputComponentHandler::setMSprintDown(bool value) {
+    if (VersionUtils::checkAboveOrEqual(21, 120)) {
+        auto* handler = actor->getMoveInputHandler();
+        if (handler) handler->mInputState.setMSprintDown(value);
+    } else {
+        auto* handler = actor->getMoveInputHandlerOLD();
+        if (handler) handler->mInputState.mSprintDown = value;
+    }
+}
+
+void MoveInputComponentHandler::setMJumpDown(bool value) {
+    if (VersionUtils::checkAboveOrEqual(21, 120)) {
+        auto* handler = actor->getMoveInputHandler();
+        if (handler) handler->mInputState.setMJumpDown(value);
+    } else {
+        auto* handler = actor->getMoveInputHandlerOLD();
+        if (handler) handler->mInputState.mJumpDown = value;
+    }
+}
+
+void MoveInputComponentHandler::setSneaking(bool value) {
+    if (VersionUtils::checkAboveOrEqual(21, 120)) {
+        auto* handler = actor->getMoveInputHandler();
+        if (handler) handler->setSneaking(value);
+    } else {
+        auto* handler = actor->getMoveInputHandlerOLD();
+        if (handler) handler->sneaking = value;
+    }
+}
+
+void MoveInputComponentHandler::setSprinting(bool value) {
+    if (VersionUtils::checkAboveOrEqual(21, 120)) {
+        auto* handler = actor->getMoveInputHandler();
+        if (handler) handler->setSprinting(value);
+    } else {
+        auto* handler = actor->getMoveInputHandlerOLD();
+        if (handler) handler->sprinting = value;
+    }
+}
+
+void MoveInputComponentHandler::setJumping(bool value) {
+    if (VersionUtils::checkAboveOrEqual(21, 120)) {
+        auto* handler = actor->getMoveInputHandler();
+        if (handler) handler->setJumping(value);
+    } else {
+        auto* handler = actor->getMoveInputHandlerOLD();
+        if (handler) handler->jumping = value;
+    }
+}
+
+void MoveInputComponentHandler::setRawForward(bool value) {
+    if (VersionUtils::checkAboveOrEqual(21, 120)) {
+        auto* handler = actor->getMoveInputHandler();
+        if (handler) handler->mRawInputState.setForward(value);
+    } else {
+        auto* handler = actor->getMoveInputHandlerOLD();
+        if (handler) handler->mRawInputState.forward = value;
+    }
+}
+
+void MoveInputComponentHandler::setRawBackward(bool value) {
+    if (VersionUtils::checkAboveOrEqual(21, 120)) {
+        auto* handler = actor->getMoveInputHandler();
+        if (handler) handler->mRawInputState.setBackward(value);
+    } else {
+        auto* handler = actor->getMoveInputHandlerOLD();
+        if (handler) handler->mRawInputState.backward = value;
+    }
+}
+
+void MoveInputComponentHandler::setRawLeft(bool value) {
+    if (VersionUtils::checkAboveOrEqual(21, 120)) {
+        auto* handler = actor->getMoveInputHandler();
+        if (handler) handler->mRawInputState.setLeft(value);
+    } else {
+        auto* handler = actor->getMoveInputHandlerOLD();
+        if (handler) handler->mRawInputState.left = value;
+    }
+}
+
+void MoveInputComponentHandler::setRawRight(bool value) {
+    if (VersionUtils::checkAboveOrEqual(21, 120)) {
+        auto* handler = actor->getMoveInputHandler();
+        if (handler) handler->mRawInputState.setRight(value);
+    } else {
+        auto* handler = actor->getMoveInputHandlerOLD();
+        if (handler) handler->mRawInputState.right = value;
+    }
+}
+
+void MoveInputComponentHandler::setRawMSneakDown(bool value) {
+    if (VersionUtils::checkAboveOrEqual(21, 120)) {
+        auto* handler = actor->getMoveInputHandler();
+        if (handler) handler->mRawInputState.setMSneakDown(value);
+    } else {
+        auto* handler = actor->getMoveInputHandlerOLD();
+        if (handler) handler->mRawInputState.mSneakDown = value;
+    }
+}
+
+void MoveInputComponentHandler::setRawMSprintDown(bool value) {
+    if (VersionUtils::checkAboveOrEqual(21, 120)) {
+        auto* handler = actor->getMoveInputHandler();
+        if (handler) handler->mRawInputState.setMSprintDown(value);
+    } else {
+        auto* handler = actor->getMoveInputHandlerOLD();
+        if (handler) handler->mRawInputState.mSprintDown = value;
+    }
+}
+
+void MoveInputComponentHandler::setRawMJumpDown(bool value) {
+    if (VersionUtils::checkAboveOrEqual(21, 120)) {
+        auto* handler = actor->getMoveInputHandler();
+        if (handler) handler->mRawInputState.setMJumpDown(value);
+    } else {
+        auto* handler = actor->getMoveInputHandlerOLD();
+        if (handler) handler->mRawInputState.mJumpDown = value;
+    }
+}
+
+// Explicit template instantiations for components used outside Actor.cpp
+template ActorUniqueIDComponent* Actor::tryGet<ActorUniqueIDComponent>(uintptr_t);
+template ActorDefinitionIdentifierComponent* Actor::tryGet<ActorDefinitionIdentifierComponent>(uintptr_t);
+template MobBodyRotationComponent* Actor::tryGet<MobBodyRotationComponent>(uintptr_t);

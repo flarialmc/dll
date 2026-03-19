@@ -3,18 +3,17 @@
 #include "Events/Game/AttackEvent.hpp"
 
 void GameModeAttackHook::callback(Gamemode *gamemode, Actor *actor) {
-    if (SDK::clientInstance->getLocalPlayer() != nullptr) {
+    if (SDK::clientInstance && SDK::clientInstance->getLocalPlayer() != nullptr) {
         if (SDK::clientInstance->getLocalPlayer() == gamemode->getPlayer()) {
             auto event = nes::make_holder<AttackEvent>(actor);
             eventMgr.trigger(event);
         }
-
     }
     ((original)funcOriginal)(gamemode, actor);
 }
 
 void GameModeAttackHook::callback1_21_50(Gamemode *gamemode, Actor *actor, bool a3) {
-    if (SDK::clientInstance->getLocalPlayer() != nullptr) {
+    if (SDK::clientInstance && SDK::clientInstance->getLocalPlayer() != nullptr) {
         if (SDK::clientInstance->getLocalPlayer() == gamemode->getPlayer()) {
             auto event = nes::make_holder<AttackEvent>(actor);
             eventMgr.trigger(event);
@@ -30,7 +29,7 @@ GameModeAttackHook::GameModeAttackHook() : Hook("GameModeAttack", 0) {}
 void GameModeAttackHook::enableHook() {
     if(VersionUtils::checkAboveOrEqual(21, 50)) {
         static auto addr = GET_SIG_ADDRESS("GameMode::attack");
-        this->manualHook((void *) addr, (void *) callback, (void **) &funcOriginal);
+        this->manualHook((void *) addr, (void *) callback1_21_50, (void **) &funcOriginal);
     } else {
         static auto base = GET_SIG_ADDRESS("GameMode::vtable");
         int offset = *reinterpret_cast<int *>(base + 3);

@@ -12,16 +12,20 @@
 #include <devguid.h>
 #include <devpkey.h>
 
+#ifdef __DEBUG__
+#include "glm/glm/trigonometric.hpp"
+#endif
 #include "DebugMenu.hpp"
 #include "Tags.hpp"
 #include "Modules/Time/Time.hpp"
 #include "Modules/CPS/CPSCounter.hpp"
+#include "Modules/ClickGUI/ClickGUI.hpp"
 
 #include "SDK/Client/Block/BlockLegacy.hpp"
+#include "SDK/Client/Render/Camera.hpp"
 #include "Utils/WinrtUtils.hpp"
 #include "GUI/Engine/Constraints.hpp"
 #include "Hook/Hooks/Render/DirectX/DXGI/SwapchainHook.hpp"
-#include "Modules/Subtitles/Subtitles.hpp"
 #include "Utils/Utils.hpp"
 
 
@@ -34,6 +38,10 @@ void JavaDebugMenu::onEnable() {
     Listen(this, HudCursorRendererRenderEvent, &JavaDebugMenu::onHudCursorRendererRender)
     Listen(this, SetTopScreenNameEvent, &JavaDebugMenu::onSetTopScreenName)
     Listen(this, PerspectiveEvent, &JavaDebugMenu::onGetViewPerspective)
+    Listen(this, SoundEnginePlayEvent, &JavaDebugMenu::onSoundEnginePlay)
+#ifdef __DEBUG__
+    Listen(this, SomeCameraRelatedEvent, &JavaDebugMenu::onCameraRelated)
+#endif
     Module::onEnable();
 }
 
@@ -46,6 +54,10 @@ void JavaDebugMenu::onDisable() {
     Deafen(this, HudCursorRendererRenderEvent, &JavaDebugMenu::onHudCursorRendererRender)
     Deafen(this, SetTopScreenNameEvent, &JavaDebugMenu::onSetTopScreenName)
     Deafen(this, PerspectiveEvent, &JavaDebugMenu::onGetViewPerspective)
+    Deafen(this, SoundEnginePlayEvent, &JavaDebugMenu::onSoundEnginePlay)
+#ifdef __DEBUG__
+    Deafen(this, SomeCameraRelatedEvent, &JavaDebugMenu::onCameraRelated)
+#endif
     Module::onDisable();
 }
 
@@ -102,6 +114,10 @@ void JavaDebugMenu::defaultConfig() {
     setDef("showMaxTags", true);
     setDef("noOfTags", 10);
 
+#ifdef __DEBUG__
+    setDef("showBlock12", false); // mce::Camera debug
+#endif
+
     setDef("showFTgraph", true);
     setDef("showMinMaxFT", true);
     setDef("showThreshold", true);
@@ -114,7 +130,7 @@ void JavaDebugMenu::settingsRender(float settingsOffset) {
     initSettingsPage();
 
     addHeader("Main");
-    addKeybind("Keybind", "Hold for 2 seconds!", "keybind", true);
+    addKeybind("Keybind", "", "keybind", true);
     addSlider("UI Scale", "", "uiscale", 2.0f);
     addToggle("Hide Modules", "", "hideModules");
     addSlider("Rounding", "Rounding of the rectangle", "rounding", 100, 0, false);
@@ -174,6 +190,10 @@ void JavaDebugMenu::settingsRender(float settingsOffset) {
     addConditionalToggle(c && getOps<bool>("showBlock11"), "Show Targeted Block Tags", "", "showTargetedBlockTags");
     addConditionalToggle(c && getOps<bool>("showBlock11") && getOps<bool>("showTargetedBlockTags"), "Show Max Tags", "", "showMaxTags");
     addConditionalSliderInt(c && getOps<bool>("showBlock11") && getOps<bool>("showTargetedBlockTags") && !getOps<bool>("showMaxTags"), "Number Of Tags To Be Show", "", "noOfTags", 20, 1);
+
+#ifdef __DEBUG__
+    addConditionalToggle(c, "Block 12", "mce::Camera Debug", "showBlock12");
+#endif
 
     FlarialGUI::UnsetScrollView();
     resetPadding();
@@ -238,7 +258,19 @@ std::wstring JavaDebugMenu::GetCpuName() {
 
     SetupDiDestroyDeviceInfoList(handle);
 
-    return std::wstring(reinterpret_cast<PWSTR>(buffer.data()));
+    std::wstring cpuName = std::wstring{reinterpret_cast<PWSTR>(buffer.data())};
+
+    const std::wstring whitespaces = L" \n\r\t\f\v";
+
+    size_t endpos = cpuName.find_last_not_of(whitespaces);
+
+    if (std::wstring::npos != endpos) {
+        cpuName.erase(endpos + 1);
+    } else {
+        cpuName.clear();
+    }
+
+    return cpuName;
 }
 
 DWORD JavaDebugMenu::GetCpuCoreCount() {
@@ -250,8 +282,8 @@ DWORD JavaDebugMenu::GetCpuCoreCount() {
 
     GetLogicalProcessorInformation(buffer.data(), &length);
 
-    return std::count_if(buffer.begin(), buffer.end(),
-                         [](const SYSTEM_LOGICAL_PROCESSOR_INFORMATION &info) { return !info.Relationship; });
+    return std::ranges::count_if(buffer,
+                                 [](const SYSTEM_LOGICAL_PROCESSOR_INFORMATION &info) { return !info.Relationship; });
 }
 
 DWORD JavaDebugMenu::GetCpuThreadCount() {
@@ -340,9 +372,28 @@ std::string JavaDebugMenu::getFormattedTime(long long seconds) {
     return text;
 }
 
+void JavaDebugMenu::onSoundEnginePlay(SoundEnginePlayEvent &event) {
+    std::string soundDescription = SoundDescriptions::getSoundDescription(event.name);
+
+    std::erase_if(sounds, [&](const Sound &s) {
+        return s.name == event.name;
+    });
+
+    if (!event.name.empty()) {
+        sounds.emplace_back(Sound{
+            event.name,
+            event.pos,
+            "",
+            Utils::Microtime(),
+            0.0f,
+            1.0f
+        });
+    }
+}
+
 void JavaDebugMenu::onTick(TickEvent &event) {
     if (!this->isEnabled()) return;
-    if (!SDK::clientInstance->getLocalPlayer()) return;
+    if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer()) return;
 
     if (isOnBlock(4)) {
         // Speed and Velocity
@@ -359,7 +410,7 @@ void JavaDebugMenu::onTick(TickEvent &event) {
         // TPS
         TimedObj tick{};
         tick.timestamp = Utils::Microtime();
-        this->tickList.insert(this->tickList.begin(), tick);
+        JavaDebugMenu::tickList.insert(JavaDebugMenu::tickList.begin(), tick);
     }
 
     if (isOnBlock(2)) {
@@ -378,7 +429,7 @@ void JavaDebugMenu::onTick(TickEvent &event) {
 
 void JavaDebugMenu::onSetupAndRender(SetupAndRenderEvent &event) {
     if (!this->isEnabled()) return;
-    if (!SDK::clientInstance->getLocalPlayer()) return;
+    if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer()) return;
     if (!SDK::clientInstance->getLocalPlayer()->getLevel()) return;
     if (!SDK::clientInstance->getBlockSource()) return;
 
@@ -426,10 +477,19 @@ void JavaDebugMenu::onSetupAndRender(SetupAndRenderEvent &event) {
     } else {
         this->currentBreakProgress = 0.0f;
     }
+
+    if (this->isOnBlock(3) && this->isOnSetting("showSoundCounter")) {
+        double microTime = Utils::Microtime();
+        std::erase_if(sounds, [microTime](const Sound &obj) {
+            return (microTime - obj.timestamp) > 1.5f;
+        });
+    }
+
 }
 
 void JavaDebugMenu::onRender(RenderEvent &event) {
-    if (!this->isEnabled()) return;
+    if (!this->isEnabled() || ClickGUI::blurActive) return;
+    ClickGUI::HudFadeGuard fadeGuard;
     if (this->active && (SDK::getCurrentScreen() == "f3_screen" || SDK::getCurrentScreen() == "hud_screen")) {
         float uiscale = this->getOps<float>("uiscale");
         float uiscaleConst = Constraints::RelativeConstraint(0.001f * uiscale);
@@ -459,7 +519,7 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
 
         bool spoof = this->getOps<bool>("imPoorButIWannaLookRich");
 
-        if (this->versionName.empty()) this->versionName = std::format("Flarial V2, Minecraft {}", WinrtUtils::getFormattedVersion());
+        if (this->versionName.empty()) this->versionName = std::format("Flarial V2 [{}], Minecraft {}", COMMIT_HASH, WinrtUtils::getFormattedVersion());
         left.emplace_back(this->versionName);
 
         if (this->isOnBlock(1)) {
@@ -485,7 +545,7 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
             if (this->curBiome != nullptr) temp = std::format("{:.2f}", this->curBiome->gettemperature());
             left.emplace_back(std::format("E: {} T: {}", player->getLevel()->getRuntimeActorList().size(), temp));
 
-            left.emplace_back(this->getDimensionName());
+            left.emplace_back(JavaDebugMenu::getDimensionName());
 
             if (this->curBiome != nullptr) {
                 if (VersionUtils::checkAboveOrEqual(21, 100)) left.emplace_back(this->curBiome->getName());
@@ -513,7 +573,7 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
             }
 
             if (this->isOnSetting("showWeather")) {
-                std::pair<std::string, std::vector<float> > weatherInfo = this->getWeatherInfo();
+                std::pair<std::string, std::vector<float> > weatherInfo = JavaDebugMenu::getWeatherInfo();
                 if (weatherInfo.second.empty()) {
                     left.emplace_back("Weather: Unknown");
                 } else {
@@ -522,7 +582,7 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
                 }
             }
 
-            if (this->isOnSetting("showSoundCounter")) left.emplace_back(std::format("Sounds: {}", Subtitles::sounds.size()));
+            if (this->isOnSetting("showSoundCounter")) left.emplace_back(std::format("Sounds: {}", sounds.size()));
 
             left.emplace_back("");
         }
@@ -555,8 +615,8 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
                 left.emplace_back(std::format("Ping: {} ms", SDK::getServerPing()));
             }
 
-            this->updateTimedVector(this->tickList, 1.0f);
-            left.emplace_back(std::format("TPS: {}", std::to_string(this->tickList.size())));
+            JavaDebugMenu::updateTimedVector(JavaDebugMenu::tickList, 1.0f);
+            left.emplace_back(std::format("TPS: {}", std::to_string(JavaDebugMenu::tickList.size())));
         }
 
 
@@ -581,7 +641,7 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
             if (spoof) right.emplace_back("CPU: 69x Intel 9 7900X3D ProMax Plus (420 Cores)");
             else {
                 if (this->cpuName.empty()) {
-                    std::wstring temp(std::format(L"CPU: {}x {} ({} Cores)", this->GetCpuThreadCount(), this->GetCpuName(), this->GetCpuCoreCount()));
+                    std::wstring temp(std::format(L"CPU: {}x {} ({} Cores)", JavaDebugMenu::GetCpuThreadCount(), JavaDebugMenu::GetCpuName(), JavaDebugMenu::GetCpuCoreCount()));
                     this->cpuName = std::string(temp.begin(), temp.end());
                 }
                 right.emplace_back(this->cpuName);
@@ -625,22 +685,72 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
                 int maxAllowedTags = getOps<int>("noOfTags");
                 int maxFittableTags = static_cast<int>(MC::windowSize.y / (textHeight / 3.0f + yPadding * 2)) - right.size();
 
-                if (lookingAtTags.size() >= maxFittableTags && (showMax || maxAllowedTags >= maxFittableTags)) {
-                    for (int i = 0; i < maxFittableTags; i++) right.emplace_back('#' + lookingAtTags[i]);
-                    right.emplace_back(std::format("{} more tags...", lookingAtTags.size() - maxFittableTags));
-                } else if (showMax) {
-                    for (const auto &i: lookingAtTags) right.emplace_back('#' + i);
-                } else if (lookingAtTags.size() > maxAllowedTags) {
-                    for (int i = 0; i < maxAllowedTags; i++) right.emplace_back('#' + lookingAtTags[i]);
-                    right.emplace_back(std::format("{} more tags...", lookingAtTags.size() - maxAllowedTags));
-                } else {
-                    for (int i = 0; i < lookingAtTags.size(); i++) right.emplace_back('#' + lookingAtTags[i]);
+#ifdef __DEBUG__
+                if (this->isOnBlock(12)) maxFittableTags -= 22;
+#endif
+
+                if (maxFittableTags > 0) {
+                    if (lookingAtTags.size() >= maxFittableTags && (showMax || maxAllowedTags >= maxFittableTags)) {
+                        for (int i = 0; i < maxFittableTags; i++) right.emplace_back('#' + lookingAtTags[i]);
+                        right.emplace_back(std::format("{} more tags...", lookingAtTags.size() - maxFittableTags));
+                    } else if (showMax) {
+                        for (const auto &i: lookingAtTags) right.emplace_back('#' + i);
+                    } else if (lookingAtTags.size() > maxAllowedTags) {
+                        for (int i = 0; i < maxAllowedTags; i++) right.emplace_back('#' + lookingAtTags[i]);
+                        right.emplace_back(std::format("{} more tags...", lookingAtTags.size() - maxAllowedTags));
+                    } else {
+                        for (const std::string& lookingAtTag : lookingAtTags) right.emplace_back('#' + lookingAtTag);
+                    }
                 }
+
+                right.emplace_back("");
             }
         }
 
+#ifdef __DEBUG__
+        if (this->isOnBlock(12)) {
+            right.emplace_back("mce::Camera");
+            auto& camera = SDK::clientInstance->getCamera();
+            right.emplace_back(std::format("FOV: {:.2f}", camera.mFov));
+            right.emplace_back(std::format("Aspect: {:.3f}", camera.mAspectRatio));
+            right.emplace_back(std::format("ZNear: {:.4f}", camera.mZNear));
+            right.emplace_back(std::format("ZFar: {:.1f}", camera.mZFar));
+            right.emplace_back(std::format("Pos: ({:.1f}, {:.1f}, {:.1f})",
+                camera.mPosition.x, camera.mPosition.y, camera.mPosition.z));
+            right.emplace_back(std::format("Right: ({:.2f}, {:.2f}, {:.2f})",
+                camera.mRight.x, camera.mRight.y, camera.mRight.z));
+            right.emplace_back(std::format("Up: ({:.2f}, {:.2f}, {:.2f})",
+                camera.mUp.x, camera.mUp.y, camera.mUp.z));
+            right.emplace_back(std::format("Fwd: ({:.2f}, {:.2f}, {:.2f})",
+                camera.mForward.x, camera.mForward.y, camera.mForward.z));
 
-        int leftYoffset = 0.0f;
+            right.emplace_back("");
+            right.emplace_back("CameraComponent");
+            right.emplace_back(std::format("Orientation: ({:.3f}, {:.3f}, {:.3f}, {:.3f})",
+                camEventOrientation.x, camEventOrientation.y, camEventOrientation.z, camEventOrientation.w));
+            right.emplace_back(std::format("Position: ({:.1f}, {:.1f}, {:.1f})",
+                camEventPosition.x, camEventPosition.y, camEventPosition.z));
+            right.emplace_back(std::format("AspectRatio: {:.3f}", camEventAspectRatio));
+            right.emplace_back(std::format("FOV: {:.2f} rad ({:.1f} deg)", camEventFieldOfView, glm::degrees(camEventFieldOfView)));
+            right.emplace_back(std::format("NearPlane: {:.4f}  FarPlane: {:.1f}", camEventNearPlane, camEventFarPlane));
+
+            auto fmtMat4 = [&](const std::string& name, const glm::mat4& m) {
+                right.emplace_back(std::format("{}:", name));
+                for (int r = 0; r < 4; r++) {
+                    right.emplace_back(std::format("  [{:.3f}, {:.3f}, {:.3f}, {:.3f}]",
+                        m[0][r], m[1][r], m[2][r], m[3][r]));
+                }
+            };
+            fmtMat4("PostViewTransform", camEventPostViewTransform);
+            fmtMat4("SavedProjection", camEventSavedProjection);
+            fmtMat4("SavedModelView", camEventSavedModelView);
+        }
+#endif
+
+
+        float lineHeight = textHeight / 3.0f + yPadding * 2;
+
+        float leftYoffset = 0.0f;
         for (const auto &i: left) {
             if (this->getOps<bool>("showBg") && !i.empty()) {
                 float lineWidth = FlarialGUI::getFlarialTextSize(
@@ -652,16 +762,16 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
                     true
                 ).x;
                 FlarialGUI::RoundedRect(
-                    0.0f, leftYoffset - yPadding + 0.05f,
+                    0.0f, leftYoffset,
                     bgColor,
-                    lineWidth, textHeight / 3.0f + yPadding * 2 - 1.0f,
-                rounding, rounding
+                    lineWidth, lineHeight,
+                    rounding, rounding
                 );
             }
 
             if (this->getOps<bool>("textShadow"))
                 FlarialGUI::FlarialTextWithFont(
-                    textShadowOffset, leftYoffset + textShadowOffset,
+                    textShadowOffset, leftYoffset + yPadding + textShadowOffset,
                     String::StrToWStr(i).c_str(),
                     30.0f, textHeight / 3.0f,
                     DWRITE_TEXT_ALIGNMENT_LEADING,
@@ -672,7 +782,7 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
                 );
 
             FlarialGUI::FlarialTextWithFont(
-                0.0f, leftYoffset,
+                0.0f, leftYoffset + yPadding,
                 String::StrToWStr(i).c_str(),
                 30.0f, textHeight / 3.0f,
                 DWRITE_TEXT_ALIGNMENT_LEADING,
@@ -681,10 +791,10 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
                 textColor,
                 true
             );
-            leftYoffset += textHeight / 3.0f + yPadding * 2;
+            leftYoffset += lineHeight;
         }
 
-        int rightYoffset = 0.0f;
+        float rightYoffset = 0.0f;
         for (const auto &i: right) {
             if (this->getOps<bool>("showBg") && !i.empty()) {
                 float lineWidth = FlarialGUI::getFlarialTextSize(
@@ -696,16 +806,16 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
                     true
                 ).x;
                 FlarialGUI::RoundedRect(
-                    MC::windowSize.x - lineWidth, rightYoffset - yPadding + 0.05f,
+                    MC::windowSize.x - lineWidth, rightYoffset,
                     bgColor,
-                    lineWidth, textHeight / 3.0f + yPadding * 2 - 1.0f,
+                    lineWidth, lineHeight,
                     rounding, rounding
                 );
             }
 
             if (this->getOps<bool>("textShadow"))
                 FlarialGUI::FlarialTextWithFont(
-                    (MC::windowSize.x - 30.0f) + textShadowOffset, rightYoffset + textShadowOffset,
+                    (MC::windowSize.x - 30.0f) + textShadowOffset, rightYoffset + yPadding + textShadowOffset,
                     String::StrToWStr(i).c_str(),
                     30.0f, textHeight / 3.0f,
                     DWRITE_TEXT_ALIGNMENT_TRAILING,
@@ -716,7 +826,7 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
                 );
 
             FlarialGUI::FlarialTextWithFont(
-                MC::windowSize.x - 30.0f, rightYoffset,
+                MC::windowSize.x - 30.0f, rightYoffset + yPadding,
                 String::StrToWStr(i).c_str(),
                 30.0f, textHeight / 3.0f,
                 DWRITE_TEXT_ALIGNMENT_TRAILING,
@@ -725,7 +835,7 @@ void JavaDebugMenu::onRender(RenderEvent &event) {
                 textColor,
                 true
             );
-            rightYoffset += textHeight / 3.0f + yPadding * 2;
+            rightYoffset += lineHeight;
         }
 
         // other cool stuff
@@ -979,7 +1089,7 @@ void JavaDebugMenu::onHudCursorRendererRender(HudCursorRendererRenderEvent &even
             SDK::getCurrentScreen() == "hud_screen" ||
             SDK::getCurrentScreen() == "f3_screen" ||
             SDK::getCurrentScreen() == "zoom_screen"
-        ) && SDK::clientInstance->getLocalPlayer() != nullptr) {
+        ) && SDK::clientInstance && SDK::clientInstance->getLocalPlayer() != nullptr) {
         event.cancel();
     }
 }
@@ -1009,3 +1119,18 @@ void JavaDebugMenu::onGetViewPerspective(PerspectiveEvent &event) {
     if (!this->active || !this->isEnabled() || !SDK::clientInstance->getLocalPlayer()) return;
     this->curPerspective = event.getPerspective();
 }
+
+#ifdef __DEBUG__
+void JavaDebugMenu::onCameraRelated(SomeCameraRelatedEvent &event) {
+    if (!this->isEnabled()) return;
+    this->camEventOrientation = event.getOrientation();
+    this->camEventPosition = event.getPosition();
+    this->camEventAspectRatio = event.getAspectRatio();
+    this->camEventFieldOfView = event.getFieldOfView();
+    this->camEventNearPlane = event.getNearPlane();
+    this->camEventFarPlane = event.getFarPlane();
+    this->camEventPostViewTransform = event.getPostViewTransform();
+    this->camEventSavedProjection = event.getSavedProjection();
+    this->camEventSavedModelView = event.getSavedModelView();
+}
+#endif

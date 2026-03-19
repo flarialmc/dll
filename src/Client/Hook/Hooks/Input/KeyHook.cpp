@@ -3,45 +3,60 @@
 #include "../../../Client.hpp"
 #include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 #include "../../../../Utils/UserActionLogger.hpp"
-#include "../../../Module/Manager.hpp"
+#include "Hook/Hooks/Game/UnicodeWndProcHack.hpp"
 
-KeyHook::KeyHook() : Hook("key_hook", GET_SIG_ADDRESS("Keyboard::feed")) {}
-
-void KeyHook::enableHook() {
-    this->autoHook((void *) keyCallback, (void **) &funcOriginal);
+KeyHook::KeyHook() : Hook("KeyHook", GET_SIG_ADDRESS("Keyboard::feed"))
+{
 }
 
-void KeyHook::keyCallback(int key, bool state) {
+void KeyHook::enableHook()
+{
+    if (!VersionUtils::checkAboveOrEqual(21, 120))
+    {
+        this->autoHook((void *)keyCallback, (void **)&funcOriginal);
+    }
+}
+
+void KeyHook::keyCallback(int key, bool state)
+{
     keys[key] = state;
 
     auto event = nes::make_holder<KeyEvent>(key, state ? 1 : 0, keys);
 
     eventMgr.trigger(event);
 
-    // Log key press for crash telemetry (but filter hud_screen to only important keys)
-    std::string context = SDK::currentScreen.empty() ? "menu" : SDK::currentScreen;
-    bool shouldLog = true;
+    if (!event->isCancelled())
+        funcOriginal(event->getKey(), state);
+}
 
-    if (SDK::currentScreen == "hud_screen") {
-        // In hud_screen, only log if this is likely a keybind (not regular gameplay keys)
-        // Skip common gameplay keys like WASD, mouse buttons, etc.
-        shouldLog = (key >= 112 && key <= 123) || // F1-F12 keys
-                   (key >= 48 && key <= 57) ||     // Number keys 0-9
-                   (key >= 96 && key <= 105) ||    // Numpad 0-9
-                   key == 27 ||                    // ESC
-                   key == 9 ||                     // TAB
-                   key == 160 || key == 161 ||     // Shift keys
-                   key == 162 || key == 163 ||     // Ctrl keys
-                   key == 164 || key == 165;       // Alt keys
+bool KeyHook::handle(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    switch (uMsg)
+    {
+    case WM_KILLFOCUS:
+    {
+        // Clear all key states when the window loses focus (e.g. alt-tab)
+        // so modifier keys don't get "stuck" as pressed.
+        keys.fill(false);
+        return false;
+    }
+    case WM_KEYUP:
+    case WM_KEYDOWN:
+    case WM_SYSKEYUP:
+    case WM_SYSKEYDOWN:
+    {
+        bool pressed = uMsg == WM_KEYDOWN || uMsg == WM_SYSKEYDOWN;
 
-        if (shouldLog) {
-            context += "_potential_keybind";
-        }
+        if (pressed && (lParam & (1LL << 30)))
+            return false; // Ignore repeats, don't block
+
+        keys[wParam] = pressed;
+        auto event = nes::make_holder<KeyEvent>(wParam, pressed, keys);
+        eventMgr.trigger(event);
+
+        return event->isCancelled();
+    }
     }
 
-    if (shouldLog) {
-        UserActionLogger::logKeyPress(key, state, context);
-    }
-
-    if (!event->isCancelled()) funcOriginal(event->getKey(), state);
+    return false; // Not a key message, don't block
 }

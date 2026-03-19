@@ -23,7 +23,7 @@ void DisableMouseWheel::defaultConfig() {
 void DisableMouseWheel::settingsRender(float settingsOffset) {
     initSettingsPage();
 
-    addKeybind("Keybind", "Hold for 2 seconds!", "keybind", true);
+    addKeybind("Keybind", "", "keybind", true);
 
     FlarialGUI::UnsetScrollView();
 
@@ -31,7 +31,12 @@ void DisableMouseWheel::settingsRender(float settingsOffset) {
 }
 
 void DisableMouseWheel::onMouse(MouseEvent &event) {
-    if (this->isEnabled() && event.getButton() == MouseButton::Scroll && SDK::getCurrentScreen() == "hud_screen" && disableScrolling)
+    if (
+        this->isEnabled() &&
+        event.getButton() == MouseButton::Scroll &&
+        disableScrolling &&
+        (SDK::getCurrentScreen() == "hud_screen" || SDK::getCurrentScreen() == "zoom_screen" || SDK::getCurrentScreen() == "f3_screen")
+    )
         event.setCancelled(true);
 }
 

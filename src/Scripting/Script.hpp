@@ -3,6 +3,9 @@
 #include <lua.hpp>
 #include <Utils/Logger/Logger.hpp>
 #include <SDK/SDK.hpp>
+#include <functional>
+#include <vector>
+#include <mutex>
 
 #define ADD_ERROR_MESSAGE(msg) \
 do { \
@@ -45,10 +48,19 @@ public:
 
     std::recursive_mutex eventMutex;
 
+    // Queue a callback to be executed on the game thread during the next event dispatch.
+    // Safe to call from any thread.
+    void queueCallback(std::function<void(lua_State*)> cb) {
+        std::lock_guard lock(mPendingMutex);
+        mPendingCallbacks.push_back(std::move(cb));
+    }
+
     template <typename... Args>
     void registerEvent(const std::string& eventName, Args&&... args) {
         std::lock_guard lock(eventMutex);
         if (mIsDestroyed) return;
+
+        processPendingCallbacks();
 
         lua_getglobal(mState, "eventHandlers");
         if (!lua_istable(mState, -1)) {
@@ -88,6 +100,8 @@ public:
     bool registerCancellableEvent(const std::string& eventName, Args&&... args) {
         std::lock_guard lock(eventMutex);
         if (mIsDestroyed) return false;
+
+        processPendingCallbacks();
 
         bool cancelled = false;
 
@@ -143,4 +157,23 @@ private:
     std::string mDescription;
     std::string mAuthor = "Unknown";
     bool mDebug = false;
+
+    // Async callback queue — populated by background threads, drained on game thread
+    std::mutex mPendingMutex;
+    std::vector<std::function<void(lua_State*)>> mPendingCallbacks;
+
+    // Must be called while eventMutex is held
+    void processPendingCallbacks() {
+        std::vector<std::function<void(lua_State*)>> callbacks;
+        {
+            std::lock_guard lock(mPendingMutex);
+            if (mPendingCallbacks.empty()) return;
+            callbacks.swap(mPendingCallbacks);
+        }
+        for (auto& cb : callbacks) {
+            if (!mIsDestroyed && mState) {
+                cb(mState);
+            }
+        }
+    }
 };

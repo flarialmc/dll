@@ -49,6 +49,15 @@ public:
 
     static void DX12Init();
 
+    // Re-hook Present from a live swapchain's vtable.
+    // Called from create-swapchain hooks to ensure we intercept the game's actual Present,
+    // not a dummy vtable address from kiero that may differ on some systems.
+    static void rehookPresentFromSwapchain(IDXGISwapChain* pSwapChain);
+
+    // Better Frames: Force DX11 fallback immediately (for UI button)
+    static bool canForceDX11Fallback();  // Returns true if we're on DX12 and haven't fallen back yet
+    static void forceDX11Fallback();     // Triggers RemoveDevice() to force DX11 fallback
+
     static winrt::com_ptr<ID3D11Texture2D> GetBackbuffer();
     static void SaveBackbuffer(bool underui = false);
     static void InitializeBackbufferStorage(int maxFrames);
@@ -59,12 +68,12 @@ public:
     typedef HRESULT(__thiscall *SwapchainOriginal)(IDXGISwapChain3 *, UINT, UINT);
 
     static SwapchainOriginal funcOriginal;
-    static bool init;
+    static std::atomic<bool> init;
     static bool recreate;
     static bool isDX12;
 
     SwapchainHook();
-    static bool initImgui;
+    static std::atomic<bool> initImgui;
     static std::atomic<bool> imguiCleanupInProgress;
     static int dx12FrameCount;
 
@@ -83,7 +92,11 @@ public:
     static int currentBackbufferIndex;
     static int currentBackbufferIndexUnderUI;
     static int maxBackbufferFrames;
+    static int validBackbufferFrames;        // How many frames have been saved to storage
+    static int validBackbufferFramesUnderUI; // How many frames have been saved to underUI storage
     static winrt::com_ptr<ID3D11Texture2D> ExtraSavedD3D11BackBuffer;
+    static std::mutex imguiInputMutex; // Protects ImGui input queue from concurrent access between render and input threads
+    static std::mutex backbufferMutex; // Protects SavedD3D11BackBuffer and ExtraSavedD3D11BackBuffer
     static UINT lastBackbufferWidth;
     static UINT lastBackbufferHeight;
 

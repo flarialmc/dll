@@ -1,5 +1,6 @@
 #include "CustomCrosshair.hpp"
 #include "Client.hpp"
+#include "Modules/ClickGUI/ClickGUI.hpp"
 
 #include "Utils/Render/PositionUtils.hpp"
 
@@ -122,7 +123,9 @@ void CustomCrosshair::onHudCursorRendererRender(HudCursorRendererRenderEvent &ev
 
     auto renderInThirdPerson = settings.getSettingByName<bool>("renderInThirdPerson")->value;
     if (!renderInThirdPerson && currentPerspective != Perspective::FirstPerson) return;
-    bool isHoveringEnemy = (player->getLevel()->getHitResult().type == HitResultType::Entity);
+    auto level = player->getLevel();
+    if (!level) return;
+    bool isHoveringEnemy = (level->getHitResult().type == HitResultType::Entity);
 
     bool isDefault = !settings.getSettingByName<bool>("CustomCrosshair")->value;
 
@@ -196,6 +199,10 @@ void CustomCrosshair::onHudCursorRendererRender(HudCursorRendererRenderEvent &ev
         IntRectangle rect = IntRectangle(pos.x, pos.y, size.x, size.y);
         ScreenRenderer::blit(screenContext, &ptr, &rect, material);
     } else {
+        if (!ptr2.clientTexture || !ptr2.clientTexture->clientTexture.resourcePointerBlock) {
+            CurrentLoadedCrosshairName = "";
+            return;
+        }
         size = size.mul(scale);
         tess->vertexUV(pos.x, pos.y + size.y, 0.f, 0.f, 1.f);
         tess->vertexUV(pos.x + size.x, pos.y + size.y, 0.f, 1.f, 1.f);
@@ -209,17 +216,23 @@ void CustomCrosshair::onHudCursorRendererRender(HudCursorRendererRenderEvent &ev
 
 void CustomCrosshair::onRender(RenderEvent &event) {
     if (!this->isEnabled()) return;
+
+    // Always allow the editor window to render (it's an intentional UI panel),
+    // but skip normal crosshair logic when blur is active.
+    if (actuallyRenderWindow) {
+        CrosshairEditorWindow();
+    } else {
+        blankWindow = false;
+    }
+    actuallyRenderWindow = false;
+
+    if (ClickGUI::blurActive) return;
+    ClickGUI::HudFadeGuard fadeGuard;
     static std::string lastScreenName = "";
     if (lastScreenName != SDK::currentScreen)
     {
         lastScreenName = SDK::currentScreen;
         CurrentLoadedCrosshairName = "";
     }
-    if (actuallyRenderWindow)
-        CrosshairEditorWindow();
-    else {
-        blankWindow = false;
-    }
-    actuallyRenderWindow = false;
     if (!blankWindow) CurrentSelectedCrosshair = settings.getSettingByName<std::string>("CurrentCrosshair")->value;
 }

@@ -4,7 +4,7 @@
 
 class ClearChat : public Module {
 public:
-    ClearChat() : Module("Clear Chat", "Clears the chat from the screen.",
+    ClearChat() : Module("Clear Chat", "Clears the chat\'s background",
         IDR_CLEARBG_PNG, "") {
     }
 

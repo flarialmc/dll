@@ -86,7 +86,7 @@ public:
             bool success = _composeFullStackHook::resourcePackManagerLoad(_composeFullStackHook::resourcePackManager, location, out);
             if (success && !out.empty()) {
                 if (VersionUtils::checkAboveOrEqual(21, 100)) event.result->assign(out);
-                    else event.retstr->assign(out);
+                else event.retstr->assign(out);
 
                 Logger::custom(fg(fmt::color::green), "MaterialBinLoader", "Successfully loaded: {}", binPath);
             }

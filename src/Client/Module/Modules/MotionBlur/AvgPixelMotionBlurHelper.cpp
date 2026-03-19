@@ -62,13 +62,11 @@ bool AvgPixelMotionBlurHelper::Initialize()
     HRESULT hr;
     ID3DBlob* vsBlob = nullptr;
     ID3DBlob* psBlob = nullptr;
-    Logger::debug("ye");
 
     if (!CompileShader(drawTextureVertexShaderSrc, "mainVS", "vs_5_0", &vsBlob))
         return false;
     ID3D11Device* m_device = SwapchainHook::d3d11Device.get();
     if (!m_device) { Logger::debug("Device is nullptr"); return false;}
-    Logger::debug("ye");
     hr = m_device->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), nullptr, m_vertexShader.put());
     if (FAILED(hr))
     {

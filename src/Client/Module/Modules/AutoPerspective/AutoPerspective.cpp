@@ -46,6 +46,7 @@ void AutoPerspective::settingsRender(float settingsOffset) {
 void AutoPerspective::onGetViewPerspective(PerspectiveEvent& event) {
         if (this->isEnabled()) {
             auto Player = SDK::clientInstance->getLocalPlayer();
+            if (!Player) return;
             std::string Mode = "";
 
             if (Player->getActorFlag(FLAG_RIDING)) { //Couldn't get this to work for some reason :heartbreak:
