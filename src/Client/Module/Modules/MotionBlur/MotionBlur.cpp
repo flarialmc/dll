@@ -30,7 +30,6 @@ void MotionBlur::onDisable() {
     frameTimestamps.clear();
     SwapchainHook::CleanupBackbufferStorage();
     RealMotionBlurHelper::Reset(); // Reset motion blur state to prevent stale matrix issues
-    OnixMotionBlurHelper::Reset();
     Module::onDisable();
 }
 

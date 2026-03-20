@@ -2,7 +2,6 @@
 
 #include "AvgPixelMotionBlurHelper.hpp"
 #include "RealMotionBlurHelper.hpp"
-#include "OnixMotionBlurHelper.hpp"
 #include "../Module.hpp"
 #include "Events/Render/RenderUnderUIEvent.hpp"
 #include "Events/Render/RenderEvent.hpp"
@@ -13,7 +12,6 @@
 class MotionBlur : public Module {
 public:
 	static inline bool initted = false;
-	static inline bool onixMotionBlurInitialized = false;
 
 	MotionBlur(): Module("Motion Blur",
 		 "Make fast movements appear smoother and more realistic by\nblurring the image slightly in the direction of motion.",

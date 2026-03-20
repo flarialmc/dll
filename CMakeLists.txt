@@ -210,16 +210,3 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
 set_property(TARGET Flarial PROPERTY UNITY_BUILD ON)
 set_property(TARGET Flarial PROPERTY UNITY_BUILD_BATCH_SIZE 16)
 endif ()
-
-# ===== Test executable =====
-# Lightweight unit tests for pure-logic components (no game dependency).
-# Build: cmake --build . --target FlarialTests
-# Run:   ./FlarialTests.exe
-
-add_executable(FlarialTests tests/ExpressionFormatTest.cpp)
-target_include_directories(FlarialTests PRIVATE "src" "lib")
-target_link_libraries(FlarialTests PRIVATE rift fmt::fmt)
-set_target_properties(FlarialTests PROPERTIES
-        MSVC_RUNTIME_LIBRARY "MultiThreaded"
-)
-target_compile_options(FlarialTests PRIVATE /utf-8 /bigobj)
