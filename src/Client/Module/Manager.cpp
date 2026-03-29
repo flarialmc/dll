@@ -133,6 +133,7 @@
 #include "Modules/PitchDisplay/PitchDisplay.hpp"
 #include "Modules/ExperienceInfo/ExperienceInfo.hpp"
 #include "Modules/DurabilityWarning/DurabilityWarning.hpp"
+#include "Modules/Misc/DynamicFPS/DynamicFPS.hpp"
 // #include "Modules/PanoramaShader/PanoramaShader.hpp"  // Uses CubemapBackgroundScreenRenderHook (render thread safe)
 
 #ifdef COMPILE_DOOM
