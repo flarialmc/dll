@@ -356,7 +356,8 @@ void DepthOfFieldHelper::RenderDepthOfField(ID3D11RenderTargetView* pDstRenderTa
     auto backbuffer = SwapchainHook::GetBackbuffer();
     if (intensity <= 0 || !backbuffer || !pDepthMapSRV) return;
 
-    winrt::com_ptr<ID3D11ShaderResourceView> pOrigShaderResourceView = MotionBlur::BackbufferToSRVExtraMode();
+    // DepthOfField renders during RenderUnderUIEvent, so read from the underUI backbuffer pool
+    winrt::com_ptr<ID3D11ShaderResourceView> pOrigShaderResourceView = MotionBlur::BackbufferToSRVExtraMode(true);
     if (!pOrigShaderResourceView) return;
 
     winrt::com_ptr<ID3D11DeviceContext> pContext = SwapchainHook::context;

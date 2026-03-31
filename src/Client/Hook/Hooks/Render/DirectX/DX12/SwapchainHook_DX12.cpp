@@ -377,8 +377,17 @@ void SwapchainHook::DX12Blur() {
 
     /* Blur Stuff */
     prepareBlur();
-    if (FlarialGUI::inMenu) FlarialGUI::needsBackBuffer = true;
-    else FlarialGUI::needsBackBuffer = false;
+    bool needsBuffer = FlarialGUI::inMenu;
+    if (ModuleManager::initialized) {
+        auto motionBlurModule = ModuleManager::getModule("Motion Blur");
+        auto depthOfFieldModule = ModuleManager::getModule("Depth Of Field");
+        auto fovChangerModule = ModuleManager::getModule("FOV Changer");
+
+        if (motionBlurModule && motionBlurModule->isEnabled()) needsBuffer = true;
+        if (depthOfFieldModule && depthOfFieldModule->isEnabled()) needsBuffer = true;
+        if (fovChangerModule && fovChangerModule->isEnabled() && fovChangerModule->getOps<bool>("panini")) needsBuffer = true;
+    }
+    FlarialGUI::needsBackBuffer = needsBuffer;
     /* Blur End */
 
 }

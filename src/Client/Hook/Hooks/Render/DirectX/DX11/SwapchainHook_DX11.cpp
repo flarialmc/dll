@@ -192,36 +192,42 @@ void SwapchainHook::_DX11RenderUnderUI()
     if (ModuleManager::initialized) {
         auto motionBlurModule = ModuleManager::getModule("Motion Blur");
         auto depthOfFieldModule = ModuleManager::getModule("Depth Of Field");
+        auto fovChangerModule = ModuleManager::getModule("FOV Changer");
 
         bool needsBuffer = FlarialGUI::inMenu;
         if (motionBlurModule && motionBlurModule->isEnabled()) needsBuffer = true;
         if (depthOfFieldModule && depthOfFieldModule->isEnabled()) needsBuffer = true;
+        if (fovChangerModule && fovChangerModule->isEnabled() && fovChangerModule->getOps<bool>("panini")) needsBuffer = true;
 
         FlarialGUI::needsBackBuffer = needsBuffer;
     }
 
     SaveBackbuffer(true);
 
-    /*
-    static UINT lastBufferWidth = 0, lastBufferHeight = 0;
+    // Ensure cachedDX11RTV exists and matches the current backbuffer dimensions.
+    // This was previously commented out, causing event->RTV to be null on the
+    // first frame and after any resize — breaking all UnderUI post-process modules.
+    {
+        static UINT lastUnderUIWidth = 0, lastUnderUIHeight = 0;
 
-    winrt::com_ptr<ID3D11Texture2D> backBuffer;
-    if (FAILED(swapchain->GetBuffer(0, IID_PPV_ARGS(backBuffer.put())))) {
-         return;/
-    }
-
-    D3D11_TEXTURE2D_DESC desc;
-    backBuffer->GetDesc(&desc);
-
-    if (!cachedDX11RTV.get() || desc.Width != lastBufferWidth || desc.Height != lastBufferHeight) {
-        cachedDX11RTV = nullptr;
-        if (FAILED(d3d11Device->CreateRenderTargetView(backBuffer.get(), nullptr, cachedDX11RTV.put()))) {
+        winrt::com_ptr<ID3D11Texture2D> backBuffer;
+        if (FAILED(swapchain->GetBuffer(0, IID_PPV_ARGS(backBuffer.put())))) {
             return;
         }
-        lastBufferWidth = desc.Width;
-        lastBufferHeight = desc.Height;
+
+        D3D11_TEXTURE2D_DESC desc;
+        backBuffer->GetDesc(&desc);
+
+        if (!cachedDX11RTV.get() || desc.Width != lastUnderUIWidth || desc.Height != lastUnderUIHeight) {
+            cachedDX11RTV = nullptr;
+            if (FAILED(d3d11Device->CreateRenderTargetView(backBuffer.get(), nullptr, cachedDX11RTV.put()))) {
+                return;
+            }
+            lastUnderUIWidth = desc.Width;
+            lastUnderUIHeight = desc.Height;
+        }
     }
-*/
+
     winrt::com_ptr<ID3D11RenderTargetView> originalRTV[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT];
     winrt::com_ptr<ID3D11DepthStencilView> originalDSV = nullptr;
 
@@ -235,37 +241,16 @@ void SwapchainHook::_DX11RenderUnderUI()
     }
     originalDSV.attach(dsv);
 
-
-    /*
-    D2D::context->BeginDraw();
-
-    ImGui_ImplDX11_NewFrame();
-    ImGui_ImplWin32_NewFrame();
-    ImGui::NewFrame();
-
-    ImGui::Begin("t", nullptr,
-        ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
-        ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground |
-        ImGuiWindowFlags_NoDecoration);
-
-*/
-
     auto event = nes::make_holder<RenderUnderUIEvent>();
     event->RTV = cachedDX11RTV.get();
     eventMgr.trigger(event);
 
-    /* At the moment, Flarial does not utilize ImGui under ui.
-     * Even if you uncomment the following lines, it won't work,
-     * Something special needs to be done.
-    D2D::context->EndDraw();
-
-    ImGui::End();
-    ImGui::EndFrame();
-    ImGui::Render();
-
-    ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-    */
-
+    // NOTE: ImGui is NOT available during RenderUnderUIEvent.
+    // Modules that need to render here must use raw D3D11 draw calls
+    // (like RealMotionBlurHelper, DepthOfFieldHelper, PaniniProjectionHelper).
+    // ImGui-based rendering (e.g. MotionBlur's ImageWithOpacity for Average/Ghost/V4
+    // blur types) will silently do nothing because there is no active ImGui frame.
+    // Starting an ImGui frame here would conflict with the one in _DX11Render().
 
     ID3D11RenderTargetView* restoreRTVs[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT] = {};
     for (UINT i = 0; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; i++) {
@@ -287,10 +272,12 @@ void SwapchainHook::DX11Blur() {
     if (ModuleManager::initialized) {
         auto motionBlurModule = ModuleManager::getModule("Motion Blur");
         auto depthOfFieldModule = ModuleManager::getModule("Depth Of Field");
+        auto fovChangerModule = ModuleManager::getModule("FOV Changer");
 
         bool needsBuffer = FlarialGUI::inMenu;
         if (motionBlurModule && motionBlurModule->isEnabled()) needsBuffer = true;
         if (depthOfFieldModule && depthOfFieldModule->isEnabled()) needsBuffer = true;
+        if (fovChangerModule && fovChangerModule->isEnabled() && fovChangerModule->getOps<bool>("panini")) needsBuffer = true;
 
         FlarialGUI::needsBackBuffer = needsBuffer;
     }
