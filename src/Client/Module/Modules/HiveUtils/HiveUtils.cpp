@@ -8,11 +8,13 @@
 #include "SDK/Client/Network/Packet/ModalFormRequestPacket.hpp"
 #include "SDK/Client/Network/Packet/ModalFormResponsePacket.hpp"
 #include "SDK/Client/Network/Packet/TextPacket.hpp"
+
 #include "Utils/HiveMaps.hpp"
 #include <json/json.hpp>
 #include <set>
+#include <chrono>
+#include <unordered_map>
 
-// For custom inline button rendering
 #include "../ClickGUI/ClickGUI.hpp"
 #include "Client/GUI/Engine/Engine.hpp"
 #include "Client/GUI/Engine/Constraints.hpp"
@@ -61,14 +63,14 @@ void HiveUtils::defaultConfig()
     setDef("partyaccept", false);
     setDef("deathcountenabled", false);
     setDef("deathcount", 5);
-
-    // Auto Map Vote settings :3
     setDef("autoMapVote", false);
     setDef("autoMapVoteNotify", true);
     setDef("announceVote", false);
     setDef("announceVoteMessage", (std::string)"@here vote for {map}!");
-    setDef("mapvote_selected_game", (std::string)"BedWars"); // Default game for settings UI
-    // Map preferences are created on-demand when the user adds maps for each game+variant
+    setDef("mapvote_selected_game", (std::string)"BedWars");
+    setDef("playerAvoider", false);
+    setDef("playerAvoiderList", (std::string)"");
+    setDef("playerAvoiderCooldown", 5);
 }
 
 void HiveUtils::settingsRender(float settingsOffset)
@@ -76,7 +78,6 @@ void HiveUtils::settingsRender(float settingsOffset)
     initSettingsPage();
     addHeader("General");
     addToggle("Use /hub instead of /q", "", "hub");
-    // this->addDropdown("Command to use", "Command to execute when somthing gets triggered",  std::vector<std::string>{"Re-Q same game", "Q a Random game", "Go back to the hub"}, getOps<std::string>("commandtouse"));
 
     addHeader("Auto Re Q");
     addToggle("Auto re-queue ", "Find a new game when the current game is over", "ReQ");
@@ -92,9 +93,7 @@ void HiveUtils::settingsRender(float settingsOffset)
               "Automatically finds you a new game when a specific map has won the vote",
               "AutoMapAvoider");
 
-    // Map avoider uses the same game/variant selection and map list as auto vote
     if (getOps<bool>("AutoMapAvoider")) {
-        // Base game options (same as auto vote)
         static const std::vector<std::string> avoiderGameOptions = {
             "BedWars", "SkyWars", "Treasure Wars", "Survival Games",
             "Death Run", "Hide and Seek", "Murder Mystery",
@@ -118,7 +117,6 @@ void HiveUtils::settingsRender(float settingsOffset)
         addDropdown("Game", "Select game to configure avoided maps",
                     avoiderGameOptions, "mapavoid_selected_game", false);
 
-        // Get the selected base game
         std::string selectedAvoiderBase = "bed";
         auto* selectedAvoiderGameSetting = settings.getSettingByName<std::string>("mapavoid_selected_game");
         if (selectedAvoiderGameSetting) {
@@ -130,7 +128,6 @@ void HiveUtils::settingsRender(float settingsOffset)
             }
         }
 
-        // Show variant dropdown if this game has variants
         auto avoiderVariantIt = avoiderGameVariants.find(selectedAvoiderBase);
         if (avoiderVariantIt != avoiderGameVariants.end()) {
             setDef("mapavoid_selected_variant", (std::string)"Solos");
@@ -146,7 +143,6 @@ void HiveUtils::settingsRender(float settingsOffset)
             selectedGameForAvoider = selectedAvoiderBase;
         }
 
-        // Refresh maps button
         std::string avoiderApiGameId = HiveMaps::gameIdToApiFormat(selectedGameForAvoider);
         bool avoiderRefreshing = HiveMaps::isRefreshInProgress(avoiderApiGameId);
         addButton(avoiderRefreshing ? "Refreshing..." : "Refresh Maps",
@@ -159,19 +155,14 @@ void HiveUtils::settingsRender(float settingsOffset)
             }
         });
 
-        // If we haven't fetched maps yet, trigger a fetch
-        // Only trigger a NEW async refresh when the game changes or cache is empty (not during/after refresh)
         bool avoiderJustCompleted = wasAvoiderRefreshing && !avoiderRefreshing;
         wasAvoiderRefreshing = avoiderRefreshing;
         if (lastFetchedAvoiderGame != selectedGameForAvoider || currentAvoiderMaps.empty()) {
-            // Game changed or no maps - need to refresh
             refreshMapsForAvoider(selectedGameForAvoider);
         } else if (avoiderJustCompleted) {
-            // Refresh just completed - only update local maps from cache, don't trigger new refresh
             updateAvoiderMapsFromCache(selectedGameForAvoider);
         }
 
-        // Get current avoided maps
         auto avoidedMaps = getAvoidedMaps(selectedGameForAvoider);
 
         extraPadding();
@@ -180,7 +171,6 @@ void HiveUtils::settingsRender(float settingsOffset)
         if (avoidedMaps.empty()) {
             addElementText("No avoided maps set", "Add maps from the list below");
         } else {
-            // Show avoided maps with Remove button
             for (size_t i = 0; i < avoidedMaps.size(); i++) {
                 std::string mapName = avoidedMaps[i];
                 addButton(mapName, "Click to remove from avoided maps", "Remove", [this, mapName] {
@@ -189,7 +179,6 @@ void HiveUtils::settingsRender(float settingsOffset)
             }
         }
 
-        // Show available maps that aren't avoided yet
         extraPadding();
         addHeader("Available Maps");
 
@@ -256,23 +245,19 @@ void HiveUtils::settingsRender(float settingsOffset)
               "Announcement Message", "Use {map} as placeholder for the map name",
               64, "announceVoteMessage");
 
-    // Game selector dropdown for map preferences :3
     if (getOps<bool>("autoMapVote")) {
-        // Base game options (no variants in main dropdown)
         static const std::vector<std::string> gameOptions = {
             "BedWars", "SkyWars", "Treasure Wars", "Survival Games",
             "Death Run", "Hide and Seek", "Murder Mystery",
             "Capture The Flag", "Block Drop", "Ground Wars",
             "Build Battle", "The Bridge", "Gravity"
         };
-        // Base game IDs
         static const std::vector<std::string> gameIds = {
             "bed", "sky", "wars", "sg",
             "dr", "hide", "murder",
             "ctf", "drop", "ground",
             "build", "bridge", "grav"
         };
-        // Which games have variants (and their variant options)
         static const std::map<std::string, std::vector<std::string>> gameVariants = {
             {"bed", {"Solos", "Duos", "Squads", "Mega"}},
             {"sky", {"Solos", "Duos", "Squads", "Mega", "Royale"}},
@@ -283,7 +268,6 @@ void HiveUtils::settingsRender(float settingsOffset)
         addDropdown("Game", "Select game to configure",
                     gameOptions, "mapvote_selected_game", false);
 
-        // Get the selected base game
         std::string selectedBaseGame = "bed";
         auto* selectedGameSetting = settings.getSettingByName<std::string>("mapvote_selected_game");
         if (selectedGameSetting) {
@@ -295,27 +279,22 @@ void HiveUtils::settingsRender(float settingsOffset)
             }
         }
 
-        // Show variant dropdown if this game has variants
         auto variantIt = gameVariants.find(selectedBaseGame);
         if (variantIt != gameVariants.end()) {
-            // Ensure variant setting exists
             setDef("mapvote_selected_variant", (std::string)"Solos");
 
             addDropdown("Variant", "Select game variant",
                         variantIt->second, "mapvote_selected_variant", false);
 
-            // Build full game ID from base + variant
             auto* variantSetting = settings.getSettingByName<std::string>("mapvote_selected_variant");
             std::string variant = variantSetting ? variantSetting->value : "Solos";
             std::string variantLower = variant;
             std::transform(variantLower.begin(), variantLower.end(), variantLower.begin(), ::tolower);
             selectedGameForPrefs = selectedBaseGame + "-" + variantLower;
         } else {
-            // No variants for this game
             selectedGameForPrefs = selectedBaseGame;
         }
 
-        // Refresh button
         std::string prefsApiGameId = HiveMaps::gameIdToApiFormat(selectedGameForPrefs);
         bool prefsRefreshing = HiveMaps::isRefreshInProgress(prefsApiGameId);
         addButton(prefsRefreshing ? "Refreshing..." : "Refresh Maps",
@@ -328,18 +307,13 @@ void HiveUtils::settingsRender(float settingsOffset)
             }
         });
 
-        // Get current preferences
         auto prefs = getMapPreferences(selectedGameForPrefs);
 
-        // If we haven't fetched maps yet, trigger a fetch
-        // Only trigger a NEW async refresh when the game changes or cache is empty (not during/after refresh)
         bool prefsJustCompleted = wasPrefsRefreshing && !prefsRefreshing;
         wasPrefsRefreshing = prefsRefreshing;
         if (lastFetchedGame != selectedGameForPrefs || currentGameMaps.empty()) {
-            // Game changed or no maps - need to refresh
             refreshMapsForGame(selectedGameForPrefs);
         } else if (prefsJustCompleted) {
-            // Refresh just completed - only update local maps from cache, don't trigger new refresh
             updatePrefsMapsFromCache(selectedGameForPrefs);
         }
 
@@ -349,29 +323,25 @@ void HiveUtils::settingsRender(float settingsOffset)
         if (prefs.empty()) {
             addElementText("No preferred maps set", "Add maps from the list below");
         } else {
-            // Show preferred maps with action dropdown
             for (size_t i = 0; i < prefs.size(); i++) {
                 std::string mapName = prefs[i];
                 std::string label = "#" + std::to_string(i + 1) + ": " + mapName;
                 std::string actionKey = "mapvote_action_" + selectedGameForPrefs + "_" + std::to_string(i);
 
-                // Build action options based on position
                 std::vector<std::string> actions;
                 actions.push_back("Choose action");
                 if (i > 0) actions.push_back("Move Up");
                 if (i < prefs.size() - 1) actions.push_back("Move Down");
                 actions.push_back("Remove");
 
-                // Ensure the setting exists with default value
                 setDef(actionKey, (std::string)"Choose action");
 
                 addDropdown(label, "", actions, actionKey, false);
 
-                // Check if an action was selected
                 auto* actionSetting = settings.getSettingByName<std::string>(actionKey);
                 if (actionSetting && actionSetting->value != "Choose action") {
                     std::string action = actionSetting->value;
-                    actionSetting->value = "Choose action"; // Reset immediately
+                    actionSetting->value = "Choose action";
 
                     auto currentPrefs = getMapPreferences(selectedGameForPrefs);
                     if (action == "Move Up" && i > 0) {
@@ -391,7 +361,6 @@ void HiveUtils::settingsRender(float settingsOffset)
             }
         }
 
-        // Show available maps that aren't in preferences yet
         extraPadding();
         addHeader("Available Maps");
 
@@ -412,8 +381,106 @@ void HiveUtils::settingsRender(float settingsOffset)
         }
     }
 
+    addHeader("Player Avoider");
+    addToggle("Player Avoider", "Auto-requeue when a blacklisted player joins your server", "playerAvoider");
+    addConditionalTextBox(getOps<bool>("playerAvoider"),
+              "Avoided Players", "Comma-separated IGNs, e.g. Steve,Alex",
+              128, "playerAvoiderList");
+    addConditionalSliderInt(getOps<bool>("playerAvoider"), "Requeue Cooldown (seconds)",
+              "Minimum seconds between auto-requeues", "playerAvoiderCooldown", 30, 1);
+
     FlarialGUI::UnsetScrollView();
     resetPadding();
+}
+
+static std::string playerAvoiderExtractGameId(const std::string& serverName) {
+    std::string lower = serverName;
+    std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
+    size_t end = lower.size();
+    while (end > 0 && std::isdigit(static_cast<unsigned char>(lower[end - 1])))
+        --end;
+    return lower.substr(0, end);
+}
+
+static std::string playerAvoiderGetQueueCommand(const std::string& serverName) {
+    static const std::unordered_map<std::string, std::string> SERVER_TO_QUEUE = {
+        { "sky",         "sky"         },
+        { "sky-duos",    "sky-duos"    },
+        { "sky-squads",  "sky-squads"  },
+        { "sky-mega",    "sky-mega"    },
+        { "sky-kits",    "sky-kits"    },
+        { "sw",          "sky"         },
+        { "sw-duos",     "sky-duos"    },
+        { "sw-squads",   "sky-squads"  },
+        { "sw-mega",     "sky-mega"    },
+        { "wars",        "wars"        },
+        { "wars-duos",   "wars-duos"   },
+        { "wars-trios",  "wars-trios"  },
+        { "wars-squads", "wars-squads" },
+        { "wars-mega",   "wars-mega"   },
+        { "sg",          "sg"          },
+        { "sg-duos",     "sg-duos"     },
+        { "build",       "build"       },
+        { "build-duos",  "build-duos"  },
+        { "build-duosx", "build-duosx" },
+        { "build-speed", "build-speed" },
+        { "bb",          "build"       },
+        { "bb-duos",     "build-duos"  },
+        { "bb-duosx",    "build-duosx" },
+        { "bb-speed",    "build-speed" },
+        { "murder",      "murder"      },
+        { "mm",          "murder"      },
+        { "hide",        "hide"        },
+        { "hns",         "hide"        },
+        { "ctf",         "ctf"         },
+        { "dr",          "dr"          },
+        { "grav",        "grav"        },
+        { "ground",      "ground"      },
+        { "gw",          "ground"      },
+    };
+    std::string gameId = playerAvoiderExtractGameId(serverName);
+    auto it = SERVER_TO_QUEUE.find(gameId);
+    if (it != SERVER_TO_QUEUE.end())
+        return "/q " + it->second;
+    return "";
+}
+
+static std::string playerAvoiderNormaliseIGN(const std::string& ign) {
+    std::string s = ign;
+    std::transform(s.begin(), s.end(), s.begin(), ::tolower);
+    return s;
+}
+
+static std::vector<std::string> playerAvoiderParseIgnList(const std::string& raw) {
+    std::vector<std::string> result;
+    std::string current;
+    for (char c : raw) {
+        if (c == ',' || c == '\n' || c == ';') {
+            std::string trimmed;
+            for (char ch : current)
+                if (!std::isspace(static_cast<unsigned char>(ch)))
+                    trimmed += ch;
+            if (!trimmed.empty())
+                result.push_back(playerAvoiderNormaliseIGN(trimmed));
+            current.clear();
+        } else {
+            current += c;
+        }
+    }
+    std::string trimmed;
+    for (char ch : current)
+        if (!std::isspace(static_cast<unsigned char>(ch)))
+            trimmed += ch;
+    if (!trimmed.empty())
+        result.push_back(playerAvoiderNormaliseIGN(trimmed));
+    return result;
+}
+
+static bool playerAvoiderIsAvoided(const std::string& playerName, const std::vector<std::string>& avoidList) {
+    std::string norm = playerAvoiderNormaliseIGN(playerName);
+    for (const auto& ign : avoidList)
+        if (ign == norm) return true;
+    return false;
 }
 
 void HiveUtils::onPacketReceive(PacketEvent& event)
@@ -421,31 +488,26 @@ void HiveUtils::onPacketReceive(PacketEvent& event)
     if (!this->isEnabled()) return;
     MinecraftPacketIds id = event.getPacket()->getId();
 
-    // Handle auto map vote :3
+
+
     if (id == MinecraftPacketIds::ShowModalForm && getOps<bool>("autoMapVote")) {
-        // Direct cast like ZeqaUtils does - simpler and known to work
         auto* pkt = reinterpret_cast<ModalFormRequestPacket*>(event.getPacket());
 
-        // Try to parse JSON
         if (!nlohmann::json::accept(pkt->mFormJSON)) {
             return;
         }
 
         auto json = nlohmann::json::parse(pkt->mFormJSON);
 
-        // Check title
         if (!json.contains("title") || !json["title"].is_string()) {
             return;
         }
 
         std::string title = json["title"].get<std::string>();
-        // Strip color codes from title before comparing :3
         std::string cleanTitle = String::removeColorCodes(title);
 
-        // Case-insensitive check for "choose map"
         std::string lowerTitle = cleanTitle;
         std::transform(lowerTitle.begin(), lowerTitle.end(), lowerTitle.begin(), ::tolower);
-        // Trim whitespace
         while (!lowerTitle.empty() && std::isspace(lowerTitle.front())) lowerTitle.erase(0, 1);
         while (!lowerTitle.empty() && std::isspace(lowerTitle.back())) lowerTitle.pop_back();
 
@@ -453,7 +515,6 @@ void HiveUtils::onPacketReceive(PacketEvent& event)
             return;
         }
 
-        // Parse buttons
         if (!json.contains("buttons") || !json["buttons"].is_array()) {
             return;
         }
@@ -462,14 +523,11 @@ void HiveUtils::onPacketReceive(PacketEvent& event)
         for (const auto& button : json["buttons"]) {
             if (button.contains("text") && button["text"].is_string()) {
                 std::string buttonText = button["text"].get<std::string>();
-                // Clean up the button text (remove vote counts, etc.)
                 size_t newlinePos = buttonText.find('\n');
                 if (newlinePos != std::string::npos) {
                     buttonText = buttonText.substr(0, newlinePos);
                 }
-                // Remove color codes
                 std::string cleanName = String::removeColorCodes(buttonText);
-                // Trim whitespace
                 while (!cleanName.empty() && std::isspace(cleanName.front())) cleanName.erase(0, 1);
                 while (!cleanName.empty() && std::isspace(cleanName.back())) cleanName.pop_back();
 
@@ -483,7 +541,6 @@ void HiveUtils::onPacketReceive(PacketEvent& event)
             return;
         }
 
-        // Find the best map to vote for
         std::string currentGame = HiveModeCatcherListener::currentGame;
         auto preferredIndex = findPreferredMapIndex(mapNames, currentGame);
 
@@ -491,13 +548,10 @@ void HiveUtils::onPacketReceive(PacketEvent& event)
             int idx = preferredIndex.value();
             std::string votedMap = idx < static_cast<int>(mapNames.size()) ? mapNames[idx] : "Unknown";
 
-            // Send the response
             sendModalResponse(pkt->mFormId, idx);
 
-            // Cancel the modal so it doesn't show
             event.cancel();
 
-            // Notify user
             if (getOps<bool>("autoMapVoteNotify")) {
                 FlarialGUI::Notify("Auto-voted for: " + votedMap);
             }
@@ -513,8 +567,7 @@ void HiveUtils::onPacketReceive(PacketEvent& event)
         {
             if (getOps<bool>("solo"))
             {
-                if ( //pkt->text == "§cYou're a spectator!" || //this brobably isn't needed anymore
-                    pkt->text == "§cYou died!" ||
+                if (pkt->text == "§cYou died!" ||
                     pkt->text == "§7You're spectating the §as§eh§6o§cw§7!")
                 {
                     reQ();
@@ -548,42 +601,33 @@ void HiveUtils::onPacketReceive(PacketEvent& event)
         if (!pktOpt) return;
         auto& pkt = *pktOpt;
 
-        // Announce vote feature :3
-        // Hive sends "§b§l» §rYou voted for MapName" when you vote for a map
         if (getOps<bool>("announceVote")) {
             static const std::string votePrefix = "You voted for ";
-            // Strip color codes to find the message
             std::string cleanMsg;
             for (size_t i = 0; i < pkt.message.size(); i++) {
                 if (pkt.message[i] == '\xC2' && i + 1 < pkt.message.size() && pkt.message[i + 1] == '\xA7') {
-                    i += 2; // Skip §X (UTF-8 encoded)
+                    i += 2;
                 } else if (pkt.message[i] == '\xA7' && i + 1 < pkt.message.size()) {
-                    i += 1; // Skip §X
+                    i += 1;
                 } else {
                     cleanMsg += pkt.message[i];
                 }
             }
-            // Check if message starts with "» You voted for "
             if (cleanMsg.find("\xC2\xBB You voted for ") == 0 || cleanMsg.find("» You voted for ") == 0) {
-                // Extract map name (after "» You voted for ")
                 size_t prefixLen = (cleanMsg.find("» ") == 0) ? 2 : 0;
                 prefixLen += votePrefix.length();
                 if (cleanMsg.length() > prefixLen) {
                     std::string mapName = cleanMsg.substr(prefixLen);
-                    // Trim any trailing whitespace
                     while (!mapName.empty() && std::isspace(mapName.back())) mapName.pop_back();
 
                     if (!mapName.empty()) {
-                        // Get the announcement message template
                         std::string announcement = getOps<std::string>("announceVoteMessage");
-                        // Replace {map} placeholder with actual map name
                         size_t pos = announcement.find("{map}");
                         while (pos != std::string::npos) {
                             announcement.replace(pos, 5, mapName);
                             pos = announcement.find("{map}", pos + mapName.length());
                         }
 
-                        // Send the chat message
                         auto player = SDK::clientInstance->getLocalPlayer();
                         if (player) {
                             std::shared_ptr<Packet> chatPacket = SDK::createPacket(static_cast<int>(MinecraftPacketIds::Text));
@@ -600,11 +644,8 @@ void HiveUtils::onPacketReceive(PacketEvent& event)
         )
         deaths = 0;
 
-        if (getOps<bool>("deathcountenabled") and HiveModeCatcherListener::currentGame
-        ==
-        "DR"
-        and
-        pkt.message == "§c§l» §r§cYou died!"
+        if (getOps<bool>("deathcountenabled") and HiveModeCatcherListener::currentGame == "DR"
+        and pkt.message == "§c§l» §r§cYou died!"
         )
         {
             deaths++;
@@ -617,7 +658,6 @@ void HiveUtils::onPacketReceive(PacketEvent& event)
         }
         if (getOps<bool>("ReQ"))
         {
-            //if(!module->getOps<bool>("solo")) {
             if (pkt.message == "§c§l» §r§c§lGame OVER!")
             {
                 reQ();
@@ -644,10 +684,8 @@ void HiveUtils::onPacketReceive(PacketEvent& event)
             if (getOps<bool>("solo"))
             {
                 if (pkt.message.substr(0, 48) == "§a§l» §r§eYou finished all maps and came in" ||
-                    //gravity
                     pkt.message.substr(0, 30) == "§a§l» §r§eYou finished in")
                 {
-                    //deathrun
                     reQ();
                 }
             }
@@ -710,54 +748,37 @@ void HiveUtils::onPacketReceive(PacketEvent& event)
         }
         if (getOps<bool>("AutoMapAvoider"))
         {
-            // Get current game mode to find avoided maps for this game
             std::string currentGame = HiveModeCatcherListener::currentGame;
             if (!currentGame.empty()) {
-                // Normalize game ID (e.g., "BED-DUOS" -> "bed-duos")
                 std::string gameKey = currentGame;
                 std::transform(gameKey.begin(), gameKey.end(), gameKey.begin(), ::tolower);
 
-                // Get avoided maps for this game
                 auto avoidedMaps = getAvoidedMaps(gameKey);
 
-                // If no avoided maps found and game has no variant suffix, try common variants
-                // (Settings UI uses "bed-solos" format, but server sends "BED" for solo modes)
                 if (avoidedMaps.empty() && gameKey.find('-') == std::string::npos) {
                     avoidedMaps = getAvoidedMaps(gameKey + "-solos");
-                    if (avoidedMaps.empty()) {
-                        avoidedMaps = getAvoidedMaps(gameKey + "-duos");
-                    }
-                    if (avoidedMaps.empty()) {
-                        avoidedMaps = getAvoidedMaps(gameKey + "-squads");
-                    }
+                    if (avoidedMaps.empty()) avoidedMaps = getAvoidedMaps(gameKey + "-duos");
+                    if (avoidedMaps.empty()) avoidedMaps = getAvoidedMaps(gameKey + "-squads");
                 }
 
                 if (!avoidedMaps.empty()) {
-                    // Message format: §b§l» §r§eCitadel §7won with §f0 §7votes!
-                    // We need to check if this is a "won with" message and extract the map name
                     std::string message = pkt.message.data();
                     std::string lowerMessage = message;
                     std::transform(lowerMessage.begin(), lowerMessage.end(), lowerMessage.begin(), ::tolower);
 
-                    // Check if this is a map win message (contains "won with" pattern)
                     if (lowerMessage.find("won with") != std::string::npos) {
-                        // Look for the map name after §r§e and before §7won
-                        // The prefix is "§b§l» §r§e"
                         static const std::string mapWinPrefix = "§b§l» §r§e";
                         size_t mapStart = message.find(mapWinPrefix);
                         if (mapStart != std::string::npos) {
                             std::string afterPrefix = message.substr(mapStart + mapWinPrefix.length());
-                            // Map name ends at the next § (which starts "§7won")
                             size_t endPos = afterPrefix.find("§");
                             std::string winningMap = (endPos != std::string::npos)
                                 ? afterPrefix.substr(0, endPos)
                                 : afterPrefix;
-                            // Trim whitespace
                             while (!winningMap.empty() && std::isspace(winningMap.front())) winningMap.erase(0, 1);
                             while (!winningMap.empty() && std::isspace(winningMap.back())) winningMap.pop_back();
 
                             if (!winningMap.empty()) {
-                                // Check if this map is in our avoided list (case-insensitive)
                                 std::string lowerWinningMap = winningMap;
                                 std::transform(lowerWinningMap.begin(), lowerWinningMap.end(), lowerWinningMap.begin(), ::tolower);
 
@@ -765,7 +786,6 @@ void HiveUtils::onPacketReceive(PacketEvent& event)
                                     std::string lowerAvoided = avoidedMap;
                                     std::transform(lowerAvoided.begin(), lowerAvoided.end(), lowerAvoided.begin(), ::tolower);
 
-                                    // Exact match or partial match (in case of slight name variations)
                                     if (lowerWinningMap == lowerAvoided ||
                                         lowerWinningMap.find(lowerAvoided) != std::string::npos ||
                                         lowerAvoided.find(lowerWinningMap) != std::string::npos) {
@@ -806,6 +826,42 @@ void HiveUtils::onPacketReceive(PacketEvent& event)
                 event.cancel();
             }
         }
+        if (getOps<bool>("playerAvoider"))
+        {
+            std::regex joinPattern("^(.+) joined\\. §8\\[\\d+/\\d+\\]");
+            std::smatch match;
+            std::string msg = pkt.message.data();
+            if (std::regex_search(msg, match, joinPattern) && match.size() > 1)
+            {
+                std::string joinedPlayer = match[1].str();
+                while (!joinedPlayer.empty() && joinedPlayer.back() == ' ') joinedPlayer.pop_back();
+
+                const std::string& raw = getOps<std::string>("playerAvoiderList");
+                auto avoidList = playerAvoiderParseIgnList(raw);
+                if (playerAvoiderIsAvoided(joinedPlayer, avoidList))
+                {
+                    int cooldown = getOps<int>("playerAvoiderCooldown");
+                    auto now = std::chrono::steady_clock::now();
+                    bool onCooldown = playerAvoiderLastRequeueSet &&
+                        std::chrono::duration_cast<std::chrono::seconds>(now - playerAvoiderLastRequeue).count() < cooldown;
+                    if (!onCooldown)
+                    {
+                        std::string currentGame = HiveModeCatcherListener::currentGame;
+                        std::string cmd = playerAvoiderGetQueueCommand(currentGame);
+                        if (cmd.empty()) cmd = "/hub";
+                        FlarialGUI::Notify("Player Avoider: requeuing away from " + joinedPlayer);
+                        std::shared_ptr<Packet> packet = SDK::createPacket(77);
+                        auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
+                        command_packet->command = cmd;
+                        command_packet->origin.type = CommandOriginType::Player;
+                        command_packet->InternalSource = true;
+                        SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
+                        playerAvoiderLastRequeue = now;
+                        playerAvoiderLastRequeueSet = true;
+                    }
+                }
+            }
+        }
         if (getOps<bool>("playermessage"))
         {
             if (pkt.message.contains(" §7§l» §r") && pkt.message.substr(0, 3) == "§7")
@@ -835,13 +891,11 @@ void HiveUtils::onPacketReceive(PacketEvent& event)
                 auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
                 std::string command;
                 command.reserve(64);
-
                 command.append("/f accept \"");
                 command.append(pkt.message.substr(40, pkt.message.length() - 44));
                 command.append("\"");
                 command_packet->command = std::move(command);
                 command_packet->origin.type = CommandOriginType::Player;
-
                 command_packet->InternalSource = true;
                 SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
 
@@ -859,7 +913,6 @@ void HiveUtils::onPacketReceive(PacketEvent& event)
             {
                 std::shared_ptr<Packet> packet = SDK::createPacket(77);
                 auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
-                // command_packet->command = "/p accept \"" + pkt.message.substr(6, pkt.message.length() - 40) + "\"";
                 std::string command;
                 command.reserve(64);
                 command.append("/p accept \"");
@@ -867,7 +920,6 @@ void HiveUtils::onPacketReceive(PacketEvent& event)
                 command.append("\"");
                 command_packet->command = std::move(command);
                 command_packet->origin.type = CommandOriginType::Player;
-
                 command_packet->InternalSource = true;
                 SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
 
@@ -930,8 +982,6 @@ void HiveUtils::onKey(KeyEvent& event)
         reQ();
 }
 
-// Auto Map Vote helper implementations :3
-
 std::optional<std::pair<uint32_t, std::vector<std::string>>> HiveUtils::parseMapVoteModal(const std::string& formJson)
 {
     try {
@@ -941,15 +991,12 @@ std::optional<std::pair<uint32_t, std::vector<std::string>>> HiveUtils::parseMap
 
         auto json = nlohmann::json::parse(formJson);
 
-        // Check if this is a "Choose map" modal
-        // The form should have a title field
         if (!json.contains("title") || !json["title"].is_string()) {
             return std::nullopt;
         }
 
         std::string title = json["title"].get<std::string>();
 
-        // Case-insensitive check for "choose map"
         std::string lowerTitle = title;
         std::transform(lowerTitle.begin(), lowerTitle.end(), lowerTitle.begin(), ::tolower);
 
@@ -957,7 +1004,6 @@ std::optional<std::pair<uint32_t, std::vector<std::string>>> HiveUtils::parseMap
             return std::nullopt;
         }
 
-        // This is a map vote modal! Parse the buttons
         if (!json.contains("buttons") || !json["buttons"].is_array()) {
             return std::nullopt;
         }
@@ -966,24 +1012,20 @@ std::optional<std::pair<uint32_t, std::vector<std::string>>> HiveUtils::parseMap
         for (const auto& button : json["buttons"]) {
             if (button.contains("text") && button["text"].is_string()) {
                 std::string buttonText = button["text"].get<std::string>();
-                // Clean up the button text (remove vote counts, etc.)
-                // Hive buttons might be like "MapName\n§73 votes"
                 size_t newlinePos = buttonText.find('\n');
                 if (newlinePos != std::string::npos) {
                     buttonText = buttonText.substr(0, newlinePos);
                 }
-                // Remove color codes
                 std::string cleanName;
                 for (size_t i = 0; i < buttonText.size(); i++) {
                     if (buttonText[i] == '\xC2' && i + 1 < buttonText.size() && buttonText[i + 1] == '\xA7') {
-                        i += 2; // Skip §X
+                        i += 2;
                     } else if (buttonText[i] == '\xA7' && i + 1 < buttonText.size()) {
-                        i += 1; // Skip §X
+                        i += 1;
                     } else {
                         cleanName += buttonText[i];
                     }
                 }
-                // Trim whitespace
                 while (!cleanName.empty() && std::isspace(cleanName.front())) cleanName.erase(0, 1);
                 while (!cleanName.empty() && std::isspace(cleanName.back())) cleanName.pop_back();
 
@@ -997,8 +1039,6 @@ std::optional<std::pair<uint32_t, std::vector<std::string>>> HiveUtils::parseMap
             return std::nullopt;
         }
 
-        // FormId isn't in the JSON, it's in the packet header
-        // Return 0 as placeholder, caller will use packet's formId
         return std::make_pair(0u, mapNames);
 
     } catch (const std::exception& e) {
@@ -1013,29 +1053,18 @@ std::optional<int> HiveUtils::findPreferredMapIndex(const std::vector<std::strin
         return std::nullopt;
     }
 
-    // Get user preferences for this game+variant
-    // Try exact match first (e.g., "BED-DUOS" or "SKY-SOLOS")
     auto prefs = getMapPreferences(currentGame);
 
-    // If no preferences found and the game has no variant suffix, try common variants
     if (prefs.empty() && currentGame.find('-') == std::string::npos) {
-        // Try solos first (most common)
         prefs = getMapPreferences(currentGame + "-SOLOS");
-
-        // Could also try duos, squads, etc. if needed
-        if (prefs.empty()) {
-            prefs = getMapPreferences(currentGame + "-DUOS");
-        }
-        if (prefs.empty()) {
-            prefs = getMapPreferences(currentGame + "-SQUADS");
-        }
+        if (prefs.empty()) prefs = getMapPreferences(currentGame + "-DUOS");
+        if (prefs.empty()) prefs = getMapPreferences(currentGame + "-SQUADS");
     }
 
     if (prefs.empty()) {
         return std::nullopt;
     }
 
-    // Create lowercase versions for comparison
     std::vector<std::string> lowerModalMaps;
     for (const auto& map : modalMaps) {
         std::string lower = map;
@@ -1043,7 +1072,6 @@ std::optional<int> HiveUtils::findPreferredMapIndex(const std::vector<std::strin
         lowerModalMaps.push_back(lower);
     }
 
-    // Find the highest priority preferred map that's in the modal
     for (const auto& pref : prefs) {
         std::string lowerPref = pref;
         std::transform(lowerPref.begin(), lowerPref.end(), lowerPref.begin(), ::tolower);
@@ -1055,42 +1083,26 @@ std::optional<int> HiveUtils::findPreferredMapIndex(const std::vector<std::strin
         }
     }
 
-    // No preferred map found in the modal options
     return std::nullopt;
 }
 
 void HiveUtils::sendModalResponse(uint32_t formId, int buttonIndex)
 {
-    // Create the response packet
     std::shared_ptr<Packet> packet = SDK::createPacket(static_cast<int>(MinecraftPacketIds::ModalFormResponse));
     if (!packet) {
         return;
     }
 
-    // PayloadPacket memory layout (from LeviLamina):
-    // Packet base class: 0x00-0x2F (48 bytes, sizeof(Packet) == 0x30)
-    // Payload starts at 0x30:
-    //   mFormId: 0x30 (uint32_t, 4 bytes)
-    //   padding: 0x34 (4 bytes for 8-byte alignment)
-    //   mJSONResponse: 0x38 (std::optional<Json::Value>, 24 bytes)
-    //   mFormCancelReason: 0x50 (std::optional<ModalFormCancelReason>, 2 bytes)
-
     uint8_t* pktData = reinterpret_cast<uint8_t*>(packet.get());
 
-    // Zero out the payload area first to ensure clean state
     memset(pktData + 0x30, 0, 0x24);
 
-    // Set mFormId at offset 0x30
     *reinterpret_cast<uint32_t*>(pktData + 0x30) = formId;
 
-    // Set mJSONResponse (std::optional<Json::Value>) starting at 0x38
-    *reinterpret_cast<int64_t*>(pktData + 0x38) = static_cast<int64_t>(buttonIndex);  // mValue.mInt
-    *reinterpret_cast<int32_t*>(pktData + 0x40) = static_cast<int32_t>(MinecraftJson::ValueType::Int);  // mType
-    *reinterpret_cast<uint8_t*>(pktData + 0x48) = 1;  // has_value = true
+    *reinterpret_cast<int64_t*>(pktData + 0x38) = static_cast<int64_t>(buttonIndex);
+    *reinterpret_cast<int32_t*>(pktData + 0x40) = static_cast<int32_t>(MinecraftJson::ValueType::Int);
+    *reinterpret_cast<uint8_t*>(pktData + 0x48) = 1;
 
-    // mFormCancelReason at 0x50 stays nullopt (zeroed = has_value false)
-
-    // Send it
     if (SDK::clientInstance && SDK::clientInstance->getPacketSender()) {
         SDK::clientInstance->getPacketSender()->sendToServer(packet.get());
     }
@@ -1098,24 +1110,18 @@ void HiveUtils::sendModalResponse(uint32_t formId, int buttonIndex)
 
 void HiveUtils::refreshMapsForGame(const std::string& gameId)
 {
-    // Store the full gameId (with variant) for cache lookup
     lastFetchedGame = gameId;
 
-    // Extract base game and variant from gameId (e.g., "bed-duos" -> "bed", "DUOS")
     std::string apiGameId = HiveMaps::gameIdToApiFormat(gameId);
     std::string variant = HiveMaps::extractVariant(gameId);
 
-    // Get cached maps immediately (non-blocking)
     auto allMaps = HiveMaps::getMapsFromCacheOnly(apiGameId);
 
-    // Trigger async refresh in background
     HiveMaps::refreshMapsAsync(apiGameId);
 
-    // Filter maps by variant and deduplicate :3
     std::set<std::string> seenNames;
     std::vector<HiveMaps::MapInfo> filteredMaps;
     for (const auto& map : allMaps) {
-        // Check if map matches the selected variant
         if (!HiveMaps::mapMatchesVariant(map, variant)) {
             continue;
         }
@@ -1134,7 +1140,6 @@ void HiveUtils::refreshMapsForGame(const std::string& gameId)
 
 void HiveUtils::updatePrefsMapsFromCache(const std::string& gameId)
 {
-    // Only update local maps from cache - do NOT trigger a new async refresh
     std::string apiGameId = HiveMaps::gameIdToApiFormat(gameId);
     std::string variant = HiveMaps::extractVariant(gameId);
 
@@ -1159,7 +1164,6 @@ void HiveUtils::updatePrefsMapsFromCache(const std::string& gameId)
 
 std::vector<std::string> HiveUtils::getMapPreferences(const std::string& gameId)
 {
-    // Use gameId directly (with variant preserved) - getMapPrefsKey handles normalization
     std::string key = getMapPrefsKey(gameId);
 
     auto* setting = settings.getSettingByName<std::string>(key);
@@ -1167,12 +1171,10 @@ std::vector<std::string> HiveUtils::getMapPreferences(const std::string& gameId)
         return {};
     }
 
-    // Parse comma-separated list
     std::vector<std::string> result;
     std::stringstream ss(setting->value);
     std::string item;
     while (std::getline(ss, item, ',')) {
-        // Trim whitespace
         while (!item.empty() && std::isspace(item.front())) item.erase(0, 1);
         while (!item.empty() && std::isspace(item.back())) item.pop_back();
         if (!item.empty()) {
@@ -1185,17 +1187,14 @@ std::vector<std::string> HiveUtils::getMapPreferences(const std::string& gameId)
 
 void HiveUtils::setMapPreferences(const std::string& gameId, const std::vector<std::string>& maps)
 {
-    // Use gameId directly (with variant preserved) - getMapPrefsKey handles normalization
     std::string key = getMapPrefsKey(gameId);
 
-    // Join with commas
     std::string value;
     for (size_t i = 0; i < maps.size(); i++) {
         if (i > 0) value += ",";
         value += maps[i];
     }
 
-    // Update the setting
     auto* setting = settings.getSettingByName<std::string>(key);
     if (setting) {
         setting->value = value;
@@ -1222,8 +1221,6 @@ void HiveUtils::moveMapPreference(const std::string& gameId, int fromIndex, int 
     setMapPreferences(gameId, prefs);
 }
 
-// Map avoider helper implementations
-
 void HiveUtils::refreshMapsForAvoider(const std::string& gameId)
 {
     lastFetchedAvoiderGame = gameId;
@@ -1231,10 +1228,8 @@ void HiveUtils::refreshMapsForAvoider(const std::string& gameId)
     std::string apiGameId = HiveMaps::gameIdToApiFormat(gameId);
     std::string variant = HiveMaps::extractVariant(gameId);
 
-    // Get cached maps immediately (non-blocking)
     auto allMaps = HiveMaps::getMapsFromCacheOnly(apiGameId);
 
-    // Trigger async refresh in background
     HiveMaps::refreshMapsAsync(apiGameId);
 
     std::set<std::string> seenNames;
@@ -1256,7 +1251,6 @@ void HiveUtils::refreshMapsForAvoider(const std::string& gameId)
 
 void HiveUtils::updateAvoiderMapsFromCache(const std::string& gameId)
 {
-    // Only update local maps from cache - do NOT trigger a new async refresh
     std::string apiGameId = HiveMaps::gameIdToApiFormat(gameId);
     std::string variant = HiveMaps::extractVariant(gameId);
 
@@ -1326,7 +1320,6 @@ void HiveUtils::addAvoidedMap(const std::string& gameId, const std::string& mapN
 {
     auto avoided = getAvoidedMaps(gameId);
 
-    // Check if already in list (case-insensitive)
     std::string lowerNewMap = mapName;
     std::transform(lowerNewMap.begin(), lowerNewMap.end(), lowerNewMap.begin(), ::tolower);
 
@@ -1334,7 +1327,7 @@ void HiveUtils::addAvoidedMap(const std::string& gameId, const std::string& mapN
         std::string lowerExisting = existing;
         std::transform(lowerExisting.begin(), lowerExisting.end(), lowerExisting.begin(), ::tolower);
         if (lowerExisting == lowerNewMap) {
-            return; // Already in list
+            return;
         }
     }
 
