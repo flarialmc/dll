@@ -1,5 +1,15 @@
 #include "Hitbox.hpp"
 
+namespace {
+    D2D_COLOR_F lerpColor(D2D_COLOR_F a, D2D_COLOR_F b, float t) {
+        t = t < 0.f ? 0.f : (t > 1.f ? 1.f : t);
+        return { a.r + (b.r - a.r) * t,
+                 a.g + (b.g - a.g) * t,
+                 a.b + (b.b - a.b) * t,
+                 a.a + (b.a - a.a) * t };
+    }
+}
+
 void Hitbox::onEnable() {
     Listen(this, KeyEvent, &Hitbox::onKey)
     Listen(this, SetupAndRenderEvent, &Hitbox::onSetupAndRender)
@@ -18,14 +28,11 @@ void Hitbox::onDisable() {
 
 void Hitbox::defaultConfig() {
     settings.renameSetting("color", "colorOpacity", "color_rgb", "hitbox");
-
     getKeybind();
-
     Module::defaultConfig("core");
-    // Java Edition default colors
-    setDef("hitbox", (std::string)"FFFFFF", 1.0f, false);      // White
-    setDef("eyeLineColor", (std::string)"FF0000", 1.0f, false); // Red
-    setDef("lookLineColor", (std::string)"0000FF", 1.0f, false); // Blue
+    setDef("hitbox", (std::string)"FFFFFF", 1.0f, false);
+    setDef("eyeLineColor", (std::string)"FF0000", 1.0f, false);
+    setDef("lookLineColor", (std::string)"0000FF", 1.0f, false);
     setDef("thickness", 1.1f);
     setDef("staticThickness", false);
     setDef("outline", false);
@@ -34,24 +41,19 @@ void Hitbox::defaultConfig() {
     setDef("lookLineLength", 2.0f);
     setDef("showSelf", true);
     setDef("hitboxOpacity", 1.0f);
-
     setDef("toggle", true);
 }
 
 void Hitbox::settingsRender(float settingsOffset) {
-
     initSettingsPage();
-
     addToggle("Toggle (Java-like behaviour)", "", "toggle");
     addKeybind("Keybind", "", "keybind", true);
     extraPadding();
-
     addToggle("2D Mode", "You get 2D rectangles instead of cuboids.", "outline");
     addToggle("Static Thickness", "Keeps line thickness constant regardless of distance.", "staticThickness");
     addSlider("Thickness", "Pretty much self-explanatory.", "thickness", 5.0f, 0.1f, false);
     addSlider("Opacity", "Adjust how transparent or opaque the hitbox is.", "hitboxOpacity", 1.0f, 0.0f, false);
     extraPadding();
-
     addHeader("Java Edition Features");
     addToggle("Eye Line", "Shows a rectangle at eye level", "eyeLine");
     addToggle("Look Direction", "Shows a line indicating where the entity is looking", "lookLine");
@@ -60,16 +62,12 @@ void Hitbox::settingsRender(float settingsOffset) {
     addToggle("Toggle Keybind", "Also self-explanatory. Press the bind to toggle.", "toggle");
     addConditionalKeybind(getOps<bool>("toggle"), "Keybind", "", "keybind", true);
     extraPadding();
-
     addHeader("Colors");
     addColorPicker("Hitbox", "", "hitbox");
     addColorPicker("Eye Line", "", "eyeLineColor");
     addColorPicker("Look Direction", "", "lookLineColor");
-
     FlarialGUI::UnsetScrollView();
-
     resetPadding();
-
 }
 
 void Hitbox::onKey(KeyEvent &event) {
@@ -108,15 +106,12 @@ void Hitbox::onSetupAndRender(SetupAndRenderEvent &event) {
 
         Vec2<float> rotation(0.f, 0.f);
         auto rotComp = ent->getActorRotationComponent();
-        if (rotComp) {
-            rotation = rotComp->rot;
-        }
+        if (rotComp) rotation = rotComp->rot;
 
         AABBInfo info = { aabb, hitbox, isSelected, eyePos, rotation };
         aabbsToRender.emplace_back(info);
     };
 
-    // Add local player hitbox when in third person (Java Edition behavior)
     if (showSelf && isThirdPerson) {
         if (player->isValid() && player->isValidAABB()) {
             addEntityInfo(player, false);
@@ -126,20 +121,14 @@ void Hitbox::onSetupAndRender(SetupAndRenderEvent &event) {
     for (const auto& ent : actorList) {
         if (!ent) continue;
         if (ent == player) continue;
-
         auto pos = ent->getPosition();
         if (!pos) continue;
-
         if (!ent->hasCategory(ActorCategory::Mob)) continue;
         if (!ent->isValidAABB()) continue;
-
         float dist = player->getPosition()->dist(*pos);
         if (dist > 30) continue;
-
         if (ent->getActorFlag(ActorFlags::FLAG_INVISIBLE)) continue;
-
         if (!player->canSee(*ent)) continue;
-
         addEntityInfo(ent, selectedEntity == ent);
     }
 }
@@ -160,51 +149,56 @@ void Hitbox::onRender(RenderEvent &event) {
         std::lock_guard<std::mutex> guard(renderMtx);
 
         for (const auto& aabbInfo : aabbsToRender) {
-            float thickness = getOps<float>("thickness");
+            float thickness      = getOps<float>("thickness");
             bool staticThickness = getOps<bool>("staticThickness");
-            bool outline = getOps<bool>("outline");
-            bool showEyeLine = getOps<bool>("eyeLine");
-            bool showLookLine = getOps<bool>("lookLine");
+            bool outline         = getOps<bool>("outline");
+            bool showEyeLine     = getOps<bool>("eyeLine");
+            bool showLookLine    = getOps<bool>("lookLine");
 
+            float distance = player->getRenderPositionComponent()->renderPos.dist(aabbInfo.aabb.lower);
             float lineWidth = thickness;
 
             if (!staticThickness) {
-                float distance = player->getRenderPositionComponent()->renderPos.dist(aabbInfo.aabb.lower);
                 float scaleFactor = 1.f - (distance / 30.0f);
                 lineWidth = thickness * scaleFactor;
             }
 
             D2D_COLOR_F hitboxColor = getColor("hitbox");
             hitboxColor.a *= getOps<float>("hitboxOpacity");
-            DrawUtils::addBox(aabbInfo.aabb.lower, aabbInfo.aabb.upper, staticThickness ? thickness : lineWidth, outline ? 2 : 1, hitboxColor);
 
-            // Draw eye height indicator (4 lines forming rectangle at eye level) - Java Edition style
-            if (showEyeLine) {
-                float minX = aabbInfo.aabb.lower.x;
-                float maxX = aabbInfo.aabb.upper.x;
-                float minZ = aabbInfo.aabb.lower.z;
-                float maxZ = aabbInfo.aabb.upper.z;
-                float eyeY = aabbInfo.eyePos.y;
-
-                D2D_COLOR_F eyeColor = getColor("eyeLineColor");
-
-                DrawUtils::addLine3D(Vec3<float>(minX, eyeY, minZ), Vec3<float>(maxX, eyeY, minZ), staticThickness ? thickness : lineWidth, eyeColor);
-                DrawUtils::addLine3D(Vec3<float>(maxX, eyeY, minZ), Vec3<float>(maxX, eyeY, maxZ), staticThickness ? thickness : lineWidth, eyeColor);
-                DrawUtils::addLine3D(Vec3<float>(maxX, eyeY, maxZ), Vec3<float>(minX, eyeY, maxZ), staticThickness ? thickness : lineWidth, eyeColor);
-                DrawUtils::addLine3D(Vec3<float>(minX, eyeY, maxZ), Vec3<float>(minX, eyeY, minZ), staticThickness ? thickness : lineWidth, eyeColor);
+            constexpr float DANGER_DIST = 3.0f;
+            if (distance <= DANGER_DIST) {
+                float t = 1.f - (distance / DANGER_DIST);
+                D2D_COLOR_F dangerColor = { 1.f, 0.f, 0.f, hitboxColor.a };
+                hitboxColor = lerpColor(hitboxColor, dangerColor, t);
             }
 
-            // Draw look direction line (blue line from eye position) - Java Edition style
+            DrawUtils::addBox(aabbInfo.aabb.lower, aabbInfo.aabb.upper,
+                              staticThickness ? thickness : lineWidth,
+                              outline ? 2 : 1, hitboxColor);
+
+            if (showEyeLine) {
+                float minX = aabbInfo.aabb.lower.x, maxX = aabbInfo.aabb.upper.x;
+                float minZ = aabbInfo.aabb.lower.z, maxZ = aabbInfo.aabb.upper.z;
+                float eyeY = aabbInfo.eyePos.y;
+                D2D_COLOR_F eyeColor = getColor("eyeLineColor");
+
+                DrawUtils::addLine3D({minX, eyeY, minZ}, {maxX, eyeY, minZ}, staticThickness ? thickness : lineWidth, eyeColor);
+                DrawUtils::addLine3D({maxX, eyeY, minZ}, {maxX, eyeY, maxZ}, staticThickness ? thickness : lineWidth, eyeColor);
+                DrawUtils::addLine3D({maxX, eyeY, maxZ}, {minX, eyeY, maxZ}, staticThickness ? thickness : lineWidth, eyeColor);
+                DrawUtils::addLine3D({minX, eyeY, maxZ}, {minX, eyeY, minZ}, staticThickness ? thickness : lineWidth, eyeColor);
+            }
+
             if (showLookLine) {
                 static constexpr float PI = 3.1415927f;
                 static constexpr float DEG_TO_RAD = PI / 180.0f;
 
-                float yawRad = aabbInfo.rotation.y * DEG_TO_RAD;
+                float yawRad   = aabbInfo.rotation.y * DEG_TO_RAD;
                 float pitchRad = aabbInfo.rotation.x * DEG_TO_RAD;
 
                 float dx = -sinf(yawRad) * cosf(pitchRad);
                 float dy = -sinf(pitchRad);
-                float dz = cosf(yawRad) * cosf(pitchRad);
+                float dz =  cosf(yawRad) * cosf(pitchRad);
 
                 float lineLength = getOps<float>("lookLineLength");
                 Vec3<float> lookEnd(
