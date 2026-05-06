@@ -2,6 +2,7 @@
 
 #include "AvgPixelMotionBlurHelper.hpp"
 #include "RealMotionBlurHelper.hpp"
+#include "VelocityBlurHelper.hpp"
 #include "../Module.hpp"
 #include "Events/Render/RenderUnderUIEvent.hpp"
 #include "Events/Render/RenderEvent.hpp"
@@ -12,12 +13,12 @@
 class MotionBlur : public Module {
 public:
 	static inline bool initted = false;
+	static inline bool velocityBlurInitialized = false;
 
 	MotionBlur(): Module("Motion Blur",
 		 "Make fast movements appear smoother and more realistic by\nblurring the image slightly in the direction of motion.",
 		 IDR_BLUR_PNG, "")
 	{
-		//this->setup();
 
 	}
 
@@ -32,7 +33,7 @@ public:
 	void settingsRender(float settingsOffset) override;
 
 	static inline std::vector<winrt::com_ptr<ID3D11ShaderResourceView>> previousFrames;
-	static inline std::vector<float> frameTimestamps;  // Capture timestamps for time-aware blur
+	static inline std::vector<float> frameTimestamps;
 
 	void onRender(RenderUnderUIEvent& event);
 
