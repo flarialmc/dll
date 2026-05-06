@@ -133,6 +133,7 @@
 #include "Modules/PitchDisplay/PitchDisplay.hpp"
 #include "Modules/ExperienceInfo/ExperienceInfo.hpp"
 #include "Modules/DurabilityWarning/DurabilityWarning.hpp"
+#include "Modules/FastOffHand/FastOffHand.hpp"
 // #include "Modules/PanoramaShader/PanoramaShader.hpp"  // Uses CubemapBackgroundScreenRenderHook (render thread safe)
 
 #ifdef COMPILE_DOOM
@@ -316,6 +317,7 @@ void ModuleManager::initialize() {
 	addModule<MessageLogger>();
 	}
 	addModule<TotemCounter>();
+	addModule<FastOffHand>();
 	addModule<ItemCounter>();
 	addModule<BetterHungerBar>();
 	addModule<ParticleMultiplier>();
