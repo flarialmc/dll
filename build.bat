@@ -2,7 +2,7 @@
 setlocal EnableDelayedExpansion
 
 :: Build script for Flarial project
-:: Usage: build.bat [R|D] where R=Release, D=Debug
+:: Usage: build.bat [R|D|A] where R=Release, D=Debug, A=ARM64-Release
 
 if %username%==Leslie (
     echo Hi...! If you see this, the user does not want you to build. If you try to work around this she will be sad :(
@@ -19,6 +19,7 @@ echo.
 set "CONFIG_FILE=%~dp0build.config"
 set "BUILD_TOOLS=CLION"
 set "CLION_PATH=C:\Program Files\JetBrains\CLion 2025.3.1"
+set "BUILD_ARCH=x64"
 
 if exist "%CONFIG_FILE%" (
     echo Loading configuration from build.config...
@@ -27,6 +28,7 @@ if exist "%CONFIG_FILE%" (
         if not "!line:~0,2!"=="::" (
             if "%%a"=="BUILD_TOOLS" set "BUILD_TOOLS=%%b"
             if "%%a"=="CLION_PATH" set "CLION_PATH=%%b"
+            if "%%a"=="BUILD_ARCH" set "BUILD_ARCH=%%b"
         )
     )
 ) else (
@@ -34,6 +36,7 @@ if exist "%CONFIG_FILE%" (
 )
 
 echo Build tools: %BUILD_TOOLS%
+echo Build arch:  %BUILD_ARCH%
 echo.
 
 :: Get build type from user input
@@ -42,34 +45,40 @@ if "%1"=="R" set BUILD_TYPE=Release
 if "%1"=="r" set BUILD_TYPE=Release
 if "%1"=="D" set BUILD_TYPE=Debug
 if "%1"=="d" set BUILD_TYPE=Debug
+if "%1"=="A" set BUILD_TYPE=Release& set BUILD_ARCH=arm64
+if "%1"=="a" set BUILD_TYPE=Release& set BUILD_ARCH=arm64
 
 :: If no argument provided, ask user
 if "%BUILD_TYPE%"=="" (
     echo Please select build type:
-    echo   [R] Release
-    echo   [D] Debug
+    echo   [R] x64 Release
+    echo   [D] x64 Debug
+    echo   [A] ARM64 Release
     echo.
-    set /p choice="Enter your choice (R/D): "
+    set /p choice="Enter your choice (R/D/A): "
     if "!choice!"=="R" set BUILD_TYPE=Release
     if "!choice!"=="r" set BUILD_TYPE=Release
     if "!choice!"=="D" set BUILD_TYPE=Debug
     if "!choice!"=="d" set BUILD_TYPE=Debug
+    if "!choice!"=="A" set BUILD_TYPE=Release& set BUILD_ARCH=arm64
+    if "!choice!"=="a" set BUILD_TYPE=Release& set BUILD_ARCH=arm64
 )
 
 :: Validate build type
 if "%BUILD_TYPE%"=="" (
     echo ERROR: Invalid build type selected!
-    echo Please use R for Release or D for Debug
+    echo Please use R for Release, D for Debug, or A for ARM64 Release
     pause
     exit /b 1
 )
 
 echo Selected build type: %BUILD_TYPE%
+echo Selected architecture: %BUILD_ARCH%
 echo.
 
 :: Set build directory (CLion style)
-set BUILD_DIR=cmake-build-debug-ninja
-if "%BUILD_TYPE%"=="Release" set BUILD_DIR=cmake-build-release-ninja
+set BUILD_DIR=cmake-build-%BUILD_ARCH%-debug-ninja
+if "%BUILD_TYPE%"=="Release" set BUILD_DIR=cmake-build-%BUILD_ARCH%-release-ninja
 
 echo Build directory: %BUILD_DIR%
 echo.
@@ -84,8 +93,13 @@ exit /b 1
 
 :setup_clion
 echo Setting up CLion bundled tools...
-set "CLION_CMAKE=%CLION_PATH%\bin\cmake\win\x64\bin"
-set "CLION_NINJA=%CLION_PATH%\bin\ninja\win\x64"
+if "%BUILD_ARCH%"=="arm64" (
+    set "CLION_CMAKE=%CLION_PATH%\bin\cmake\win\arm64\bin"
+    set "CLION_NINJA=%CLION_PATH%\bin\ninja\win\arm64"
+) else (
+    set "CLION_CMAKE=%CLION_PATH%\bin\cmake\win\x64\bin"
+    set "CLION_NINJA=%CLION_PATH%\bin\ninja\win\x64"
+)
 
 if not exist "%CLION_PATH%" (
     echo ERROR: CLion not found at: %CLION_PATH%
@@ -199,8 +213,8 @@ exit /b 1
 
 :found_msvc
 echo Found Visual Studio at: %VCVARSALL_PATH%
-echo Initializing MSVC x64 environment...
-call "%VCVARSALL_PATH%" x64 >nul 2>&1
+echo Initializing MSVC %BUILD_ARCH% environment...
+call "%VCVARSALL_PATH%" %BUILD_ARCH% >nul 2>&1
 if errorlevel 1 (
     echo ERROR: Failed to initialize MSVC environment!
     pause
@@ -282,6 +296,7 @@ echo              Build Completed Successfully!
 echo ===============================================
 echo.
 echo Build type: %BUILD_TYPE%
+echo Build arch:  %BUILD_ARCH%
 echo Build tools: %BUILD_TOOLS%
 echo Output directory: %BUILD_DIR%
 echo Binary location: %BUILD_DIR%\Flarial.dll

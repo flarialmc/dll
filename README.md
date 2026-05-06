@@ -14,7 +14,8 @@ Everything mentioned here can and will change in the future.
 
 ## Supported Platforms
 
-- **Operating System:** Windows 10/11 (64-bit processors only)
+- **Operating System:** Windows 10/11 (x64 and ARM64 processors)
+- **Architecture:** Native x64 and ARM64 builds supported
 - **Minecraft Version:** Compatible with MCBE versions 1.20 and above.
 
 ## Troubleshooting
@@ -35,6 +36,14 @@ If you encounter issues, check out our [FAQ](https://discord.gg/flarial-communit
 
 Method 1 - You can open this project in CLion or Visual Studio, and make sure to use the MSVC toolchain, preferably combined with Ninja. If you don't know what any of this means, please do some research on this matter.
 Method 2 - You can use **build.bat** file as well.
+
+### Build Types
+
+| Command | Architecture | Configuration |
+|---------|-------------|---------------|
+| `build.bat R` | x64 | Release |
+| `build.bat D` | x64 | Debug |
+| `build.bat A` | ARM64 | Release |
 
 By following these steps, you should be able to clone and build the project using CMake successfully.
 
