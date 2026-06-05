@@ -2,7 +2,8 @@
 
 #include "../Module.hpp"
 #include "../../../Client.hpp"
-
+#include "Events/Render/RenderEvent.hpp"
+#include "Events/Render/RenderUnderUIEvent.hpp"
 
 #include "Assets/Assets.hpp"
 
@@ -24,5 +25,11 @@ public:
 	void settingsRender(float settingsOffset) override;
 
 	void onGetFOV(FOVEvent& event);
-};
 
+	void onRender(RenderEvent& event);
+
+	void onRenderUnderUI(RenderUnderUIEvent& event);
+
+private:
+	void renderPanini(ID3D11RenderTargetView* rtv);
+};

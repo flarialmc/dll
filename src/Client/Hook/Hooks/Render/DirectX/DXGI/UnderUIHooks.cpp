@@ -101,12 +101,10 @@ void UnderUIHooks::ClearDepthStencilViewCallbackDX12(
         UINT                        NumRects,
         const D3D12_RECT            *pRects) {
 
-
     index++;
 
-    if (ClearFlags == D3D12_CLEAR_FLAG_DEPTH && SwapchainHook::init){
+    if (ClearFlags == D3D12_CLEAR_FLAG_DEPTH && SwapchainHook::init) {
         savedpDethStencilView = pDepthStencilView;
-        SwapchainHook::DX12Render(true);
     }
     funcOriginalDX12(cmdList, pDepthStencilView, ClearFlags, Depth, Stencil, NumRects, pRects);
 
@@ -201,17 +199,11 @@ void UnderUIHooks::enableHook() {
 
     } else {
 
-        /* DX12 */
-
-        /*
-        void** vtable = *reinterpret_cast<void***>(SwapchainHook::DX12CommandLists);
-        const size_t INDEX_CLEAR_DEPTH_STENCIL_VIEW = 47;
-        Memory::hookFunc(
-            vtable[INDEX_CLEAR_DEPTH_STENCIL_VIEW],
-            ClearDepthStencilViewCallbackDX12,
-            (void**)&funcOriginalDX12,
-            "ClearDepthStencilViewDX12"
-        );*/
+        /* DX12 — ClearDepthStencilView hook is not viable mid-frame on DX12.
+         * D3D11On12 AcquireWrappedResources + ReleaseWrappedResources transitions
+         * the backbuffer state, and restoring it requires fence waits that stall
+         * the GPU pipeline and risk heap corruption on resize/fullscreen.
+         * RenderUnderUIEvent is DX11-only; DX12 modules fall back to RenderEvent. */
 
         /* DX12 */
 
